@@ -1,0 +1,25 @@
+.dh-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dh-space-1);
+  padding: var(--dh-space-6) var(--dh-space-4);
+  text-align: center;
+}
+
+.dh-empty__title {
+  margin: 0;
+  font-size: var(--dh-text-md);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-empty__description {
+  margin: 0;
+  max-width: 260px;
+  font-size: var(--dh-text-sm);
+  color: var(--dh-color-muted);
+}
+
+.dh-empty--error .dh-empty__title {
+  color: var(--dh-color-danger);
+}

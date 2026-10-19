@@ -1,0 +1,56 @@
+.dh-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dh-space-1);
+  height: 28px;
+  padding: 0 var(--dh-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--dh-radius-sm);
+  font: inherit;
+  font-size: var(--dh-text-sm);
+  font-weight: var(--dh-weight-bold);
+  cursor: pointer;
+  transition:
+    background-color var(--dh-duration),
+    border-color var(--dh-duration);
+}
+
+.dh-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dh-button--primary {
+  background: var(--dh-color-accent);
+  color: var(--dh-color-on-accent);
+}
+
+.dh-button--primary:hover:not(:disabled) {
+  background: var(--dh-color-accent-hover);
+}
+
+.dh-button--secondary {
+  background: var(--dh-color-bg);
+  border-color: var(--dh-color-border);
+  color: var(--dh-color-text);
+}
+
+.dh-button--secondary:hover:not(:disabled) {
+  background: var(--dh-color-bg-hover);
+}
+
+.dh-button--ghost {
+  background: transparent;
+  color: var(--dh-color-muted);
+}
+
+.dh-button--ghost:hover:not(:disabled) {
+  background: var(--dh-color-bg-hover);
+  color: var(--dh-color-text);
+}
+
+.dh-button--icon {
+  width: 28px;
+  padding: 0;
+}

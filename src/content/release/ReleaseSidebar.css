@@ -1,0 +1,18 @@
+.dh-sidebar {
+  position: fixed;
+  top: 96px;
+  right: var(--dh-space-4);
+  z-index: var(--dh-z-panel);
+  width: 320px;
+  max-height: calc(100vh - 128px);
+}
+
+.dh-sidebar__toggle {
+  position: fixed;
+  top: 96px;
+  right: 0;
+  z-index: var(--dh-z-panel);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: var(--dh-shadow-panel);
+}

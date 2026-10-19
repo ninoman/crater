@@ -1,0 +1,24 @@
+.dh-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dh-space-1);
+}
+
+.dh-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-color-subtle);
+}
+
+.dh-status--ok .dh-status__dot {
+  background: var(--dh-color-success);
+}
+
+.dh-status--warning .dh-status__dot {
+  background: var(--dh-color-warning);
+}
+
+.dh-status--error .dh-status__dot {
+  background: var(--dh-color-danger);
+}

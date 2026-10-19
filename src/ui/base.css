@@ -1,0 +1,29 @@
+/* Baseline for our own roots (shadow roots and the popup), so pages can't change how we render. */
+.dh-root {
+  all: initial;
+  display: block;
+  font-family: var(--dh-font);
+  font-size: var(--dh-text-md);
+  line-height: var(--dh-leading);
+  color: var(--dh-color-text);
+}
+
+.dh-root *,
+.dh-root *::before,
+.dh-root *::after {
+  box-sizing: border-box;
+}
+
+.dh-root :focus-visible {
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: 1px;
+}
+
+.dh-root a {
+  color: var(--dh-color-accent);
+  text-decoration: none;
+}
+
+.dh-root a:hover {
+  text-decoration: underline;
+}

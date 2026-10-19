@@ -1,0 +1,44 @@
+/* Design tokens. Components use these variables only, never raw values.
+   Tuned to sit comfortably next to Bandcamp's own UI. */
+:root,
+:host {
+  --dh-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --dh-text-xs: 11px;
+  --dh-text-sm: 12px;
+  --dh-text-md: 14px;
+  --dh-text-lg: 16px;
+  --dh-weight-regular: 400;
+  --dh-weight-bold: 600;
+  --dh-leading: 1.4;
+
+  --dh-color-text: #333333;
+  --dh-color-muted: #777777;
+  --dh-color-subtle: #a0a0a0;
+  --dh-color-border: #e2e2e2;
+  --dh-color-bg: #ffffff;
+  --dh-color-bg-subtle: #f6f6f6;
+  --dh-color-bg-hover: #efefef;
+  --dh-color-accent: #1da0c3;
+  --dh-color-accent-hover: #1689a8;
+  --dh-color-on-accent: #ffffff;
+  --dh-color-success: #3b9a5b;
+  --dh-color-warning: #c98a1b;
+  --dh-color-danger: #c4473a;
+  --dh-color-focus: rgba(29, 160, 195, 0.45);
+
+  --dh-space-1: 4px;
+  --dh-space-2: 8px;
+  --dh-space-3: 12px;
+  --dh-space-4: 16px;
+  --dh-space-5: 24px;
+  --dh-space-6: 32px;
+
+  --dh-radius-sm: 3px;
+  --dh-radius-md: 6px;
+  --dh-radius-pill: 999px;
+
+  --dh-shadow-panel: 0 4px 18px rgba(0, 0, 0, 0.12);
+  --dh-duration: 120ms;
+
+  --dh-z-panel: 2147483000;
+}

@@ -1,0 +1,8 @@
+dist/
+tests/fixtures/
+package-lock.json
+spikes/
+scripts/
+ROADMAP.md
+docs/
+CLAUDE.md

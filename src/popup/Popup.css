@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+}
+
+.dh-popup {
+  width: 320px;
+}
+
+.dh-popup__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--dh-space-3) var(--dh-space-4);
+  border-bottom: 1px solid var(--dh-color-border);
+}
+
+.dh-popup__title {
+  margin: 0;
+  font-size: var(--dh-text-lg);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-popup__status {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}

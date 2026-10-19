@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Dighead cookie spike",
+  "version": "0.0.1",
+  "description": "Phase 0 spike: does a service-worker fetch to bandcamp.com carry the user's session cookies?",
+  "host_permissions": ["https://*.bandcamp.com/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["https://bandcamp.com/*", "https://*.bandcamp.com/*"], "js": ["check.js", "content.js"] }
+  ],
+  "action": { "default_popup": "popup.html", "default_title": "Cookie spike" }
+}
