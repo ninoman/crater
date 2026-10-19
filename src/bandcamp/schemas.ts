@@ -18,6 +18,8 @@ export const rawCollectionItem = z.object({
   item_url: z.string(),
   purchased: z.string().nullish(),
   added: z.string().nullish(),
+  /** This item's position in the list, usable as older_than_token for the next page. */
+  token: z.string().nullish(),
 });
 export type RawCollectionItem = z.infer<typeof rawCollectionItem>;
 

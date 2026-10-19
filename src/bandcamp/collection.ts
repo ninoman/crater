@@ -38,7 +38,9 @@ export function parseCollectionPage(json: unknown, source = 'collection_items'):
   return {
     items: toCollectionItems(data.items),
     moreAvailable: data.more_available,
-    lastToken: data.last_token,
+    // last_token points at the 20th item whatever `count` was, so with bigger batches it would
+    // re-fetch most of the page. Continue from the last item's own token instead.
+    nextToken: data.items.at(-1)?.token ?? data.last_token,
   };
 }
 
@@ -69,7 +71,7 @@ export async function* collectionPages(
     const page = parseCollectionPage(json, source);
     yield page;
     // A repeated token would loop forever, so treat it as the end.
-    if (!page.moreAvailable || page.lastToken === null || page.lastToken === token) return;
-    token = page.lastToken;
+    if (!page.moreAvailable || page.nextToken === null || page.nextToken === token) return;
+    token = page.nextToken;
   }
 }

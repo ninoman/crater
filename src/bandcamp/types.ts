@@ -56,7 +56,8 @@ export interface ReleasePage {
 export interface CollectionPage {
   items: CollectionItem[];
   moreAvailable: boolean;
-  lastToken: string | null;
+  /** older_than_token for the page after this one. */
+  nextToken: string | null;
 }
 
 export interface FanPage {

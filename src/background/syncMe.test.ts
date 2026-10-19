@@ -6,8 +6,9 @@ import { syncMe, type SyncDeps } from './syncMe';
 
 const FAN = 77;
 
-function rawAlbum(id: number) {
+function rawAlbum(id: number, position: number) {
   return {
+    token: `at:${position}`,
     item_type: 'album',
     tralbum_id: id,
     tralbum_type: 'a',
@@ -36,9 +37,10 @@ function fakeBandcamp(lists: { collection: number[]; wishlist: number[] | 'hidde
     const page = ids.slice(offset, offset + body.count);
     const end = offset + page.length;
     return {
-      items: page.map(rawAlbum),
+      items: page.map((id, i) => rawAlbum(id, offset + i + 1)),
       more_available: end < ids.length,
-      last_token: page.length ? `at:${end}` : null,
+      // Like Bandcamp, last_token lags behind the end of a page (it points at item 20).
+      last_token: page.length ? `at:${offset + 1}` : null,
     };
   };
   return { fetchJson, requests };

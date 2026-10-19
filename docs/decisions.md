@@ -28,6 +28,7 @@ Recon done on 2026-10-19, logged out, with curl against live bandcamp.com. Raw r
 
 - `POST /api/fancollection/1/collection_items` and `/wishlist_items` with `{fan_id, older_than_token, count}` → `{items, more_available, last_token, tracklists, ...}`.
 - Page tokens look like `<purchase unix ts>:<tralbum_id>:<a|t>::`.
+- **`last_token` always points at the 20th item, whatever `count` is** (found 2026-10-20: at batch 100, each page overlapped the next by 80 items). Every item carries its own `token`, so page on from the **last item's** `token`, not `last_token`.
 - **A synthetic first token works:** `"<now unix ts>::a::"`. Supporter rows already give `fan_id`, so a fan scan **doesn't need to fetch the fan's profile page**, which saves one request per fan.
 - **`count` is accepted up to at least 500.** One request returned 500 items in 1.2 MB and 3.6 s. The site itself uses 20.
 - Every collection item carries:
@@ -80,7 +81,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 2. **`supporters(i)` = `also_collected_count + 1`**, read from any collection page that contains the item. Fall back to the count of scanned owners only if it's missing. `items.supporterCount` gets filled for almost every item.
 3. **Label = the selling account** (`band_id` / `url_hints.subdomain`). Collection items have no label field, but a label's releases are sold from the label's own account. For the label-cluster flag, measure "share of that seller's catalog" against the seller's items in the local DB for the MVP. A real catalog count would need one fetch of `<subdomain>.bandcamp.com/music` per seller, which can come later.
 4. **Fan scans skip the profile page.** Start `collection_items` with a synthetic token, and take `username`, `name` and `image_id` from the supporter row. `fans.collectionSize` stays unknown until the last page, or until you open that fan's profile.
-5. **Batch size 100 for collections** (up to 20 requests to hit the 2,000-item cap, instead of 100 at batch 20). 500 works too, but responses get big and slow. 100 is a polite middle ground.
+5. **Batch size 100 for collections**, paging on from the last item's `token` (see §1). That's up to 20 requests to hit the 2,000-item cap, instead of 100 at batch 20. 500 works too, but responses get big and slow. 100 is a polite middle ground.
 6. **New cap: supporters per release.** Promises has about 18,400 supporters, which would be 184 supporter pages before scanning a single fan. Default to the **most recent 500 supporters** (first page plus about 5 requests), and make it a setting.
 7. **`ownership.purchasedAt`** comes from the item's `purchased` field, or from the supporter token's timestamp.
 8. **Matching uses a `matchKey`, not the raw item key.**
@@ -106,3 +107,4 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 - **Hidden wishlist:** if your wishlist errors on its first page, the sync keeps going with the collection.
 - **Pace:** your own sync waits the scanner's pace (1.5–3 s) between pages but doesn't count against the daily budget. Each wait re-reads settings from `chrome.storage`. Because that's an extension API call, it keeps the service worker alive through a long sync. If the worker is killed anyway, `syncedAt` stays unset and the next trigger runs a full sync again.
 - **Purchase page (unverified):** treated as `https://bandcamp.com/download`. Re-downloads match too, but that only costs an incremental sync. Confirm with `purchase-confirmation.html`.
+- **Confirmed with a real account (2026-10-20):** the worker's session cookies reach the API. A wishlist that is hidden publicly synced in full (137 items), and the collection count was slightly above the logged-out profile's (1,131 vs 1,127).

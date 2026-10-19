@@ -26,7 +26,8 @@ describe('parseCollectionPage', () => {
 
     expect(page.items).toHaveLength(40);
     expect(page.moreAvailable).toBe(true);
-    expect(page.lastToken).toBe('1782206456:2206491889:a::');
+    // The last item's token. The response's own last_token (1782206456:…) points at item 20.
+    expect(page.nextToken).toBe('1773195462:2701887816:a::');
     for (const item of page.items) {
       expect(item.itemKey).toMatch(/^[at]\d+$/);
       expect(item.addedAt).toEqual(expect.any(Number));
@@ -37,7 +38,7 @@ describe('parseCollectionPage', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-p2.json'));
 
     expect(page.items).toHaveLength(40);
-    expect(page.lastToken).toBe('1773195462:2701887816:a::');
+    expect(page.nextToken).toBe('1756342375:1256372863:a::');
   });
 
   it('parses a wishlist, using the added date', () => {
@@ -51,7 +52,7 @@ describe('parseCollectionPage', () => {
   it('returns an empty page for an unknown fan', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-unknown-fan.json'));
 
-    expect(page).toEqual({ items: [], moreAvailable: false, lastToken: null });
+    expect(page).toEqual({ items: [], moreAvailable: false, nextToken: null });
   });
 
   it('throws BandcampApiError for a bad token or a hidden wishlist', () => {
@@ -93,16 +94,16 @@ describe('collectionPages', () => {
     return { fetchJson, tokens };
   }
 
-  it('follows last_token from page to page', async () => {
+  it('follows the last item token from page to page', async () => {
     const { fetchJson, tokens } = fakeFetch({
       start: fixtureJson('collection_items-p1.json'),
-      '1782206456:2206491889:a::': fixtureJson('collection_items-p2.json'),
+      '1773195462:2701887816:a::': fixtureJson('collection_items-p2.json'),
     });
     const pages = collectionPages(fetchJson, 'collection', 1138719, 40, 'start');
 
     expect((await pages.next()).value?.items).toHaveLength(40);
     expect((await pages.next()).value?.items).toHaveLength(40);
-    expect(tokens).toEqual(['start', '1782206456:2206491889:a::']);
+    expect(tokens).toEqual(['start', '1773195462:2701887816:a::']);
   });
 
   it('stops when no more pages are available', async () => {
@@ -118,7 +119,7 @@ describe('collectionPages', () => {
 
   it('stops when the API repeats a token', async () => {
     const { fetchJson, tokens } = fakeFetch({
-      '1782206456:2206491889:a::': fixtureJson('collection_items-p1.json'),
+      '1773195462:2701887816:a::': fixtureJson('collection_items-p1.json'),
     });
     const pages = [];
     for await (const page of collectionPages(
@@ -126,7 +127,7 @@ describe('collectionPages', () => {
       'collection',
       1,
       40,
-      '1782206456:2206491889:a::',
+      '1773195462:2701887816:a::',
     )) {
       pages.push(page);
     }
