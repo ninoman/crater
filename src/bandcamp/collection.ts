@@ -1,6 +1,7 @@
 import { itemKey, parseBandcampDate } from './keys';
+import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
-import type { CollectionItem, CollectionPage } from './types';
+import type { CollectionItem, CollectionList, CollectionPage } from './types';
 import { assertNotApiError, validate } from './validate';
 
 const PURCHASE_KINDS = ['album', 'track', 'package'] as const;
@@ -39,4 +40,36 @@ export function parseCollectionPage(json: unknown, source = 'collection_items'):
     moreAvailable: data.more_available,
     lastToken: data.last_token,
   };
+}
+
+/** Performs a request and returns the parsed JSON body. The service worker supplies this. */
+export type FetchJson = (request: BandcampRequest) => Promise<unknown>;
+
+const LIST_SOURCES: Record<CollectionList, string> = {
+  collection: 'collection_items',
+  wishlist: 'wishlist_items',
+};
+
+/**
+ * Pages through a fan's collection or wishlist, newest first, following `last_token`.
+ * Lazy: the next request is only sent when the consumer asks for the next page,
+ * so the consumer controls pacing and can stop early.
+ */
+export async function* collectionPages(
+  fetchJson: FetchJson,
+  list: CollectionList,
+  fanId: number,
+  batchSize: number,
+  startToken: string = firstPageToken(),
+): AsyncGenerator<CollectionPage> {
+  const source = LIST_SOURCES[list];
+  let token = startToken;
+  for (;;) {
+    const json = await fetchJson(collectionListRequest(list, fanId, token, batchSize));
+    const page = parseCollectionPage(json, source);
+    yield page;
+    // A repeated token would loop forever, so treat it as the end.
+    if (!page.moreAvailable || page.lastToken === null || page.lastToken === token) return;
+    token = page.lastToken;
+  }
 }

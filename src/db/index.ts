@@ -1,6 +1,7 @@
 import { DigheadDb } from './schema';
 
 export * from './mappers';
+export * from './repo';
 export type * from './schema';
 export { DigheadDb };
 

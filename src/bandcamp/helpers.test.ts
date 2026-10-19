@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { decodeEntities, readBlobById } from './html';
 import { matchKey, parseBandcampDate, parseItemKey, purchasedAtFromToken } from './keys';
-import { collectionItemsRequest, firstPageToken } from './requests';
+import { collectionListRequest, firstPageToken } from './requests';
 
 describe('decodeEntities', () => {
   it('decodes named and numeric entities', () => {
@@ -52,12 +52,17 @@ describe('requests', () => {
   });
 
   it('builds a collection request', () => {
-    const request = collectionItemsRequest(42, 'tok', 100);
+    const request = collectionListRequest('collection', 42, 'tok', 100);
     expect(request.url).toBe('https://bandcamp.com/api/fancollection/1/collection_items');
     expect(JSON.parse(request.init.body as string)).toEqual({
       fan_id: 42,
       older_than_token: 'tok',
       count: 100,
     });
+  });
+
+  it('builds a wishlist request', () => {
+    const request = collectionListRequest('wishlist', 42, 'tok', 100);
+    expect(request.url).toBe('https://bandcamp.com/api/fancollection/1/wishlist_items');
   });
 });

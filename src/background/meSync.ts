@@ -1,0 +1,91 @@
+// Decides when to sync the logged-in fan's collection, runs one sync at a time and tracks progress.
+
+import type { Viewer } from '../bandcamp';
+import { countOwnership, db, getMe, saveViewer } from '../db';
+import { loadSettings } from '../shared/settings';
+import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
+import { fetchJson } from './http';
+import { syncMe } from './syncMe';
+
+/** A page view re-syncs incrementally when the last sync is older than this. */
+const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+
+let activity: SyncActivity = { state: 'idle' };
+let running: Promise<void> | null = null;
+
+/** Starts a sync unless one is already running, in which case it joins that one. */
+export function startSync(mode: SyncMode): Promise<void> {
+  running ??= runSync(mode).finally(() => {
+    running = null;
+  });
+  return running;
+}
+
+async function runSync(requested: SyncMode): Promise<void> {
+  const me = await getMe(db);
+  if (!me) return;
+  // Without a finished sync there's nothing to be incremental against.
+  const mode = me.syncedAt === null ? 'full' : requested;
+  const settings = await loadSettings();
+  activity = { state: 'syncing', mode, itemsFetched: 0 };
+  try {
+    await syncMe(
+      {
+        db,
+        fetchJson,
+        batchSize: settings.collectionBatchSize,
+        // Re-reading settings is also an extension API call, which keeps the worker alive.
+        pause: async () => {
+          const { paceMinMs, paceMaxMs } = await loadSettings();
+          await sleep(paceMinMs + Math.random() * (paceMaxMs - paceMinMs));
+        },
+        now: Date.now,
+        onProgress: (itemsFetched) => {
+          activity = { state: 'syncing', mode, itemsFetched };
+        },
+      },
+      me,
+      mode,
+    );
+    activity = { state: 'idle' };
+  } catch (error) {
+    console.error('dighead: sync failed', error);
+    activity = { state: 'error', message: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/** A Bandcamp tab reported who is logged in and whether it's a purchase confirmation. */
+export async function onPageSeen(viewer: Viewer | null, purchaseConfirmation: boolean) {
+  if (!viewer) {
+    if (purchaseConfirmation) void startSync('incremental');
+    return;
+  }
+  const before = await getMe(db);
+  const me = await saveViewer(db, viewer);
+  if (before?.fanId !== me.fanId || me.syncedAt === null) {
+    void startSync('full');
+  } else if (purchaseConfirmation || Date.now() - me.syncedAt > STALE_AFTER_MS) {
+    void startSync('incremental');
+  }
+}
+
+export async function getSyncStatus(): Promise<SyncStatus> {
+  const me = await getMe(db);
+  if (!me) return { state: 'logged-out' };
+  const [owned, wishlisted] = await Promise.all([
+    countOwnership(db, me.fanId, 'collection'),
+    countOwnership(db, me.fanId, 'wishlist'),
+  ]);
+  return {
+    state: 'known',
+    username: me.username,
+    owned,
+    wishlisted,
+    syncedAt: me.syncedAt,
+    activity,
+  };
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fixtureJson } from '../../tests/fixtures';
-import { parseCollectionPage, toCollectionItem } from './collection';
+import { collectionPages, parseCollectionPage, toCollectionItem } from './collection';
+import type { BandcampRequest } from './requests';
 import { BandcampApiError, ParserError } from './errors';
 import type { RawCollectionItem } from './schemas';
 
@@ -78,5 +79,67 @@ describe('toCollectionItem', () => {
 
   it('skips item kinds it does not track', () => {
     expect(toCollectionItem({ ...rawTrack, item_type: 'subscription' })).toBeNull();
+  });
+});
+
+describe('collectionPages', () => {
+  function fakeFetch(responses: Record<string, unknown>) {
+    const tokens: string[] = [];
+    const fetchJson = async (request: BandcampRequest) => {
+      const body = JSON.parse(request.init.body as string) as { older_than_token: string };
+      tokens.push(body.older_than_token);
+      return responses[body.older_than_token];
+    };
+    return { fetchJson, tokens };
+  }
+
+  it('follows last_token from page to page', async () => {
+    const { fetchJson, tokens } = fakeFetch({
+      start: fixtureJson('collection_items-p1.json'),
+      '1782206456:2206491889:a::': fixtureJson('collection_items-p2.json'),
+    });
+    const pages = collectionPages(fetchJson, 'collection', 1138719, 40, 'start');
+
+    expect((await pages.next()).value?.items).toHaveLength(40);
+    expect((await pages.next()).value?.items).toHaveLength(40);
+    expect(tokens).toEqual(['start', '1782206456:2206491889:a::']);
+  });
+
+  it('stops when no more pages are available', async () => {
+    const { fetchJson, tokens } = fakeFetch({ start: fixtureJson('wishlist_items.json') });
+    const pages = [];
+    for await (const page of collectionPages(fetchJson, 'wishlist', 1138719, 40, 'start')) {
+      pages.push(page);
+    }
+
+    expect(pages).toHaveLength(1);
+    expect(tokens).toEqual(['start']);
+  });
+
+  it('stops when the API repeats a token', async () => {
+    const { fetchJson, tokens } = fakeFetch({
+      '1782206456:2206491889:a::': fixtureJson('collection_items-p1.json'),
+    });
+    const pages = [];
+    for await (const page of collectionPages(
+      fetchJson,
+      'collection',
+      1,
+      40,
+      '1782206456:2206491889:a::',
+    )) {
+      pages.push(page);
+    }
+
+    expect(pages).toHaveLength(1);
+    expect(tokens).toHaveLength(1);
+  });
+
+  it('surfaces API errors', async () => {
+    const { fetchJson } = fakeFetch({ start: fixtureJson('wishlist_items-hidden.json') });
+
+    await expect(collectionPages(fetchJson, 'wishlist', 1, 40, 'start').next()).rejects.toThrow(
+      BandcampApiError,
+    );
   });
 });

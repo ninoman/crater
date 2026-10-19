@@ -1,8 +1,21 @@
 // Typed message bus between UI surfaces (content script, popup) and the service worker.
 // Add a message by extending MessageMap; both sides get checked types for free.
 
+import type { Viewer } from '../bandcamp';
+import type { SyncStatus } from './sync';
+
+type NoPayload = Record<string, never>;
+
 export interface MessageMap {
-  ping: { request: Record<string, never>; response: { version: string } };
+  ping: { request: NoPayload; response: { version: string } };
+  /** Sent by the content script on every Bandcamp page. */
+  pageSeen: {
+    request: { viewer: Viewer | null; purchaseConfirmation: boolean };
+    response: null;
+  };
+  getSyncStatus: { request: NoPayload; response: SyncStatus };
+  /** Full re-sync of your collection and wishlist, from the popup. */
+  resync: { request: NoPayload; response: null };
 }
 
 export type MessageType = keyof MessageMap;

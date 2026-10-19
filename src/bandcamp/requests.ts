@@ -1,6 +1,6 @@
 // Request builders for Bandcamp's internal endpoints. Pure: the worker does the actual fetching.
 
-import type { TralbumType } from './types';
+import type { CollectionList, TralbumType } from './types';
 
 export interface BandcampRequest {
   url: string;
@@ -26,16 +26,19 @@ export function firstPageToken(now = Date.now()): string {
   return `${Math.floor(now / 1000)}::a::`;
 }
 
-export function collectionItemsRequest(fanId: number, olderThanToken: string, count: number) {
-  return postJson(`${API}/fancollection/1/collection_items`, {
-    fan_id: fanId,
-    older_than_token: olderThanToken,
-    count,
-  });
-}
+const LIST_ENDPOINTS: Record<CollectionList, string> = {
+  collection: 'collection_items',
+  wishlist: 'wishlist_items',
+};
 
-export function wishlistItemsRequest(fanId: number, olderThanToken: string, count: number) {
-  return postJson(`${API}/fancollection/1/wishlist_items`, {
+/** One page of a fan's collection or wishlist, older than the given token. */
+export function collectionListRequest(
+  list: CollectionList,
+  fanId: number,
+  olderThanToken: string,
+  count: number,
+) {
+  return postJson(`${API}/fancollection/1/${LIST_ENDPOINTS[list]}`, {
     fan_id: fanId,
     older_than_token: olderThanToken,
     count,

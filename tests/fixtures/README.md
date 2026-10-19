@@ -19,5 +19,5 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 
 Still to capture (needs you, logged in):
 
-- `me-fan-page.html`: your own profile while logged in (`identities.fan`, `is_own_page`, hidden items)
-- `purchase-confirmation.html`: the page after a purchase completes (re-sync trigger)
+- `me-fan-page.html`: your own profile while logged in (`identities.fan`, `is_own_page`, hidden items). Phase 2 assumes `identities.fan` is `{id, username, …}`.
+- `purchase-confirmation.html`: the page after a purchase completes, and its URL (re-sync trigger; Phase 2 guesses `bandcamp.com/download`)

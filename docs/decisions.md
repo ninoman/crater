@@ -94,3 +94,15 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
      - Recommendations are ranked per `matchKey` and point at the album, with a reason such as "2 twins own tracks from this".
      - If you own one track of A, A stays in your recommendations, tagged "you own 1 track", and is not hidden.
    - Still open for Phase 4: track-only buyers don't appear in the album's supporter list. Pulling them would cost one supporters request per track on the album page. Measure whether it's worth it once the sidebar works.
+
+## 4. Syncing your own collection (Phase 2)
+
+- **Who you are** comes from `#pagedata` → `identities.fan` (`id`, `username`), which is on fan, album and track pages. The content script sends only that element to `parseViewer`, not the whole page. It reports it to the worker on every Bandcamp page view (`pageSeen`).
+- **Your owned and wishlisted items are your `ownership` rows** (`source` = `collection` or `wishlist`). `me` only holds who you are and `syncedAt`. Item metadata goes into `items` with the same mapper as fan scans, keeping any tags from release pages.
+- **Two sync modes:**
+  - *full*: page everything, then delete your rows that weren't seen, so removed wishlist items go away. It runs on first detection, when the logged-in fan changes, after a sync that never finished, and from the popup's Re-sync button.
+  - *incremental*: stop at the first page whose items are all known, so it usually costs 1–2 requests per list. It runs on browser startup, on the purchase page, and on any page view when the last sync is over 24 h old. It can't see removals.
+- **Wishlist first, then collection**, so an item you bought since wishlisting ends up as `collection` (same `[fanId+itemKey]` row).
+- **Hidden wishlist:** if your wishlist errors on its first page, the sync keeps going with the collection.
+- **Pace:** your own sync waits the scanner's pace (1.5–3 s) between pages but doesn't count against the daily budget. Each wait re-reads settings from `chrome.storage`. Because that's an extension API call, it keeps the service worker alive through a long sync. If the worker is killed anyway, `syncedAt` stays unset and the next trigger runs a full sync again.
+- **Purchase page (unverified):** treated as `https://bandcamp.com/download`. Re-downloads match too, but that only costs an incremental sync. Confirm with `purchase-confirmation.html`.

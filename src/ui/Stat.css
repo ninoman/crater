@@ -1,0 +1,16 @@
+.dh-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dh-stat__value {
+  font-size: var(--dh-text-lg);
+  font-weight: var(--dh-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.dh-stat__label {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}

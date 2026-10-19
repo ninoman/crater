@@ -4,7 +4,10 @@
 import { detectPageKind } from './pageKind';
 import { ReleaseSidebar } from './release/ReleaseSidebar';
 import sidebarCss from './release/ReleaseSidebar.css?inline';
+import { reportPage } from './reportPage';
 import { mountShadow } from './shared/mountShadow';
+
+reportPage();
 
 switch (detectPageKind(document)) {
   case 'release':

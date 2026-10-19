@@ -69,5 +69,13 @@ export interface FanPage {
   /** First items of the collection, newest first, as embedded in the page. */
   firstItems: CollectionItem[];
   /** The fan who is logged in while viewing, or null when logged out. */
-  viewer: { fanId: number; username: string } | null;
+  viewer: Viewer | null;
 }
+
+/** The logged-in fan, as seen in any page's `#pagedata`. */
+export interface Viewer {
+  fanId: number;
+  username: string;
+}
+
+export type CollectionList = 'collection' | 'wishlist';

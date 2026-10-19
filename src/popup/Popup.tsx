@@ -1,5 +1,34 @@
+import { useSyncStatus } from '../hooks/useSyncStatus';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot } from '../ui';
+import { SyncSummary } from './SyncSummary';
+
+function Body() {
+  const { view, resync } = useSyncStatus();
+
+  switch (view.state) {
+    case 'loading':
+      return <EmptyState title="Loading…" />;
+    case 'unreachable':
+      return (
+        <EmptyState
+          tone="error"
+          title="Background worker unreachable"
+          description="Try reloading the extension from chrome://extensions."
+        />
+      );
+    case 'ready':
+      if (view.status.state === 'logged-out') {
+        return (
+          <EmptyState
+            title="Log in to Bandcamp"
+            description="Open any bandcamp.com page while logged in, and Dighead will sync your collection."
+          />
+        );
+      }
+      return <SyncSummary status={view.status} now={view.checkedAt} onResync={resync} />;
+  }
+}
 
 export function Popup() {
   const worker = useWorkerStatus();
@@ -14,10 +43,7 @@ export function Popup() {
           {worker.state === 'unreachable' && <StatusDot tone="error">Worker unreachable</StatusDot>}
         </span>
       </header>
-      <EmptyState
-        title="Nothing synced yet"
-        description="Open any Bandcamp page while logged in. Collection sync arrives in the next update."
-      />
+      <Body />
     </div>
   );
 }

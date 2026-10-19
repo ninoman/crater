@@ -68,6 +68,13 @@ export const rawLdJson = z.object({
   keywords: z.union([z.array(z.string()), z.string()]).nullish(),
 });
 
+const rawViewer = z.object({ id: z.number(), username: z.string() });
+
+/** The part of any page's `#pagedata` that names the logged-in fan. */
+export const rawViewerPagedata = z.object({
+  identities: z.object({ fan: rawViewer.nullish() }).nullish(),
+});
+
 const rawListData = z.object({
   item_count: z.number(),
   last_token: z.string().nullable(),
@@ -84,7 +91,5 @@ export const rawFanPagedata = z.object({
   collection_data: rawListData.extend({ hidden_items_count: z.number().nullish() }),
   wishlist_data: rawListData.extend({ hidden: z.boolean().nullish() }),
   item_cache: z.object({ collection: z.record(z.string(), rawCollectionItem) }),
-  identities: z.object({
-    fan: z.object({ id: z.number(), username: z.string() }).nullable(),
-  }),
+  identities: z.object({ fan: rawViewer.nullable() }),
 });
