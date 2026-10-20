@@ -35,3 +35,13 @@ export interface TwinsResult {
   /** Fans whose collection we've read: the pool twins come from. */
   fansRead: number;
 }
+
+/** Where one fan stands among your twins, for the badge on their profile. */
+export interface TwinStanding {
+  /** Place on the leaderboard, 1 for your closest twin. */
+  rank: number;
+  /** Releases you both own. */
+  overlap: number;
+  /** Jaccard as a percentage (0 to 100). */
+  matchPct: number;
+}

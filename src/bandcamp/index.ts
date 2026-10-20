@@ -14,4 +14,5 @@ export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
 export { FAN_PAGE_DOM } from './fanPageDom';
 export { isOwnFanPage, parseViewer } from './viewer';
+export { parseViewedFanId } from './viewedFan';
 export type * from './types';

@@ -241,6 +241,17 @@ Code: `src/scoring/forYou.ts` (pure), `src/db/repo/forYou.ts` (gathering), `src/
 - **Empty states** reuse the twins basis (`no-viewer`, `unsynced`), then "no taste twins yet" (no leaderboard) and "nothing new from your twins", both linking to `#twins`. A scanner `ParserError` shows as a notice above the rows, or in place of them when there are none.
 - **Scored on request**, each time the tab opens. Nothing pushes updates while it's open, as with the Twins tab.
 
+### Twin badge on other fans' profiles (Phase 5.6)
+
+Code: `src/content/fan/`, `getTwinStanding` in `background/recommend/twinStanding.ts`. Decided 2026-10-20, checked against the fixtures' markup; not yet tried on the live page.
+
+- **Mount:** page kind `fan` (anyone but you). The badge goes at the end of the header's `.name` block, under the `<h1>` (`FAN_PAGE_DOM.name`, which skips the hidden edit-mode copy of the bio), in a shadow root.
+- **Whose page:** `parseViewedFanId` reads `fan_data.fan_id` from the `#pagedata` element only, so the tab doesn't parse the whole collection.
+- **Lookup:** `getTwinStanding { fanId }` finds the fan in the stored board and answers `{ rank, overlap, matchPct }`, or null. The tab never receives the board. `rank` is the position in `getTwins`, as everywhere else; `matchPct` is Jaccard × 100.
+- **Text:** "your #4 twin · 37 in common". The tooltip (a real `<button>` is the trigger, so it takes keyboard focus) gives the rank, the overlap and the % match with its definition.
+- **Not on the board shows nothing**, rather than "not in your twins yet". The board holds only the top 200, so "not a twin" would be wrong for a fan we've scanned who ranks 201st, and a note on every stranger's page is noise. Loading and errors also render nothing (no layout jump); errors are `console.warn`ed.
+- **Gap:** the badge looks up once on load. A twins recompute while the page is open isn't pushed to it.
+
 ## 8. Following tags (planned)
 
 Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.

@@ -8,7 +8,7 @@ import type { ForYouResult } from './forYou';
 import type { ReleaseTwinsResult } from './releaseTwins';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
-import type { TwinsResult } from './twins';
+import type { TwinsResult, TwinStanding } from './twins';
 
 type NoPayload = Record<string, never>;
 
@@ -36,6 +36,8 @@ export interface MessageMap {
   getTwins: { request: NoPayload; response: TwinsResult };
   /** Releases your top twins own and you don't, for the For you tab on your profile. */
   getForYou: { request: NoPayload; response: ForYouResult };
+  /** Where a fan stands on your leaderboard, or null if they aren't on it. */
+  getTwinStanding: { request: { fanId: number }; response: TwinStanding | null };
   /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
   getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
   /** Stops the scanner until resumed, from the popup. */

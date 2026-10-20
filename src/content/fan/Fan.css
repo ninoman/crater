@@ -1,0 +1,10 @@
+.dh-twin-badge {
+  display: inline-block;
+  margin: var(--dh-space-1) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dh-radius-pill);
+  background: none;
+  font: inherit;
+  cursor: help;
+}
