@@ -1,0 +1,77 @@
+.dh-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dh-field__label {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
+
+.dh-field__input {
+  height: 28px;
+  width: 100%;
+  padding: 0 var(--dh-space-2);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+  font: inherit;
+  font-size: var(--dh-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--dh-color-text);
+}
+
+.dh-field__input[aria-invalid='true'] {
+  border-color: var(--dh-color-danger);
+}
+
+.dh-field__error {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-danger);
+}
+
+.dh-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+}
+
+.dh-toggle__input {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: var(--dh-toggle-width);
+  height: var(--dh-toggle-height);
+  margin: 0;
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-color-border);
+  cursor: pointer;
+  transition: background-color var(--dh-duration);
+}
+
+.dh-toggle__input::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(var(--dh-toggle-height) - 4px);
+  height: calc(var(--dh-toggle-height) - 4px);
+  border-radius: 50%;
+  background: var(--dh-color-bg);
+  transition: transform var(--dh-duration);
+}
+
+.dh-toggle__input:checked {
+  background: var(--dh-color-accent);
+}
+
+.dh-toggle__input:checked::after {
+  transform: translateX(calc(var(--dh-toggle-width) - var(--dh-toggle-height)));
+}
+
+.dh-toggle__label {
+  font-size: var(--dh-text-sm);
+  cursor: pointer;
+}

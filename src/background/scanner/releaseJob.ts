@@ -107,7 +107,7 @@ async function recordSupporters(
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   supporters: Supporter[],
 ): Promise<void> {
-  const fans = await upsertSupporterFans(ctx.db, supporters);
+  const fans = await upsertSupporterFans(ctx.db, supporters, ctx.now);
   await addSupporterOwnership(ctx.db, release, supporters);
   const stale = fans.filter((fan) => needsFanScan(fan, ctx.now)).map((fan) => fanJob(fan.fanId));
   await enqueue(ctx.db, stale, job.priority, ctx.now);

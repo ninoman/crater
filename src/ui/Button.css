@@ -54,6 +54,15 @@
   color: var(--dh-color-text);
 }
 
+.dh-button--danger {
+  background: var(--dh-color-danger);
+  color: var(--dh-color-on-accent);
+}
+
+.dh-button--danger:hover:not(:disabled) {
+  background: var(--dh-color-danger-hover);
+}
+
 .dh-button--icon {
   width: 28px;
   padding: 0;

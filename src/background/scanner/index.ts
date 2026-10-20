@@ -7,7 +7,9 @@ import {
   type ReleasePageItem,
 } from '../../bandcamp';
 import {
+  clearAllData,
   countJobs,
+  countScannedFans,
   db,
   enqueue,
   focusRelease,
@@ -28,7 +30,7 @@ import { supportersAreFresh } from './freshness';
 import { releaseProgress } from './progress';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { chromeScannerStore, pauseFor } from './state';
-import { watchedReleases, watchRelease } from './watched';
+import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
 
 /** The release open in the most recent tab, and its supporters. */
 const FOREGROUND = 1;
@@ -120,18 +122,40 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
 }
 
 export async function getScannerStatus(): Promise<ScannerStatus> {
-  const [state, settings, queued] = await Promise.all([
+  const [state, settings, queued, fansScanned] = await Promise.all([
     chromeScannerStore.load(),
     loadSettings(),
     countJobs(db),
+    countScannedFans(db),
   ]);
   const now = Date.now();
   return {
     queued,
+    fansScanned,
     requestsToday: usedToday(state.budget, now),
     dailyBudget: settings.dailyRequestBudget,
     pause: pauseFor(state, settings.dailyRequestBudget, now),
     lastError: state.lastError,
     parserError: state.parserError?.message ?? null,
   };
+}
+
+/** Stops the scanner after the request in flight, until resumed. Survives a restart. */
+export async function pauseScanner(): Promise<void> {
+  await chromeScannerStore.save({ paused: true });
+}
+
+export async function resumeScanner(): Promise<void> {
+  await chromeScannerStore.save({ paused: false });
+  kickScanner();
+}
+
+/**
+ * Wipes the database and the scanner's errors. Settings, your pause and today's budget stay:
+ * they're about how politely to scan, not what was scanned.
+ */
+export async function clearScanData(): Promise<void> {
+  await clearAllData(db);
+  await clearWatchedReleases();
+  await chromeScannerStore.save({ lastError: null, parserError: null });
 }

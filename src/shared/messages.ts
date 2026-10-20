@@ -29,6 +29,11 @@ export interface MessageMap {
   getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };
   /** Never recommend this release again, in any list. */
   hideRelease: { request: { matchKey: ItemKey }; response: null };
+  /** Stops the scanner until resumed, from the popup. */
+  pauseScanner: { request: NoPayload; response: null };
+  resumeScanner: { request: NoPayload; response: null };
+  /** Deletes everything Dighead has stored except settings. Your collection re-syncs on the next Bandcamp page. */
+  clearAllData: { request: NoPayload; response: null };
 }
 
 export type MessageType = keyof MessageMap;

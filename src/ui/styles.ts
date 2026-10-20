@@ -4,9 +4,11 @@
 import badge from './Badge.css?inline';
 import base from './base.css?inline';
 import button from './Button.css?inline';
+import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
 import embedFrame from './EmbedFrame.css?inline';
 import emptyState from './EmptyState.css?inline';
+import field from './Field.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import progress from './Progress.css?inline';
@@ -33,6 +35,8 @@ export const uiStyles = [
   progress,
   row,
   tooltip,
+  field,
+  confirmDialog,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

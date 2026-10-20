@@ -3,6 +3,8 @@ import type { FanRecord, ReleaseSupportersRecord } from '../../db';
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const FAN_FRESH_MS = 30 * DAY_MS;
 export const SUPPORTERS_FRESH_MS = 7 * DAY_MS;
+/** Fans no supporter list or scan has shown for this long are forgotten (decisions §9). */
+export const FAN_FORGET_MS = 180 * DAY_MS;
 
 /** A fan needs a scan unless their collection was read in the last 30 days. */
 export function needsFanScan(

@@ -61,7 +61,7 @@ export function ownershipFromSupporter(
   };
 }
 
-export function fanFromSupporter(supporter: Supporter): FanRecord {
+export function fanFromSupporter(supporter: Supporter, now: number): FanRecord {
   return {
     fanId: supporter.fanId,
     username: supporter.username,
@@ -71,5 +71,6 @@ export function fanFromSupporter(supporter: Supporter): FanRecord {
     scannedItems: 0,
     collectionFetchedAt: null,
     status: 'queued',
+    lastSeenAt: now,
   };
 }

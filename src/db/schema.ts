@@ -35,6 +35,8 @@ export interface FanRecord {
   scannedItems: number;
   collectionFetchedAt: number | null;
   status: FanStatus;
+  /** Last time a supporter list or a scan showed this fan. Long-unseen fans are forgotten. */
+  lastSeenAt: number;
 }
 
 export interface OwnershipRecord {
@@ -183,6 +185,18 @@ export class DigheadDb extends Dexie {
         const index = buildMatchIndex(await tx.table<OwnershipRecord>('ownership').toArray());
         await tx.table('fanMatches').bulkPut(index.fanMatches);
         await tx.table('matchOwners').bulkPut(index.matchOwners);
+      });
+    // v4: when each fan was last seen, for forgetting long-unseen fans (decisions §9).
+    this.version(4)
+      .stores({ fans: 'fanId, status, collectionFetchedAt, lastSeenAt' })
+      .upgrade(async (tx) => {
+        const now = Date.now();
+        await tx
+          .table<FanRecord>('fans')
+          .toCollection()
+          .modify((fan) => {
+            fan.lastSeenAt ??= fan.collectionFetchedAt ?? now;
+          });
       });
   }
 }

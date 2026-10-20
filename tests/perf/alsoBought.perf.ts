@@ -55,6 +55,7 @@ function fan(fanId: number): FanRecord {
     scannedItems: ITEMS_PER_FAN,
     collectionFetchedAt: 0,
     status: 'done',
+    lastSeenAt: 0,
   };
 }
 

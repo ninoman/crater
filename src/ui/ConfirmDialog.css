@@ -1,0 +1,41 @@
+.dh-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dh-z-dialog);
+  background: var(--dh-color-overlay);
+}
+
+.dh-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--dh-z-dialog);
+  width: calc(100% - 2 * var(--dh-space-4));
+  max-width: var(--dh-dialog-width);
+  padding: var(--dh-space-4);
+  border-radius: var(--dh-radius-md);
+  background: var(--dh-color-bg);
+  box-shadow: var(--dh-shadow-panel);
+  font-family: var(--dh-font);
+  font-size: var(--dh-text-sm);
+  line-height: var(--dh-leading);
+  color: var(--dh-color-text);
+  transform: translate(-50%, -50%);
+}
+
+.dh-dialog__title {
+  margin: 0 0 var(--dh-space-2);
+  font-size: var(--dh-text-md);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-dialog__description {
+  margin: 0 0 var(--dh-space-4);
+  color: var(--dh-color-muted);
+}
+
+.dh-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--dh-space-2);
+}

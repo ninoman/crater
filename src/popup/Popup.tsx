@@ -1,10 +1,12 @@
 import { useSyncStatus } from '../hooks/useSyncStatus';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
-import { EmptyState, StatusDot } from '../ui';
+import { EmptyState, StatusDot, Tabs } from '../ui';
+import { ClearData } from './ClearData';
 import { ScannerSummary } from './ScannerSummary';
+import { SettingsPanel } from './SettingsPanel';
 import { SyncSummary } from './SyncSummary';
 
-function Body() {
+function SyncBody() {
   const { view, resync } = useSyncStatus();
 
   switch (view.state) {
@@ -31,6 +33,24 @@ function Body() {
   }
 }
 
+function StatusTab({ connected }: { connected: boolean }) {
+  return (
+    <>
+      <SyncBody />
+      {connected && <ScannerSummary />}
+    </>
+  );
+}
+
+function SettingsTab() {
+  return (
+    <>
+      <SettingsPanel />
+      <ClearData />
+    </>
+  );
+}
+
 export function Popup() {
   const worker = useWorkerStatus();
 
@@ -44,8 +64,17 @@ export function Popup() {
           {worker.state === 'unreachable' && <StatusDot tone="error">Worker unreachable</StatusDot>}
         </span>
       </header>
-      <Body />
-      {worker.state === 'connected' && <ScannerSummary />}
+      <Tabs
+        label="Dighead"
+        items={[
+          {
+            value: 'status',
+            label: 'Status',
+            content: <StatusTab connected={worker.state === 'connected'} />,
+          },
+          { value: 'settings', label: 'Settings', content: <SettingsTab /> },
+        ]}
+      />
     </div>
   );
 }

@@ -54,7 +54,7 @@ const track = (key: ItemKey, album: ItemKey) => item(key, {}, album);
 async function fans(ids: number[], items: CollectionItem[], status: FanStatus = 'done') {
   await upsertCollectionItems(db, items, 0);
   for (const fanId of ids) {
-    await upsertSupporterFans(db, [supporter(fanId)]);
+    await upsertSupporterFans(db, [supporter(fanId)], 0);
     await putOwnership(db, fanId, items, 'collection');
     if (status !== 'queued') await finishFanScan(db, fanId, status, items.length, 0);
   }
