@@ -1,0 +1,90 @@
+{
+  "followeers": [
+    {
+      "fan_id": 3780697,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 37201644,
+      "trackpipe_url": "https://bandcamp.com/martingilleshoej",
+      "name": "martingilleshoej",
+      "is_following": false,
+      "location": null,
+      "date_followed": "02 Mar 2026 20:20:12 GMT",
+      "token": "1772482812:3780697"
+    },
+    {
+      "fan_id": 5125895,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 43454341,
+      "trackpipe_url": "https://bandcamp.com/arwhomp",
+      "name": "★",
+      "is_following": false,
+      "location": "London, UK",
+      "date_followed": "02 Mar 2026 20:19:06 GMT",
+      "token": "1772482746:5125895"
+    },
+    {
+      "fan_id": 5820639,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 38084132,
+      "trackpipe_url": "https://bandcamp.com/kazmir00",
+      "name": "volodyavodisevs",
+      "is_following": false,
+      "location": null,
+      "date_followed": "20 Mar 2025 19:56:16 GMT",
+      "token": "1742500576:5820639"
+    },
+    {
+      "fan_id": 3223825,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 19691286,
+      "trackpipe_url": "https://bandcamp.com/bilsol",
+      "name": "Bil-Sol",
+      "is_following": false,
+      "location": "Brighton And Hove, UK",
+      "date_followed": "16 Sep 2024 13:39:28 GMT",
+      "token": "1726493968:3223825"
+    },
+    {
+      "fan_id": 1020617,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 23528049,
+      "trackpipe_url": "https://bandcamp.com/heyna1",
+      "name": "heyna!",
+      "is_following": false,
+      "location": "Berlin, Germany",
+      "date_followed": "26 Jun 2024 12:41:24 GMT",
+      "token": "1719405684:1020617"
+    },
+    {
+      "fan_id": 3437386,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 20814246,
+      "trackpipe_url": "https://bandcamp.com/trist-camp",
+      "name": "tristan",
+      "is_following": false,
+      "location": "Melbourne, Australia",
+      "date_followed": "25 Nov 2023 21:56:42 GMT",
+      "token": "1700949402:3437386"
+    },
+    {
+      "fan_id": 1590719,
+      "band_id": null,
+      "fan_url": null,
+      "image_id": 25705412,
+      "trackpipe_url": "https://bandcamp.com/adampits",
+      "name": "adampits",
+      "is_following": false,
+      "location": null,
+      "date_followed": "17 Nov 2023 15:02:29 GMT",
+      "token": "1700233349:1590719"
+    }
+  ],
+  "more_available": false,
+  "last_token": "1700233349:1590719"
+}

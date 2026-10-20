@@ -1,0 +1,81 @@
+{
+  "followeers": [
+    {
+      "band_id": 1652258384,
+      "image_id": 34271228,
+      "art_id": 836317252,
+      "url_hints": {
+        "subdomain": "latenightburners",
+        "custom_domain": null
+      },
+      "name": "Late Night Burners",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Amsterdam, Netherlands",
+      "date_followed": "09 Oct 2026 12:10:41 GMT",
+      "token": "1791547841:1652258384"
+    },
+    {
+      "band_id": 1818554519,
+      "image_id": 45332724,
+      "art_id": 644548464,
+      "url_hints": {
+        "subdomain": "edvinwikner",
+        "custom_domain": null
+      },
+      "name": "Weirdvin / Edvin Wikner",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Stockholm, Sweden",
+      "date_followed": "06 Oct 2026 15:35:13 GMT",
+      "token": "1791300913:1818554519"
+    },
+    {
+      "band_id": 1829349523,
+      "image_id": 26840864,
+      "art_id": 1749248603,
+      "url_hints": {
+        "subdomain": "nachtrecords1",
+        "custom_domain": null
+      },
+      "name": "nacht records",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Leuven, Belgium",
+      "date_followed": "02 Oct 2026 15:20:03 GMT",
+      "token": "1790954403:1829349523"
+    },
+    {
+      "band_id": 2495405526,
+      "image_id": 41326445,
+      "art_id": 2592556288,
+      "url_hints": {
+        "subdomain": "samgoku",
+        "custom_domain": null
+      },
+      "name": "Sam Goku",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Munich, Germany",
+      "date_followed": "02 Oct 2026 15:19:50 GMT",
+      "token": "1790954390:2495405526"
+    },
+    {
+      "band_id": 110579793,
+      "image_id": 41556776,
+      "art_id": 3927106021,
+      "url_hints": {
+        "subdomain": "darkroomdubs",
+        "custom_domain": null
+      },
+      "name": "Darkroom Dubs",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Glasgow, UK",
+      "date_followed": "02 Oct 2026 15:19:38 GMT",
+      "token": "1790954378:110579793"
+    }
+  ],
+  "more_available": true,
+  "last_token": "1790954378:110579793"
+}

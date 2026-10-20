@@ -16,6 +16,9 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `wishlist_items-hidden.json` | wishlist_items for a fan whose wishlist is hidden (`fan_id` 11705655) | hidden wishlist gives `{"error":true}` |
 | `collection_items-unknown-fan.json` | collection_items with `fan_id: 1` | empty result: `items: []`, `last_token: null` |
 | `collection_items-bad-token.json` | collection_items with `older_than_token: "garbage"` | error shape: HTTP 200 with `{"error":true}` |
+| `following_bands-p1.json` / `-p2.json` | `POST https://bandcamp.com/api/fancollection/1/following_bands` with `{"fan_id":7027105,"older_than_token":"9999999999:","count":5}`, then the `last_token` (2026-10-20) | following parser: band rows, token round trip (decisions §8) |
+| `following_fans.json` | `POST .../fancollection/1/following_fans`, same fan, `count: 20` (all 7, `more_available: false`) | following parser: fan rows, last page |
+| `following_fans-unknown-fan.json` | following_fans with `fan_id: 1` | empty result: `followeers: []`, `last_token: null` |
 | `me-fan-page.html` | `GET https://bandcamp.com/randoom_taker` in a logged-in browser (2026-10-20). Scrubbed: email, re-download `sig`/`payment_id` and CSRF crumbs are placeholders | `parseViewer` on a logged-in page: `identities.fan` is `{id, username, name, photo, private, url, verified}`; also `is_own_page`, `hidden_data` |
 | `purchase-confirmation.html` | The page checkout lands on, `GET https://bandcamp.com/download?cart_id=<id>&sig=<sig>&from=checkout`, logged in (2026-10-20, one track). Scrubbed: email is `fan@example.com`, every `sig`, crumb and `payment_id` is a placeholder | `isPurchaseConfirmationUrl` (the URL shape; `from` is gone from the address bar after load). `#pagedata` also has `download_items` with `cart_id`, `tralbum_id`, `item_type` |
 

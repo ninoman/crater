@@ -1,0 +1,81 @@
+{
+  "followeers": [
+    {
+      "band_id": 3648395603,
+      "image_id": 13000818,
+      "art_id": 3847645221,
+      "url_hints": {
+        "subdomain": "peacefrog",
+        "custom_domain": null
+      },
+      "name": "Peacefrog Records",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "London, UK",
+      "date_followed": "20 Oct 2026 18:55:15 GMT",
+      "token": "1792522515:3648395603"
+    },
+    {
+      "band_id": 4024044661,
+      "image_id": 36014612,
+      "art_id": 2548804316,
+      "url_hints": {
+        "subdomain": "movelikememusic",
+        "custom_domain": null
+      },
+      "name": "Move Like Me",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Manchester, UK",
+      "date_followed": "09 Oct 2026 12:11:10 GMT",
+      "token": "1791547870:4024044661"
+    },
+    {
+      "band_id": 2535808698,
+      "image_id": 19094206,
+      "art_id": 3761480676,
+      "url_hints": {
+        "subdomain": "robertleiner",
+        "custom_domain": null
+      },
+      "name": "The Source Experience",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": null,
+      "date_followed": "09 Oct 2026 12:10:59 GMT",
+      "token": "1791547859:2535808698"
+    },
+    {
+      "band_id": 2995877273,
+      "image_id": 32896330,
+      "art_id": 2113996810,
+      "url_hints": {
+        "subdomain": "pearsonsound",
+        "custom_domain": "music.pearsonsound.com"
+      },
+      "name": "Pearson Sound",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "London, UK",
+      "date_followed": "09 Oct 2026 12:10:51 GMT",
+      "token": "1791547851:2995877273"
+    },
+    {
+      "band_id": 4165709441,
+      "image_id": 13275703,
+      "art_id": 3557224155,
+      "url_hints": {
+        "subdomain": "phoenixg",
+        "custom_domain": null
+      },
+      "name": "Phoenix G",
+      "is_following": false,
+      "is_subscribed": null,
+      "location": "Rotterdam, Netherlands",
+      "date_followed": "09 Oct 2026 12:10:46 GMT",
+      "token": "1791547846:4165709441"
+    }
+  ],
+  "more_available": true,
+  "last_token": "1791547846:4165709441"
+}

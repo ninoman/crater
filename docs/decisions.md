@@ -48,6 +48,7 @@ Recon done on 2026-10-19, logged out, with curl against live bandcamp.com. Raw r
 ### Fan profile page (`#pagedata`)
 
 - `fan_data`: `fan_id`, `username`, `name`, `followers_count`, `is_own_page`, …
+- Following lists (`following_bands_data`, `following_fans_data`) and their endpoint: see §8.
 - `collection_data`: `item_count`, `hidden_items_count`, `last_token`, `batch_size`
 - `wishlist_data`: `item_count`, `hidden` (whole wishlist hidden), `last_token`
 - `identities.fan`: `null` when logged out. This is how the logged-in user is detected.
@@ -231,7 +232,7 @@ Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.htm
 - **The hash is the state.** The link sets `#twins` itself (a history entry, so Back works), `hashchange` opens and closes our tabs, and a direct `#twins` link opens it on load. Clicking one of Bandcamp's tabs drops the hash with `replaceState` and hands the `active` class back to the tab that had it, in the capture phase, before Bandcamp's handler runs.
 - **While ours is open**, a class on `#grids` hides every `.grid` and `.owner-controls` through one injected `<style>`. Bandcamp's selectors live in `bandcamp/fanPageDom.ts`.
 - **% match is Jaccard**, shown as a percentage. The roadmap's columns (overlap, % match, score) and sorts (overlap, Jaccard, score) are the same three numbers. Sorting is one-way, best first; ties keep leaderboard order.
-- **A new tab** (For you, Following) is one entry in `PROFILE_TABS` in `ProfileApp.tsx`: an id, a lowercase label and a view component. Views mount when their tab opens, so each opening fetches fresh data.
+- **A new tab** (For you) is one entry in `PROFILE_TABS` in `ProfileApp.tsx`: an id, a lowercase label and a view component. Views mount when their tab opens, so each opening fetches fresh data.
 - **Gap:** the leaderboard doesn't update live while open. Reopen the tab or reload after a recompute.
 
 ### For you (Phase 6)
@@ -259,28 +260,29 @@ Code: `src/content/fan/`, `getTwinStanding` in `background/recommend/twinStandin
 
 ## 8. Following tags (planned)
 
-Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.
+Planned 2026-10-20; data source verified the same day. Roadmap: *Following tags*.
 
 You create your own tags and assign them to the fans, artists and labels you follow. Then you filter your followings by tag. **Tags apply only to followings**, not to twins, supporters or other fans you don't follow.
 
-### Data source: unverified
+### Data source (verified 2026-10-20)
 
-- §1 confirms no following list or following endpoint. `fan_data` has only `followers_count`.
-- **Nothing here may be built until a fixture is captured.** To capture it, log in, open your own fan page's following view, and save every request it makes (or what `#pagedata` holds for it) to `tests/fixtures/`, with a README entry. Record:
-  - whether fans and artists/labels come back as one list or two
-  - how it paginates
-  - the id on each row
-  - whether anything marks an account as a label
+- §1 missed it: a fan page's `#pagedata` has `following_bands_data` and `following_fans_data` (`item_count`, `last_token`, `batch_size: 20`), with the first rows in `item_cache.following_bands` / `item_cache.following_fans`. `following_genres_data` exists too; genres are out of scope.
+- **The rest pages like the collection:** `POST https://bandcamp.com/api/fancollection/1/following_bands` (or `following_fans`) with `{"fan_id", "older_than_token", "count"}`. The response is `{followeers: [...], more_available, last_token}` (Bandcamp's spelling). Fixtures: `following_bands-p1.json`, `-p2.json`, `following_fans.json`, `following_fans-unknown-fan.json`.
+- **Works logged out**, newest follow first. `"9999999999:"` as the token starts from the top. `count: 500` returns 500 rows in one request, so a full list is `ceil(n / 500)` requests.
+- **Two lists, two kinds.** Band rows: `band_id`, `name`, `url_hints.subdomain` / `custom_domain`, `image_id` (avatar), `art_id`, `location`, `date_followed`, `token`. Fan rows: `fan_id`, `name`, `trackpipe_url` (the profile URL; username is its path), `image_id`, `location`, `date_followed`, `token`.
+- **Nothing marks a label.** Artists and labels are both band accounts, which is how Bandcamp's own sub-tab ("artists & labels") lists them. No `isLabel`.
+- `is_following` is from the viewer's side (false logged out). Ignore it.
+- An unknown `fan_id` gives `{followeers: [], more_available: false, last_token: null}`, not an error.
 
 ### Sync
 
-- Followings are part of your own sync (§4). They're paced and don't count against the budget, with *full* and *incremental* modes.
-- A full sync deletes unfollowed rows.
+- Followings are part of your own sync (§4): paced and off the budget.
+- **Always full.** With 500-row batches, even 600 follows is two requests per list, so there's no incremental mode. A full sync is the only way to notice an unfollow made elsewhere, and it deletes those rows.
 
 ### Data
 
-- **Kinds:** `'fan' | 'band'`. Artists and labels are both band accounts (`band_id`, see §3.3), so they share one kind. If the fixture flags labels, store that as a display-only `isLabel?: boolean`, **never in the key**.
-- **Schema v5 (planned, additive; `itemKey` and `matchKey` untouched; v4 went to `fans.lastSeenAt`, §9):**
+- **Kinds:** `'fan' | 'band'`.
+- **Schema v5 (additive; `itemKey` and `matchKey` untouched; v4 went to `fans.lastSeenAt`, §9):**
   ```
   following: '[kind+id], kind, *tagIds'
   tags:      '++id, &nameKey'
@@ -290,26 +292,33 @@ You create your own tags and assign them to the fans, artists and labels you fol
   - Unfollowing removes the row and its tags with it.
 - **Sync must not wipe tags:** `putFollowing` merges by key and keeps the existing `tagIds`. This needs its own test.
 - **Deleting a tag:** one transaction deletes the `tags` row and removes its id from every following row, found through the `tagIds` index.
+- **Bulk assign:** one message takes many keys and a tag id, and adds or removes it in one transaction.
 
 ### Filter
 
 - Default mode is `all` (AND); `any` (OR) is an option.
 - OR uses `where('tagIds').anyOf(...)`. AND queries by the first tag, then filters in memory with a pure `matchesTags(assigned, selected, mode)`.
-- You can also filter by kind (Fans / Artists & labels).
+- Kind isn't a filter of ours: Bandcamp's own sub-tabs (artists & labels / fans) pick it.
+- A name search sits next to the tag filter.
 - Follow lists are small (hundreds of rows), so filtering in memory is fine.
 
 ### Planned layout
 
-- `bandcamp/following.ts` (`parseFollowing` + zod schema + fixture test), and a request builder in `bandcamp/requests.ts`
+- `bandcamp/following.ts` (`parseFollowingPage` + zod schema + fixture tests), the pagedata part in the fan page parser, and a request builder in `bandcamp/requests.ts`
 - `db/repo/tags.ts` and `db/repo/following.ts`
-- messages `tags.list`, `tags.create`, `tags.rename`, `tags.delete`, `tags.assign`, `tags.unassign`, `following.list`
-- hooks `useFollowing(tagIds, mode)` and `useTags()`
+- messages, named like the rest of `shared/messages.ts`: `listTags`, `createTag`, `renameTag`, `deleteTag`, `assignTag` (many keys, add or remove), `listFollowing`, `getFollowTags { kind, id }`, `exportTags`, `importTags`, and `getTwinStandings { fanIds }`, a batched `getTwinStanding`, so a list of fans is one message
+- hooks `useFollowing(tagIds, mode)`, `useTags()`, `useFollowTags(kind, id)`
 
-### UI
+### UI: Bandcamp's following tab, modified
 
-- A **Following** tab on your profile (`#following`), injected the same way as Phase 5's Twins tab and reusing that code.
-- Rows show avatar, name, a kind `Badge` and tag chips. A filter bar sits above the list.
-- New `src/ui/` components: `Chip`, and `TagPicker` (a wrapped Radix Popover with a combobox, where Enter creates a tag). Its portal goes to the shadow-root container.
+We change Bandcamp's own **following** tab on your profile instead of adding a tab of ours.
+
+- **Why not decorate Bandcamp's rows:** they're rendered client-side, 20 at a time, behind "view all N" and scrolling. A tag filter over the rows Bandcamp happens to have loaded would be wrong.
+- **So we take over the list:** inside `#following-grid`, Bandcamp's sub-tab bar (artists & labels / fans / genres) stays. Under it, in the artists & labels and fans sub-tabs, our filter bar and list replace Bandcamp's `ol.followeer-grid` and its "view all" button, rendered from the DB in a shadow root. The genres sub-tab is untouched. Selectors live in `FAN_PAGE_DOM`, next to the profile tabs'.
+- **Cards match Bandcamp's follow grid:** avatar, name, location, plus tag chips and "+ tag". Fan cards also show twin rank ("#4 twin") when the fan is on the board.
+- **Bulk tagging:** each card has a checkbox. With any checked, a bar shows "N selected · Tag… · Clear".
+- **Tag colours** come from a fixed set of design tokens (`--dh-tag-1` … `--dh-tag-8`), picked by tag id, so a rename keeps the colour. No colour picker.
+- New `src/ui/` components: `Chip`, `Checkbox`, and `TagPicker` (a wrapped Radix Popover with a combobox, where Enter creates a tag). Its portal goes to the shadow-root container.
 - States:
   - loading, including "syncing follows"
   - empty: you follow no one
@@ -318,9 +327,14 @@ You create your own tags and assign them to the fans, artists and labels you fol
   - error (reuse `parserError`)
   - results
 
+### Tags on the account's own page
+
+- On a fan page you follow, next to the twin badge, and on an artist's or label's pages (release pages via the publisher's `band_id`, §3.3, and the band's home page), show your tags as chips with "+ tag".
+- Shown only when you follow the account, since only followings can be tagged. Not following shows nothing.
+
 ### Backup
 
-- **Tags are hand-made and a re-sync can't rebuild them**, so a JSON export/import of tags is part of the feature.
+- **Tags are hand-made and a re-sync can't rebuild them**, so a JSON export/import of tags is part of the feature. The file holds tag names and `[kind, id]` assignments. Import merges by `nameKey` and skips assignments to accounts you no longer follow.
 
 ## 9. Popup controls and storage (Phase 7)
 

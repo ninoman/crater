@@ -7,7 +7,7 @@ Each phase ends with something you can load unpacked in Chrome and use. Phases 0
 ```
 P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also bought ─► P5 Twins ─► P6 For you ─► P7 Harden ─► P8 Ship
                                   └────────────── (P2 and P3 can overlap once P1 is done) ──┘
-                                                                         └─► Following tags (after P6, uses P5's profile tab; not MVP)
+                                                                         └─► Following tags (after P6, modifies Bandcamp's following tab; not MVP)
 ```
 
 ---
@@ -172,21 +172,23 @@ Also added: the scanner seeds itself from your own collection. After each sync, 
 
 ## Following tags (planned, not MVP)
 
-**Goal:** tag the fans, artists and labels you follow with your own tags, then filter your followings by tag.
+**Goal:** tag the fans, artists and labels you follow with your own tags, then filter your followings by tag, on Bandcamp's own following tab.
 
-Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and open questions: decisions §8.
+It isn't part of the MVP. Design and data source: decisions §8.
 
-1. [ ] Capture the following fixture and add its findings to decisions §8. **This blocks everything below.**
-2. [ ] Parser with a fixture test.
-3. [ ] Schema v4 migration.
-4. [ ] Following sync inside your own sync.
-5. [ ] Tags repo, with tests for merge-on-sync and delete-cascade.
-6. [ ] Message bus and hooks.
-7. [ ] `Chip` and `TagPicker` components.
-8. [ ] Following tab with filters and all view states.
-9. [ ] Tag export/import.
+1. [x] Capture the following fixtures (pagedata and the `following_bands` / `following_fans` endpoint) and write the findings into decisions §8.
+2. [ ] Capture the rendered following tab, logged in, and add its selectors to `FAN_PAGE_DOM`.
+3. [ ] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
+4. [ ] Schema v5 migration.
+5. [ ] Following sync inside your own sync (always full, 500 per request).
+6. [ ] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
+7. [ ] Message bus and hooks, including batched `getTwinStandings`.
+8. [ ] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
+9. [ ] Take over the following tab's list: filter bar, cards with tag chips and twin rank, bulk tagging, and all view states.
+10. [ ] Tags on the account's own page: fan pages, release pages and the band's home page.
+11. [ ] Tag export/import.
 
-**Done when:** the Following tab lists everyone you follow, tags survive a full re-sync, and filtering by two tags in AND and OR mode gives the right rows.
+**Done when:** the following tab lists everyone you follow, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, and a followed artist's release page shows its tags.
 
 ---
 
