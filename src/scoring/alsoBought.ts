@@ -13,40 +13,6 @@ export const TWIN_BOOST = 0;
 export const SMALL_RELEASE_OWNERS = 8;
 export const ALSO_BOUGHT_LIMIT = 30;
 
-/** One ownership row of yours, as far as filtering cares. */
-export interface MyRow {
-  itemKey: ItemKey;
-  matchKey: ItemKey;
-  source: 'collection' | 'wishlist';
-}
-
-/** Keyed by match id (keyToNumber), like the lists they filter. */
-export interface Exclusions {
-  excluded: Set<number>;
-  /** Albums you own some tracks of. They stay in, tagged with the count (decisions §3.8). */
-  ownedTracks: Map<number, number>;
-}
-
-/**
- * What never gets recommended: the release itself, hidden releases, and releases you own or
- * wishlisted as a whole. Owning or wishlisting a track of an album keeps the album in.
- */
-export function exclusions(
-  mine: readonly MyRow[],
-  hidden: ReadonlySet<ItemKey>,
-  release: ItemKey,
-): Exclusions {
-  const excluded = new Set([release, ...hidden].map(keyToNumber));
-  const ownedTracks = new Map<number, number>();
-  for (const row of mine) {
-    const id = keyToNumber(row.matchKey);
-    if (row.itemKey === row.matchKey) excluded.add(id);
-    else if (row.source === 'collection') ownedTracks.set(id, (ownedTracks.get(id) ?? 0) + 1);
-  }
-  for (const key of excluded) ownedTracks.delete(key);
-  return { excluded, ownedTracks };
-}
-
 export interface CoOwned {
   /** The release, as keyToNumber(matchKey). */
   id: number;
