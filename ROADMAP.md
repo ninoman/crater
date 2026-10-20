@@ -138,8 +138,8 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 
 **Goal:** a ranked list of the fans whose collections overlap most with yours, shown on your profile page.
 
-1. [ ] `scoring/twins.ts`: weighted overlap on `matchKey` divided by `√(|M|·|F|)`, plus raw overlap and Jaccard. Apply the min and max collection-size filters from settings.
-2. [ ] Label-cluster flag: more than 50% of the overlap comes from one label and F owns more than 60% of that label's catalog. Apply ×0.3 (toggleable). For the MVP, "label" is the selling account (`band_id`), and catalog size is that seller's item count in the local DB (see decisions §3).
+1. [x] `scoring/twins.ts`: weighted overlap on `matchKey` divided by `√(|M|·|F|)`, plus raw overlap and Jaccard. Apply the min and max collection-size filters from settings.
+2. [x] Label-cluster flag: more than 50% of the overlap comes from one label and F owns more than 60% of that label's catalog. Apply ×0.3 (toggleable). For the MVP, "label" is the selling account (`band_id`), and catalog size is that seller's item count in the local DB (see decisions §3).
 3. [ ] Recompute twins after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
 4. [ ] Wire the twin boost into Also bought, and add a *Twins who own this* tab to the sidebar.
 5. [ ] Profile page integration on `bandcamp.com/<you>`:
