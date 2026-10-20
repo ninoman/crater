@@ -1,11 +1,9 @@
 // Reads what the Also-bought scorer needs, as plain data. The ranking itself is in src/scoring.
 
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanStatus, ItemRecord, OwnershipRecord } from '../schema';
+import type { DigheadDb, ItemRecord, OwnershipRecord } from '../schema';
+import { collectionRead } from './fans';
 import { hiddenMatchKeys } from './hidden';
-
-/** Fans whose collection we've actually read. Private and failed fans own nothing we can see. */
-const READ_STATUSES: ReadonlySet<FanStatus> = new Set(['done', 'partial']);
 
 export interface AlsoBoughtData {
   /** albumKey ?? itemKey of the release (decisions §3.8). */
@@ -43,10 +41,7 @@ export async function gatherAlsoBought(
         ...new Set(ownerRows.filter((row) => row.source === 'collection').map((row) => row.fanId)),
       ].filter((fanId) => fanId !== meFanId);
       const fans = await db.fans.bulkGet(ownerIds);
-      const readIds = ownerIds.filter((_, i) => {
-        const status = fans[i]?.status;
-        return status !== undefined && READ_STATUSES.has(status);
-      });
+      const readIds = ownerIds.filter((_, i) => collectionRead(fans[i]?.status));
 
       const [lists, listed, myList, mine, hidden] = await Promise.all([
         db.fanMatches.bulkGet(readIds),

@@ -7,6 +7,11 @@ export const LABEL_CLUSTER_FACTOR = 0.3;
 export const LABEL_CLUSTER_OVERLAP_SHARE = 0.5;
 /** ...and the fan owns more than this share of that label's local catalog. */
 export const LABEL_CLUSTER_CATALOG_SHARE = 0.6;
+/**
+ * ...and at least this many shared releases come from it. Local catalogs start tiny, so one
+ * shared release would otherwise make anyone owning it "most of the label".
+ */
+export const LABEL_CLUSTER_MIN_SHARED = 3;
 
 export interface Candidate {
   fanId: number;
@@ -76,7 +81,8 @@ export function isLabelCluster(
   for (const [label, count] of perLabel) {
     if (count > topCount) [top, topCount] = [label, count];
   }
-  if (top === undefined || topCount <= shared.length * LABEL_CLUSTER_OVERLAP_SHARE) return false;
+  if (top === undefined || topCount < LABEL_CLUSTER_MIN_SHARED) return false;
+  if (topCount <= shared.length * LABEL_CLUSTER_OVERLAP_SHARE) return false;
 
   const catalog = catalogSize.get(top) ?? 0;
   if (catalog === 0) return false;

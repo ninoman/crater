@@ -102,6 +102,12 @@ describe('isLabelCluster', () => {
     ).toBe(false);
   });
 
+  it('needs a few shared releases from the label, however small its catalog', () => {
+    const tiny = new Map([[100, 2]]);
+    expect(isLabelCluster([1, 2], ids(1, 2), labelOf, tiny)).toBe(false);
+    expect(isLabelCluster([1, 2, 3], ids(1, 2, 3), labelOf, new Map([[100, 3]]))).toBe(true);
+  });
+
   it('ignores labels it knows nothing about', () => {
     expect(isLabelCluster([1, 2], ids(1, 2), new Map(), catalogSize)).toBe(false);
     expect(isLabelCluster([1, 2], ids(1, 2), labelOf, new Map())).toBe(false);

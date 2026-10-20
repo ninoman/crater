@@ -8,3 +8,4 @@ export * from './me';
 export * from './ownership';
 export * from './queue';
 export * from './releaseSupporters';
+export * from './twins';

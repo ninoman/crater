@@ -184,3 +184,80 @@ Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering
 - **Wishlist from the sidebar isn't wired up.** Adding to a wishlist needs a logged-in Bandcamp API call that we haven't captured. The ♡ button opens the release page in a new tab, where Bandcamp's own Wishlist button works. To fix it, capture the request Bandcamp sends when you click Wishlist on a release page (logged in) and save it as a fixture.
 - **Track-only buyers of an album aren't listed as its supporters** (§3.8). This is still unmeasured: watch for albums whose supporter list looks small next to their `also_collected_count`.
 - **Preview:** Bandcamp's release-page CSP sets no `frame-src`, and the EmbeddedPlayer sends no `X-Frame-Options` (checked 2026-10-20), so the iframe loads on artist pages.
+
+## 7. Following tags (planned)
+
+Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.
+
+You create your own tags and assign them to the fans, artists and labels you follow. Then you filter your followings by tag. **Tags apply only to followings**, not to twins, supporters or other fans you don't follow.
+
+### Data source: unverified
+
+- §1 confirms no following list or following endpoint. `fan_data` has only `followers_count`.
+- **Nothing here may be built until a fixture is captured.** To capture it, log in, open your own fan page's following view, and save every request it makes (or what `#pagedata` holds for it) to `tests/fixtures/`, with a README entry. Record:
+  - whether fans and artists/labels come back as one list or two
+  - how it paginates
+  - the id on each row
+  - whether anything marks an account as a label
+
+### Sync
+
+- Followings are part of your own sync (§4). They're paced and don't count against the budget, with *full* and *incremental* modes.
+- A full sync deletes unfollowed rows.
+
+### Data
+
+- **Kinds:** `'fan' | 'band'`. Artists and labels are both band accounts (`band_id`, see §3.3), so they share one kind. If the fixture flags labels, store that as a display-only `isLabel?: boolean`, **never in the key**.
+- **Schema v4 (planned, additive; `itemKey` and `matchKey` untouched):**
+  ```
+  following: '[kind+id], kind, *tagIds'
+  tags:      '++id, &nameKey'
+  ```
+  `nameKey` = the trimmed, lowercased name.
+  - Tags are stored on the following row. A join table isn't needed, because only followings can be tagged.
+  - Unfollowing removes the row and its tags with it.
+- **Sync must not wipe tags:** `putFollowing` merges by key and keeps the existing `tagIds`. This needs its own test.
+- **Deleting a tag:** one transaction deletes the `tags` row and removes its id from every following row, found through the `tagIds` index.
+
+### Filter
+
+- Default mode is `all` (AND); `any` (OR) is an option.
+- OR uses `where('tagIds').anyOf(...)`. AND queries by the first tag, then filters in memory with a pure `matchesTags(assigned, selected, mode)`.
+- You can also filter by kind (Fans / Artists & labels).
+- Follow lists are small (hundreds of rows), so filtering in memory is fine.
+
+### Planned layout
+
+- `bandcamp/following.ts` (`parseFollowing` + zod schema + fixture test), and a request builder in `bandcamp/requests.ts`
+- `db/repo/tags.ts` and `db/repo/following.ts`
+- messages `tags.list`, `tags.create`, `tags.rename`, `tags.delete`, `tags.assign`, `tags.unassign`, `following.list`
+- hooks `useFollowing(tagIds, mode)` and `useTags()`
+
+### UI
+
+- A **Following** tab on your profile (`#following`), injected the same way as Phase 5's Twins tab and reusing that code.
+- Rows show avatar, name, a kind `Badge` and tag chips. A filter bar sits above the list.
+- New `src/ui/` components: `Chip`, and `TagPicker` (a wrapped Radix Popover with a combobox, where Enter creates a tag). Its portal goes to the shadow-root container.
+- States:
+  - loading, including "syncing follows"
+  - empty: you follow no one
+  - empty: no tags yet
+  - empty: the filter matches nothing, with "Clear filters"
+  - error (reuse `parserError`)
+  - results
+
+### Backup
+
+- **Tags are hand-made and a re-sync can't rebuild them**, so a JSON export/import of tags is part of the feature.
+
+## 7. Taste twins (Phase 5)
+
+Code: `src/scoring/twins.ts` (pure), `src/db/repo/twins.ts` (gathering and storing), `src/background/recommend/twins.ts` (running it). Decided 2026-10-20.
+
+- **Score** = Σ w(i) over the shared matchKeys / √(|M|·|F|), where |M| and |F| are the two `fanMatches` lists (collection only, tracks folded into albums). w(i) uses the album's `supporterCount` first, then a track's, then `matchOwners`. Raw overlap and Jaccard are stored alongside.
+- **|F| is what we've scanned**, so a collection capped at 2,000 items is compared on its newest 2,000. The size filter uses `collectionSize` once known (a `done` scan), otherwise `scannedItems`. A capped fan's real size is unknown, so `maxCollectionSize` can't catch them yet.
+- **Candidates** are fans whose collection was read (`done` or `partial`), as for Also bought. Private, queued and failed fans are left out.
+- **Label** = `labelId ?? bandId` (§3.3). A label's catalog is its distinct matchKeys in the local `items` table. Only the labels of releases you own are looked up, since only they can carry an overlap.
+- **Label-cluster flag:** more than 50% of the overlap from one label, the fan owns more than 60% of that label's local catalog, **and at least 3 shared releases come from that label**. The last rule is new: local catalogs start tiny (often one release), so one shared release would otherwise flag everyone who owns it. Flagged twins are multiplied by 0.3 when `labelClusterDownweight` is on, and the flag is stored either way.
+- **The leaderboard keeps the top 200**, replaced in full on each recompute. Fans are scored 500 at a time with a yield between pages.
+- **Recompute triggers:** after each finished sync of your own collection, after every 25 fan scans (an in-memory counter, lost with the worker), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.

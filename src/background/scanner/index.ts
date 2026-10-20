@@ -21,7 +21,7 @@ import type { ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled } from '../meSync';
-import { onScanStep } from '../recommend';
+import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
@@ -68,7 +68,10 @@ const deps: SchedulerDeps = {
   random: Math.random,
   owner: crypto.randomUUID(),
   waitForOwnSync: ownSyncSettled,
-  onStep: reportProgress,
+  onStep: async (job, finished) => {
+    if (finished && job.kind === 'fan') onFanScanned();
+    await reportProgress(job, finished);
+  },
 };
 
 let running: Promise<void> | null = null;

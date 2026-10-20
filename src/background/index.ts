@@ -3,6 +3,7 @@
 
 import { listenForMessages } from '../shared/messages';
 import { startSync } from './meSync';
+import { refreshTwins } from './recommend';
 import { handlers } from './router';
 import { ensureScannerAlarm, kickScanner, SCANNER_ALARM } from './scanner';
 
@@ -10,6 +11,11 @@ listenForMessages(handlers);
 
 chrome.runtime.onStartup.addListener(() => {
   void startSync('incremental');
+});
+
+// An update may change how twins are scored, so don't wait for the next sync to see it.
+chrome.runtime.onInstalled.addListener(() => {
+  refreshTwins();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {

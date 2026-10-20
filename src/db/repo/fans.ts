@@ -2,6 +2,11 @@ import type { Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
 import type { DigheadDb, FanRecord, FanStatus } from '../schema';
 
+/** Fans whose collection we've actually read. Private and failed fans own nothing we can see. */
+export function collectionRead(status: FanStatus | undefined): boolean {
+  return status === 'done' || status === 'partial';
+}
+
 /**
  * Records fans seen in a supporter list. New fans start `queued`; known fans only get their
  * name and avatar refreshed, keeping their scan state.

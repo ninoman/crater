@@ -5,6 +5,7 @@ import { countOwnership, db, getMe, saveViewer } from '../db';
 import { loadSettings } from '../shared/settings';
 import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
+import { refreshTwins } from './recommend';
 import { paceDelayMs } from './scanner/pace';
 import { syncMe } from './syncMe';
 
@@ -51,6 +52,7 @@ async function runSync(requested: SyncMode): Promise<void> {
       mode,
     );
     activity = { state: 'idle' };
+    refreshTwins();
   } catch (error) {
     console.error('dighead: sync failed', error);
     activity = { state: 'error', message: error instanceof Error ? error.message : String(error) };

@@ -7,6 +7,7 @@ Each phase ends with something you can load unpacked in Chrome and use. Phases 0
 ```
 P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also bought ─► P5 Twins ─► P6 For you ─► P7 Harden ─► P8 Ship
                                   └────────────── (P2 and P3 can overlap once P1 is done) ──┘
+                                                                         └─► Following tags (after P6, uses P5's profile tab; not MVP)
 ```
 
 ---
@@ -140,7 +141,7 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 
 1. [x] `scoring/twins.ts`: weighted overlap on `matchKey` divided by `√(|M|·|F|)`, plus raw overlap and Jaccard. Apply the min and max collection-size filters from settings.
 2. [x] Label-cluster flag: more than 50% of the overlap comes from one label and F owns more than 60% of that label's catalog. Apply ×0.3 (toggleable). For the MVP, "label" is the selling account (`band_id`), and catalog size is that seller's item count in the local DB (see decisions §3).
-3. [ ] Recompute twins after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
+3. [x] Recompute twins after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
 4. [ ] Wire the twin boost into Also bought, and add a *Twins who own this* tab to the sidebar.
 5. [ ] Profile page integration on `bandcamp.com/<you>`:
    - inject a **Twins** tab next to Bandcamp's own tabs, styled to match
@@ -163,6 +164,26 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 4. [ ] Tests on synthetic data.
 
 **Done when:** all three features work together on your real data.
+
+---
+
+## Following tags (planned, not MVP)
+
+**Goal:** tag the fans, artists and labels you follow with your own tags, then filter your followings by tag.
+
+Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and open questions: decisions §7.
+
+1. [ ] Capture the following fixture and add its findings to decisions §7. **This blocks everything below.**
+2. [ ] Parser with a fixture test.
+3. [ ] Schema v4 migration.
+4. [ ] Following sync inside your own sync.
+5. [ ] Tags repo, with tests for merge-on-sync and delete-cascade.
+6. [ ] Message bus and hooks.
+7. [ ] `Chip` and `TagPicker` components.
+8. [ ] Following tab with filters and all view states.
+9. [ ] Tag export/import.
+
+**Done when:** the Following tab lists everyone you follow, tags survive a full re-sync, and filtering by two tags in AND and OR mode gives the right rows.
 
 ---
 
@@ -192,7 +213,7 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 - Page badges ("6 twins" / "owned") next to release links anywhere on bandcamp.com, behind a setting
 - Export picks as CSV or M3U-style text for DJ library tools
 - Database export and import (backup, or moving to a new machine)
-- Followers / following as an extra signal
+- Followers / following as an extra signal. The following sync from *Following tags* would provide its data.
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
 - Better scoring: recency weighting, ignoring compilations
 
