@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatOverlap, formatOwnedTracks, formatReason } from './formatReason';
+import { formatOverlap, formatReason } from './formatReason';
 
 describe('formatReason', () => {
   it.each([
@@ -22,10 +22,5 @@ describe('formatReason', () => {
   it('counts releases in common', () => {
     expect(formatOverlap(1)).toBe('1 release in common with you');
     expect(formatOverlap(37)).toBe('37 releases in common with you');
-  });
-
-  it('counts owned tracks', () => {
-    expect(formatOwnedTracks(1)).toBe('you own 1 track');
-    expect(formatOwnedTracks(3)).toBe('you own 3 tracks');
   });
 });

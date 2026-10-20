@@ -12,6 +12,7 @@ export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';
 export { PortalContainerProvider, usePortalContainer } from './portal';
 export { Progress, type ProgressProps } from './Progress';
+export { ReleaseRow, type ReleaseRowProps, type ReleaseRowRelease } from './ReleaseRow';
 export { Row, RowList, type RowProps } from './Row';
 export { SearchField, type SearchFieldProps } from './SearchField';
 export { Stat, type StatProps } from './Stat';

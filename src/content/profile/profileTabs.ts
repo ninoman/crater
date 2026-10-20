@@ -1,4 +1,4 @@
-// Adds our own tabs (Twins, later For you and Following) to Bandcamp's tab bar on your profile.
+// Adds our own tabs (Twins, For you, later Following) to Bandcamp's tab bar on your profile.
 // The tab handles are plain <li>s in Bandcamp's own markup so its CSS styles them natively; what
 // a tab shows is rendered by React in a shadow root inside `contentSlot`.
 

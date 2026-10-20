@@ -4,6 +4,7 @@
 
 import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
+import type { ForYouResult } from './forYou';
 import type { ReleaseTwinsResult } from './releaseTwins';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
@@ -33,6 +34,8 @@ export interface MessageMap {
   hideRelease: { request: { matchKey: ItemKey }; response: null };
   /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */
   getTwins: { request: NoPayload; response: TwinsResult };
+  /** Releases your top twins own and you don't, for the For you tab on your profile. */
+  getForYou: { request: NoPayload; response: ForYouResult };
   /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
   getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
   /** Stops the scanner until resumed, from the popup. */

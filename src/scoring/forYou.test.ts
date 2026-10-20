@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { keyFromNumber, keyToNumber, type ItemKey } from '../bandcamp';
 import { exclusions, type MyRow } from './exclusions';
 import {
+  couldRank,
   diversify,
   forYouPicks,
   rankForYou,
@@ -153,5 +154,24 @@ describe('forYouPicks', () => {
       { matchKey: 'a2', twins: 2 },
       { matchKey: 'a4', twins: 4 },
     ]);
+  });
+});
+
+describe('couldRank', () => {
+  const top: ForYouScored[] = [2, 1].map((score, i) => ({
+    id: i + 1,
+    twinScore: score * 2,
+    twins: 1,
+    supporters: 2,
+    score,
+  }));
+
+  it('lets anything in while the list is short', () => {
+    expect(couldRank(top, 3, 0.1)).toBe(true);
+  });
+
+  it('keeps out candidates whose twin score is below the last place', () => {
+    expect(couldRank(top, 2, 1)).toBe(true);
+    expect(couldRank(top, 2, 0.9)).toBe(false);
   });
 });

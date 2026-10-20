@@ -4,11 +4,13 @@
 import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
+import type { ForYouResult } from '../../shared/forYou';
 import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { computeAlsoBought } from './alsoBought';
+import { computeForYou } from './forYou';
 import { computeReleaseTwins } from './releaseTwins';
 import { rescoreDue } from './rescore';
 import { computeTwins } from './twins';
@@ -28,6 +30,12 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
   fansSinceScore.set(releaseKey, 0);
   const me = await getMe(db);
   return computeAlsoBought(db, releaseKey, me?.fanId ?? null);
+}
+
+/** For you on your profile, from the stored twins leaderboard. */
+export async function getForYou(): Promise<ForYouResult> {
+  const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
+  return computeForYou(db, me, settings.topTwinsK);
 }
 
 export function getReleaseTwins(releaseKey: ItemKey): Promise<ReleaseTwinsResult> {

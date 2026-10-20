@@ -1,0 +1,11 @@
+/* Ranks line up as a narrow numeric column beside the covers. */
+.dh-release-row__rank {
+  flex: none;
+  align-self: center;
+  min-width: var(--dh-space-5);
+  font-size: var(--dh-text-sm);
+  font-weight: var(--dh-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--dh-color-muted);
+  text-align: right;
+}

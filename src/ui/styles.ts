@@ -13,6 +13,7 @@ import identity from './Identity.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import progress from './Progress.css?inline';
+import releaseRow from './ReleaseRow.css?inline';
 import row from './Row.css?inline';
 import searchField from './SearchField.css?inline';
 import stat from './Stat.css?inline';
@@ -37,6 +38,7 @@ export const uiStyles = [
   notice,
   progress,
   row,
+  releaseRow,
   table,
   searchField,
   identity,

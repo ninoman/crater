@@ -21,7 +21,3 @@ export function formatReason(reason: AlsoBoughtReason): string {
 export function formatOverlap(count: number): string {
   return `${count} release${count === 1 ? '' : 's'} in common with you`;
 }
-
-export function formatOwnedTracks(count: number): string {
-  return `you own ${count} track${count === 1 ? '' : 's'}`;
-}

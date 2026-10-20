@@ -163,7 +163,7 @@ Also added: the scanner seeds itself from your own collection. After each sync, 
 
 1. [x] `scoring/forYou.ts`: take the top K twins (default 30), with `score(i) = Σ score(F) × w(i)`. Apply the same filters as Also bought.
 2. [x] Optional diversity rule: at most 2 items per artist in the first 20.
-3. [ ] **For you** tab on your profile (`#for-you`), with ranked rows, the reason line ("owned by 5 of your top twins"), and preview, wishlist and hide buttons.
+3. [x] **For you** tab on your profile (`#for-you`), with ranked rows, the reason line ("owned by 5 of your top twins"), and preview, wishlist and hide buttons.
 4. [x] Tests on synthetic data.
 
 **Done when:** all three features work together on your real data.

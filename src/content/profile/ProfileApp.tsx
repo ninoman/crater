@@ -1,4 +1,5 @@
 import { useSyncExternalStore, type ComponentType } from 'react';
+import { ForYouTab } from './forYou/ForYouTab';
 import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
 import { TwinsTab } from './twins/TwinsTab';
 
@@ -9,6 +10,7 @@ interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
 /** Our tabs on your profile, in order after Bandcamp's own. A new tab is one more entry here. */
 export const PROFILE_TABS = [
   { id: 'twins', label: 'twins', View: TwinsTab },
+  { id: 'for-you', label: 'for you', View: ForYouTab },
 ] as const satisfies readonly ProfileTab<string>[];
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];

@@ -21,3 +21,11 @@
 .dh-profile__note {
   margin-top: var(--dh-space-3);
 }
+
+.dh-profile__notice {
+  margin-bottom: var(--dh-space-2);
+}
+
+.dh-profile__list {
+  border-top: 1px solid var(--dh-color-border);
+}

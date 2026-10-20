@@ -1,7 +1,7 @@
 // Dresses the stored twins leaderboard for display: names, avatars and profile links.
 
 import { fanImageUrl, fanPageUrl } from '../../bandcamp';
-import { countReadFans, getFans, getMe, getTwins, type DigheadDb } from '../../db';
+import { countReadFans, getFans, getMe, getTwins, type DigheadDb, type MeRecord } from '../../db';
 import type { TwinRow, TwinsBasis, TwinsResult } from '../../shared/twins';
 
 export async function readTwinsResult(db: DigheadDb): Promise<TwinsResult> {
@@ -30,6 +30,10 @@ export async function readTwinsResult(db: DigheadDb): Promise<TwinsResult> {
     ];
   });
 
-  const basis: TwinsBasis = !me ? 'no-viewer' : me.syncedAt === null ? 'unsynced' : 'ready';
-  return { basis, rows, computedAt: twins[0]?.computedAt ?? null, fansRead };
+  return { basis: twinsBasis(me), rows, computedAt: twins[0]?.computedAt ?? null, fansRead };
+}
+
+/** Whether there's a synced collection of yours for twins to be worked out from. */
+export function twinsBasis(me: MeRecord | undefined): TwinsBasis {
+  return !me ? 'no-viewer' : me.syncedAt === null ? 'unsynced' : 'ready';
 }

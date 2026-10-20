@@ -229,6 +229,18 @@ Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.htm
 - **A new tab** (For you, Following) is one entry in `PROFILE_TABS` in `ProfileApp.tsx`: an id, a lowercase label and a view component. Views mount when their tab opens, so each opening fetches fresh data.
 - **Gap:** the leaderboard doesn't update live while open. Reopen the tab or reload after a recompute.
 
+### For you (Phase 6)
+
+Code: `src/scoring/forYou.ts` (pure), `src/db/repo/forYou.ts` (gathering), `src/background/recommend/forYou.ts` (running it), `src/content/profile/forYou/` (the `#for-you` tab). Decided 2026-10-20.
+
+- **Twins** are the top `settings.topTwinsK` (default 30) of the stored leaderboard, ties on fanId. Their `fanMatches` lists are what's counted, so tracks fold into albums and wishlists don't count, as everywhere else. Label-cluster twins carry their ×0.3 in their score.
+- **Filters** are `scoring/exclusions.ts`, as for Also bought: hidden releases and releases you own or wishlisted as a whole. Owning tracks of an album keeps it in, tagged "you own N tracks".
+- **w(i)** uses the shown record's `supporterCount` (the album's, or a track's when only tracks of the album have turned up), else `matchOwners`. It doesn't look for a track's count when the album record exists without one.
+- **Pruning:** w(i) ≤ 1, so a candidate's summed twin score is its ceiling. Candidates come in falling twin-score order, 200 at a time, and the loop stops once the next ceiling is below the 60th-best score. 60 (twice the 30 shown) leaves room for the diversity rule to move an artist's extras down without leaving rows empty. Candidates with no item record are dropped before ranking, since they can't be shown.
+- **Rows** show their place in the list, cover, artist · label, "owned by N of your top twins", and the same preview / wishlist / open / hide buttons as Also bought (one shared `ReleaseRow` in `src/ui/`). Wishlist still opens the release page (§6, Gaps). Hide drops the row at once and re-fetches, so the next pick moves up.
+- **Empty states** reuse the twins basis (`no-viewer`, `unsynced`), then "no taste twins yet" (no leaderboard) and "nothing new from your twins", both linking to `#twins`. A scanner `ParserError` shows as a notice above the rows, or in place of them when there are none.
+- **Scored on request**, each time the tab opens. Nothing pushes updates while it's open, as with the Twins tab.
+
 ## 8. Following tags (planned)
 
 Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.

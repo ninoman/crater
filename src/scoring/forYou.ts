@@ -122,3 +122,12 @@ export function forYouPicks(
     .slice(0, limit)
     .map(({ id, twins }) => ({ matchKey: keyFromNumber(id), twins }));
 }
+
+/**
+ * Whether a candidate can still make the top `limit` of `top` (ranked). w(i) ≤ 1, so a
+ * candidate's twinScore is the most it can score.
+ */
+export function couldRank(top: readonly ForYouScored[], limit: number, twinScore: number): boolean {
+  const last = top[limit - 1];
+  return top.length < limit || last === undefined || twinScore >= last.score;
+}
