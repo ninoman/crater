@@ -20,7 +20,7 @@ import {
   type QueueJob,
 } from '../../db';
 import { broadcastToTabs } from '../../shared/messages';
-import type { ScannerStatus, ScanProgress } from '../../shared/scan';
+import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled, type SyncResult } from '../meSync';
@@ -28,6 +28,7 @@ import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
+import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
 import { BACKGROUND, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
@@ -117,6 +118,16 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
   await focusRelease(db, itemKey, supporters?.fanIds ?? [], FOREGROUND, BACKGROUND);
   kickScanner();
   return releaseProgress(db, itemKey);
+}
+
+export async function requestRelease(
+  itemKey: ItemKey,
+  url: string,
+): Promise<{ status: QueueReleaseStatus }> {
+  if (!isBandcampUrl(url)) throw new Error(`Not a bandcamp.com release: ${url}`);
+  const status = await queueRelease(db, itemKey, url, Date.now());
+  if (status !== 'fresh') kickScanner();
+  return { status };
 }
 
 /**

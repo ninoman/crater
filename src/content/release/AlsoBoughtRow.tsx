@@ -1,7 +1,8 @@
+import { useQueueRelease } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
-import { Badge, ReleaseRow } from '../../ui';
+import { Badge, Button, QueueIcon, ReleaseRow, Tooltip } from '../../ui';
 import { formatOwnedTracks } from '../shared/formatOwnedTracks';
-import { formatReason } from './formatReason';
+import { formatQueueOutcome, formatReason } from './formatReason';
 
 export interface AlsoBoughtRowProps {
   row: RowData;
@@ -11,11 +12,27 @@ export interface AlsoBoughtRowProps {
 }
 
 export function AlsoBoughtRow({ row, ...actions }: AlsoBoughtRowProps) {
+  const name = `${row.artist} – ${row.title}`;
+  const { queue, queueRelease } = useQueueRelease(row.matchKey, row.url);
   return (
     <ReleaseRow
       release={row}
       reason={formatReason(row.reason)}
+      status={formatQueueOutcome(queue)}
       badges={row.ownedTracks > 0 && <Badge>{formatOwnedTracks(row.ownedTracks)}</Badge>}
+      extraActions={
+        <Tooltip content="Scan this release's supporters">
+          <Button
+            variant="ghost"
+            icon
+            aria-label={`Scan supporters of ${name}`}
+            disabled={queue.state === 'queueing'}
+            onClick={() => void queueRelease()}
+          >
+            <QueueIcon />
+          </Button>
+        </Tooltip>
+      }
       {...actions}
     />
   );

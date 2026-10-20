@@ -49,3 +49,9 @@ export const HideIcon = () => (
     <path d="M4 4l8 8M12 4l-8 8" />
   </Icon>
 );
+
+export const QueueIcon = () => (
+  <Icon>
+    <path d="M2.5 4.5h7M2.5 8h7M2.5 11.5h4M12 8.5v5M9.5 11h5" />
+  </Icon>
+);

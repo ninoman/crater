@@ -23,6 +23,10 @@ export interface ReleaseRowProps {
   /** Place in a ranked list, shown before the cover. */
   rank?: number;
   badges?: ReactNode;
+  /** A line under the reason, such as the outcome of an extra action. */
+  status?: string | null;
+  /** More action buttons, shown before Hide. */
+  extraActions?: ReactNode;
   previewing: boolean;
   onPreview: (open: boolean) => void;
   onHide: () => void;
@@ -34,6 +38,8 @@ export function ReleaseRow({
   reason,
   rank,
   badges,
+  status,
+  extraActions,
   previewing,
   onPreview,
   onHide,
@@ -52,7 +58,11 @@ export function ReleaseRow({
           {release.title}
         </a>
       }
-      meta={[release.label ? `${release.artist} · ${release.label}` : release.artist, reason]}
+      meta={[
+        release.label ? `${release.artist} · ${release.label}` : release.artist,
+        reason,
+        ...(status ? [status] : []),
+      ]}
       badges={badges}
       actions={
         <>
@@ -92,6 +102,7 @@ export function ReleaseRow({
               <ExternalIcon />
             </LinkButton>
           </Tooltip>
+          {extraActions}
           <Tooltip content="Hide: never recommend this">
             <Button variant="ghost" icon aria-label={`Hide ${name}`} onClick={onHide}>
               <HideIcon />

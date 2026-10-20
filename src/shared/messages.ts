@@ -6,7 +6,7 @@ import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { ForYouResult } from './forYou';
 import type { ReleaseTwinsResult } from './releaseTwins';
-import type { ScannerStatus, ScanProgress } from './scan';
+import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { TwinsResult, TwinStanding } from './twins';
 
@@ -27,6 +27,11 @@ export interface MessageMap {
    * Answers with the progress so far.
    */
   releaseOpened: { request: { item: ReleasePageItem }; response: ScanProgress };
+  /** Scans a release's supporters on request, at background priority, so the dataset grows where you want. */
+  queueRelease: {
+    request: { itemKey: ItemKey; url: string };
+    response: { status: QueueReleaseStatus };
+  };
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Scores Also bought for a release from what's in the database now. */
   getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };

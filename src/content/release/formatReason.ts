@@ -1,3 +1,4 @@
+import type { QueueReleaseState } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtReason } from '../../shared/alsoBought';
 
 /**
@@ -20,4 +21,25 @@ export function formatReason(reason: AlsoBoughtReason): string {
 
 export function formatOverlap(count: number): string {
   return `${count} release${count === 1 ? '' : 's'} in common with you`;
+}
+
+/** The line after a "scan supporters" click, or null before one. */
+export function formatQueueOutcome(queue: QueueReleaseState): string | null {
+  switch (queue.state) {
+    case 'idle':
+      return null;
+    case 'queueing':
+      return 'Queueing…';
+    case 'error':
+      return 'Could not queue it';
+    case 'done':
+      switch (queue.status) {
+        case 'queued':
+          return 'Queued for scanning';
+        case 'already-queued':
+          return 'Already queued';
+        case 'fresh':
+          return 'Scanned recently';
+      }
+  }
 }
