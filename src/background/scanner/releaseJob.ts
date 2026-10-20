@@ -100,7 +100,11 @@ function carryOn(ctx: StepContext, cursor: ReleaseCursor): ReleaseCursor | null 
   return exhausted || cursor.collected >= ctx.settings.supportersPerReleaseCap ? null : cursor;
 }
 
-/** Saves the fans and what they own, and queues the ones not scanned recently. */
+/**
+ * Saves the fans and what they own, and queues the ones not scanned recently. They take the
+ * release job's priority and place in line, so a release's fans run before the next release at
+ * that priority: your newest seed releases fill in fully before older ones start.
+ */
 async function recordSupporters(
   ctx: StepContext,
   job: ReleaseJob,
@@ -110,5 +114,5 @@ async function recordSupporters(
   const fans = await upsertSupporterFans(ctx.db, supporters, ctx.now);
   await addSupporterOwnership(ctx.db, release, supporters);
   const stale = fans.filter((fan) => needsFanScan(fan, ctx.now)).map((fan) => fanJob(fan.fanId));
-  await enqueue(ctx.db, stale, job.priority, ctx.now);
+  await enqueue(ctx.db, stale, job.priority, job.nextAttemptAt);
 }

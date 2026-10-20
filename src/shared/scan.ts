@@ -21,6 +21,8 @@ export interface ScannerStatus {
   queued: { release: number; fan: number };
   /** Fans whose scan has ended, whatever the outcome. With `queued.fan`, the queue's progress. */
   fansScanned: number;
+  /** Releases you own whose supporters have been listed, out of all you own (one per matchKey). */
+  ownReleases: { scanned: number; total: number };
   requestsToday: number;
   dailyBudget: number;
   pause: ScannerPause | null;

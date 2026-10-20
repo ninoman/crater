@@ -45,3 +45,11 @@ export async function upsertReleasePageItem(
 export function getItem(db: DigheadDb, itemKey: ItemKey): Promise<ItemRecord | undefined> {
   return db.items.get(itemKey);
 }
+
+export async function getItems(
+  db: DigheadDb,
+  itemKeys: ItemKey[],
+): Promise<Map<ItemKey, ItemRecord>> {
+  const items = await db.items.bulkGet(itemKeys);
+  return new Map(items.filter((item) => item !== undefined).map((item) => [item.itemKey, item]));
+}

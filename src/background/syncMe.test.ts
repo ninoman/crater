@@ -102,8 +102,9 @@ describe('syncMe', () => {
     );
     const bandcamp = fakeBandcamp({ collection: [9, 1, 2, 3, 4, 5, 6], wishlist: [] });
 
-    await syncMe(deps(bandcamp.fetchJson), me, 'incremental');
+    const added = await syncMe(deps(bandcamp.fetchJson), me, 'incremental');
 
+    expect(added).toEqual(['a9']);
     expect(await ownedItemKeys(db, FAN, 'collection')).toContain('a9');
     expect(bandcamp.requests).toEqual(['wishlist:start', 'collection:start', 'collection:at:2']);
   });
@@ -119,9 +120,14 @@ describe('syncMe', () => {
   it('moves a bought wishlist item to the collection', async () => {
     await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [10] }).fetchJson), me, 'full');
 
-    await syncMe(deps(fakeBandcamp({ collection: [10], wishlist: [10] }).fetchJson), me, 'full');
+    const added = await syncMe(
+      deps(fakeBandcamp({ collection: [10], wishlist: [10] }).fetchJson),
+      me,
+      'full',
+    );
 
     expect((await db.ownership.get([FAN, 'a10']))?.source).toBe('collection');
+    expect(added).toEqual(['a10']);
   });
 
   it('still syncs the collection when the wishlist is hidden', async () => {

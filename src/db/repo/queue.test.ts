@@ -5,6 +5,7 @@ import {
   completeJob,
   countJobs,
   enqueue,
+  enqueueAt,
   failJob,
   fanJob,
   focusRelease,
@@ -42,6 +43,36 @@ describe('queue', () => {
     await enqueue(db, [fanJob(3), fanJob(4)], 1, 10);
 
     expect(await order()).toEqual(['3', '4', '2', '1']);
+  });
+
+  it('runs foreground, then background, then seed jobs, each in its own place in line', async () => {
+    await enqueueAt(
+      db,
+      [
+        { spec: release('a1'), at: -100 },
+        { spec: release('a2'), at: -300 },
+      ],
+      3,
+    );
+    await enqueue(db, [release('a3')], 2, 50);
+    await enqueue(db, [fanJob(1)], 3, -300);
+    await enqueue(db, [release('a4')], 1, 99);
+
+    expect(await order()).toEqual(['a4', 'a3', 'a2', '1', 'a1']);
+  });
+
+  it('keeps a background release out of reach of a later focus, and seeds below both', async () => {
+    await enqueue(db, [release('a1')], 1, 0);
+    await enqueueAt(db, [{ spec: release('a9'), at: -1 }], 3);
+    await enqueue(db, [release('a2')], 1, 10);
+
+    await focusRelease(db, 'a2', [], 1, 2);
+
+    expect((await db.queue.toArray()).map((j) => [j.target, j.priority])).toEqual([
+      ['a1', 2],
+      ['a9', 3],
+      ['a2', 1],
+    ]);
   });
 
   it('skips jobs that are not due yet', async () => {

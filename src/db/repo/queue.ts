@@ -8,33 +8,46 @@ export function fanJob(fanId: number): JobSpec {
   return { kind: 'fan', target: `${fanId}` };
 }
 
-function newJob(spec: JobSpec, priority: number, now: number): QueueJob {
-  return { ...spec, priority, attempts: 0, nextAttemptAt: now, cursor: null } as QueueJob;
+function newJob(spec: JobSpec, priority: number, at: number): QueueJob {
+  return { ...spec, priority, attempts: 0, nextAttemptAt: at, cursor: null } as QueueJob;
 }
 
-/**
- * Adds jobs, skipping ones already queued. A duplicate only raises the existing job's priority,
- * so its cursor and retry state survive.
- */
-export async function enqueue(
+/** Adds jobs that are due from `now`, skipping ones already queued (see enqueueAt). */
+export function enqueue(
   db: DigheadDb,
   specs: JobSpec[],
   priority: number,
   now: number,
 ): Promise<void> {
-  if (specs.length === 0) return;
+  return enqueueAt(
+    db,
+    specs.map((spec) => ({ spec, at: now })),
+    priority,
+  );
+}
+
+/**
+ * Adds jobs, each due from its own `at`, which is also its place in line within the priority.
+ * A duplicate only raises the existing job's priority, so its cursor and retry state survive.
+ */
+export async function enqueueAt(
+  db: DigheadDb,
+  entries: { spec: JobSpec; at: number }[],
+  priority: number,
+): Promise<void> {
+  if (entries.length === 0) return;
   await db.transaction('rw', db.queue, async () => {
     const existing = await db.queue
       .where('[kind+target]')
-      .anyOf(specs.map((spec) => [spec.kind, spec.target]))
+      .anyOf(entries.map(({ spec }) => [spec.kind, spec.target]))
       .toArray();
     const byKey = new Map(existing.map((job) => [`${job.kind}:${job.target}`, job]));
     const fresh: QueueJob[] = [];
-    for (const spec of specs) {
+    for (const { spec, at } of entries) {
       const key = `${spec.kind}:${spec.target}`;
       const job = byKey.get(key);
       if (!job) {
-        const added = newJob(spec, priority, now);
+        const added = newJob(spec, priority, at);
         fresh.push(added);
         byKey.set(key, added);
       } else if (job.id !== undefined && priority < job.priority) {

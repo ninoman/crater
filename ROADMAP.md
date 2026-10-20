@@ -151,6 +151,8 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 6. [ ] On other fans' profiles, show a badge such as "your #4 twin · 37 in common".
 7. [ ] "Add release to queue" button, so you can deliberately grow the dataset.
 
+Also added: the scanner seeds itself from your own collection. After each sync, your owned releases' supporters are queued at a third, lowest priority, newest purchase first, with a setting to turn it off and "N / M your releases scanned" in the popup (decisions §5).
+
 **Done when:** the leaderboard loads on reload or a direct `#twins` link, and the top 10 feel like real taste matches, not label subscribers.
 
 ---

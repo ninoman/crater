@@ -108,6 +108,14 @@ describe('runReleaseStep', () => {
     expect((await db.fans.get(first as number))?.status).toBe('done');
   });
 
+  it("queues fans at the release job's priority and place in line", async () => {
+    await runReleaseStep(context(86), { ...job(), priority: 3, nextAttemptAt: -500 });
+
+    const queued = await db.queue.toArray();
+    expect(queued).toHaveLength(86);
+    expect(queued.every((q) => q.priority === 3 && q.nextAttemptAt === -500)).toBe(true);
+  });
+
   it('refuses a page that is a different release than the job asked for', async () => {
     await expect(runReleaseStep(context(500), { ...job(), target: 'a1' })).rejects.toThrow(
       ParserError,

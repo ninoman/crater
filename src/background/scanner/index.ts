@@ -13,6 +13,7 @@ import {
   db,
   enqueue,
   focusRelease,
+  getMe,
   getReleaseSupporters,
   releasesSupportedBy,
   upsertReleasePageItem,
@@ -22,20 +23,17 @@ import { broadcastToTabs } from '../../shared/messages';
 import type { ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
-import { ownSyncSettled } from '../meSync';
+import { ownSyncSettled, type SyncResult } from '../meSync';
 import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
 import { releaseProgress } from './progress';
+import { BACKGROUND, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
+import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { chromeScannerStore, pauseFor } from './state';
 import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
-
-/** The release open in the most recent tab, and its supporters. */
-const FOREGROUND = 1;
-/** Everything else, including releases opened earlier. */
-const BACKGROUND = 2;
 
 export const SCANNER_ALARM = 'scanner';
 
@@ -121,17 +119,31 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
   return releaseProgress(db, itemKey);
 }
 
+/**
+ * After a sync of your own collection, queues your releases' supporters (decisions §5). A full
+ * sync seeds every release you own, an incremental one only what it added.
+ */
+export async function seedFromSync({ me, mode, added }: SyncResult): Promise<void> {
+  if (!(await loadSettings()).seedFromCollection) return;
+  const only = mode === 'incremental' ? new Set(added) : undefined;
+  if (only?.size === 0) return;
+  if ((await seedOwnReleases(db, me.fanId, Date.now(), only)) > 0) kickScanner();
+}
+
 export async function getScannerStatus(): Promise<ScannerStatus> {
-  const [state, settings, queued, fansScanned] = await Promise.all([
+  const [state, settings, queued, fansScanned, me] = await Promise.all([
     chromeScannerStore.load(),
     loadSettings(),
     countJobs(db),
     countScannedFans(db),
+    getMe(db),
   ]);
+  const ownReleases = me ? await ownReleaseProgress(db, me.fanId) : { scanned: 0, total: 0 };
   const now = Date.now();
   return {
     queued,
     fansScanned,
+    ownReleases,
     requestsToday: usedToday(state.budget, now),
     dailyBudget: settings.dailyRequestBudget,
     pause: pauseFor(state, settings.dailyRequestBudget, now),

@@ -3,12 +3,13 @@
 
 import { listenForMessages } from '../shared/messages';
 import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
-import { startSync } from './meSync';
+import { onSynced, startSync } from './meSync';
 import { refreshTwins } from './recommend';
 import { handlers } from './router';
-import { ensureScannerAlarm, kickScanner, SCANNER_ALARM } from './scanner';
+import { ensureScannerAlarm, kickScanner, SCANNER_ALARM, seedFromSync } from './scanner';
 
 listenForMessages(handlers);
+onSynced(seedFromSync);
 
 chrome.runtime.onStartup.addListener(() => {
   void startSync('incremental');
