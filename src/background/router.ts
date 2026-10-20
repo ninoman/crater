@@ -1,11 +1,13 @@
 import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
+import { followingHandlers } from './followingHandlers';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import {
   getAlsoBought,
   getForYou,
   getReleaseTwins,
   getTwinStanding,
+  getTwinStandings,
   readTwinsResult,
 } from './recommend';
 import {
@@ -38,8 +40,10 @@ export const handlers: MessageHandlers = {
   },
   getTwins: () => readTwinsResult(db),
   getTwinStanding: ({ fanId }) => getTwinStanding(db, fanId),
+  getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
   getForYou: () => getForYou(),
+  ...followingHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();
     return null;

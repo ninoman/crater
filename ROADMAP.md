@@ -183,7 +183,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 5. [x] Schema v5 migration.
 6. [ ] Following sync inside your own sync (always full, 500 per request).
 7. [x] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
-8. [ ] Message bus and hooks, including batched `getTwinStandings`.
+8. [x] Message bus and hooks, including batched `getTwinStandings`.
 9. [x] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
 10. [ ] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and twin rank inside each card. Bulk tagging, unfollow tracking and all view states.
 11. [ ] Tags on the account's own page: fan pages, release pages and the band's home page.

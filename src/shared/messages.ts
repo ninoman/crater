@@ -5,6 +5,17 @@
 import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { ForYouResult } from './forYou';
+import type {
+  Following,
+  FollowingKey,
+  FollowKind,
+  Tag,
+  TagAction,
+  TagBackup,
+  TagImportSummary,
+  TagMode,
+  TagResult,
+} from './following';
 import type { ReleaseTwinsResult } from './releaseTwins';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
@@ -43,8 +54,42 @@ export interface MessageMap {
   getForYou: { request: NoPayload; response: ForYouResult };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
   getTwinStanding: { request: { fanId: number }; response: TwinStanding | null };
+  /** `getTwinStanding` for many fans in one board read. Fans not on the board are left out. */
+  getTwinStandings: {
+    request: { fanIds: number[] };
+    response: Record<number, TwinStanding>;
+  };
   /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
   getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
+  /** Your tags, by name. */
+  listTags: { request: NoPayload; response: Tag[] };
+  /** A name that already exists answers with that tag. */
+  createTag: { request: { name: string }; response: TagResult };
+  renameTag: { request: { id: number; name: string }; response: TagResult };
+  /** Also takes the tag off every following. */
+  deleteTag: { request: { id: number }; response: null };
+  /** Adds a tag to, or removes it from, many followings at once. Answers with how many changed. */
+  assignTag: {
+    request: { tagId: number; keys: FollowingKey[]; action: TagAction };
+    response: number;
+  };
+  /** Followings of one kind passing the tag filter, newest first. No tags selected keeps all. */
+  listFollowing: {
+    request: { kind: FollowKind; tagIds: number[]; mode: TagMode };
+    response: Following[];
+  };
+  /** The tag ids on an account you follow, or null when you don't follow it. */
+  getFollowTags: {
+    request: { kind: FollowKind; id: number };
+    response: number[] | null;
+  };
+  /** Marks or clears an unfollow made on the tab. */
+  setUnfollowed: {
+    request: { key: FollowingKey; unfollowed: boolean };
+    response: null;
+  };
+  exportTags: { request: NoPayload; response: TagBackup };
+  importTags: { request: { backup: TagBackup }; response: TagImportSummary };
   /** Stops the scanner until resumed, from the popup. */
   pauseScanner: { request: NoPayload; response: null };
   resumeScanner: { request: NoPayload; response: null };

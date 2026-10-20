@@ -16,7 +16,7 @@ import { rescoreDue } from './rescore';
 import { computeTwins } from './twins';
 
 export { readTwinsResult } from './twinRows';
-export { getTwinStanding } from './twinStanding';
+export { getTwinStanding, getTwinStandings } from './twinStanding';
 
 /** Twins are recomputed after this many fans finish scanning. */
 export const TWINS_EVERY_FANS = 25;
