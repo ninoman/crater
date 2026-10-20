@@ -192,7 +192,7 @@ Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and
 1. [ ] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".
 2. [ ] Error states throughout: offline, budget reached, queue paused for backoff, parser broken.
 3. [ ] Tune weights and thresholds from real use (lift cap, label-cluster limits, K).
-4. [ ] Fixture refresh script: re-capture fixtures and diff them against the saved ones, so you can quickly check whether Bandcamp changed something.
+4. [x] Fixture refresh script: re-capture fixtures and diff them against the saved ones, so you can quickly check whether Bandcamp changed something.
 5. [ ] Storage check: estimate DB size for a heavy user and add a cleanup for fans not seen in more than 180 days.
 6. [ ] Run 2–4 weeks of daily use, ideally with a few friends who dig (load unpacked).
 
