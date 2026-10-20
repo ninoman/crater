@@ -5,6 +5,8 @@ export {
   parseCollectionPage,
   type FetchJson,
 } from './collection';
+export { hasTralbumItem, parseBandId } from './bandPage';
+export { BAND_PAGE_DOM } from './bandPageDom';
 export { BandcampApiError, ParserError } from './errors';
 export { followCardHtml } from './followCard';
 export { fetchFollowingPage, parseFollowingPage } from './following';

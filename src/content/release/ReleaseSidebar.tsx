@@ -7,6 +7,7 @@ import { useScanProgress } from '../../hooks/useScanProgress';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
+import { FollowedAccountTags } from '../shared/FollowedAccountTags';
 import { AlsoBoughtList } from './AlsoBoughtList';
 import { ReleaseTwinsList } from './ReleaseTwinsList';
 import { ScanHeader } from './ScanHeader';
@@ -45,6 +46,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
+      <FollowedAccountTags kind="band" id={item.bandId} name={item.artist} />
       <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"

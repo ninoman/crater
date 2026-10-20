@@ -7,6 +7,7 @@ import {
   firstPageToken,
   FOLLOWING_FIRST_TOKEN,
   followingRequest,
+  parseBandId,
   parseCollectionPage,
   parseFanPage,
   parseFollowingPage,
@@ -28,6 +29,8 @@ export interface Spec {
 }
 
 const ALBUM = 'https://floatingpoints.bandcamp.com/album/promises';
+// `/` redirects to the latest album; `/music` is the home page.
+const BAND_PAGE = 'https://floatingpoints.bandcamp.com/music';
 const ALBUM_ID = 3149089081;
 const FAN_ID = 1138719;
 const PAGE_SIZE = 40;
@@ -98,6 +101,13 @@ export const SPECS: Spec[] = [
         supportersRequest('reviews', 'a', ALBUM_ID, lastSupporterToken(page, true), 100),
       ),
     parse: json((data) => parseSupportersPage(data, 'reviews')),
+  },
+  {
+    file: 'band-page.html',
+    request: () => ({ url: BAND_PAGE, init: { credentials: 'omit' } }),
+    parse: html((body) => {
+      if (parseBandId(body) === null) throw new Error('no data-band on the band page');
+    }),
   },
   {
     file: 'fan-page.html',

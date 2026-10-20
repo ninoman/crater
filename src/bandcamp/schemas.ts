@@ -90,6 +90,12 @@ export const rawViewedFanPagedata = z.object({
   fan_data: z.object({ fan_id: z.number() }),
 });
 
+/** The part of a band page's `data-band` attribute that says whose page it is. */
+export const rawBandData = z.object({ id: z.number() });
+
+/** `data-tralbum` on a band's home page holds only a url; on a release page it has the item. */
+export const rawTralbumMarker = z.object({ id: z.number().nullish() });
+
 const rawListData = z.object({
   item_count: z.number(),
   last_token: z.string().nullable(),
