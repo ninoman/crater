@@ -52,7 +52,7 @@ function zipDist() {
   const zip = new URL(`${slug}-${version}.zip`, releases);
   rmSync(zip, { force: true });
   // -X drops extra file attributes so the same dist/ always zips to the same bytes.
-  run('zip', ['-r', '-X', zip.pathname, '.'], path('dist/'));
+  run('zip', ['-r', '-q', '-X', zip.pathname, '.'], path('dist/'));
   return zip.pathname;
 }
 

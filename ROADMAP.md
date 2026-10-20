@@ -207,7 +207,7 @@ Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and
 2. [ ] Write a privacy policy page: all data stays local, there is no server and no analytics.
 3. [ ] Write a short justification for each permission (host permission for bandcamp.com only, plus `alarms` and `storage`).
 4. [ ] Build, zip and submit, then handle review feedback.
-5. [ ] Add a version bump and changelog process, plus a quick-patch path for parser breakage.
+5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage.
 
 ---
 
