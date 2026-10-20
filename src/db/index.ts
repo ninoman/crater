@@ -1,5 +1,6 @@
 import { DigheadDb } from './schema';
 
+export * from './backup';
 export * from './mappers';
 export * from './matchIndex';
 export * from './repo';

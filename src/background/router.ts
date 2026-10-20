@@ -1,5 +1,6 @@
 import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
+import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import {
@@ -44,6 +45,7 @@ export const handlers: MessageHandlers = {
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
   getForYou: () => getForYou(),
   ...followingHandlers(db),
+  ...backupHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();
     return null;

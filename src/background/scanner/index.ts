@@ -183,3 +183,9 @@ export async function clearScanData(): Promise<void> {
   await clearWatchedReleases();
   await chromeScannerStore.save({ lastError: null, parserError: null });
 }
+
+/** After an import: queue-side leftovers from the old data no longer apply. Pause and budget stay. */
+export async function resetScanDataAfterImport(): Promise<void> {
+  await clearWatchedReleases();
+  await chromeScannerStore.save({ lastError: null, parserError: null });
+}

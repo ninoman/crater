@@ -4,6 +4,7 @@
 
 import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
+import type { BackupSummary } from './backupFile';
 import type { ForYouResult } from './forYou';
 import type {
   Following,
@@ -90,6 +91,10 @@ export interface MessageMap {
   };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
+  /** Writes a full backup to the staging file (shared/backupStaging.ts); the popup saves it. */
+  exportBackup: { request: NoPayload; response: BackupSummary };
+  /** Replaces the whole database with the staged file the popup wrote. */
+  importBackup: { request: NoPayload; response: BackupSummary };
   /** Stops the scanner until resumed, from the popup. */
   pauseScanner: { request: NoPayload; response: null };
   resumeScanner: { request: NoPayload; response: null };

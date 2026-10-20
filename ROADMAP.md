@@ -212,13 +212,14 @@ It isn't part of the MVP. Design and data source: decisions §8.
 4. [ ] Build, zip and submit, then handle review feedback.
 5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage. release-please opens the release PR and CI submits to the store; see `docs/releasing.md`.
 
+Also added: full database export and import on the popup's Settings tab (backup, or moving to a new machine). Import replaces everything and keeps settings, pause and budget (decisions §10).
+
 ---
 
 ## Post-MVP backlog (roughly by value)
 
 - Page badges ("6 twins" / "owned") next to release links anywhere on bandcamp.com, behind a setting
 - Export picks as CSV or M3U-style text for DJ library tools
-- Database export and import (backup, or moving to a new machine)
 - Followers / following as an extra signal. The following sync from *Following tags* would provide its data.
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
 - Better scoring: recency weighting, ignoring compilations
