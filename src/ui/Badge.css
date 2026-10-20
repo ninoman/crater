@@ -1,0 +1,10 @@
+.dh-badge {
+  display: inline-block;
+  padding: 0 var(--dh-space-2);
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-color-bg-subtle);
+  border: 1px solid var(--dh-color-border);
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+  white-space: nowrap;
+}

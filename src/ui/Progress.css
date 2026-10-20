@@ -1,0 +1,12 @@
+.dh-progress {
+  height: var(--dh-progress-height);
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-color-bg-hover);
+  overflow: hidden;
+}
+
+.dh-progress__bar {
+  height: 100%;
+  background: var(--dh-color-accent);
+  transition: width var(--dh-duration);
+}

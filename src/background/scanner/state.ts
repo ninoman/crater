@@ -1,6 +1,7 @@
 // The scanner's own state: back-off, budget, pace and lock. Kept in chrome.storage.local
 // so a pause survives the worker being killed and the browser restarting.
 
+import type { JobKind } from '../../db';
 import type { ScannerPause } from '../../shared/scan';
 import type { Backoff } from './backoff';
 import { budgetExhausted, nextLocalMidnight, type Budget } from './budget';
@@ -12,6 +13,11 @@ export interface ScannerState {
   lastRequestAt: number | null;
   lock: Lock | null;
   lastError: string | null;
+  /**
+   * The last ParserError, meaning Bandcamp changed something we read. Cleared once a job of
+   * the same kind succeeds, so one odd page doesn't look like a broken parser for good.
+   */
+  parserError: { kind: JobKind; message: string } | null;
 }
 
 export const INITIAL_SCANNER_STATE: ScannerState = {
@@ -20,6 +26,7 @@ export const INITIAL_SCANNER_STATE: ScannerState = {
   lastRequestAt: null,
   lock: null,
   lastError: null,
+  parserError: null,
 };
 
 export interface ScannerStore {

@@ -23,4 +23,6 @@ export interface ScannerStatus {
   dailyBudget: number;
   pause: ScannerPause | null;
   lastError: string | null;
+  /** Set while Bandcamp data fails to parse: Dighead needs an update. */
+  parserError: string | null;
 }

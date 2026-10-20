@@ -1,6 +1,11 @@
 // Wires the scan loop to Chrome: storage, alarms, tabs and the message handlers.
 
-import { isBandcampUrl, RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
+import {
+  isBandcampUrl,
+  RELEASE_PAGE_PATTERNS,
+  type ItemKey,
+  type ReleasePageItem,
+} from '../../bandcamp';
 import {
   countJobs,
   db,
@@ -8,6 +13,7 @@ import {
   focusRelease,
   getReleaseSupporters,
   releasesSupportedBy,
+  upsertReleasePageItem,
   type QueueJob,
 } from '../../db';
 import { broadcastToTabs } from '../../shared/messages';
@@ -15,6 +21,7 @@ import type { ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled } from '../meSync';
+import { onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
@@ -30,6 +37,7 @@ const BACKGROUND = 2;
 
 export const SCANNER_ALARM = 'scanner';
 
+/** Sends progress for watched releases after each step, and re-scores them when a job ends. */
 async function reportProgress(job: QueueJob, finished: boolean): Promise<void> {
   try {
     const releases: ItemKey[] =
@@ -40,7 +48,9 @@ async function reportProgress(job: QueueJob, finished: boolean): Promise<void> {
           : [];
     const watched = new Set(await watchedReleases());
     for (const key of releases.filter((release) => watched.has(release))) {
-      await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'scanProgress', await releaseProgress(db, key));
+      const progress = await releaseProgress(db, key);
+      await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'scanProgress', progress);
+      if (finished) await onScanStep(key, job.kind, progress);
     }
   } catch (error) {
     console.warn('dighead: could not report scan progress', error);
@@ -90,9 +100,12 @@ export async function ensureScannerAlarm(): Promise<void> {
   }
 }
 
-export async function openRelease(itemKey: ItemKey, url: string): Promise<ScanProgress> {
+export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> {
+  const { itemKey, url } = item;
   if (!isBandcampUrl(url)) throw new Error(`Not a bandcamp.com release: ${url}`);
   const now = Date.now();
+  // The open page already tells us about the release, so scoring needn't wait for its job.
+  await upsertReleasePageItem(db, item, now);
   await watchRelease(itemKey);
   const supporters = await getReleaseSupporters(db, itemKey);
   if (!supportersAreFresh(supporters, now)) {
@@ -116,5 +129,6 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     dailyBudget: settings.dailyRequestBudget,
     pause: pauseFor(state, settings.dailyRequestBudget, now),
     lastError: state.lastError,
+    parserError: state.parserError?.message ?? null,
   };
 }

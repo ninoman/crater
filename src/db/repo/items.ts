@@ -22,7 +22,10 @@ export async function upsertCollectionItems(
   await db.items.bulkPut(records);
 }
 
-/** Saves what a release page says about itself. Keeps the supporter count from collection pages. */
+/**
+ * Saves what a release page says about itself. Keeps what only collection pages tell us: the
+ * supporter count and the label.
+ */
 export async function upsertReleasePageItem(
   db: DigheadDb,
   item: ReleasePageItem,
@@ -33,6 +36,8 @@ export async function upsertReleasePageItem(
     await db.items.put({
       ...itemFromReleasePage(item, now),
       supporterCount: old?.supporterCount ?? null,
+      label: old?.label ?? null,
+      labelId: old?.labelId ?? null,
     });
   });
 }

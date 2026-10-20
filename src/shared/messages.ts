@@ -2,7 +2,8 @@
 // Add a message by extending MessageMap; both sides get checked types for free.
 // Worker-to-tab events go the other way and are listed in EventMap.
 
-import type { ItemKey, Viewer } from '../bandcamp';
+import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
+import type { AlsoBoughtResult } from './alsoBought';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 
@@ -18,9 +19,16 @@ export interface MessageMap {
   getSyncStatus: { request: NoPayload; response: SyncStatus };
   /** Full re-sync of your collection and wishlist, from the popup. */
   resync: { request: NoPayload; response: null };
-  /** A release page opened: scan its supporters first. Answers with the progress so far. */
-  releaseOpened: { request: { itemKey: ItemKey; url: string }; response: ScanProgress };
+  /**
+   * A release page opened: save what the page says about it and scan its supporters first.
+   * Answers with the progress so far.
+   */
+  releaseOpened: { request: { item: ReleasePageItem }; response: ScanProgress };
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
+  /** Scores Also bought for a release from what's in the database now. */
+  getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };
+  /** Never recommend this release again, in any list. */
+  hideRelease: { request: { matchKey: ItemKey }; response: null };
 }
 
 export type MessageType = keyof MessageMap;
@@ -70,6 +78,8 @@ export function listenForMessages(handlers: MessageHandlers): void {
 /** Events the worker pushes to Bandcamp tabs. */
 export interface EventMap {
   scanProgress: ScanProgress;
+  /** A watched release was re-scored. */
+  alsoBought: AlsoBoughtResult;
 }
 
 export type EventType = keyof EventMap;

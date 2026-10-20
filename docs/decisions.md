@@ -37,7 +37,7 @@ Recon done on 2026-10-19, logged out, with curl against live bandcamp.com. Raw r
   - `band_id`, `band_name`, `url_hints.subdomain`, `item_url`, `item_art_id`
   - `purchased` (date string)
   - **`also_collected_count`: how many other fans own this release.** This is the rarity weight input, and it comes with every collection item, so you never fetch it separately.
-  - **No label field.** See §3.
+  - `label` and `label_id`, **but only on about half the items** (correction, 2026-10-20: the original recon missed them). They're set when a release is on a label and sold from the artist's own account. When a label sells from its own account, `band_id` is the label and `label` is empty. See §3.3.
 
 ### Release metadata
 
@@ -79,7 +79,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 
 1. **Item key = `tralbum_type + tralbum_id`**, never `item_id`, so packages map onto their album.
 2. **`supporters(i)` = `also_collected_count + 1`**, read from any collection page that contains the item. Fall back to the count of scanned owners only if it's missing. `items.supporterCount` gets filled for almost every item.
-3. **Label = the selling account** (`band_id` / `url_hints.subdomain`). Collection items have no label field, but a label's releases are sold from the label's own account. For the label-cluster flag, measure "share of that seller's catalog" against the seller's items in the local DB for the MVP. A real catalog count would need one fetch of `<subdomain>.bandcamp.com/music` per seller, which can come later.
+3. **Label = `label_id` when a collection item has one, otherwise the selling account** (`band_id` / `url_hints.subdomain`). `items` keeps `label` and `labelId` from collection pages; release pages only show the label's name (ld+json `recordLabel`), not its id, so a release-page save keeps whatever collection pages said. A label that sells from its own account shows up only as the selling account. For the label-cluster flag, measure "share of that seller's catalog" against the seller's items in the local DB for the MVP. A real catalog count would need one fetch of `<subdomain>.bandcamp.com/music` per seller, which can come later.
 4. **Fan scans skip the profile page.** Start `collection_items` with a synthetic token, and take `username`, `name` and `image_id` from the supporter row. `fans.collectionSize` stays unknown until the last page, or until you open that fan's profile.
 5. **Batch size 100 for collections**, paging on from the last item's `token` (see §1). That's up to 20 requests to hit the 2,000-item cap, instead of 100 at batch 20. 500 works too, but responses get big and slow. 100 is a polite middle ground.
 6. **New cap: supporters per release.** Promises has about 18,400 supporters, which would be 184 supporter pages before scanning a single fan. Default to the **most recent 500 supporters** (first page plus about 5 requests), and make it a setting.
@@ -141,3 +141,46 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
   - `scanned` counts every supporter with a final status, including `private` and `error`.
   - The event carries one field more than the spec, `listed`, so the UI can tell "not fetched yet" (0 / 0, false) from "no supporters" (0 / 0, true).
 - **Known limitation:** a re-scan after 30 days adds new items but doesn't remove items a fan no longer has. That's rare, and harmless for scoring at this scale.
+
+## 6. Also bought (Phase 4)
+
+Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering), `src/background/recommend/` (running it). Decided 2026-10-20.
+
+### Match index: the risk-checkpoint fallback, applied up front
+
+- **Measured first.** Reading the raw `ownership` rows of 300 supporters (300k rows) took about 1 s in fake-indexeddb, so plain index reads miss the 200 ms target before scoring even starts. The ROADMAP's P4 fallback ("precompute per-item owner counts") is therefore built in from the start, as schema v3:
+  - `fanMatches`: each fan's distinct collection matchKeys, one record per fan.
+  - `matchOwners`: per matchKey, how many fans' collections hold it.
+- **They're derived from `ownership` and never drift from it.** Every ownership write (`putOwnership`, `removeOwnershipExcept`, `addSupporterOwnership`) recomputes the touched fans' lists from their rows in the same transaction (`refreshFanMatches`). Wishlists don't count as owning. The v3 upgrade builds both tables from existing rows.
+- **Keys are stored as numbers.** `keyToNumber` maps albums to `+id` and tracks to `−id`, and each fan's list is a sorted `Float64Array`. Strings cost about twice as much to read and count, and made garbage collection the bottleneck in a big heap.
+- **The roadmap's "move scoring to an offscreen document" wasn't needed.** A re-score takes 39 ms at 300k rows and 88 ms at the caps (500 supporters × 2,000 items, about 1M rows), both in fake-indexeddb, which is slower than Chrome's IndexedDB. Check: `npm run perf` (`tests/perf/`, kept out of `npm test` because it seeds for ~10 s). An earlier string-based version measured ~580 ms at full size; part of that gap was the test seeding everything in one huge transaction, which fake-indexeddb handles badly.
+
+### Scoring
+
+- **Supporters N** = fans other than you who own the release's matchKey (from the `ownership.matchKey` index, so track buyers and album buyers alike) **and whose collection has been read** (`done` or `partial`). Queued, private and failed fans don't count, so "7 of 32 supporters" always means 7 of the 32 we can actually see.
+- **co(i)** = how many of those N lists contain i. Each list holds distinct matchKeys, so a fan with two tracks of an album counts once. Drop co < 2.
+- **Lift uses the local base rate:** `lift = (co / N) / (owners(i) / population)`, where `owners(i)` comes from `matchOwners` and `population` is every fan with a known collection apart from you. This overrides the spec's unstated base rate. Bandcamp-wide counts would need the total number of Bandcamp fans, which we don't know, and they'd rank your own scene's staples high everywhere. Local lift answers "more common among this release's buyers than among everyone you've dug through". With only one release scanned, lift is about 1 for everything and the ranking falls back to plain co.
+- **Lift is capped at 10**, then `score = co × ln(1 + lift)`. The twin boost is the constant `TWIN_BOOST = 0` until Phase 5.
+- **Pruning:** candidates come in falling co order, and owner counts are fetched 200 at a time. No candidate can score more than `co × ln(1 + 10)`, so the loop stops as soon as the next candidate's ceiling is below the 30th-best score. In the perf data that means 200 lookups out of ~46k candidates.
+- **Filters:** the release itself, hidden releases, and releases you own or wishlisted *as a whole*. Owning tracks of an album keeps the album in, tagged "you own N tracks" (§3.8). Wishlisting a single track keeps the album in, untagged.
+- **Display:** rows point at the album. If no scanned collection holds the album itself, only tracks of it, the row shows one of those tracks (title and link) until the album turns up. The reason line doesn't say whether owners bought the album or only tracks.
+- **`weights.ts`** implements `w(i)` and `supporters(i)` (album count, then track count, then owners we've seen). Phase 4 only uses `supporters(i)`, to order fallback picks. `w(i)` is for twins and For you.
+
+### Small-release fallback
+
+- A release counts as **small when fewer than 8 fans other than you are known to own it**, scanned or not.
+- Small releases get **same-artist and same-label picks** from the local `items` table: other releases with the same selling account or the same `labelId`. Same seller and same artist name means "More from this artist". Same seller with a different artist name means the account is a label's, so "From the same label". A matching `labelId` reads "Also on <label>".
+- Album tracks are skipped. Order: same artist first, then by `supporters(i)`, highest first. These picks come after the co-owned ones, up to 30 rows in all.
+
+### Re-scoring and the message bus
+
+- The worker scores on request (`getAlsoBought`, when the sidebar opens or after a hide). It also re-scores **watched releases** (the ones open in tabs, §5) after every 5 supporters scanned, after the last supporter, and when the supporter list is complete. Results go out as the `alsoBought` event. The 5-fan counter lives in memory, so a killed worker restarts it from zero.
+- `releaseOpened` now carries the page's parsed `ReleasePageItem`, and the worker saves it. Scoring and the fallback therefore know the release before its scan job runs, even while the queue is paused.
+- **Hidden releases** live in the `hidden` store, keyed by matchKey (so hiding an album hides its tracks too). Every scorer must respect them. There's no "unhide" yet; that's Phase 7 (popup).
+- **Parser broken:** the scanner records the last `ParserError` as `parserError` in its state. It's cleared when a job of the same kind succeeds, so one odd page doesn't look like a broken parser for good. The sidebar shows "Parser broken" in place of an empty list, or as a notice above existing rows. The popup shows it too.
+
+### Gaps
+
+- **Wishlist from the sidebar isn't wired up.** Adding to a wishlist needs a logged-in Bandcamp API call that we haven't captured. The ♡ button opens the release page in a new tab, where Bandcamp's own Wishlist button works. To fix it, capture the request Bandcamp sends when you click Wishlist on a release page (logged in) and save it as a fixture.
+- **Track-only buyers of an album aren't listed as its supporters** (§3.8). This is still unmeasured: watch for albums whose supporter list looks small next to their `also_collected_count`.
+- **Preview:** Bandcamp's release-page CSP sets no `frame-src`, and the EmbeddedPlayer sends no `X-Frame-Options` (checked 2026-10-20), so the iframe loads on artist pages.

@@ -1,13 +1,13 @@
-import type { ScannerStatus } from '../shared/scan';
 import { useScannerStatus } from '../hooks/useScannerStatus';
+import type { ScannerStatus } from '../shared/scan';
+import { clockTime } from '../shared/timeAgo';
 import { Stat, StatusDot } from '../ui';
 
-function clockTime(at: number): string {
-  return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
 function StateLine({ status }: { status: ScannerStatus }) {
-  const { pause, queued, lastError } = status;
+  const { pause, queued, lastError, parserError } = status;
+  if (parserError) {
+    return <StatusDot tone="error">Bandcamp changed its data. Dighead needs an update</StatusDot>;
+  }
   if (pause?.reason === 'backoff') {
     return (
       <StatusDot tone="warning">

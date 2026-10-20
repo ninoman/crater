@@ -23,6 +23,8 @@ export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null 
     url: raw.item_url,
     artId: raw.item_art_id ?? null,
     purchaseKind: raw.item_type,
+    label: raw.label || null,
+    labelId: raw.label_id ?? null,
     otherOwners: raw.also_collected_count ?? null,
     addedAt: parseBandcampDate(raw.purchased ?? raw.added),
   };

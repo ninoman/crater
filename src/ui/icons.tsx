@@ -1,0 +1,51 @@
+// Small stroke icons, sized by the button text and coloured by currentColor.
+
+import type { ReactNode } from 'react';
+
+function Icon({ children }: { children: ReactNode }) {
+  return (
+    <svg
+      className="dh-icon"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      focusable="false"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {children}
+    </svg>
+  );
+}
+
+export const PlayIcon = () => (
+  <Icon>
+    <path d="M5 3.5v9l7-4.5z" fill="currentColor" />
+  </Icon>
+);
+
+export const StopIcon = () => (
+  <Icon>
+    <rect x="4" y="4" width="8" height="8" rx="1" fill="currentColor" />
+  </Icon>
+);
+
+export const HeartIcon = () => (
+  <Icon>
+    <path d="M8 13.5S2.5 10.2 2.5 6.2A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.2c0 4-5.5 7.3-5.5 7.3z" />
+  </Icon>
+);
+
+export const ExternalIcon = () => (
+  <Icon>
+    <path d="M9.5 2.5h4v4M13.5 2.5 7.5 8.5M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3" />
+  </Icon>
+);
+
+export const HideIcon = () => (
+  <Icon>
+    <path d="M4 4l8 8M12 4l-8 8" />
+  </Icon>
+);

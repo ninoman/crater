@@ -286,6 +286,19 @@ describe('drainQueue', () => {
     expect((await db.fans.get(4))?.status).toBe('error');
     expect((await db.fans.get(5))?.status).toBe('done');
     expect(store.state.lastError).toBeNull(); // cleared by the success after it
+    expect(store.state.parserError).toBeNull();
+  });
+
+  it('flags a parser error until a job of the same kind succeeds', async () => {
+    fakeBandcamp({ 4: 'broken' });
+    await queue([fanJob(4)]);
+
+    await drainQueue(deps());
+
+    expect(store.state.parserError).toEqual({
+      kind: 'fan',
+      message: expect.stringContaining('fan 4') as string,
+    });
   });
 
   it('retries a job that failed for an unknown reason, without pausing the queue', async () => {

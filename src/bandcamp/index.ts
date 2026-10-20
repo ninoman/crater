@@ -8,7 +8,7 @@ export {
 export { BandcampApiError, ParserError } from './errors';
 export { parseFanPage } from './fanPage';
 export { isPurchaseConfirmationUrl } from './purchase';
-export { itemKey, matchKey, parseItemKey } from './keys';
+export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';

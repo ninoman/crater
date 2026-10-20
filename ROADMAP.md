@@ -110,23 +110,25 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
 
 **Goal:** useful recommendations in context on every release page.
 
-1. [ ] `scoring/weights.ts`: `w(i) = 1 / log2(2 + supporters(i))`, with `supporters(i) = also_collected_count + 1` taken from collection items, falling back to the count of scanned owners.
-2. [ ] `scoring/alsoBought.ts`, implementing the spec's steps 1–5:
+1. [x] `scoring/weights.ts`: `w(i) = 1 / log2(2 + supporters(i))`, with `supporters(i) = also_collected_count + 1` taken from collection items, falling back to the count of scanned owners.
+2. [x] `scoring/alsoBought.ts`, implementing the spec's steps 1–5 (lift uses the local base rate, decisions §6):
    - co-ownership counts read from the `ownership.matchKey` index (no full scans), so a track and its album count as the same release
    - lift with a cap, then `score = co × log(1 + lift)`
    - twin boost (stubbed as 0 until Phase 5)
    - drop owned, wishlisted, the release itself, and anything with `co < 2`
    - reason line: "7 of 48 supporters own this"
-3. [ ] Small-release fallback (fewer than 8 supporters): blend in the same label's and the same artist's other releases, labeled as such.
-4. [ ] Scoring runs in the service worker, re-scores every 5 fans scanned and pushes the results to the tab.
-5. [ ] Sidebar UI: collapsible, docked right, in a shadow root.
+3. [x] Small-release fallback (fewer than 8 supporters): blend in the same label's and the same artist's other releases, labeled as such.
+4. [x] Scoring runs in the service worker, re-scores every 5 fans scanned and pushes the results to the tab.
+5. [x] Sidebar UI: collapsible, docked right, in a shadow root.
    - header with scan progress ("32 / 48 supporters scanned")
-   - rows with cover, artist – title, label, reason line, and buttons for preview, wishlist, open and hide
+   - rows with cover, artist – title, label, reason line, and buttons for preview, wishlist, open and hide. Wishlist opens the release page for now: the logged-in wishlist call isn't captured yet (decisions §6)
    - preview in a Bandcamp `EmbeddedPlayer` iframe
    - "hide" saves a hidden-items set that the scorers respect
-6. [ ] "Parser broken" state: if a `ParserError` comes up, show a clear message instead of an empty panel.
-7. [ ] Scoring tests on a small synthetic dataset with known expected rankings.
-8. [ ] Performance check: seed around 300k `ownership` rows and confirm a re-score stays under about 200 ms.
+6. [x] "Parser broken" state: if a `ParserError` comes up, show a clear message instead of an empty panel.
+7. [x] Scoring tests on a small synthetic dataset with known expected rankings.
+8. [x] Performance check: seed around 300k `ownership` rows and confirm a re-score stays under about 200 ms. `npm run perf`: 39 ms at 300k rows, 88 ms at 1M. Uses a precomputed match index (decisions §6).
+
+Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match index and the `hidden` store), a "queue paused" notice in the sidebar, and the collapsed state kept across pages.
 
 **Done when:** you use it on real releases for a week and the results look right. Note what feels off, so you can tune it in P7.
 
@@ -203,5 +205,5 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
 | End of P0 | Supporters endpoint captured and paginates | Fall back to first-page supporters only, and show "partial" in the UI |
 | End of P0 | Service-worker fetch carries cookies | Move your own collection and wishlist fetches into the content script |
 | End of P3 | No 429s at the default pace over an hour of scanning | Lower the defaults and the daily budget |
-| End of P4 | Re-score under ~200 ms at 300k rows | Precompute per-item owner counts and move scoring to an offscreen document |
+| End of P4 | Re-score under ~200 ms at 300k rows | Precompute per-item owner counts and move scoring to an offscreen document. **Precomputing was enough: 39 ms (decisions §6).** |
 | End of P5 | Top twins aren't dominated by label subscribers | Tighten the label-cluster thresholds or the down-weight |

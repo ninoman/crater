@@ -34,6 +34,15 @@ describe('parseCollectionPage', () => {
     }
   });
 
+  it('reads the label when the release is on one', () => {
+    const [denali, castrovalva] = parseCollectionPage(
+      fixtureJson('collection_items-p1.json'),
+    ).items;
+
+    expect(denali).toMatchObject({ artist: 'Denali', label: 'Jade Tree', labelId: 1638814209 });
+    expect(castrovalva).toMatchObject({ label: null, labelId: null });
+  });
+
   it('continues with the second page', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-p2.json'));
 

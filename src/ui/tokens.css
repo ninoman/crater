@@ -25,6 +25,10 @@
   --dh-color-warning: #c98a1b;
   --dh-color-danger: #c4473a;
   --dh-color-focus: rgba(29, 160, 195, 0.45);
+  --dh-color-warning-bg: #fdf5e6;
+  --dh-color-danger-bg: #fbeeec;
+  --dh-color-tooltip-bg: #333333;
+  --dh-color-on-tooltip: #ffffff;
 
   --dh-space-1: 4px;
   --dh-space-2: 8px;
@@ -38,7 +42,14 @@
   --dh-radius-pill: 999px;
 
   --dh-shadow-panel: 0 4px 18px rgba(0, 0, 0, 0.12);
+  --dh-shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.18);
+
+  --dh-cover-sm: 44px;
+  --dh-progress-height: 4px;
+  /* Bandcamp's small EmbeddedPlayer is 42px tall. */
+  --dh-embed-small-height: 42px;
   --dh-duration: 120ms;
 
   --dh-z-panel: 2147483000;
+  --dh-z-tooltip: 2147483001;
 }

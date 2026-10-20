@@ -14,3 +14,8 @@ export function timeAgo(then: number, now: number): string {
   }
   return 'just now';
 }
+
+/** "14:05": a time later today, e.g. when a pause ends. */
+export function clockTime(at: number): string {
+  return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}

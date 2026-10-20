@@ -1,6 +1,6 @@
 // Request builders for Bandcamp's internal endpoints. Pure: the worker does the actual fetching.
 
-import type { CollectionList, TralbumType } from './types';
+import type { CollectionList, ItemKey, TralbumType } from './types';
 
 export interface BandcampRequest {
   url: string;
@@ -86,6 +86,12 @@ export function releasePageRequest(url: string): BandcampRequest {
 
 export function fanPageUrl(username: string): string {
   return `https://bandcamp.com/${encodeURIComponent(username)}`;
+}
+
+/** Bandcamp's own small player, as used for previews (the page's `twitter:player` uses v=2 too). */
+export function embeddedPlayerUrl(key: ItemKey): string {
+  const kind = key[0] === 'a' ? 'album' : 'track';
+  return `https://bandcamp.com/EmbeddedPlayer/v=2/${kind}=${key.slice(1)}/size=small/bgcol=ffffff/linkcol=1da0c3/transparent=true/`;
 }
 
 /** Cover image URL. Sizes in px: 7 → 150, 2 → 350, 5 → 700, 10 → 1200. */

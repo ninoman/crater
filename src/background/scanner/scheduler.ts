@@ -1,7 +1,7 @@
 // The scan loop: one request at a time, paced, within the daily budget, and paused as a whole
 // when Bandcamp pushes back. Every run is one request, so a killed worker loses at most one.
 
-import type { FetchJson, FetchText } from '../../bandcamp';
+import { ParserError, type FetchJson, type FetchText } from '../../bandcamp';
 import { completeJob, failJob, nextJob, saveCursor, type DigheadDb, type QueueJob } from '../../db';
 import type { Settings } from '../../shared/settings';
 import { jobRetryAt, nextBackoff } from './backoff';
@@ -85,8 +85,13 @@ async function runJob(
   if (cursor) await saveCursor(ctx.db, job, cursor);
   else await completeJob(ctx.db, job);
   await deps.onStep(job, cursor === null);
-  return state.backoff || state.lastError
-    ? deps.store.save({ backoff: null, lastError: null })
+  const parserFixed = state.parserError?.kind === job.kind;
+  return state.backoff || state.lastError || parserFixed
+    ? deps.store.save({
+        backoff: null,
+        lastError: null,
+        ...(parserFixed ? { parserError: null } : {}),
+      })
     : state;
 }
 
@@ -113,5 +118,8 @@ async function handleFailure(
     if (job.kind === 'fan') await abandonFan(ctx, job);
     await deps.onStep(job, true);
   }
-  return deps.store.save({ lastError: message });
+  return deps.store.save({
+    lastError: message,
+    ...(error instanceof ParserError ? { parserError: { kind: job.kind, message } } : {}),
+  });
 }

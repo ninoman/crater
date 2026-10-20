@@ -13,6 +13,9 @@ export const rawCollectionItem = z.object({
   item_title: z.string(),
   band_id: z.number(),
   band_name: z.string(),
+  /** Set when the release is on a label but sold from the artist's own account. */
+  label: z.string().nullish(),
+  label_id: z.number().nullish(),
   also_collected_count: z.number().nullish(),
   item_art_id: z.number().nullish(),
   item_url: z.string(),

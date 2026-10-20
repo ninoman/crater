@@ -1,5 +1,7 @@
+import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
+import { getAlsoBought } from './recommend';
 import { getScannerStatus, openRelease } from './scanner';
 
 export const handlers: MessageHandlers = {
@@ -13,6 +15,11 @@ export const handlers: MessageHandlers = {
     void startSync('full');
     return null;
   },
-  releaseOpened: ({ itemKey, url }) => openRelease(itemKey, url),
+  releaseOpened: ({ item }) => openRelease(item),
   getScannerStatus: () => getScannerStatus(),
+  getAlsoBought: ({ itemKey }) => getAlsoBought(itemKey),
+  hideRelease: async ({ matchKey }) => {
+    await hideRelease(db, matchKey, Date.now());
+    return null;
+  },
 };

@@ -7,10 +7,8 @@ export type ScannerStatusView =
   | { state: 'ready'; status: ScannerStatus }
   | { state: 'unreachable'; error: string };
 
-const POLL_MS = 1000;
-
 /** Polls the scanner's queue, budget and pause state while mounted. */
-export function useScannerStatus(): ScannerStatusView {
+export function useScannerStatus(pollMs = 1000): ScannerStatusView {
   const [view, setView] = useState<ScannerStatusView>({ state: 'loading' });
 
   useEffect(() => {
@@ -20,9 +18,9 @@ export function useScannerStatus(): ScannerStatusView {
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       );
     void refresh();
-    const timer = setInterval(() => void refresh(), POLL_MS);
+    const timer = setInterval(() => void refresh(), pollMs);
     return () => clearInterval(timer);
-  }, []);
+  }, [pollMs]);
 
   return view;
 }

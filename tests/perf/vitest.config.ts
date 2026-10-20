@@ -1,0 +1,11 @@
+import { defineConfig } from 'vitest/config';
+
+// Perf checks seed big databases, so they run apart from `npm test`: `npm run perf`.
+export default defineConfig({
+  test: {
+    include: ['tests/perf/**/*.perf.ts'],
+    environment: 'node',
+    testTimeout: 10 * 60 * 1000,
+    hookTimeout: 10 * 60 * 1000,
+  },
+});

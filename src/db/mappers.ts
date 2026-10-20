@@ -18,6 +18,8 @@ export function itemFromCollection(item: CollectionItem, now: number): ItemRecor
     bandId: item.bandId,
     url: item.url,
     artId: item.artId,
+    label: item.label,
+    labelId: item.labelId,
     tags: [],
     supporterCount: item.otherOwners === null ? null : item.otherOwners + 1,
     fetchedAt: now,
@@ -27,7 +29,7 @@ export function itemFromCollection(item: CollectionItem, now: number): ItemRecor
 export function itemFromReleasePage(
   item: ReleasePageItem,
   now: number,
-): Omit<ItemRecord, 'supporterCount'> {
+): Omit<ItemRecord, 'supporterCount' | 'label' | 'labelId'> {
   return { ...item, fetchedAt: now };
 }
 

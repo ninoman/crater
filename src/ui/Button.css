@@ -16,6 +16,10 @@
     border-color var(--dh-duration);
 }
 
+.dh-root a.dh-button {
+  text-decoration: none;
+}
+
 .dh-button:disabled {
   opacity: 0.5;
   cursor: default;

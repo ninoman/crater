@@ -1,0 +1,12 @@
+.dh-tooltip {
+  z-index: var(--dh-z-tooltip);
+  max-width: 220px;
+  padding: var(--dh-space-1) var(--dh-space-2);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-tooltip-bg);
+  color: var(--dh-color-on-tooltip);
+  font-family: var(--dh-font);
+  font-size: var(--dh-text-xs);
+  line-height: var(--dh-leading);
+  box-shadow: var(--dh-shadow-tooltip);
+}

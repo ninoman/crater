@@ -1,0 +1,16 @@
+.dh-notice {
+  padding: var(--dh-space-2) var(--dh-space-3);
+  border-left: 3px solid;
+  border-radius: var(--dh-radius-sm);
+  font-size: var(--dh-text-sm);
+}
+
+.dh-notice--warning {
+  border-color: var(--dh-color-warning);
+  background: var(--dh-color-warning-bg);
+}
+
+.dh-notice--error {
+  border-color: var(--dh-color-danger);
+  background: var(--dh-color-danger-bg);
+}

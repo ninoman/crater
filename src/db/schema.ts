@@ -2,14 +2,18 @@
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
 import type { ItemKey } from '../bandcamp';
+import { buildMatchIndex } from './matchIndex';
 
 export interface ItemRecord {
   itemKey: ItemKey;
   albumKey: ItemKey | null;
   title: string;
   artist: string;
-  /** Selling account; the label proxy (decisions §3.3). */
+  /** Selling account: the artist's own, or a label's (decisions §3.3). */
   bandId: number;
+  /** Set when the release is on a label but sold from the artist's account. From collection pages. */
+  label: string | null;
+  labelId: number | null;
   url: string;
   artId: number | null;
   /** Only known once the release page itself has been parsed. */
@@ -40,6 +44,29 @@ export interface OwnershipRecord {
   matchKey: ItemKey;
   source: 'collection' | 'wishlist';
   addedAt: number | null;
+}
+
+/**
+ * A fan's distinct collection matchKeys, kept in step with their `ownership` rows. Scoring reads
+ * these compact lists instead of every ownership row (decisions §6).
+ */
+export interface FanMatchesRecord {
+  fanId: number;
+  /** matchKeys as numbers (keyToNumber), sorted ascending. */
+  matchIds: Float64Array;
+}
+
+/** How many fans' collections hold a matchKey: the base rate for lift (decisions §6). */
+export interface MatchOwnersRecord {
+  /** keyToNumber(matchKey) */
+  matchId: number;
+  owners: number;
+}
+
+/** A release you hid from recommendations. Keyed by matchKey, so it hides tracks of it too. */
+export interface HiddenRecord {
+  matchKey: ItemKey;
+  hiddenAt: number;
 }
 
 export interface ReleaseSupportersRecord {
@@ -116,6 +143,9 @@ export class DigheadDb extends Dexie {
   me!: EntityTable<MeRecord, 'id'>;
   twins!: EntityTable<TwinRecord, 'fanId'>;
   queue!: EntityTable<QueueJob, 'id'>;
+  fanMatches!: EntityTable<FanMatchesRecord, 'fanId'>;
+  matchOwners!: EntityTable<MatchOwnersRecord, 'matchId'>;
+  hidden!: EntityTable<HiddenRecord, 'matchKey'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -134,5 +164,25 @@ export class DigheadDb extends Dexie {
     this.version(2)
       .stores({ releaseSupporters: 'itemKey, *fanIds' })
       .upgrade((tx) => tx.table('queue').clear());
+    // v3: labels on items, the match index scoring reads (decisions §6) and hidden releases.
+    this.version(3)
+      .stores({
+        items: 'itemKey, bandId, albumKey, labelId',
+        fanMatches: 'fanId',
+        matchOwners: 'matchId',
+        hidden: 'matchKey',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table<ItemRecord>('items')
+          .toCollection()
+          .modify((item) => {
+            item.label ??= null;
+            item.labelId ??= null;
+          });
+        const index = buildMatchIndex(await tx.table<OwnershipRecord>('ownership').toArray());
+        await tx.table('fanMatches').bulkPut(index.fanMatches);
+        await tx.table('matchOwners').bulkPut(index.matchOwners);
+      });
   }
 }

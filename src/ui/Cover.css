@@ -1,0 +1,12 @@
+.dh-cover {
+  display: block;
+  flex: none;
+  width: var(--dh-cover-sm);
+  height: var(--dh-cover-sm);
+  border-radius: var(--dh-radius-sm);
+  object-fit: cover;
+}
+
+.dh-cover--empty {
+  background: var(--dh-color-bg-hover);
+}

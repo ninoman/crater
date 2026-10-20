@@ -23,6 +23,12 @@ export interface ReleasePageItem extends ReleaseInfo {
 
 export interface CollectionItem extends ReleaseInfo {
   purchaseKind: 'album' | 'track' | 'package';
+  /**
+   * The record label, when the release is on one but sold from the artist's account. Null when
+   * the selling account is itself the label (then bandId is the label) or there's no label.
+   */
+  label: string | null;
+  labelId: number | null;
   /** Bandcamp's also_collected_count: how many other fans own this release. */
   otherOwners: number | null;
   /** ms since epoch; purchase date for collections, added date for wishlists. */

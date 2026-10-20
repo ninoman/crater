@@ -1,0 +1,70 @@
+.dh-row-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dh-row {
+  padding: var(--dh-space-2) var(--dh-space-3) var(--dh-space-2) var(--dh-space-4);
+  border-bottom: 1px solid var(--dh-color-border);
+}
+
+.dh-row:last-child {
+  border-bottom: 0;
+}
+
+.dh-row__main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dh-space-3);
+}
+
+.dh-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dh-row__title,
+.dh-row__meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-row__title {
+  font-size: var(--dh-text-sm);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-row__meta {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
+
+.dh-row__badges {
+  margin-top: 2px;
+}
+
+.dh-row__actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+}
+
+/* Actions stay reachable by keyboard, but only draw the eye on hover or focus. */
+.dh-row__actions .dh-button--ghost {
+  color: var(--dh-color-subtle);
+}
+
+.dh-row:hover .dh-row__actions .dh-button--ghost,
+.dh-row:focus-within .dh-row__actions .dh-button--ghost {
+  color: var(--dh-color-muted);
+}
+
+/* Four actions have to fit beside the text in a narrow panel. */
+.dh-row__actions .dh-button--icon {
+  width: 24px;
+  height: 24px;
+}

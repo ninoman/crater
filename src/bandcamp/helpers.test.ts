@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { decodeEntities, readBlobById } from './html';
-import { matchKey, parseBandcampDate, parseItemKey, purchasedAtFromToken } from './keys';
-import { collectionListRequest, firstPageToken } from './requests';
+import {
+  keyFromNumber,
+  keyToNumber,
+  matchKey,
+  parseBandcampDate,
+  parseItemKey,
+  purchasedAtFromToken,
+} from './keys';
+import { collectionListRequest, embeddedPlayerUrl, firstPageToken } from './requests';
 
 describe('decodeEntities', () => {
   it('decodes named and numeric entities', () => {
@@ -35,6 +42,13 @@ describe('keys', () => {
     expect(parseItemKey('t456')).toEqual({ type: 't', tralbumId: 456 });
   });
 
+  it('turns keys into numbers and back: albums positive, tracks negative', () => {
+    expect(keyToNumber('a4294967295')).toBe(4294967295);
+    expect(keyToNumber('t456')).toBe(-456);
+    expect(keyFromNumber(-456)).toBe('t456');
+    expect(keyFromNumber(keyToNumber('a3149089081'))).toBe('a3149089081');
+  });
+
   it('reads the purchase time from a supporter token', () => {
     expect(purchasedAtFromToken('1:1792430325:5325531:0:1:0')).toBe(1792430325000);
     expect(purchasedAtFromToken('garbage')).toBeNull();
@@ -59,6 +73,13 @@ describe('requests', () => {
       older_than_token: 'tok',
       count: 100,
     });
+  });
+
+  it('builds an embedded player URL for albums and tracks', () => {
+    expect(embeddedPlayerUrl('a3149089081')).toMatch(
+      /^https:\/\/bandcamp\.com\/EmbeddedPlayer\/v=2\/album=3149089081\/size=small\//,
+    );
+    expect(embeddedPlayerUrl('t3961474810')).toContain('/track=3961474810/');
   });
 
   it('builds a wishlist request', () => {

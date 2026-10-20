@@ -28,6 +28,8 @@ function item(itemKey: CollectionItem['itemKey'], otherOwners: number | null = 4
     url: 'https://artist.bandcamp.com/album/title',
     artId: null,
     purchaseKind: 'album',
+    label: null,
+    labelId: null,
     otherOwners,
     addedAt: null,
   };

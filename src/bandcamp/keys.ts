@@ -13,6 +13,19 @@ export function matchKey(item: { itemKey: ItemKey; albumKey: ItemKey | null }): 
   return item.albumKey ?? item.itemKey;
 }
 
+/**
+ * A key as one number, so lists of them store and count fast (decisions §6): albums are
+ * positive, tracks negative. Tralbum ids are 32-bit, so every key round-trips exactly.
+ */
+export function keyToNumber(key: ItemKey): number {
+  const id = Number(key.slice(1));
+  return key[0] === 'a' ? id : -id;
+}
+
+export function keyFromNumber(value: number): ItemKey {
+  return value < 0 ? `t${-value}` : `a${value}`;
+}
+
 /** Supporter tokens look like `1:<purchase unix ts>:<fan_id>:<is_review>:1:0`. */
 export function purchasedAtFromToken(token: string): number | null {
   const seconds = Number(token.split(':')[1]);

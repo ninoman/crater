@@ -14,6 +14,8 @@ const album: CollectionItem = {
   url: 'https://artist.bandcamp.com/album/album',
   artId: null,
   purchaseKind: 'album',
+  label: null,
+  labelId: null,
   otherOwners: 11,
   addedAt: null,
 };
