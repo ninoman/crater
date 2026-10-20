@@ -5,7 +5,7 @@ export type SyncMode = 'full' | 'incremental';
 
 export type SyncActivity =
   | { state: 'idle' }
-  | { state: 'syncing'; mode: SyncMode; itemsFetched: number }
+  | { state: 'syncing'; mode: SyncMode; itemsFetched: number; followingFetched: number }
   | { state: 'error'; message: string };
 
 export type SyncStatus =
@@ -15,6 +15,7 @@ export type SyncStatus =
       username: string;
       owned: number;
       wishlisted: number;
+      followed: number;
       /** ms since epoch of the last completed sync, or null if none has finished. */
       syncedAt: number | null;
       activity: SyncActivity;

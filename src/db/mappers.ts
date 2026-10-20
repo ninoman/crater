@@ -3,10 +3,12 @@
 import {
   matchKey,
   type CollectionItem,
+  type FollowingRow,
   type ReleaseInfo,
   type ReleasePageItem,
   type Supporter,
 } from '../bandcamp';
+import type { SyncedFollowing } from './repo/following';
 import type { FanRecord, ItemRecord, OwnershipRecord } from './schema';
 
 export function itemFromCollection(item: CollectionItem, now: number): ItemRecord {
@@ -73,4 +75,8 @@ export function fanFromSupporter(supporter: Supporter, now: number): FanRecord {
     status: 'queued',
     lastSeenAt: now,
   };
+}
+
+export function followingFromRow(row: FollowingRow): SyncedFollowing {
+  return { ...row, followedAt: row.followedAt ?? 0 };
 }

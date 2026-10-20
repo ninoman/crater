@@ -1,7 +1,7 @@
 // Decides when to sync the logged-in fan's collection, runs one sync at a time and tracks progress.
 
 import type { ItemKey, Viewer } from '../bandcamp';
-import { countOwnership, db, getMe, saveViewer, type MeRecord } from '../db';
+import { countFollowing, countOwnership, db, getMe, saveViewer, type MeRecord } from '../db';
 import { loadSettings } from '../shared/settings';
 import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
@@ -48,7 +48,7 @@ async function runSync(requested: SyncMode): Promise<void> {
   // Without a finished sync there's nothing to be incremental against.
   const mode = me.syncedAt === null ? 'full' : requested;
   const settings = await loadSettings();
-  activity = { state: 'syncing', mode, itemsFetched: 0 };
+  activity = { state: 'syncing', mode, itemsFetched: 0, followingFetched: 0 };
   try {
     const added = await syncMe(
       {
@@ -59,7 +59,10 @@ async function runSync(requested: SyncMode): Promise<void> {
         pause: async () => sleep(paceDelayMs(await loadSettings(), Math.random)),
         now: Date.now,
         onProgress: (itemsFetched) => {
-          activity = { state: 'syncing', mode, itemsFetched };
+          activity = { state: 'syncing', mode, itemsFetched, followingFetched: 0 };
+        },
+        onFollowingProgress: (followingFetched) => {
+          if (activity.state === 'syncing') activity = { ...activity, followingFetched };
         },
       },
       me,
@@ -94,15 +97,17 @@ export async function onPageSeen(viewer: Viewer | null, purchaseConfirmation: bo
 export async function getSyncStatus(): Promise<SyncStatus> {
   const me = await getMe(db);
   if (!me) return { state: 'logged-out' };
-  const [owned, wishlisted] = await Promise.all([
+  const [owned, wishlisted, followed] = await Promise.all([
     countOwnership(db, me.fanId, 'collection'),
     countOwnership(db, me.fanId, 'wishlist'),
+    countFollowing(db),
   ]);
   return {
     state: 'known',
     username: me.username,
     owned,
     wishlisted,
+    followed,
     syncedAt: me.syncedAt,
     activity,
   };

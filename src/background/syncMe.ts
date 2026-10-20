@@ -17,6 +17,7 @@ import {
   type MeRecord,
 } from '../db';
 import type { SyncMode } from '../shared/sync';
+import { syncFollowing } from './syncFollowing';
 
 export interface SyncDeps {
   db: DigheadDb;
@@ -26,12 +27,13 @@ export interface SyncDeps {
   pause: () => Promise<void>;
   now: () => number;
   onProgress: (itemsFetched: number) => void;
+  onFollowingProgress: (followingFetched: number) => void;
 }
 
 // Wishlist first: if an item was bought since, the collection pass overwrites its row.
 const LISTS: CollectionList[] = ['wishlist', 'collection'];
 
-/** Syncs both lists. Returns the collection items that weren't in your collection before. */
+/** Syncs both lists, then your followings. Returns the collection items that weren't in your collection before. */
 export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Promise<ItemKey[]> {
   const before = await ownedItemKeys(deps.db, me.fanId, 'collection');
   let fetched = 0;
@@ -40,6 +42,10 @@ export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Prom
   }
   await markSynced(deps.db, deps.now());
   const after = await ownedItemKeys(deps.db, me.fanId, 'collection');
+  // Its own failure leaves the followings as they were and doesn't undo the collection sync.
+  await syncFollowing(deps, me.fanId).catch((error: unknown) =>
+    console.error('dighead: following sync failed', error),
+  );
   return [...after].filter((key) => !before.has(key));
 }
 

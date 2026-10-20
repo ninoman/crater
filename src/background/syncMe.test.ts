@@ -27,6 +27,8 @@ function rawAlbum(id: number, position: number) {
 function fakeBandcamp(lists: { collection: number[]; wishlist: number[] | 'hidden' }) {
   const requests: string[] = [];
   const fetchJson = async ({ url, init }: BandcampRequest) => {
+    if (url.includes('following_'))
+      return { followeers: [], more_available: false, last_token: null };
     const list = url.endsWith('wishlist_items') ? 'wishlist' : 'collection';
     const body = JSON.parse(init.body as string) as { older_than_token: string; count: number };
     const token = body.older_than_token.startsWith('at:') ? body.older_than_token : 'start';
@@ -67,6 +69,7 @@ function deps(fetchJson: SyncDeps['fetchJson'], overrides: Partial<SyncDeps> = {
     pause: async () => {},
     now: () => 1000,
     onProgress: () => {},
+    onFollowingProgress: () => {},
     ...overrides,
   };
 }

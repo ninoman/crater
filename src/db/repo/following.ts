@@ -54,6 +54,10 @@ export async function setUnfollowed(
   await db.following.update(key, { unfollowed });
 }
 
+export function countFollowing(db: DigheadDb): Promise<number> {
+  return db.following.count();
+}
+
 export function getFollowing(
   db: DigheadDb,
   key: FollowingKey,

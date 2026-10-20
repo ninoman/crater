@@ -181,7 +181,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 3. [x] Find how Bandcamp's follow buttons work, so our cards can reuse its handler instead of sending requests (decisions §8).
 4. [x] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
 5. [x] Schema v5 migration.
-6. [ ] Following sync inside your own sync (always full, 500 per request).
+6. [x] Following sync inside your own sync (always full, 500 per request).
 7. [x] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
 8. [ ] Message bus and hooks, including batched `getTwinStandings`.
 9. [x] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
