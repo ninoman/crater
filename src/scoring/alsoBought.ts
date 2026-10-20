@@ -40,7 +40,7 @@ export function coOwnership(
   all.sort();
 
   const result: CoOwned[] = [];
-  for (let start = 0; start < all.length;) {
+  for (let start = 0; start < all.length; ) {
     const id = all[start] as number;
     let end = start + 1;
     while (end < all.length && all[end] === id) end++;
@@ -229,7 +229,8 @@ export function fallbackPicks(
 }
 
 export type AlsoBoughtPick =
-  { matchKey: ItemKey; kind: 'co-owned'; co: number; twins: number } | FallbackPick;
+  | { matchKey: ItemKey; kind: 'co-owned'; co: number; twins: number }
+  | FallbackPick;
 
 /** Co-owned picks first, then fallback picks they don't already cover. */
 export function blendPicks(

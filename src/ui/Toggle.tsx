@@ -17,6 +17,7 @@ export function Toggle({ label, checked, onChange }: ToggleProps) {
         type="checkbox"
         role="switch"
         checked={checked}
+        aria-checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
       <label className="dh-toggle__label" htmlFor={id}>

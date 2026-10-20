@@ -38,7 +38,7 @@ P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also b
 
 **Goal:** an empty extension that builds, loads, and has tested parsers.
 
-1. [x] Scaffold: TypeScript, Vite, CRXJS, React, Dexie, Vitest. Add ESLint and Prettier, and keep `strict: true`.
+1. [x] Scaffold: TypeScript, Vite, CRXJS, React, Dexie, Vitest. Add Biome (lint + format), and keep `strict: true`.
 2. [x] Manifest: MV3, `host_permissions: ["https://*.bandcamp.com/*"]`, `permissions: ["storage", "alarms"]`, the background service worker, content scripts for `bandcamp.com/*` and `*.bandcamp.com/album/*` and `/track/*`, and the popup.
 3. [x] Repo layout:
    ```

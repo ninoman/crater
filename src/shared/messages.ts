@@ -74,7 +74,8 @@ export async function sendMessage<K extends MessageType>(
 export function listenForMessages(handlers: MessageHandlers): void {
   chrome.runtime.onMessage.addListener((message: Envelope<MessageType>, sender, sendResponse) => {
     const handler = handlers[message.type] as
-      ((payload: unknown, sender: chrome.runtime.MessageSender) => unknown) | undefined;
+      | ((payload: unknown, sender: chrome.runtime.MessageSender) => unknown)
+      | undefined;
     if (!handler) return false;
     Promise.resolve()
       .then(() => handler(message.payload, sender))

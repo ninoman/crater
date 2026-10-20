@@ -103,14 +103,16 @@ beforeAll(async () => {
     ...Array.from({ length: TWIN_SUPPORTERS }, (_, i) => 100 + i * 6),
     ...Array.from({ length: TWINS - TWIN_SUPPORTERS }, (_, i) => 10_000 + i),
   ];
-  const twins = twinIds.map((fanId, i): TwinRecord => ({
-    fanId,
-    overlap: 50,
-    jaccard: 0.05,
-    score: 1 / (1 + i),
-    labelCluster: false,
-    computedAt: 0,
-  }));
+  const twins = twinIds.map(
+    (fanId, i): TwinRecord => ({
+      fanId,
+      overlap: 50,
+      jaccard: 0.05,
+      score: 1 / (1 + i),
+      labelCluster: false,
+      computedAt: 0,
+    }),
+  );
 
   const started = performance.now();
   const index = buildMatchIndex(rows);

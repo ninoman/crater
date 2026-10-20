@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { parseReleasePage, ParserError, type ReleasePage } from '../../bandcamp';
 
 export type CurrentRelease =
-  { state: 'ok'; page: ReleasePage } | { state: 'parser-broken'; detail: string };
+  | { state: 'ok'; page: ReleasePage }
+  | { state: 'parser-broken'; detail: string };
 
 /** Parses the release page we're on, once. */
 export function useCurrentRelease(): CurrentRelease {

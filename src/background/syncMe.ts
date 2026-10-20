@@ -64,7 +64,7 @@ async function syncList(
       }
       await upsertCollectionItems(db, page.items, deps.now());
       await putOwnership(db, fanId, page.items, list);
-      keys.forEach((key) => seen.add(key));
+      for (const key of keys) seen.add(key);
       fetched += page.items.length;
       deps.onProgress(fetched);
       first = false;

@@ -26,7 +26,7 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<FanCurs
     Math.min(settings.collectionBatchSize, settings.collectionCap - scanned),
   );
 
-  let page;
+  let page: Awaited<ReturnType<typeof fetchCollectionPage>>;
   try {
     page = await fetchCollectionPage(ctx.fetchJson, 'collection', fanId, token, count);
   } catch (error) {

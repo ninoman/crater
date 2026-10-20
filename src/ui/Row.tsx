@@ -30,6 +30,7 @@ export function Row({ media, title, meta = [], badges, actions, children }: RowP
         <div className="dh-row__text">
           <span className="dh-row__title">{title}</span>
           {meta.map((line, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: meta lines are static and never reorder.
             <span key={i} className="dh-row__meta">
               {line}
             </span>
