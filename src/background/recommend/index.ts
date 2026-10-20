@@ -11,6 +11,8 @@ import { computeAlsoBought } from './alsoBought';
 import { rescoreDue } from './rescore';
 import { computeTwins } from './twins';
 
+export { readTwinsResult } from './twinRows';
+
 /** Twins are recomputed after this many fans finish scanning. */
 export const TWINS_EVERY_FANS = 25;
 

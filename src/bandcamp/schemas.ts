@@ -80,6 +80,11 @@ export const rawViewerPagedata = z.object({
   identities: z.object({ fan: rawViewer.nullish() }).nullish(),
 });
 
+/** The part of a fan page's `#pagedata` that says whether it's the logged-in fan's own. */
+export const rawOwnPagePagedata = z.object({
+  fan_data: z.object({ is_own_page: z.boolean().nullish() }).nullish(),
+});
+
 const rawListData = z.object({
   item_count: z.number(),
   last_token: z.string().nullable(),

@@ -1,0 +1,26 @@
+.dh-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  min-width: 0;
+}
+
+.dh-identity__avatar {
+  display: block;
+  flex: none;
+  width: var(--dh-avatar-sm);
+  height: var(--dh-avatar-sm);
+  border-radius: var(--dh-radius-pill);
+  object-fit: cover;
+}
+
+.dh-identity__avatar--empty {
+  background: var(--dh-color-bg-hover);
+}
+
+.dh-identity__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--dh-weight-bold);
+}

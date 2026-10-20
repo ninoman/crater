@@ -6,6 +6,7 @@ import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
+import type { TwinsResult } from './twins';
 
 type NoPayload = Record<string, never>;
 
@@ -29,6 +30,8 @@ export interface MessageMap {
   getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };
   /** Never recommend this release again, in any list. */
   hideRelease: { request: { matchKey: ItemKey }; response: null };
+  /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */
+  getTwins: { request: NoPayload; response: TwinsResult };
 }
 
 export type MessageType = keyof MessageMap;

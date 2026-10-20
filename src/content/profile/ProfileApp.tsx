@@ -1,0 +1,26 @@
+import { useSyncExternalStore, type ComponentType } from 'react';
+import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
+import { TwinsTab } from './twins/TwinsTab';
+
+interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
+  View: ComponentType;
+}
+
+/** Our tabs on your profile, in order after Bandcamp's own. A new tab is one more entry here. */
+export const PROFILE_TABS = [
+  { id: 'twins', label: 'twins', View: TwinsTab },
+] as const satisfies readonly ProfileTab<string>[];
+
+export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];
+
+/** Shows the open tab's view. Views mount on open, so each opening loads fresh data. */
+export function ProfileApp({ tabs }: { tabs: ProfileTabs<ProfileTabId> }) {
+  const active = useSyncExternalStore(tabs.subscribe, tabs.getActive);
+  const tab = PROFILE_TABS.find(({ id }) => id === active);
+  if (!tab) return null;
+  return (
+    <section className="dh-profile" aria-label={`Dighead: ${tab.label}`}>
+      <tab.View />
+    </section>
+  );
+}

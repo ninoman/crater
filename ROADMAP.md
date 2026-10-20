@@ -143,10 +143,11 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 2. [x] Label-cluster flag: more than 50% of the overlap comes from one label and F owns more than 60% of that label's catalog. Apply ×0.3 (toggleable). For the MVP, "label" is the selling account (`band_id`), and catalog size is that seller's item count in the local DB (see decisions §3).
 3. [x] Recompute twins after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
 4. [ ] Wire the twin boost into Also bought, and add a *Twins who own this* tab to the sidebar.
-5. [ ] Profile page integration on `bandcamp.com/<you>`:
+5. [x] Profile page integration on `bandcamp.com/<you>`:
    - inject a **Twins** tab next to Bandcamp's own tabs, styled to match
    - put tab state in the URL hash (`#twins`), and hide Bandcamp's grid while the tab is active
    - leaderboard with avatar, name, overlap, % match, score and flag, plus sort (score / overlap / Jaccard) and filter
+   - one tab injector (`src/content/profile/`) that For you (6.3) and Following reuse by adding an entry to `PROFILE_TABS`
 6. [ ] On other fans' profiles, show a badge such as "your #4 twin · 37 in common".
 7. [ ] "Add release to queue" button, so you can deliberately grow the dataset.
 
