@@ -45,6 +45,7 @@
   --dh-shadow-tooltip: 0 2px 8px rgba(0, 0, 0, 0.18);
 
   --dh-cover-sm: 44px;
+  --dh-avatar-sm: 32px;
   --dh-progress-height: 4px;
   /* Bandcamp's small EmbeddedPlayer is 42px tall. */
   --dh-embed-small-height: 42px;

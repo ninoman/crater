@@ -1,0 +1,61 @@
+.dh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--dh-text-sm);
+}
+
+.dh-table__head {
+  padding: var(--dh-space-2) var(--dh-space-3);
+  border-bottom: 1px solid var(--dh-color-border);
+  font-size: var(--dh-text-xs);
+  font-weight: var(--dh-weight-regular);
+  color: var(--dh-color-muted);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.dh-table__cell {
+  padding: var(--dh-space-2) var(--dh-space-3);
+  border-bottom: 1px solid var(--dh-color-border);
+  vertical-align: middle;
+}
+
+.dh-table__row:hover .dh-table__cell {
+  background: var(--dh-color-bg-subtle);
+}
+
+.dh-table__cell--numeric {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dh-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dh-table__sort:hover,
+.dh-table__head[aria-sort] .dh-table__sort {
+  color: var(--dh-color-text);
+}
+
+.dh-table__head[aria-sort] .dh-table__sort {
+  font-weight: var(--dh-weight-bold);
+}
+
+/* Only the active sort shows its arrow; the others keep the space so headers don't shift. */
+.dh-table__sort-mark {
+  visibility: hidden;
+}
+
+.dh-table__head[aria-sort] .dh-table__sort-mark {
+  visibility: visible;
+}

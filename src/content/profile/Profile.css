@@ -1,0 +1,23 @@
+.dh-profile {
+  padding: var(--dh-space-4) 0 var(--dh-space-6);
+}
+
+.dh-profile__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dh-space-3);
+  margin-bottom: var(--dh-space-2);
+}
+
+.dh-profile__summary,
+.dh-profile__note {
+  margin: 0;
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
+
+.dh-profile__note {
+  margin-top: var(--dh-space-3);
+}

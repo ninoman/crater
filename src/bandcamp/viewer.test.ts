@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fixtureText } from '../../tests/fixtures';
 import { ParserError } from './errors';
-import { parseViewer } from './viewer';
+import { isOwnFanPage, parseViewer } from './viewer';
 
 /** Builds a `#pagedata` element the way a browser serializes it. */
 function pagedataHtml(blob: object): string {
@@ -39,6 +39,29 @@ describe('parseViewer', () => {
 
   it('throws ParserError when the fan identity changes shape', () => {
     expect(() => parseViewer(pagedataHtml({ identities: { fan: { id: '42' } } }))).toThrow(
+      ParserError,
+    );
+  });
+});
+
+describe('isOwnFanPage', () => {
+  it('is true on your own fan page', () => {
+    expect(isOwnFanPage(fixtureText('me-fan-page.html'))).toBe(true);
+  });
+
+  it.each(['fan-page.html', 'fan-page-medium.html', 'album-page.html'])(
+    'is false on %s',
+    (fixture) => {
+      expect(isOwnFanPage(fixtureText(fixture))).toBe(false);
+    },
+  );
+
+  it('is false without #pagedata', () => {
+    expect(isOwnFanPage('<html><body></body></html>')).toBe(false);
+  });
+
+  it('throws ParserError when the flag changes shape', () => {
+    expect(() => isOwnFanPage(pagedataHtml({ fan_data: { is_own_page: 'yes' } }))).toThrow(
       ParserError,
     );
   });

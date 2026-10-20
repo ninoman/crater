@@ -8,7 +8,7 @@ import {
   parseItemKey,
   purchasedAtFromToken,
 } from './keys';
-import { collectionListRequest, embeddedPlayerUrl, firstPageToken } from './requests';
+import { collectionListRequest, embeddedPlayerUrl, fanImageUrl, firstPageToken } from './requests';
 
 describe('decodeEntities', () => {
   it('decodes named and numeric entities', () => {
@@ -80,6 +80,10 @@ describe('requests', () => {
       /^https:\/\/bandcamp\.com\/EmbeddedPlayer\/v=2\/album=3149089081\/size=small\//,
     );
     expect(embeddedPlayerUrl('t3961474810')).toContain('/track=3961474810/');
+  });
+
+  it('builds a fan avatar URL like the supporter thumbnails on album-page.html', () => {
+    expect(fanImageUrl(2053905)).toBe('https://f4.bcbits.com/img/0002053905_42.jpg');
   });
 
   it('builds a wishlist request', () => {

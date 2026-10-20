@@ -94,6 +94,11 @@ export function embeddedPlayerUrl(key: ItemKey): string {
   return `https://bandcamp.com/EmbeddedPlayer/v=2/${kind}=${key.slice(1)}/size=small/bgcol=ffffff/linkcol=1da0c3/transparent=true/`;
 }
 
+/** A fan's avatar (`image_id`), 50×50 as on Bandcamp's supporter thumbnails. */
+export function fanImageUrl(imageId: number): string {
+  return `https://f4.bcbits.com/img/${String(imageId).padStart(10, '0')}_42.jpg`;
+}
+
 /** Cover image URL. Sizes in px: 7 → 150, 2 → 350, 5 → 700, 10 → 1200. */
 export function artUrl(artId: number, size: 2 | 5 | 7 | 10 = 7): string {
   return `https://f4.bcbits.com/img/a${artId}_${size}.jpg`;

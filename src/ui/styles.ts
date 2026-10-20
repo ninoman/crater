@@ -7,12 +7,15 @@ import button from './Button.css?inline';
 import cover from './Cover.css?inline';
 import embedFrame from './EmbedFrame.css?inline';
 import emptyState from './EmptyState.css?inline';
+import identity from './Identity.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import progress from './Progress.css?inline';
 import row from './Row.css?inline';
+import searchField from './SearchField.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
+import table from './Table.css?inline';
 import tabs from './Tabs.css?inline';
 import tokens from './tokens.css?inline';
 import tooltip from './Tooltip.css?inline';
@@ -32,6 +35,9 @@ export const uiStyles = [
   notice,
   progress,
   row,
+  table,
+  searchField,
+  identity,
   tooltip,
 ].join('\n');
 

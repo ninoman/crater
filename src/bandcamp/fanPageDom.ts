@@ -1,0 +1,18 @@
+// Where Bandcamp's fan page keeps its collection tabs and grids (see me-fan-page.html).
+// The profile integration injects its own tabs among these, so this is the one place that knows
+// the markup.
+
+export const FAN_PAGE_DOM = {
+  /** Wraps the tab bar and every grid. */
+  grids: '#grids',
+  /** The `<ol>` of tabs: collection, playlists, wishlist, followers, following. */
+  tabList: '#grid-tabs',
+  /** Bandcamp's own tabs inside the list. */
+  tab: 'li[data-tab]',
+  /** Class on the selected tab. Bandcamp's CSS draws the underline from it. */
+  activeTabClass: 'active',
+  /** Sticky bar holding the tabs and search; content shown for a tab goes right after it. */
+  tabBar: '.grid-tabs-anchor',
+  /** Bandcamp's tab contents and their search and visibility controls. */
+  tabContents: ['.grid', '.owner-controls'],
+} as const;

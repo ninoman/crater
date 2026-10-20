@@ -12,5 +12,6 @@ export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './k
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
-export { parseViewer } from './viewer';
+export { FAN_PAGE_DOM } from './fanPageDom';
+export { isOwnFanPage, parseViewer } from './viewer';
 export type * from './types';

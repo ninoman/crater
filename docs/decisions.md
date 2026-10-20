@@ -197,6 +197,18 @@ Code: `src/scoring/twins.ts` (pure), `src/db/repo/twins.ts` (gathering and stori
 - **The leaderboard keeps the top 200**, replaced in full on each recompute. Fans are scored 500 at a time with a yield between pages.
 - **Recompute triggers:** after each finished sync of your own collection, after every 25 fan scans (an in-memory counter, lost with the worker), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.
 
+### Profile tabs (Phase 5.5)
+
+Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.html` with Bandcamp's real CSS and a stand-in for its tab script. Not yet tried on the live page with Bandcamp's own JS.
+
+- **Your own page** is told apart by `fan_data.is_own_page` in `#pagedata` (`isOwnFanPage`), not by comparing usernames.
+- **The tab handle is light DOM**, an `<li class="dighead-tab"><a class="tab-title" href="#twins">` appended to Bandcamp's `#grid-tabs`, so Bandcamp's CSS styles it exactly like its own tabs. It's the one exception to "injected UI lives in a shadow root". It has no `data-tab`, and clicks on it stop at the `<li>` (`stopImmediatePropagation`) so Bandcamp's tab switcher never sees them. The tab content renders in a shadow root in a slot right after `.grid-tabs-anchor`, kept at the tab list's width by a ResizeObserver because Bandcamp's grid width steps with the viewport.
+- **The hash is the state.** The link sets `#twins` itself (a history entry, so Back works), `hashchange` opens and closes our tabs, and a direct `#twins` link opens it on load. Clicking one of Bandcamp's tabs drops the hash with `replaceState` and hands the `active` class back to the tab that had it, in the capture phase, before Bandcamp's handler runs.
+- **While ours is open**, a class on `#grids` hides every `.grid` and `.owner-controls` through one injected `<style>`. Bandcamp's selectors live in `bandcamp/fanPageDom.ts`.
+- **% match is Jaccard**, shown as a percentage. The roadmap's columns (overlap, % match, score) and sorts (overlap, Jaccard, score) are the same three numbers. Sorting is one-way, best first; ties keep leaderboard order.
+- **A new tab** (For you, Following) is one entry in `PROFILE_TABS` in `ProfileApp.tsx`: an id, a lowercase label and a view component. Views mount when their tab opens, so each opening fetches fresh data.
+- **Gap:** the leaderboard doesn't update live while open. Reopen the tab or reload after a recompute.
+
 ## 8. Following tags (planned)
 
 Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.

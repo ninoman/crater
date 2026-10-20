@@ -1,7 +1,7 @@
 import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
-import { getAlsoBought } from './recommend';
+import { getAlsoBought, readTwinsResult } from './recommend';
 import { getScannerStatus, openRelease } from './scanner';
 
 export const handlers: MessageHandlers = {
@@ -22,4 +22,5 @@ export const handlers: MessageHandlers = {
     await hideRelease(db, matchKey, Date.now());
     return null;
   },
+  getTwins: () => readTwinsResult(db),
 };

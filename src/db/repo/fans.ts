@@ -2,9 +2,11 @@ import type { Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
 import type { DigheadDb, FanRecord, FanStatus } from '../schema';
 
+const READ_STATUSES: FanStatus[] = ['done', 'partial'];
+
 /** Fans whose collection we've actually read. Private and failed fans own nothing we can see. */
 export function collectionRead(status: FanStatus | undefined): boolean {
-  return status === 'done' || status === 'partial';
+  return status !== undefined && READ_STATUSES.includes(status);
 }
 
 /**
@@ -27,6 +29,11 @@ export async function upsertSupporterFans(
     await db.fans.bulkPut(records);
     return records;
   });
+}
+
+/** How many fans' collections we've read: the pool twins and Also bought draw from. */
+export function countReadFans(db: DigheadDb): Promise<number> {
+  return db.fans.where('status').anyOf(READ_STATUSES).count();
 }
 
 export async function getFans(db: DigheadDb, fanIds: number[]): Promise<(FanRecord | undefined)[]> {
