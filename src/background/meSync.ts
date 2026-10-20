@@ -1,7 +1,7 @@
 // Decides when to sync the logged-in fan's collection, runs one sync at a time and tracks progress.
 
-import type { Viewer } from '../bandcamp';
-import { countOwnership, db, getMe, saveViewer } from '../db';
+import type { ItemKey, Viewer } from '../bandcamp';
+import { countOwnership, db, getMe, saveViewer, type MeRecord } from '../db';
 import { loadSettings } from '../shared/settings';
 import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
@@ -12,7 +12,16 @@ import { syncMe } from './syncMe';
 /** A page view re-syncs incrementally when the last sync is older than this. */
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
+/** What a finished sync did, for whoever acts on it (the scanner seeds from it). */
+export interface SyncResult {
+  me: MeRecord;
+  mode: SyncMode;
+  /** Collection items that weren't owned before this sync. */
+  added: ItemKey[];
+}
+
 let activity: SyncActivity = { state: 'idle' };
+let afterSync: (result: SyncResult) => Promise<void> = async () => {};
 let running: Promise<void> | null = null;
 
 /** Starts a sync unless one is already running, in which case it joins that one. */
@@ -21,6 +30,11 @@ export function startSync(mode: SyncMode): Promise<void> {
     running = null;
   });
   return running;
+}
+
+/** Runs after each successful sync, before the sync counts as settled. */
+export function onSynced(listener: (result: SyncResult) => Promise<void>): void {
+  afterSync = listener;
 }
 
 /** Resolves once no sync of your own is running, however it ends. */
@@ -36,7 +50,7 @@ async function runSync(requested: SyncMode): Promise<void> {
   const settings = await loadSettings();
   activity = { state: 'syncing', mode, itemsFetched: 0 };
   try {
-    await syncMe(
+    const added = await syncMe(
       {
         db,
         fetchJson,
@@ -53,6 +67,9 @@ async function runSync(requested: SyncMode): Promise<void> {
     );
     activity = { state: 'idle' };
     refreshTwins();
+    await afterSync({ me, mode, added }).catch((error: unknown) =>
+      console.error('dighead: after-sync step failed', error),
+    );
   } catch (error) {
     console.error('dighead: sync failed', error);
     activity = { state: 'error', message: error instanceof Error ? error.message : String(error) };

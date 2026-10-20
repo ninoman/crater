@@ -47,6 +47,12 @@ export async function ownedItemKeys(
   return new Set(rows.filter((row) => row.source === source).map((row) => row.itemKey));
 }
 
+/** A fan's collection rows (not the wishlist). */
+export async function collectionRows(db: DigheadDb, fanId: number): Promise<OwnershipRecord[]> {
+  const rows = await db.ownership.where('fanId').equals(fanId).toArray();
+  return rows.filter((row) => row.source === 'collection');
+}
+
 export async function countOwnership(db: DigheadDb, fanId: number, source: Source) {
   return db.ownership
     .where('fanId')

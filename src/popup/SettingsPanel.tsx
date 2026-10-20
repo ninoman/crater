@@ -1,8 +1,19 @@
 import { useSettings } from '../hooks/useSettings';
-import { SETTING_LIMITS, type NumericSetting, type Settings } from '../shared/settings';
+import {
+  SETTING_LIMITS,
+  type BooleanSetting,
+  type NumericSetting,
+  type Settings,
+} from '../shared/settings';
 import { Button, EmptyState, NumberField, StatusDot, Toggle } from '../ui';
 
-const GROUPS: { title: string; fields: { key: NumericSetting; label: string }[] }[] = [
+interface Group {
+  title: string;
+  fields: { key: NumericSetting; label: string }[];
+  toggles?: { key: BooleanSetting; label: string }[];
+}
+
+const GROUPS: Group[] = [
   {
     title: 'Pace',
     fields: [
@@ -10,6 +21,7 @@ const GROUPS: { title: string; fields: { key: NumericSetting; label: string }[] 
       { key: 'paceMaxMs', label: 'Max gap (ms)' },
       { key: 'dailyRequestBudget', label: 'Requests per day' },
     ],
+    toggles: [{ key: 'seedFromCollection', label: 'Scan supporters of releases you own' }],
   },
   {
     title: 'Caps',
@@ -26,6 +38,7 @@ const GROUPS: { title: string; fields: { key: NumericSetting; label: string }[] 
       { key: 'maxCollectionSize', label: 'Max collection' },
       { key: 'topTwinsK', label: 'Twins used (K)' },
     ],
+    toggles: [{ key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' }],
   },
 ];
 
@@ -82,13 +95,14 @@ export function SettingsPanel() {
               />
             ))}
           </div>
-          {group.title === 'Taste twins' && (
+          {group.toggles?.map(({ key, label }) => (
             <Toggle
-              label="Down-weight label-cluster twins"
-              checked={draft.labelClusterDownweight}
-              onChange={(checked) => setField('labelClusterDownweight', checked)}
+              key={key}
+              label={label}
+              checked={draft[key]}
+              onChange={(checked) => setField(key, checked)}
             />
-          )}
+          ))}
         </fieldset>
       ))}
       <div className="dh-settings__footer">

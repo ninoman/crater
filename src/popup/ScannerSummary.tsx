@@ -33,7 +33,7 @@ function StateLine({ status }: { status: ScannerStatus }) {
 
 function Ready({ status }: { status: ScannerStatus }) {
   const controls = useScannerControls();
-  const { queued, fansScanned, requestsToday, dailyBudget } = status;
+  const { queued, fansScanned, ownReleases, requestsToday, dailyBudget } = status;
   const pausedByYou = status.pause?.reason === 'manual';
   const fansKnown = fansScanned + queued.fan;
 
@@ -43,6 +43,12 @@ function Ready({ status }: { status: ScannerStatus }) {
         <div className="dh-scanner__stats">
           <Stat value={`${fansScanned} / ${fansKnown}`} label="fans scanned" />
           {queued.release > 0 && <Stat value={queued.release} label="releases queued" />}
+          {ownReleases.total > 0 && (
+            <Stat
+              value={`${ownReleases.scanned} / ${ownReleases.total}`}
+              label="your releases scanned"
+            />
+          )}
         </div>
         <Progress value={fansScanned} max={fansKnown} label="Fans scanned" />
       </div>

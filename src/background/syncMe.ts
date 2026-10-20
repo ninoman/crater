@@ -31,12 +31,16 @@ export interface SyncDeps {
 // Wishlist first: if an item was bought since, the collection pass overwrites its row.
 const LISTS: CollectionList[] = ['wishlist', 'collection'];
 
-export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Promise<void> {
+/** Syncs both lists. Returns the collection items that weren't in your collection before. */
+export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Promise<ItemKey[]> {
+  const before = await ownedItemKeys(deps.db, me.fanId, 'collection');
   let fetched = 0;
   for (const list of LISTS) {
     fetched = await syncList(deps, me.fanId, list, mode, fetched);
   }
   await markSynced(deps.db, deps.now());
+  const after = await ownedItemKeys(deps.db, me.fanId, 'collection');
+  return [...after].filter((key) => !before.has(key));
 }
 
 async function syncList(

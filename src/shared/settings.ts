@@ -15,6 +15,8 @@ export interface Settings {
   maxCollectionSize: number;
   topTwinsK: number;
   labelClusterDownweight: boolean;
+  /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
+  seedFromCollection: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -28,10 +30,15 @@ export const DEFAULT_SETTINGS: Settings = {
   maxCollectionSize: 20000,
   topTwinsK: 30,
   labelClusterDownweight: true,
+  seedFromCollection: true,
 };
 
 export type NumericSetting = {
   [K in keyof Settings]: Settings[K] extends number ? K : never;
+}[keyof Settings];
+
+export type BooleanSetting = {
+  [K in keyof Settings]: Settings[K] extends boolean ? K : never;
 }[keyof Settings];
 
 /**
