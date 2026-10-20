@@ -58,6 +58,14 @@ export async function enqueueAt(
   });
 }
 
+export function getQueuedJob(
+  db: DigheadDb,
+  kind: QueueJob['kind'],
+  target: string,
+): Promise<QueueJob | undefined> {
+  return db.queue.where('[kind+target]').equals([kind, target]).first();
+}
+
 /** The most urgent job that is due: lowest priority first, then earliest nextAttemptAt. */
 export function nextJob(db: DigheadDb, now: number): Promise<QueueJob | undefined> {
   return db.queue

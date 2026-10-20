@@ -7,6 +7,7 @@ import {
   getScannerStatus,
   openRelease,
   pauseScanner,
+  requestRelease,
   resumeScanner,
 } from './scanner';
 
@@ -22,6 +23,7 @@ export const handlers: MessageHandlers = {
     return null;
   },
   releaseOpened: ({ item }) => openRelease(item),
+  queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
   getAlsoBought: ({ itemKey }) => getAlsoBought(itemKey),
   hideRelease: async ({ matchKey }) => {

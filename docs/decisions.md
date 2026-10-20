@@ -151,6 +151,10 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
   - The event carries one field more than the spec, `listed`, so the UI can tell "not fetched yet" (0 / 0, false) from "no supporters" (0 / 0, true).
 - **Known limitation:** a re-scan after 30 days adds new items but doesn't remove items a fan no longer has. That's rare, and harmless for scoring at this scale.
 
+### Add release to queue (Phase 5.7)
+
+A "scan supporters" button on each Also bought row sends `queueRelease { itemKey, url }`, which queues that release's job at BACKGROUND priority (never above the page you're reading). Fresh supporter lists (7 days) are reported as "scanned recently" and not re-queued; a job already waiting isn't duplicated, though it moves up from SEED. We chose the row button over a popup URL field because the rows are where you already spot interesting releases, and they carry the item key and url, so there is no URL parsing to get wrong. Twins-who-own-this rows list fans, not releases, so they get no button.
+
 ## 6. Also bought (Phase 4)
 
 Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering), `src/background/recommend/` (running it). Decided 2026-10-20.

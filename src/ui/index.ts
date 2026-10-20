@@ -6,7 +6,7 @@ export { cx } from './cx';
 export { EmbedFrame, type EmbedFrameProps } from './EmbedFrame';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
-export { ExternalIcon, HeartIcon, HideIcon, PlayIcon, StopIcon } from './icons';
+export { ExternalIcon, HeartIcon, HideIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
 export { Notice, type NoticeProps } from './Notice';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';

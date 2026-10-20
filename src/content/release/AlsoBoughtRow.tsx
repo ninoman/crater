@@ -1,3 +1,4 @@
+import { useQueueRelease } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
 import {
   Badge,
@@ -9,11 +10,12 @@ import {
   HideIcon,
   LinkButton,
   PlayIcon,
+  QueueIcon,
   Row,
   StopIcon,
   Tooltip,
 } from '../../ui';
-import { formatOwnedTracks, formatReason } from './formatReason';
+import { formatOwnedTracks, formatQueueOutcome, formatReason } from './formatReason';
 
 export interface AlsoBoughtRowProps {
   row: RowData;
@@ -24,6 +26,8 @@ export interface AlsoBoughtRowProps {
 
 export function AlsoBoughtRow({ row, previewing, onPreview, onHide }: AlsoBoughtRowProps) {
   const name = `${row.artist} – ${row.title}`;
+  const { queue, queueRelease } = useQueueRelease(row.matchKey, row.url);
+  const outcome = formatQueueOutcome(queue);
   return (
     <Row
       media={<Cover src={row.coverUrl} />}
@@ -32,7 +36,11 @@ export function AlsoBoughtRow({ row, previewing, onPreview, onHide }: AlsoBought
           {row.title}
         </a>
       }
-      meta={[row.label ? `${row.artist} · ${row.label}` : row.artist, formatReason(row.reason)]}
+      meta={[
+        row.label ? `${row.artist} · ${row.label}` : row.artist,
+        formatReason(row.reason),
+        ...(outcome ? [outcome] : []),
+      ]}
       badges={row.ownedTracks > 0 && <Badge>{formatOwnedTracks(row.ownedTracks)}</Badge>}
       actions={
         <>
@@ -71,6 +79,17 @@ export function AlsoBoughtRow({ row, previewing, onPreview, onHide }: AlsoBought
             >
               <ExternalIcon />
             </LinkButton>
+          </Tooltip>
+          <Tooltip content="Scan this release's supporters">
+            <Button
+              variant="ghost"
+              icon
+              aria-label={`Scan supporters of ${name}`}
+              disabled={queue.state === 'queueing'}
+              onClick={() => void queueRelease()}
+            >
+              <QueueIcon />
+            </Button>
           </Tooltip>
           <Tooltip content="Hide: never recommend this">
             <Button variant="ghost" icon aria-label={`Hide ${name}`} onClick={onHide}>
