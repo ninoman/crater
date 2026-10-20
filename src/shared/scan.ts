@@ -17,6 +17,8 @@ export interface ScanProgress {
 export type ScannerPause =
   | { reason: 'manual' }
   | { reason: 'backoff'; until: number }
+  /** A request got no answer: retried at `until`, with the same back-off as Bandcamp pushing back. */
+  | { reason: 'offline'; until: number }
   | { reason: 'budget'; until: number };
 
 export interface ScannerStatus {
@@ -28,6 +30,8 @@ export interface ScannerStatus {
   requestsToday: number;
   dailyBudget: number;
   pause: ScannerPause | null;
+  /** The browser's own guess at a network connection, as the worker sees it. */
+  online: boolean;
   lastError: string | null;
   /** Set while Bandcamp data fails to parse: Dighead needs an update. */
   parserError: string | null;

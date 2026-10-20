@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { timeAgo } from './timeAgo';
+import { timeAgo, timeUntil } from './timeAgo';
 
 const NOW = 1_800_000_000_000;
 
@@ -17,5 +17,18 @@ describe('timeAgo', () => {
 
   it('treats a future time as just now', () => {
     expect(timeAgo(NOW + 10_000, NOW)).toBe('just now');
+  });
+});
+
+describe('timeUntil', () => {
+  it.each([
+    [10_000, 'in under a minute'],
+    [60_000, 'in 1 minute'],
+    [61_000, 'in 2 minutes'],
+    [59 * 60_000, 'in 59 minutes'],
+    [3_600_000, 'in 1 hour'],
+    [150 * 60_000, 'in 3 hours'],
+  ])('formats %i ms ahead as %s', (remaining, expected) => {
+    expect(timeUntil(NOW + remaining, NOW)).toBe(expected);
   });
 });

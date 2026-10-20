@@ -1,17 +1,11 @@
 import { useForYou } from '../../../hooks/useForYou';
-import { useScannerStatus } from '../../../hooks/useScannerStatus';
 import type { ForYouResult } from '../../../shared/forYou';
 import { Button, EmptyState, LinkButton } from '../../../ui';
 import { ForYouList } from './ForYouList';
 
-/** The profile checks the queue's health as rarely as the sidebar does. */
-const SCANNER_POLL_MS = 5000;
-
 /** The For you tab on your profile: picks from your top twins, or why there aren't any yet. */
 export function ForYouTab() {
   const { view, reload, hide } = useForYou();
-  const scanner = useScannerStatus(SCANNER_POLL_MS);
-  const parserBroken = scanner.state === 'ready' && scanner.status.parserError !== null;
 
   switch (view.state) {
     case 'loading':
@@ -26,15 +20,8 @@ export function ForYouTab() {
         />
       );
     case 'ready':
-      if (view.result.rows.length > 0) {
-        return <ForYouList result={view.result} parserBroken={parserBroken} onHide={hide} />;
-      }
-      return parserBroken ? (
-        <EmptyState
-          tone="error"
-          title="Parser broken"
-          description="Bandcamp changed something Dighead reads, so it can't scan fans right now and For you can't grow. Dighead needs an update."
-        />
+      return view.result.rows.length > 0 ? (
+        <ForYouList result={view.result} onHide={hide} />
       ) : (
         <NoPicks result={view.result} />
       );

@@ -1,4 +1,6 @@
 import { useSyncExternalStore, type ComponentType } from 'react';
+import { useScannerNotices } from '../../hooks/useScannerNotices';
+import { NoticeStack } from '../../ui';
 import { ForYouTab } from './forYou/ForYouTab';
 import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
 import { TwinsTab } from './twins/TwinsTab';
@@ -15,6 +17,9 @@ export const PROFILE_TABS = [
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];
 
+/** The profile checks the queue's health as rarely as the sidebar does. */
+const SCANNER_POLL_MS = 5000;
+
 /** Shows the open tab's view. Views mount on open, so each opening loads fresh data. */
 export function ProfileApp({ tabs }: { tabs: ProfileTabs<ProfileTabId> }) {
   const active = useSyncExternalStore(tabs.subscribe, tabs.getActive);
@@ -22,7 +27,20 @@ export function ProfileApp({ tabs }: { tabs: ProfileTabs<ProfileTabId> }) {
   if (!tab) return null;
   return (
     <section className="dh-profile" aria-label={`Dighead: ${tab.label}`}>
+      <ScannerNotices />
       <tab.View />
     </section>
+  );
+}
+
+/** Mounted only while one of our tabs is open, so a closed tab doesn't poll. */
+function ScannerNotices() {
+  const notices = useScannerNotices(SCANNER_POLL_MS);
+  return (
+    notices.length > 0 && (
+      <div className="dh-profile__notice">
+        <NoticeStack notices={notices} />
+      </div>
+    )
   );
 }

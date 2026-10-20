@@ -7,7 +7,7 @@ export { EmbedFrame, type EmbedFrameProps } from './EmbedFrame';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
 export { ExternalIcon, HeartIcon, HideIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
-export { Notice, type NoticeProps } from './Notice';
+export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';
 export { PortalContainerProvider, usePortalContainer } from './portal';

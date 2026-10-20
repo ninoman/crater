@@ -213,11 +213,18 @@ describe('drainQueue', () => {
 
     await drainQueue(deps());
     expect(store.state.backoff).toEqual({ failures: 1, until: START + 60_000 });
+    expect(store.state.offline).toBe(false);
 
     vi.setSystemTime(START + 60_000);
     await drainQueue(deps());
     expect(store.state.backoff?.failures).toBe(2);
     expect(store.state.backoff?.until).toBe(Date.now() + 120_000);
+    expect(store.state.offline).toBe(true);
+
+    vi.setSystemTime(START + 180_000);
+    await drainQueue(deps());
+    expect(store.state.backoff).toBeNull();
+    expect(store.state.offline).toBe(false);
   });
 
   it('stops at the daily budget and carries on after local midnight', async () => {

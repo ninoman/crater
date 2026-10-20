@@ -1,30 +1,17 @@
 import type { ScanProgressView } from '../../hooks/useScanProgress';
-import type { ScannerStatusView } from '../../hooks/useScannerStatus';
-import { clockTime } from '../../shared/timeAgo';
-import { Notice, Progress } from '../../ui';
+import { NoticeStack, Progress, type NoticeItem } from '../../ui';
 
-/** Where the supporter scan stands, and whether the queue is paused. */
+/** Where the supporter scan stands, and why the scanner has stopped, if it has. */
 export function ScanHeader({
   progress,
-  scanner,
+  notices,
 }: {
   progress: ScanProgressView;
-  scanner: ScannerStatusView;
+  notices: readonly NoticeItem[];
 }) {
-  const status = scanner.state === 'ready' ? scanner.status : null;
   return (
     <div className="dh-scan-header">
-      {status?.pause?.reason === 'backoff' && (
-        <Notice tone="warning">
-          Queue paused: Bandcamp asked Dighead to slow down. Resumes at{' '}
-          {clockTime(status.pause.until)}.
-        </Notice>
-      )}
-      {status?.pause?.reason === 'budget' && (
-        <Notice tone="warning">
-          Queue paused: today&apos;s request budget is used up. Resumes at midnight.
-        </Notice>
-      )}
+      <NoticeStack notices={notices} />
       <ProgressLine progress={progress} />
     </div>
   );

@@ -9,6 +9,8 @@ import type { Lock } from './lock';
 
 export interface ScannerState {
   backoff: Backoff | null;
+  /** The back-off came from a request that got no answer, so it's us that are offline. */
+  offline: boolean;
   budget: Budget | null;
   lastRequestAt: number | null;
   lock: Lock | null;
@@ -24,6 +26,7 @@ export interface ScannerState {
 
 export const INITIAL_SCANNER_STATE: ScannerState = {
   backoff: null,
+  offline: false,
   budget: null,
   lastRequestAt: null,
   lock: null,
@@ -63,7 +66,7 @@ export function pauseFor(
 ): ScannerPause | null {
   if (state.paused) return { reason: 'manual' };
   if (state.backoff && state.backoff.until > now) {
-    return { reason: 'backoff', until: state.backoff.until };
+    return { reason: state.offline ? 'offline' : 'backoff', until: state.backoff.until };
   }
   if (budgetExhausted(state.budget, dailyBudget, now)) {
     return { reason: 'budget', until: nextLocalMidnight(now) };

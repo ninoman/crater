@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import type { ItemKey } from '../../../bandcamp';
 import type { ForYouResult } from '../../../shared/forYou';
-import { Badge, Notice, ReleaseRow, RowList } from '../../../ui';
+import { Badge, ReleaseRow, RowList } from '../../../ui';
 import { formatOwnedTracks } from '../../shared/formatOwnedTracks';
 import { formatForYouSummary, formatTwinOwners } from './forYouText';
 
 export interface ForYouListProps {
   result: ForYouResult;
-  parserBroken: boolean;
   onHide: (matchKey: ItemKey) => void;
 }
 
 /** The ranked picks, one preview open at a time. */
-export function ForYouList({ result, parserBroken, onHide }: ForYouListProps) {
+export function ForYouList({ result, onHide }: ForYouListProps) {
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
 
   return (
@@ -22,14 +21,6 @@ export function ForYouList({ result, parserBroken, onHide }: ForYouListProps) {
           {formatForYouSummary(result.rows.length, result.twinsUsed)}
         </p>
       </div>
-      {parserBroken && (
-        <div className="dh-profile__notice">
-          <Notice tone="error">
-            Parser broken: Bandcamp changed something Dighead reads, so these won&apos;t update
-            until Dighead is updated.
-          </Notice>
-        </div>
-      )}
       <div className="dh-profile__list">
         <RowList label="For you">
           {result.rows.map((row, i) => (

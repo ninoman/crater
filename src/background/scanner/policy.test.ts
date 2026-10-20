@@ -103,6 +103,17 @@ describe('pauseFor', () => {
     ).toEqual({ reason: 'budget', until: nextLocalMidnight(now) });
     expect(pauseFor({ ...INITIAL_SCANNER_STATE, budget: spent }, 4, now)).toBeNull();
   });
+
+  it('calls a back-off from a request that got no answer offline', () => {
+    const now = Date.now();
+    expect(
+      pauseFor(
+        { ...INITIAL_SCANNER_STATE, backoff: { until: now + 1, failures: 1 }, offline: true },
+        3,
+        now,
+      ),
+    ).toEqual({ reason: 'offline', until: now + 1 });
+  });
 });
 
 describe('freshness', () => {

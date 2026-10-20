@@ -34,10 +34,6 @@
   color: var(--dh-color-muted);
 }
 
-.dh-also-bought__notice {
-  padding: var(--dh-space-2) var(--dh-space-4) 0;
-}
-
 .dh-twin-rank {
   display: flex;
   flex: none;

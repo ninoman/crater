@@ -1,28 +1,16 @@
 import { useScannerControls } from '../hooks/useScannerControls';
 import { useScannerStatus } from '../hooks/useScannerStatus';
 import type { ScannerStatus } from '../shared/scan';
-import { clockTime } from '../shared/timeAgo';
-import { Button, Progress, Stat, StatusDot } from '../ui';
+import { describeScannerNotice, scannerNotices } from '../shared/scannerNotices';
+import { Button, NoticeStack, Progress, Stat, StatusDot } from '../ui';
 
-function StateLine({ status }: { status: ScannerStatus }) {
-  const { pause, queued, lastError, parserError } = status;
-  if (parserError) {
-    return <StatusDot tone="error">Bandcamp changed its data. Dighead needs an update</StatusDot>;
+/** The one-line state. Why it's stopped, other than by you, is in the notices above. */
+function StateLine({ status, stopped }: { status: ScannerStatus; stopped: boolean }) {
+  const { pause, queued, lastError } = status;
+  if (pause?.reason === 'manual') {
+    return <StatusDot tone="warning">Paused. Nothing is sent until you resume</StatusDot>;
   }
-  switch (pause?.reason) {
-    case 'manual':
-      return <StatusDot tone="warning">Paused. Nothing is sent until you resume</StatusDot>;
-    case 'backoff':
-      return (
-        <StatusDot tone="warning">
-          Paused: Bandcamp asked us to slow down. Resumes at {clockTime(pause.until)}
-        </StatusDot>
-      );
-    case 'budget':
-      return (
-        <StatusDot tone="warning">Daily request budget reached. Resumes at midnight</StatusDot>
-      );
-  }
+  if (stopped) return <StatusDot tone="warning">Not scanning right now</StatusDot>;
   if (lastError) return <StatusDot tone="error">Last error: {lastError}</StatusDot>;
   return queued.release + queued.fan > 0 ? (
     <StatusDot tone="neutral">Scanning…</StatusDot>
@@ -36,9 +24,15 @@ function Ready({ status }: { status: ScannerStatus }) {
   const { queued, fansScanned, ownReleases, requestsToday, dailyBudget } = status;
   const pausedByYou = status.pause?.reason === 'manual';
   const fansKnown = fansScanned + queued.fan;
+  const now = Date.now();
+  // Your own pause has its Resume button right here, so it needs no notice.
+  const notices = scannerNotices(status)
+    .filter(({ kind }) => kind !== 'paused-by-you')
+    .map((notice) => describeScannerNotice(notice, now));
 
   return (
     <>
+      <NoticeStack notices={notices} />
       <div className="dh-scanner__meter">
         <div className="dh-scanner__stats">
           <Stat value={`${fansScanned} / ${fansKnown}`} label="fans scanned" />
@@ -61,7 +55,7 @@ function Ready({ status }: { status: ScannerStatus }) {
           {controls.error ? (
             <StatusDot tone="error">Couldn't reach the scanner: {controls.error}</StatusDot>
           ) : (
-            <StateLine status={status} />
+            <StateLine status={status} stopped={notices.length > 0} />
           )}
         </span>
         {pausedByYou ? (

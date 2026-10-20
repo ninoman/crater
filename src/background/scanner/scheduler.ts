@@ -86,9 +86,10 @@ async function runJob(
   else await completeJob(ctx.db, job);
   await deps.onStep(job, cursor === null);
   const parserFixed = state.parserError?.kind === job.kind;
-  return state.backoff || state.lastError || parserFixed
+  return state.backoff || state.offline || state.lastError || parserFixed
     ? deps.store.save({
         backoff: null,
+        offline: false,
         lastError: null,
         ...(parserFixed ? { parserError: null } : {}),
       })
@@ -108,7 +109,7 @@ async function handleFailure(
   if (failure.kind === 'throttled') {
     const backoff = nextBackoff(state.backoff, failure.retryAfterMs, ctx.now);
     console.warn(`dighead: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
-    return deps.store.save({ backoff, lastError: message });
+    return deps.store.save({ backoff, offline: failure.offline, lastError: message });
   }
 
   const retryAt = failure.kind === 'transient' ? jobRetryAt(job.attempts, ctx.now) : null;

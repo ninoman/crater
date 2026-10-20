@@ -158,6 +158,7 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     requestsToday: usedToday(state.budget, now),
     dailyBudget: settings.dailyRequestBudget,
     pause: pauseFor(state, settings.dailyRequestBudget, now),
+    online: navigator.onLine,
     lastError: state.lastError,
     parserError: state.parserError?.message ?? null,
   };

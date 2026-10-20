@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { ReleasePageItem } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
 import { useReleaseTwins } from '../../hooks/useReleaseTwins';
-import { useScannerStatus } from '../../hooks/useScannerStatus';
+import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useScanProgress } from '../../hooks/useScanProgress';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
@@ -38,14 +38,14 @@ export function ReleaseSidebar() {
  */
 function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const progress = useScanProgress(item);
-  const scanner = useScannerStatus(SCANNER_POLL_MS);
+  const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
   const { view, hide } = useAlsoBought(item.itemKey, releaseSaved);
   const twins = useReleaseTwins(item.itemKey, releaseSaved);
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
-      <ScanHeader progress={progress} scanner={scanner} />
+      <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"
         items={[
@@ -53,7 +53,12 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
             value: 'also-bought',
             label: 'Also bought',
             content: (
-              <AlsoBoughtList view={view} progress={progress} scanner={scanner} onHide={hide} />
+              <AlsoBoughtList
+                view={view}
+                progress={progress}
+                scanStopped={notices.length > 0}
+                onHide={hide}
+              />
             ),
           },
           {

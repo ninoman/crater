@@ -14,3 +14,13 @@
   border-color: var(--dh-color-danger);
   background: var(--dh-color-danger-bg);
 }
+
+.dh-notice__title {
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-notice-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dh-space-2);
+}

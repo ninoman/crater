@@ -19,3 +19,11 @@ export function timeAgo(then: number, now: number): string {
 export function clockTime(at: number): string {
   return new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
+
+/** "in 12 minutes", "in 3 hours": how long until a pause ends. */
+export function timeUntil(at: number, now: number): string {
+  const remaining = at - now;
+  if (remaining < 60_000) return 'in under a minute';
+  if (remaining < 3_600_000) return format.format(Math.ceil(remaining / 60_000), 'minute');
+  return format.format(Math.round(remaining / 3_600_000), 'hour');
+}
