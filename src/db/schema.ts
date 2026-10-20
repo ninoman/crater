@@ -137,6 +137,34 @@ export interface FanJob extends JobBase {
 export type QueueJob = ReleaseJob | FanJob;
 export type JobKind = QueueJob['kind'];
 
+/** Bandcamp has no label flag: artists and labels are both band accounts (decisions §8). */
+export type FollowKind = 'fan' | 'band';
+export type FollowingKey = [kind: FollowKind, id: number];
+
+/** An account you follow, from your own sync. Only followings can be tagged (decisions §8). */
+export interface FollowingRecord {
+  kind: FollowKind;
+  /** fan_id or band_id. */
+  id: number;
+  name: string;
+  /** A fan's profile, or a band's subdomain or custom domain. */
+  url: string;
+  imageId: number | null;
+  location: string | null;
+  followedAt: number;
+  tagIds: number[];
+  /** Unfollowed on the tab since the last sync. Keeps its tags until a full sync deletes it. */
+  unfollowed: boolean;
+}
+
+export interface TagRecord {
+  /** Auto-incremented, so optional only when adding. */
+  id: number;
+  name: string;
+  /** The trimmed, lowercased name. Unique, so "Ambient" and "ambient " are one tag. */
+  nameKey: string;
+}
+
 export class DigheadDb extends Dexie {
   items!: EntityTable<ItemRecord, 'itemKey'>;
   fans!: EntityTable<FanRecord, 'fanId'>;
@@ -148,6 +176,8 @@ export class DigheadDb extends Dexie {
   fanMatches!: EntityTable<FanMatchesRecord, 'fanId'>;
   matchOwners!: EntityTable<MatchOwnersRecord, 'matchId'>;
   hidden!: EntityTable<HiddenRecord, 'matchKey'>;
+  following!: Table<FollowingRecord, FollowingKey>;
+  tags!: EntityTable<TagRecord, 'id'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -198,5 +228,10 @@ export class DigheadDb extends Dexie {
             fan.lastSeenAt ??= fan.collectionFetchedAt ?? now;
           });
       });
+    // v5: followings and your tags on them (decisions §8). New tables, so nothing to migrate.
+    this.version(5).stores({
+      following: '[kind+id], kind, *tagIds',
+      tags: '++id, &nameKey',
+    });
   }
 }

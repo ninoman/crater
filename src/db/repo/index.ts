@@ -2,6 +2,7 @@
 export * from './alsoBought';
 export * from './clear';
 export * from './fans';
+export * from './following';
 export * from './forYou';
 export * from './hidden';
 export * from './items';
@@ -10,4 +11,5 @@ export * from './me';
 export * from './ownership';
 export * from './queue';
 export * from './releaseSupporters';
+export * from './tags';
 export * from './twins';
