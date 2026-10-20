@@ -32,6 +32,19 @@
   --dh-color-on-tooltip: #ffffff;
   --dh-color-overlay: rgba(0, 0, 0, 0.35);
 
+  /* Tag colours, picked by tag id (see tag.ts). Chips are filled with these and carry
+     --dh-color-on-tag text, so they read the same on light and dark pages.
+     Each passes 4.5:1 against white. */
+  --dh-tag-1: #0e7490;
+  --dh-tag-2: #b45309;
+  --dh-tag-3: #15803d;
+  --dh-tag-4: #be123c;
+  --dh-tag-5: #6d28d9;
+  --dh-tag-6: #a21caf;
+  --dh-tag-7: #1d4ed8;
+  --dh-tag-8: #475569;
+  --dh-color-on-tag: #ffffff;
+
   --dh-space-1: 4px;
   --dh-space-2: 8px;
   --dh-space-3: 12px;
@@ -54,9 +67,14 @@
   --dh-dialog-width: 300px;
   --dh-toggle-width: 28px;
   --dh-toggle-height: 16px;
+  --dh-checkbox-size: 14px;
+  --dh-chip-height: 20px;
+  --dh-picker-width: 220px;
+  --dh-picker-list-height: 200px;
   --dh-duration: 120ms;
 
   --dh-z-panel: 2147483000;
   --dh-z-tooltip: 2147483001;
   --dh-z-dialog: 2147483002;
+  --dh-z-popover: 2147483001;
 }

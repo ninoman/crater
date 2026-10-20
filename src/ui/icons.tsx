@@ -55,3 +55,9 @@ export const QueueIcon = () => (
     <path d="M2.5 4.5h7M2.5 8h7M2.5 11.5h4M12 8.5v5M9.5 11h5" />
   </Icon>
 );
+
+export const CheckIcon = () => (
+  <Icon>
+    <path d="M3.5 8.5l3 3 6-7" />
+  </Icon>
+);

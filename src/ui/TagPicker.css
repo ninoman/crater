@@ -1,0 +1,92 @@
+.dh-tag-picker__trigger {
+  height: var(--dh-chip-height);
+  padding: 0 var(--dh-space-2);
+  font-size: var(--dh-text-xs);
+}
+
+.dh-tag-picker {
+  z-index: var(--dh-z-popover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dh-space-1);
+  width: var(--dh-picker-width);
+  padding: var(--dh-space-2);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-md);
+  background: var(--dh-color-bg);
+  box-shadow: var(--dh-shadow-panel);
+  font-family: var(--dh-font);
+  font-size: var(--dh-text-sm);
+  line-height: var(--dh-leading);
+  color: var(--dh-color-text);
+}
+
+.dh-tag-picker__input {
+  height: 28px;
+  width: 100%;
+  padding: 0 var(--dh-space-2);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+  font: inherit;
+  color: var(--dh-color-text);
+}
+
+.dh-tag-picker__input::placeholder {
+  color: var(--dh-color-subtle);
+}
+
+.dh-tag-picker__input:focus-visible {
+  border-color: var(--dh-color-accent);
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: 1px;
+}
+
+.dh-tag-picker__list {
+  max-height: var(--dh-picker-list-height);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.dh-tag-picker__option {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  padding: var(--dh-space-1) var(--dh-space-2);
+  border-radius: var(--dh-radius-sm);
+  cursor: pointer;
+}
+
+/* The highlighted option is the keyboard focus, so it gets the focus colour. */
+.dh-tag-picker__option[data-active] {
+  background: var(--dh-color-bg-hover);
+  box-shadow: inset 2px 0 0 var(--dh-color-accent);
+}
+
+.dh-tag-picker__swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dh-chip-color);
+}
+
+.dh-tag-picker__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-tag-picker__option .dh-icon {
+  color: var(--dh-color-accent);
+}
+
+.dh-tag-picker__empty {
+  margin: 0;
+  padding: var(--dh-space-1) var(--dh-space-2);
+  color: var(--dh-color-muted);
+  font-size: var(--dh-text-xs);
+}

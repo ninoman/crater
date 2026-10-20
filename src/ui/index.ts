@@ -1,5 +1,7 @@
 export { Badge } from './Badge';
 export { Button, LinkButton, type ButtonProps, type LinkButtonProps } from './Button';
+export { Checkbox, type CheckboxProps } from './Checkbox';
+export { Chip, type ChipProps } from './Chip';
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog';
 export { Cover } from './Cover';
 export { cx } from './cx';
@@ -19,6 +21,8 @@ export { Stat, type StatProps } from './Stat';
 export { StatusDot, type StatusDotProps } from './StatusDot';
 export { injectStyles, uiStyles } from './styles';
 export { Table, type TableColumn, type TableProps } from './Table';
+export { type TagOption, tagColor } from './tag';
+export { TagPicker, type TagPickerProps } from './TagPicker';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { Toggle, type ToggleProps } from './Toggle';
 export { Tooltip, type TooltipProps } from './Tooltip';
