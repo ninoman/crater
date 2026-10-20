@@ -35,6 +35,11 @@ export interface MessageMap {
   getTwins: { request: NoPayload; response: TwinsResult };
   /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
   getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
+  /** Stops the scanner until resumed, from the popup. */
+  pauseScanner: { request: NoPayload; response: null };
+  resumeScanner: { request: NoPayload; response: null };
+  /** Deletes everything Dighead has stored except settings. Your collection re-syncs on the next Bandcamp page. */
+  clearAllData: { request: NoPayload; response: null };
 }
 
 export type MessageType = keyof MessageMap;

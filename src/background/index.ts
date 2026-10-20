@@ -2,6 +2,7 @@
 // Listeners must be registered synchronously at top level so Chrome can wake the worker for them.
 
 import { listenForMessages } from '../shared/messages';
+import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
 import { startSync } from './meSync';
 import { refreshTwins } from './recommend';
 import { handlers } from './router';
@@ -20,8 +21,12 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === SCANNER_ALARM) kickScanner();
+  if (alarm.name === MAINTENANCE_ALARM) {
+    runMaintenance().catch((error: unknown) => console.error('dighead: maintenance failed', error));
+  }
 });
 
 // Every wake-up, including the one after the worker was killed, picks the queue back up.
 void ensureScannerAlarm();
+void ensureMaintenanceAlarm();
 kickScanner();

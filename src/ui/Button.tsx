@@ -2,7 +2,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react';
 import { cx } from './cx';
 
 interface ButtonLook {
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   /** Square button for a single icon or glyph. Needs an aria-label. */
   icon?: boolean;
 }

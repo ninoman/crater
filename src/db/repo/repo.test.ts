@@ -110,10 +110,14 @@ function supporter(fanId: number, name = `Fan ${fanId}`): Supporter {
 
 describe('fans', () => {
   it('queues new supporters and keeps the scan state of known ones', async () => {
-    await upsertSupporterFans(db, [supporter(1)]);
+    await upsertSupporterFans(db, [supporter(1)], 0);
     await finishFanScan(db, 1, 'done', 12, 500);
 
-    const [known, fresh] = await upsertSupporterFans(db, [supporter(1, 'Renamed'), supporter(2)]);
+    const [known, fresh] = await upsertSupporterFans(
+      db,
+      [supporter(1, 'Renamed'), supporter(2)],
+      0,
+    );
 
     expect(known).toMatchObject({
       name: 'Renamed',
@@ -125,7 +129,7 @@ describe('fans', () => {
   });
 
   it('does not mark an errored scan as fresh', async () => {
-    await upsertSupporterFans(db, [supporter(1)]);
+    await upsertSupporterFans(db, [supporter(1)], 0);
     await finishFanScan(db, 1, 'error', 0, 500);
     await finishFanScan(db, 2, 'done', 3, 500); // unknown fan: no-op
 

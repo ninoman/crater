@@ -15,10 +15,12 @@ export interface ScanProgress {
 
 /** Why the scanner isn't sending requests right now. `until` is ms since epoch. */
 export type ScannerPause =
-  { reason: 'backoff'; until: number } | { reason: 'budget'; until: number };
+  { reason: 'manual' } | { reason: 'backoff'; until: number } | { reason: 'budget'; until: number };
 
 export interface ScannerStatus {
   queued: { release: number; fan: number };
+  /** Fans whose scan has ended, whatever the outcome. With `queued.fan`, the queue's progress. */
+  fansScanned: number;
   requestsToday: number;
   dailyBudget: number;
   pause: ScannerPause | null;

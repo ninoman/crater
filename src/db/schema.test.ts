@@ -1,4 +1,5 @@
 import 'fake-indexeddb/auto';
+import Dexie from 'dexie';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseFanPage, type CollectionItem } from '../bandcamp';
 import { fixtureText } from '../../tests/fixtures';
@@ -84,5 +85,31 @@ describe('DigheadDb', () => {
       'a1',
       'a2',
     ]);
+  });
+
+  it('gives fans from before v4 a last-seen time', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(3).stores({ fans: 'fanId, status, collectionFetchedAt' });
+    const fan = {
+      username: 'f',
+      name: 'F',
+      imageId: null,
+      collectionSize: null,
+      scannedItems: 0,
+      status: 'queued',
+    };
+    await old.table('fans').bulkPut([
+      { ...fan, fanId: 1, collectionFetchedAt: 500 },
+      { ...fan, fanId: 2, collectionFetchedAt: null },
+    ]);
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    const before = Date.now();
+    const [scanned, queued] = await upgraded.fans.bulkGet([1, 2]);
+    expect(scanned?.lastSeenAt).toBe(500);
+    expect(queued?.lastSeenAt).toBeGreaterThanOrEqual(before);
+    await upgraded.delete();
   });
 });

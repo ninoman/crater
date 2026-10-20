@@ -2,7 +2,13 @@ import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import { getAlsoBought, getReleaseTwins, readTwinsResult } from './recommend';
-import { getScannerStatus, openRelease } from './scanner';
+import {
+  clearScanData,
+  getScannerStatus,
+  openRelease,
+  pauseScanner,
+  resumeScanner,
+} from './scanner';
 
 export const handlers: MessageHandlers = {
   ping: () => ({ version: chrome.runtime.getManifest().version }),
@@ -24,4 +30,16 @@ export const handlers: MessageHandlers = {
   },
   getTwins: () => readTwinsResult(db),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
+  pauseScanner: async () => {
+    await pauseScanner();
+    return null;
+  },
+  resumeScanner: async () => {
+    await resumeScanner();
+    return null;
+  },
+  clearAllData: async () => {
+    await clearScanData();
+    return null;
+  },
 };

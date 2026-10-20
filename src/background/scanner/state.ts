@@ -18,6 +18,8 @@ export interface ScannerState {
    * the same kind succeeds, so one odd page doesn't look like a broken parser for good.
    */
   parserError: { kind: JobKind; message: string } | null;
+  /** Paused from the popup. Stays paused until resumed there. */
+  paused: boolean;
 }
 
 export const INITIAL_SCANNER_STATE: ScannerState = {
@@ -27,6 +29,7 @@ export const INITIAL_SCANNER_STATE: ScannerState = {
   lock: null,
   lastError: null,
   parserError: null,
+  paused: false,
 };
 
 export interface ScannerStore {
@@ -52,12 +55,13 @@ export const chromeScannerStore: ScannerStore = {
   },
 };
 
-/** Back-off wins over the budget, since it's Bandcamp asking us to stop. */
+/** Your own pause comes first. Back-off wins over the budget, since it's Bandcamp asking. */
 export function pauseFor(
   state: ScannerState,
   dailyBudget: number,
   now: number,
 ): ScannerPause | null {
+  if (state.paused) return { reason: 'manual' };
   if (state.backoff && state.backoff.until > now) {
     return { reason: 'backoff', until: state.backoff.until };
   }

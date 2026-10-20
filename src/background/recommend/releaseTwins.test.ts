@@ -45,17 +45,21 @@ function twin(fanId: number, score: number, labelCluster = false): TwinRecord {
 
 async function fan(fanId: number, items: CollectionItem[], source: 'collection' | 'wishlist') {
   await upsertCollectionItems(db, items, 0);
-  await upsertSupporterFans(db, [
-    {
-      fanId,
-      username: `fan${fanId}`,
-      name: fanId === 13 ? '' : `Fan ${fanId}`,
-      imageId: null,
-      token: `1:1:${fanId}:0:1:0`,
-      purchasedAt: null,
-      isReviewer: false,
-    },
-  ]);
+  await upsertSupporterFans(
+    db,
+    [
+      {
+        fanId,
+        username: `fan${fanId}`,
+        name: fanId === 13 ? '' : `Fan ${fanId}`,
+        imageId: null,
+        token: `1:1:${fanId}:0:1:0`,
+        purchasedAt: null,
+        isReviewer: false,
+      },
+    ],
+    0,
+  );
   await putOwnership(db, fanId, items, source);
 }
 

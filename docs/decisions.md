@@ -243,7 +243,7 @@ You create your own tags and assign them to the fans, artists and labels you fol
 ### Data
 
 - **Kinds:** `'fan' | 'band'`. Artists and labels are both band accounts (`band_id`, see §3.3), so they share one kind. If the fixture flags labels, store that as a display-only `isLabel?: boolean`, **never in the key**.
-- **Schema v4 (planned, additive; `itemKey` and `matchKey` untouched):**
+- **Schema v5 (planned, additive; `itemKey` and `matchKey` untouched; v4 went to `fans.lastSeenAt`, §9):**
   ```
   following: '[kind+id], kind, *tagIds'
   tags:      '++id, &nameKey'
@@ -284,3 +284,37 @@ You create your own tags and assign them to the fans, artists and labels you fol
 ### Backup
 
 - **Tags are hand-made and a re-sync can't rebuild them**, so a JSON export/import of tags is part of the feature.
+
+## 9. Popup controls and storage (Phase 7)
+
+Code: `src/popup/`, `src/shared/settings.ts`, `src/background/maintenance.ts`, `scripts/estimate-storage.ts`. Decided 2026-10-20.
+
+### Popup v1
+
+- **Two tabs:** *Status* (your sync, queue progress, today's budget, pause/resume) and *Settings* (pace, caps, twins thresholds, Clear all data).
+- **Queue progress** is `fansScanned / (fansScanned + fans queued)`, where `fansScanned` counts every fan with a final status. A bar over "everything ever queued" is honest about the backlog and never jumps backwards when a release adds supporters.
+- **Pause is yours and sticks:** `paused` in the scanner state (`chrome.storage.local`), so it survives a restart. It wins over back-off and budget in `pauseFor`, since it's the reason that won't clear on its own. The request in flight still finishes. Your own sync isn't paused by it: it's a handful of requests and off the budget (§4).
+- **Settings are validated** against `SETTING_LIMITS`, plus `paceMin ≤ paceMax` and `minCollection ≤ maxCollection`. The floor on pace (1 s) and the batch ceiling (500, the largest page seen in §1) aren't negotiable from the UI. `loadSettings` sanitizes what's stored: a missing, mistyped or out-of-range value falls back to its default, and if that leaves a pair out of order, everything resets. Reset removes the stored key. The popup writes `chrome.storage` directly; the worker re-reads settings before every request, so no message is needed.
+- **Clear all data** empties every IndexedDB table and the watched-release list, and clears the scanner's errors. It keeps settings, your pause and today's budget: those are about how politely to scan, not what was scanned. `me` goes too, so your collection re-syncs (full) on the next Bandcamp page.
+- **Dialog:** `ConfirmDialog` wraps Radix Dialog and portals into the `PortalContainerProvider` container. The popup provides `#root`, so the dialog stays inside `.dh-root`'s base styles; in a shadow root it would be the shadow container.
+
+### Storage estimate
+
+`npm run storage:estimate` sizes records from real fixtures through the real mappers, serialized as V8 structured clones (Chrome's IndexedDB value format), and adds one entry per index (index key + primary key + ~16 B LevelDB overhead). Compression is ignored, so it leans high.
+
+| Scenario (5k own items, 20k fans) | Ownership rows | Items | Total |
+| --- | --- | --- | --- |
+| Every fan at the 2,000-item cap | 40M | 4M | **~15 GB** |
+| 500 items per fan on average | 10M | 1.5M | **~4 GB** |
+
+- **`ownership` is ~89% of it**, at ~360 B per row: the value (~100 B) plus four entries (primary key and three indexes), each carrying the `[fanId+itemKey]` primary key.
+- **Cheapest win, not done yet:** the `ownership.itemKey` index is never queried outside tests, and `ownership.fanId` duplicates the primary key's prefix (`where('[fanId+itemKey]').between([id, Dexie.minKey], [id, Dexie.maxKey])`). Dropping both cuts about 40% of ownership. That's a schema version of its own, measured with `npm run perf` first.
+- No quota problem at these sizes: Chrome lets an origin use a large share of free disk. If the Web Store build ever needs a guarantee, that's the `unlimitedStorage` permission (Phase 8).
+- A real-browser check is still worth doing in dogfooding: `navigator.storage.estimate()` from the worker console after a few weeks of use.
+
+### Forgetting long-unseen fans
+
+- **Schema v4** adds `fans.lastSeenAt` (indexed). It's set whenever a supporter list lists the fan (`upsertSupporterFans`) and whenever a scan of theirs ends (`finishFanScan`). The upgrade fills it from `collectionFetchedAt`, or the upgrade time for fans never scanned.
+- **Daily cleanup** (`maintenance` alarm, every 24 h): fans with `lastSeenAt` over 180 days ago (`FAN_FORGET_MS`) are deleted with their `ownership` rows, their match-index entries (`refreshFanMatches` drops the list and lowers `matchOwners`), their twin rows and any queued fan job. You are never forgotten, even if you were once listed as a supporter. It runs 100 fans per transaction, and recomputes twins when anything went.
+- **Left alone:** `items` (cheap, and still describe releases others own) and old `releaseSupporters` lists that still name forgotten fans. Such a list is over 7 days old, so opening its release re-fetches and replaces it; until then its progress counts those fans as not scanned.
+

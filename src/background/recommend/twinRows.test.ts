@@ -67,7 +67,7 @@ describe('readTwinsResult', () => {
 
   it('ranks by score and adds names, avatars and profile links', async () => {
     await saveViewer(db, { fanId: 1, username: 'me' });
-    await upsertSupporterFans(db, [supporter(10, 'Ten', 2053905), supporter(11, '')]);
+    await upsertSupporterFans(db, [supporter(10, 'Ten', 2053905), supporter(11, '')], 0);
     await finishFanScan(db, 10, 'done', 40, 0);
     await finishFanScan(db, 11, 'partial', 20, 0);
     await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, { labelCluster: true })]);

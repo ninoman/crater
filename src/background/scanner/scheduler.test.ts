@@ -234,6 +234,19 @@ describe('drainQueue', () => {
     expect(store.state.budget).toEqual({ day: '2026-10-21', used: 1 });
   });
 
+  it('sends nothing while paused from the popup, and carries on once resumed', async () => {
+    const bandcamp = fakeBandcamp({ 1: 1 });
+    await queue([fanJob(1)]);
+    await store.save({ paused: true });
+
+    expect(await drainQueue(deps())).toBe('paused');
+    expect(bandcamp.requests).toHaveLength(0);
+
+    await store.save({ paused: false });
+    expect(await drainQueue(deps())).toBe('idle');
+    expect(bandcamp.requests).toHaveLength(1);
+  });
+
   it('resumes a fan from its saved cursor after the worker is killed', async () => {
     settings.collectionCap = 2000;
     const bandcamp = fakeBandcamp({ 9: 250 });
@@ -272,6 +285,7 @@ describe('drainQueue', () => {
         scannedItems: 0,
         collectionFetchedAt: null,
         status: 'queued' as const,
+        lastSeenAt: START,
       })),
     );
     await queue([
