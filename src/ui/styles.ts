@@ -4,6 +4,8 @@
 import badge from './Badge.css?inline';
 import base from './base.css?inline';
 import button from './Button.css?inline';
+import checkbox from './Checkbox.css?inline';
+import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
 import embedFrame from './EmbedFrame.css?inline';
@@ -19,6 +21,7 @@ import searchField from './SearchField.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
 import table from './Table.css?inline';
+import tagPicker from './TagPicker.css?inline';
 import tabs from './Tabs.css?inline';
 import tokens from './tokens.css?inline';
 import tooltip from './Tooltip.css?inline';
@@ -45,6 +48,9 @@ export const uiStyles = [
   tooltip,
   field,
   confirmDialog,
+  chip,
+  checkbox,
+  tagPicker,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

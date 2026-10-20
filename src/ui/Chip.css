@@ -1,0 +1,85 @@
+/* --dh-chip-color is set per chip from tagColor(). */
+.dh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  height: var(--dh-chip-height);
+  padding: 0 var(--dh-space-2);
+  border: 1px solid var(--dh-chip-color);
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-chip-color);
+  color: var(--dh-color-on-tag);
+  font: inherit;
+  font-size: var(--dh-text-xs);
+  font-weight: var(--dh-weight-bold);
+  white-space: nowrap;
+}
+
+.dh-chip__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dh-chip:has(.dh-chip__remove) {
+  padding-right: 2px;
+}
+
+.dh-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dh-chip__remove .dh-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.dh-chip__remove:hover {
+  background: var(--dh-color-overlay);
+}
+
+/* The shared focus colour vanishes on a tag fill, so the ring takes the chip's text colour. */
+.dh-root .dh-chip__remove:focus-visible {
+  outline: 2px solid var(--dh-color-on-tag);
+  outline-offset: -2px;
+}
+
+/* Unpressed filters are outlined, so the pressed ones stand out. */
+.dh-chip--toggle {
+  background: transparent;
+  color: var(--dh-color-text);
+  cursor: pointer;
+  transition: background-color var(--dh-duration);
+}
+
+.dh-chip--toggle::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-right: 2px;
+  border-radius: 50%;
+  background: var(--dh-chip-color);
+}
+
+.dh-chip--toggle:hover {
+  background: var(--dh-color-bg-hover);
+}
+
+.dh-chip--toggle[aria-pressed='true'] {
+  background: var(--dh-chip-color);
+  color: var(--dh-color-on-tag);
+}
+
+.dh-chip--toggle[aria-pressed='true']::before {
+  background: var(--dh-color-on-tag);
+}

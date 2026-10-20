@@ -1,0 +1,53 @@
+.dh-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+}
+
+.dh-checkbox__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--dh-checkbox-size);
+  height: var(--dh-checkbox-size);
+  padding: 0;
+  border: 1px solid var(--dh-color-subtle);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+  color: var(--dh-color-on-accent);
+  cursor: pointer;
+  transition:
+    background-color var(--dh-duration),
+    border-color var(--dh-duration);
+}
+
+.dh-checkbox__box:hover {
+  border-color: var(--dh-color-accent);
+}
+
+/* Also set here, not only in .dh-root, because the box sits in per-card shadow roots too. */
+.dh-checkbox__box:focus-visible {
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: 1px;
+}
+
+.dh-checkbox__box[data-state='checked'] {
+  border-color: var(--dh-color-accent);
+  background: var(--dh-color-accent);
+}
+
+.dh-checkbox__indicator {
+  display: inline-flex;
+}
+
+.dh-checkbox__indicator .dh-icon {
+  width: 10px;
+  height: 10px;
+  stroke-width: 2.5;
+}
+
+.dh-checkbox__label {
+  font-size: var(--dh-text-sm);
+  cursor: pointer;
+}
