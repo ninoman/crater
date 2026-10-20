@@ -1,13 +1,15 @@
-// Keeps Also-bought lists fresh for releases open in a tab, answers the sidebar's requests, and
-// keeps the taste-twins leaderboard up to date.
+// Keeps Also-bought and twins-who-own-this lists fresh for releases open in a tab, answers the
+// sidebar's requests, and keeps the taste-twins leaderboard up to date.
 
 import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
+import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { computeAlsoBought } from './alsoBought';
+import { computeReleaseTwins } from './releaseTwins';
 import { rescoreDue } from './rescore';
 import { computeTwins } from './twins';
 
@@ -28,6 +30,10 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
   return computeAlsoBought(db, releaseKey, me?.fanId ?? null);
 }
 
+export function getReleaseTwins(releaseKey: ItemKey): Promise<ReleaseTwinsResult> {
+  return computeReleaseTwins(db, releaseKey);
+}
+
 /** A job finished for a watched release. Re-scores and pushes the list to tabs when due. */
 export async function onScanStep(
   releaseKey: ItemKey,
@@ -40,6 +46,7 @@ export async function onScanStep(
     return;
   }
   await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'alsoBought', await getAlsoBought(releaseKey));
+  await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'releaseTwins', await getReleaseTwins(releaseKey));
 }
 
 /** Recomputes twins now, or once more after the running pass if one is under way. */

@@ -1,4 +1,5 @@
-// ROADMAP Phase 4 step 8: a re-score stays under ~200 ms with ~300k ownership rows.
+// ROADMAP Phase 4 step 8: a re-score stays under ~200 ms with ~300k ownership rows, with a full
+// twins leaderboard so the twin boost (Phase 5) is part of the measurement.
 // fake-indexeddb is slower than Chrome's IndexedDB, so passing here leaves headroom.
 
 import 'fake-indexeddb/auto';
@@ -12,12 +13,16 @@ import {
   type FanRecord,
   type ItemRecord,
   type OwnershipRecord,
+  type TwinRecord,
 } from '../../src/db';
 
 const SUPPORTERS = 300;
 const ITEMS_PER_FAN = 1000;
 const CATALOG = 60_000;
 const OTHER_FANS = 2_000;
+/** The leaderboard keeps 200 twins; this many of them are the release's supporters. */
+const TWINS = 200;
+const TWIN_SUPPORTERS = 50;
 const ME = 1;
 const RELEASE: ItemKey = 'a1';
 const BUDGET_MS = 200;
@@ -93,6 +98,19 @@ beforeAll(async () => {
     fetchedAt: 0,
   }));
 
+  const twinIds = [
+    ...Array.from({ length: TWIN_SUPPORTERS }, (_, i) => 100 + i * 6),
+    ...Array.from({ length: TWINS - TWIN_SUPPORTERS }, (_, i) => 10_000 + i),
+  ];
+  const twins = twinIds.map((fanId, i): TwinRecord => ({
+    fanId,
+    overlap: 50,
+    jaccard: 0.05,
+    score: 1 / (1 + i),
+    labelCluster: false,
+    computedAt: 0,
+  }));
+
   const started = performance.now();
   const index = buildMatchIndex(rows);
   for (const [table, records] of [
@@ -101,6 +119,7 @@ beforeAll(async () => {
     [db.matchOwners, index.matchOwners],
     [db.fans, fans],
     [db.items, items],
+    [db.twins, twins],
   ] as const) {
     for (let start = 0; start < records.length; start += SEED_CHUNK) {
       await (table as Table).bulkPut(records.slice(start, start + SEED_CHUNK));

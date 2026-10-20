@@ -4,6 +4,7 @@
 
 import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
+import type { ReleaseTwinsResult } from './releaseTwins';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { TwinsResult } from './twins';
@@ -32,6 +33,8 @@ export interface MessageMap {
   hideRelease: { request: { matchKey: ItemKey }; response: null };
   /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */
   getTwins: { request: NoPayload; response: TwinsResult };
+  /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
+  getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
 }
 
 export type MessageType = keyof MessageMap;
@@ -83,6 +86,8 @@ export interface EventMap {
   scanProgress: ScanProgress;
   /** A watched release was re-scored. */
   alsoBought: AlsoBoughtResult;
+  /** Sent with `alsoBought`: the twins owning that release, after the same scans. */
+  releaseTwins: ReleaseTwinsResult;
 }
 
 export type EventType = keyof EventMap;

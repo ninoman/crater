@@ -1,7 +1,7 @@
 import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
-import { getAlsoBought, readTwinsResult } from './recommend';
+import { getAlsoBought, getReleaseTwins, readTwinsResult } from './recommend';
 import { getScannerStatus, openRelease } from './scanner';
 
 export const handlers: MessageHandlers = {
@@ -23,4 +23,5 @@ export const handlers: MessageHandlers = {
     return null;
   },
   getTwins: () => readTwinsResult(db),
+  getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
 };

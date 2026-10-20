@@ -6,6 +6,7 @@ import {
   finishFanScan,
   hideRelease,
   putOwnership,
+  replaceTwins,
   upsertCollectionItems,
   upsertSupporterFans,
   type FanStatus,
@@ -115,8 +116,8 @@ describe('computeAlsoBought', () => {
   it('ranks by co-ownership and lift, folding tracks into albums', async () => {
     await seedBigRelease();
 
-    // Population: fans 10–41 = 32, you left out. Scores: a300 5·ln(1+3.2) ≈ 7.2,
-    // a400 4·ln(1+3.2) ≈ 5.7, a200 8·ln(1+0.91) ≈ 5.2, a900 3·ln(1+2.4) ≈ 3.7.
+    // Population: fans 10–41 = 32, you left out. Scores: a300 5·ln(1+2.3) ≈ 5.9 (fans 40 and
+    // 41 own it too), a400 4·ln(1+3.2) ≈ 5.7, a200 8·ln(1+0.91) ≈ 5.2, a900 3·ln(1+2.4) ≈ 3.7.
     expect(await ranking('a100')).toEqual(['a300', 'a400', 'a200', 'a900']);
   });
 
@@ -133,7 +134,7 @@ describe('computeAlsoBought', () => {
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       previewUrl: expect.stringContaining('/album=300/') as string,
-      reason: { kind: 'co-owned', owners: 5, of: 10 },
+      reason: { kind: 'co-owned', owners: 5, of: 10, twins: 0 },
       ownedTracks: 0,
     });
     expect(rows.find((row) => row.matchKey === 'a900')?.ownedTracks).toBe(1);
@@ -159,6 +160,26 @@ describe('computeAlsoBought', () => {
 
     // Hidden still applies. a500 ranks below a600: your copy makes it one owner more common.
     expect(await ranking('a100', null)).toEqual(['a300', 'a400', 'a200', 'a600', 'a500', 'a900']);
+  });
+
+  it('boosts releases your twins among the supporters own', async () => {
+    await seedBigRelease();
+    // Fan 30 is your best twin but doesn't own a100, so their a200 copy doesn't count.
+    await replaceTwins(db, [
+      { fanId: 30, overlap: 9, jaccard: 0.1, score: 0.8, labelCluster: false, computedAt: 0 },
+      { fanId: 17, overlap: 5, jaccard: 0.1, score: 0.4, labelCluster: false, computedAt: 0 },
+      { fanId: 18, overlap: 5, jaccard: 0.1, score: 0.4, labelCluster: false, computedAt: 0 },
+    ]);
+
+    // a200 (fan 17, share 0.5): 5.2 × 1.25 ≈ 6.5 jumps from third to first, past a300's 5.9.
+    // a900 (fans 17 and 18, share 1): 3.7 × 1.5 ≈ 5.5, just short of a400's 5.7.
+    const { rows } = await computeAlsoBought(db, 'a100', ME);
+    expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
+      ['a200', { kind: 'co-owned', owners: 8, of: 10, twins: 1 }],
+      ['a300', { kind: 'co-owned', owners: 5, of: 10, twins: 0 }],
+      ['a400', { kind: 'co-owned', owners: 4, of: 10, twins: 0 }],
+      ['a900', { kind: 'co-owned', owners: 3, of: 10, twins: 2 }],
+    ]);
   });
 
   it('returns nothing before any supporter is scanned', async () => {
@@ -197,7 +218,7 @@ describe('small-release fallback', () => {
     const { rows } = await computeAlsoBought(db, 'a1000', ME);
 
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a2000', { kind: 'co-owned', owners: 2, of: 2 }],
+      ['a2000', { kind: 'co-owned', owners: 2, of: 2, twins: 0 }],
       ['a1001', { kind: 'same-artist' }],
       ['a1002', { kind: 'same-label', label: 'Tiny Label' }],
       ['a1003', { kind: 'same-label', label: 'Tiny Label' }],
