@@ -9,7 +9,7 @@ export default defineConfig({
     target: 'chrome120',
   },
   test: {
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.ts'],
     environment: 'node',
   },
 });

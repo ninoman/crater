@@ -350,6 +350,19 @@ We change Bandcamp's own **following** tab on your profile instead of adding a t
   - error (reuse `parserError`)
   - results
 
+### Following tab as built (roadmap step 10)
+
+Code: `src/content/following/`, mounted by `mountProfile`. Built 2026-10-21 and tested on the fixtures (jsdom); not yet tried on the live page with Bandcamp's own JS.
+
+- **Lazy takeover:** a sub-tab's list is taken over the first time it opens, then stays taken over and mounted, so filters and selection survive switching sub-tabs. A `MutationObserver` watches only `#following-grid` and the sub-tab `<li>`s, not the cards.
+- **Bandcamp's list comes back** while ours can't stand in for it: the worker is unreachable, or our list is empty and the sync hasn't finished, has failed, or hasn't seen you log in. It's hidden by a class on the sub-tab container and one injected `<style>`, not inline styles.
+- **Cards are reused** across refetches and only moved when the order changes, so focus inside a card and Bandcamp's button state survive a tag change. A row unfollowed since the last sync is built without `following` on its button, so it offers "Follow".
+- **Unfollow tracking** compares each button's class before its first change in a mutation batch with its class now, so a burst of class edits reports once.
+- **Filtering** is in memory over the whole list (`followingFilter.ts`), since `listFollowing` with no tags answers every row. **Bulk actions** act on the checked cards still shown; hidden ones stay checked. The bulk bar floats at the bottom of the window, so it's in reach on a long list.
+- **The tag editor** (`FollowTagEditor` and `followTagHandlers` in `src/content/shared/`) is presentational: callers pass your tags, the account's tag ids and `useTags()`'s mutations. Step 11 reuses it on fan, release and band pages.
+- **Parser errors** show as the scanner notices (`NoticeStack`) above the open list. A failed sync shows its message in the empty state.
+- DOM tests run under jsdom (`// @vitest-environment jsdom`), on the fan page with its following grid swapped for the rendered one (`tests/followingTabDom.ts`).
+
 ### Tags on the account's own page
 
 - On a fan page you follow, next to the twin badge, and on an artist's or label's pages (release pages via the publisher's `band_id`, §3.3, and the band's home page), show your tags as chips with "+ tag".

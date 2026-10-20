@@ -1,0 +1,50 @@
+.dh-segmented {
+  display: inline-flex;
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+  overflow: hidden;
+}
+
+.dh-segmented__option {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Visually hidden but still focusable, so the label carries the look. */
+.dh-segmented__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.dh-segmented__label {
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--dh-chip-height) + 2px);
+  padding: 0 var(--dh-space-2);
+  background: var(--dh-color-bg);
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+  cursor: pointer;
+  transition: background-color var(--dh-duration);
+}
+
+.dh-segmented__option + .dh-segmented__option .dh-segmented__label {
+  border-left: 1px solid var(--dh-color-border);
+}
+
+.dh-segmented__label:hover {
+  background: var(--dh-color-bg-hover);
+}
+
+.dh-segmented__input:checked + .dh-segmented__label {
+  background: var(--dh-color-accent);
+  color: var(--dh-color-on-accent);
+}
+
+.dh-segmented__input:focus-visible + .dh-segmented__label {
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: -2px;
+}
