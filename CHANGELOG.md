@@ -1,12 +1,5 @@
 # Changelog
 
-All notable changes to this project are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
-[Semantic Versioning](https://semver.org/). Add entries under Unreleased as you go;
-`npm run release:*` moves them under the new version.
-
-## [Unreleased]
-
 ## [0.1.0] - 2026-10-20
 
 First build: the MVP (ROADMAP phases 0 to 6) plus hardening.

@@ -207,7 +207,7 @@ Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and
 2. [x] Write a privacy policy page: all data stays local, there is no server and no analytics.
 3. [x] Write a short justification for each permission (host permission for bandcamp.com only, plus `alarms` and `storage`).
 4. [ ] Build, zip and submit, then handle review feedback.
-5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage.
+5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage. release-please opens the release PR and CI submits to the store; see `docs/releasing.md`.
 
 ---
 
