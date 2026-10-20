@@ -9,7 +9,7 @@ export type {
 } from '../db/schema';
 export type { TagBackup } from '../db/tagBackup';
 export type { TagImportSummary, TagResult } from '../db/repo/tags';
-export type { TagMode } from '../db/tagFilter';
+export { matchesTags, type TagMode } from '../db/tagFilter';
 
 /** Who `assignTag` changes: add the tag to the followings, or take it off. */
 export type TagAction = 'add' | 'remove';

@@ -1,5 +1,6 @@
 // Sorting, filtering and number formats for the twins leaderboard. Pure, so the table stays dumb.
 
+import { foldText as fold } from '../../../shared/fold';
 import type { TwinRow } from '../../../shared/twins';
 
 export type TwinSort = 'score' | 'overlap' | 'jaccard';
@@ -7,14 +8,6 @@ export type TwinSort = 'score' | 'overlap' | 'jaccard';
 /** Highest first. Ties keep leaderboard order. */
 export function sortTwins(rows: readonly TwinRow[], by: TwinSort): TwinRow[] {
   return [...rows].sort((a, b) => b[by] - a[by] || a.rank - b.rank);
-}
-
-/** Lowercase without accents, so "bjork" finds "Björk". */
-function fold(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();
 }
 
 /** Twins whose name or username contains the query. A blank query keeps everyone. */

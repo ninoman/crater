@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
-const dir = fileURLToPath(new URL('./fixtures/', import.meta.url));
+// A path, not a URL: under the jsdom environment `import.meta.url` isn't a file URL.
+const dir = join(import.meta.dirname, 'fixtures/');
 
 export function fixtureText(name: string): string {
   return readFileSync(dir + name, 'utf8');

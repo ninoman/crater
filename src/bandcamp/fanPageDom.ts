@@ -32,8 +32,12 @@ export const FAN_PAGE_DOM = {
   },
   /** Inside a container: Bandcamp's own paged list and "view all" button, both hidden for ours. */
   followingNativeList: 'ol.followeer-grid',
+  /** The class Bandcamp's CSS lays a list of cards out by; our own list carries it too. */
+  followingListClass: 'followeer-grid',
   followingExpand: '.expand-container',
   /** A card and its follow button, which Bandcamp's own handler listens on. */
   followingCard: 'li.followeer',
   followButton: 'button.follow-unfollow',
+  /** Class on a follow button while you follow; Bandcamp's handler toggles it. */
+  followingButtonClass: 'following',
 } as const;

@@ -1,6 +1,7 @@
 import { StrictMode, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { injectStyles, PortalContainerProvider } from '../../ui';
+import { PortalContainerProvider } from '../../ui';
+import { createShadowSlot } from './shadowSlot';
 
 /**
  * Renders React UI inside a shadow root attached to `parent`, so page CSS can't leak in.
@@ -8,13 +9,7 @@ import { injectStyles, PortalContainerProvider } from '../../ui';
  * Returns a function that removes the UI again.
  */
 export function mountShadow(parent: Element, ui: ReactNode, extraCss = ''): () => void {
-  const host = document.createElement('dighead-root');
-  const shadow = host.attachShadow({ mode: 'open' });
-  injectStyles(shadow, extraCss);
-
-  const container = document.createElement('div');
-  container.className = 'dh-root';
-  shadow.append(container);
+  const { host, container } = createShadowSlot(document, 'dighead-root', extraCss);
   parent.append(host);
 
   const root = createRoot(container);

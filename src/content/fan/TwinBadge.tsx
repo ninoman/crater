@@ -1,14 +1,12 @@
 import type { TwinStanding } from '../../shared/twins';
 import { Badge, Tooltip } from '../../ui';
-import { formatMatch } from '../profile/twins/twinsView';
+import { twinStandingHint } from '../shared/twinStandingHint';
 
 /** "your #4 twin · 37 in common", with the numbers explained on hover and focus. */
 export function TwinBadge({ standing }: { standing: TwinStanding }) {
-  const { rank, overlap, matchPct } = standing;
+  const { rank, overlap } = standing;
   return (
-    <Tooltip
-      content={`#${rank} on your taste-twins leaderboard. You both own ${overlap} releases, a ${formatMatch(matchPct / 100)} match: shared releases over both collections combined.`}
-    >
+    <Tooltip content={twinStandingHint(standing)}>
       {/* A real button so keyboard users can focus it and get the tooltip. */}
       <button type="button" className="dh-twin-badge">
         <Badge>

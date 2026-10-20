@@ -1,0 +1,14 @@
+.dh-follow-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dh-follow-tags > li {
+  display: inline-flex;
+  min-width: 0;
+}
