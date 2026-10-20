@@ -11,6 +11,28 @@ export function twinStanding(twins: readonly TwinRecord[], fanId: number): TwinS
   return { rank: i + 1, overlap: twin.overlap, matchPct: twin.jaccard * 100 };
 }
 
+/** `twinStanding` for many fans at once, indexing the board a single time. */
+export function twinStandings(
+  twins: readonly TwinRecord[],
+  fanIds: readonly number[],
+): Record<number, TwinStanding> {
+  const wanted = new Set(fanIds);
+  const standings: Record<number, TwinStanding> = {};
+  twins.forEach((twin, i) => {
+    if (wanted.has(twin.fanId)) {
+      standings[twin.fanId] = { rank: i + 1, overlap: twin.overlap, matchPct: twin.jaccard * 100 };
+    }
+  });
+  return standings;
+}
+
+export async function getTwinStandings(
+  db: DigheadDb,
+  fanIds: readonly number[],
+): Promise<Record<number, TwinStanding>> {
+  return twinStandings(await getTwins(db), fanIds);
+}
+
 export async function getTwinStanding(db: DigheadDb, fanId: number): Promise<TwinStanding | null> {
   return twinStanding(await getTwins(db), fanId);
 }
