@@ -17,10 +17,8 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `collection_items-unknown-fan.json` | collection_items with `fan_id: 1` | empty result: `items: []`, `last_token: null` |
 | `collection_items-bad-token.json` | collection_items with `older_than_token: "garbage"` | error shape: HTTP 200 with `{"error":true}` |
 | `me-fan-page.html` | `GET https://bandcamp.com/randoom_taker` in a logged-in browser (2026-10-20). Scrubbed: email, re-download `sig`/`payment_id` and CSRF crumbs are placeholders | `parseViewer` on a logged-in page: `identities.fan` is `{id, username, name, photo, private, url, verified}`; also `is_own_page`, `hidden_data` |
+| `purchase-confirmation.html` | The page checkout lands on, `GET https://bandcamp.com/download?cart_id=<id>&sig=<sig>&from=checkout`, logged in (2026-10-20, one track). Scrubbed: email is `fan@example.com`, every `sig`, crumb and `payment_id` is a placeholder | `isPurchaseConfirmationUrl` (the URL shape; `from` is gone from the address bar after load). `#pagedata` also has `download_items` with `cart_id`, `tralbum_id`, `item_type` |
 
-Still to capture (needs you, logged in):
-
-- `purchase-confirmation.html`: the page after a purchase completes, and its URL (re-sync trigger; Phase 2 guesses `bandcamp.com/download`)
 
 ## Refreshing the public fixtures
 

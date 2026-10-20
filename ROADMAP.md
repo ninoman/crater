@@ -76,7 +76,7 @@ Also added: the UI kit in `src/ui/` (tokens, Button, Panel, Tabs (Radix), EmptyS
 1. [x] Detect the logged-in fan from page data on any bandcamp.com page, then store `fan_id` and `username` in `me`. Reads `#pagedata` `identities.fan`; the logged-in shape `{id, username}` is confirmed by `me-fan-page.html`.
 2. [x] Write a paginated collection fetcher in `bandcamp/collection.ts`: loop on `older_than_token` and yield pages.
 3. [x] Pull your full collection and wishlist (no cap for yourself). Write to `items`, `ownership` (with `source`) and `me` (owned and wishlist key sets). Your owned and wishlisted sets are your `ownership` rows, not copies in `me`.
-4. [ ] Re-sync triggers: `chrome.runtime.onStartup`, and the purchase confirmation page (record a fixture of it and match on URL or DOM). `onStartup` is done, plus a re-sync on any page view when the last sync is over 24 h old. The purchase page match (`bandcamp.com/download`) is a guess until `purchase-confirmation.html` is captured.
+4. [x] Re-sync triggers: `chrome.runtime.onStartup`, and the purchase confirmation page (record a fixture of it and match on URL or DOM). `onStartup` is done, plus a re-sync on any page view when the last sync is over 24 h old. The purchase page is `bandcamp.com/download` with a `cart_id` param (confirmed by `purchase-confirmation.html`); re-downloads don't match.
 5. [x] Incremental re-sync: stop paging once a page contains only items you already have.
 6. [x] Popup v0: "N items synced · M wishlisted · last synced X ago", plus a "Re-sync" button.
 

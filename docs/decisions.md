@@ -106,7 +106,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 - **Wishlist first, then collection**, so an item you bought since wishlisting ends up as `collection` (same `[fanId+itemKey]` row).
 - **Hidden wishlist:** if your wishlist errors on its first page, the sync keeps going with the collection.
 - **Pace:** your own sync waits the scanner's pace (1.5–3 s) between pages but doesn't count against the daily budget. Each wait re-reads settings from `chrome.storage`. Because that's an extension API call, it keeps the service worker alive through a long sync. If the worker is killed anyway, `syncedAt` stays unset and the next trigger runs a full sync again.
-- **Purchase page (unverified):** treated as `https://bandcamp.com/download`. Re-downloads match too, but that only costs an incremental sync. Confirm with `purchase-confirmation.html`.
+- **Purchase page (confirmed 2026-10-20, `purchase-confirmation.html`):** checkout (`/cart/checkout?…`) 303s to `https://bandcamp.com/download?cart_id=…&sig=…&from=checkout`. The page drops `from` from the address bar after load, so content scripts match on `/download` with a `cart_id` param. Re-downloads from your collection use `/download?from=collection&payment_id=…&sig=…&sitem_id=…` with no `cart_id`, so they don't trigger a sync.
 - **Confirmed with a real account (2026-10-20):** the worker's session cookies reach the API. A wishlist that is hidden publicly synced in full (137 items), and the collection count was slightly above the logged-out profile's (1,131 vs 1,127).
 
 ## 5. Network and the scanner (Phase 3)
