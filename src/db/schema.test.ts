@@ -112,4 +112,43 @@ describe('DigheadDb', () => {
     expect(queued?.lastSeenAt).toBeGreaterThanOrEqual(before);
     await upgraded.delete();
   });
+
+  it('keys followings by kind and id, and indexes their tags', async () => {
+    const row = {
+      name: 'N',
+      url: 'https://bandcamp.com/n',
+      imageId: null,
+      location: null,
+      followedAt: 0,
+      unfollowed: false,
+    };
+    await db.following.bulkPut([
+      { ...row, kind: 'fan', id: 1, tagIds: [3, 4] },
+      { ...row, kind: 'band', id: 1, tagIds: [4] },
+    ]);
+
+    expect(await db.following.count()).toBe(2);
+    expect(await db.following.where('tagIds').equals(4).count()).toBe(2);
+    expect(await db.following.where('kind').equals('fan').primaryKeys()).toEqual([['fan', 1]]);
+  });
+
+  it('rejects a second tag with the same name key', async () => {
+    await db.tags.add({ name: 'Ambient', nameKey: 'ambient' });
+
+    await expect(db.tags.add({ name: 'ambient', nameKey: 'ambient' })).rejects.toThrow();
+  });
+
+  it('keeps v4 data when adding the following tables in v5', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(4).stores({ hidden: 'matchKey' });
+    await old.table('hidden').put({ matchKey: 'a1', hiddenAt: 5 });
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    expect(await upgraded.hidden.get('a1')).toEqual({ matchKey: 'a1', hiddenAt: 5 });
+    expect(await upgraded.following.count()).toBe(0);
+    expect(await upgraded.tags.count()).toBe(0);
+    await upgraded.delete();
+  });
 });

@@ -3,6 +3,8 @@ import { DigheadDb } from './schema';
 export * from './mappers';
 export * from './matchIndex';
 export * from './repo';
+export * from './tagBackup';
+export * from './tagFilter';
 export type * from './schema';
 export { DigheadDb };
 

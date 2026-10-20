@@ -180,9 +180,9 @@ It isn't part of the MVP. Design and data source: decisions §8.
 2. [x] Capture the rendered following tab and the band follow/unfollow request, logged in (decisions §8).
 3. [x] Find how Bandcamp's follow buttons work, so our cards can reuse its handler instead of sending requests (decisions §8).
 4. [x] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
-5. [ ] Schema v5 migration.
+5. [x] Schema v5 migration.
 6. [ ] Following sync inside your own sync (always full, 500 per request).
-7. [ ] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
+7. [x] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
 8. [ ] Message bus and hooks, including batched `getTwinStandings`.
 9. [ ] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
 10. [ ] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and twin rank inside each card. Bulk tagging, unfollow tracking and all view states.
