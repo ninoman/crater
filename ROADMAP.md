@@ -171,9 +171,9 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 
 **Goal:** tag the fans, artists and labels you follow with your own tags, then filter your followings by tag.
 
-Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and open questions: decisions §7.
+Depends on Phase 5's profile-tab injection. It isn't part of the MVP. Design and open questions: decisions §8.
 
-1. [ ] Capture the following fixture and add its findings to decisions §7. **This blocks everything below.**
+1. [ ] Capture the following fixture and add its findings to decisions §8. **This blocks everything below.**
 2. [ ] Parser with a fixture test.
 3. [ ] Schema v4 migration.
 4. [ ] Following sync inside your own sync.

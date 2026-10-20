@@ -185,7 +185,19 @@ Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering
 - **Track-only buyers of an album aren't listed as its supporters** (§3.8). This is still unmeasured: watch for albums whose supporter list looks small next to their `also_collected_count`.
 - **Preview:** Bandcamp's release-page CSP sets no `frame-src`, and the EmbeddedPlayer sends no `X-Frame-Options` (checked 2026-10-20), so the iframe loads on artist pages.
 
-## 7. Following tags (planned)
+## 7. Taste twins (Phase 5)
+
+Code: `src/scoring/twins.ts` (pure), `src/db/repo/twins.ts` (gathering and storing), `src/background/recommend/twins.ts` (running it). Decided 2026-10-20.
+
+- **Score** = Σ w(i) over the shared matchKeys / √(|M|·|F|), where |M| and |F| are the two `fanMatches` lists (collection only, tracks folded into albums). w(i) uses the album's `supporterCount` first, then a track's, then `matchOwners`. Raw overlap and Jaccard are stored alongside.
+- **|F| is what we've scanned**, so a collection capped at 2,000 items is compared on its newest 2,000. The size filter uses `collectionSize` once known (a `done` scan), otherwise `scannedItems`. A capped fan's real size is unknown, so `maxCollectionSize` can't catch them yet.
+- **Candidates** are fans whose collection was read (`done` or `partial`), as for Also bought. Private, queued and failed fans are left out.
+- **Label** = `labelId ?? bandId` (§3.3). A label's catalog is its distinct matchKeys in the local `items` table. Only the labels of releases you own are looked up, since only they can carry an overlap.
+- **Label-cluster flag:** more than 50% of the overlap from one label, the fan owns more than 60% of that label's local catalog, **and at least 3 shared releases come from that label**. The last rule is new: local catalogs start tiny (often one release), so one shared release would otherwise flag everyone who owns it. Flagged twins are multiplied by 0.3 when `labelClusterDownweight` is on, and the flag is stored either way.
+- **The leaderboard keeps the top 200**, replaced in full on each recompute. Fans are scored 500 at a time with a yield between pages.
+- **Recompute triggers:** after each finished sync of your own collection, after every 25 fan scans (an in-memory counter, lost with the worker), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.
+
+## 8. Following tags (planned)
 
 Planned 2026-10-20. **The data source is not yet verified.** Roadmap: *Following tags*.
 
@@ -249,15 +261,3 @@ You create your own tags and assign them to the fans, artists and labels you fol
 ### Backup
 
 - **Tags are hand-made and a re-sync can't rebuild them**, so a JSON export/import of tags is part of the feature.
-
-## 7. Taste twins (Phase 5)
-
-Code: `src/scoring/twins.ts` (pure), `src/db/repo/twins.ts` (gathering and storing), `src/background/recommend/twins.ts` (running it). Decided 2026-10-20.
-
-- **Score** = Σ w(i) over the shared matchKeys / √(|M|·|F|), where |M| and |F| are the two `fanMatches` lists (collection only, tracks folded into albums). w(i) uses the album's `supporterCount` first, then a track's, then `matchOwners`. Raw overlap and Jaccard are stored alongside.
-- **|F| is what we've scanned**, so a collection capped at 2,000 items is compared on its newest 2,000. The size filter uses `collectionSize` once known (a `done` scan), otherwise `scannedItems`. A capped fan's real size is unknown, so `maxCollectionSize` can't catch them yet.
-- **Candidates** are fans whose collection was read (`done` or `partial`), as for Also bought. Private, queued and failed fans are left out.
-- **Label** = `labelId ?? bandId` (§3.3). A label's catalog is its distinct matchKeys in the local `items` table. Only the labels of releases you own are looked up, since only they can carry an overlap.
-- **Label-cluster flag:** more than 50% of the overlap from one label, the fan owns more than 60% of that label's local catalog, **and at least 3 shared releases come from that label**. The last rule is new: local catalogs start tiny (often one release), so one shared release would otherwise flag everyone who owns it. Flagged twins are multiplied by 0.3 when `labelClusterDownweight` is on, and the flag is stored either way.
-- **The leaderboard keeps the top 200**, replaced in full on each recompute. Fans are scored 500 at a time with a yield between pages.
-- **Recompute triggers:** after each finished sync of your own collection, after every 25 fan scans (an in-memory counter, lost with the worker), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.
