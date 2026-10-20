@@ -2,6 +2,7 @@ import { useSyncStatus } from '../hooks/useSyncStatus';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot, Tabs } from '../ui';
 import { ClearData } from './ClearData';
+import { TagBackup } from './TagBackup';
 import { ScannerSummary } from './ScannerSummary';
 import { SettingsPanel } from './SettingsPanel';
 import { SyncSummary } from './SyncSummary';
@@ -46,6 +47,7 @@ function SettingsTab() {
   return (
     <>
       <SettingsPanel />
+      <TagBackup />
       <ClearData />
     </>
   );

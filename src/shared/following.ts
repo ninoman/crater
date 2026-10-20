@@ -7,7 +7,7 @@ export type {
   FollowKind,
   TagRecord as Tag,
 } from '../db/schema';
-export type { TagBackup } from '../db/tagBackup';
+export { parseTagBackup, type TagBackup } from '../db/tagBackup';
 export type { TagImportSummary, TagResult } from '../db/repo/tags';
 export type { TagMode } from '../db/tagFilter';
 
