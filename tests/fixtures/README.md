@@ -22,6 +22,7 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `me-following-tab.html` | `#following-grid` outerHTML from `https://bandcamp.com/randoom_taker/following/artists_and_labels`, logged in, after "view all" (2026-10-20, 232 cards). No crumbs or personal data in it | following tab selectors: active sub-tab, card markup, `button.follow-unfollow` data attributes |
 | `me-fan-page.html` | `GET https://bandcamp.com/randoom_taker` in a logged-in browser (2026-10-20). Scrubbed: email, re-download `sig`/`payment_id` and CSRF crumbs are placeholders | `parseViewer` on a logged-in page: `identities.fan` is `{id, username, name, photo, private, url, verified}`; also `is_own_page`, `hidden_data` |
 | `purchase-confirmation.html` | The page checkout lands on, `GET https://bandcamp.com/download?cart_id=<id>&sig=<sig>&from=checkout`, logged in (2026-10-20, one track). Scrubbed: email is `fan@example.com`, every `sig`, crumb and `payment_id` is a placeholder | `isPurchaseConfirmationUrl` (the URL shape; `from` is gone from the address bar after load). `#pagedata` also has `download_items` with `cart_id`, `tralbum_id`, `item_type` |
+| `band-page.html` | `GET https://floatingpoints.bandcamp.com/music`, logged out (2026-10-20). `/` 303s to the latest album, so `/music` is the band's home page. `data-tralbum` there holds only a url (no item), `data-band` has `id` and `name`, and the name sits in `#band-name-location` | `parseBandId`, `hasTralbumItem`, `detectPageKind` |
 
 
 ## Refreshing the public fixtures

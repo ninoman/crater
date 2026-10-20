@@ -1,9 +1,11 @@
 import { FAN_PAGE_DOM, ParserError, parseViewedFanId } from '../../bandcamp';
+import { FollowedAccountTags } from '../shared/FollowedAccountTags';
+import { accountTagsStyles } from '../shared/accountTagsStyles';
 import { mountShadow } from '../shared/mountShadow';
 import fanCss from './Fan.css?inline';
 import { TwinStandingBadge } from './TwinStandingBadge';
 
-/** Adds the "your #N twin" badge under the name on another fan's profile. */
+/** Adds the "your #N twin" badge and, for fans you follow, your tags under the name. */
 export function mountFan(doc: Document): void {
   const pagedata = doc.getElementById('pagedata');
   const name = doc.querySelector(FAN_PAGE_DOM.name);
@@ -19,5 +21,14 @@ export function mountFan(doc: Document): void {
     }
     throw error;
   }
-  if (fanId !== null) mountShadow(name, <TwinStandingBadge fanId={fanId} />, fanCss);
+  if (fanId === null) return;
+  const fanName = name.querySelector('h1')?.textContent?.trim() || 'this fan';
+  mountShadow(
+    name,
+    <>
+      <TwinStandingBadge fanId={fanId} />
+      <FollowedAccountTags kind="fan" id={fanId} name={fanName} />
+    </>,
+    fanCss + accountTagsStyles,
+  );
 }

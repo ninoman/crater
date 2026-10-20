@@ -186,7 +186,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 8. [x] Message bus and hooks, including batched `getTwinStandings`.
 9. [x] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
 10. [x] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and twin rank inside each card. Bulk tagging, unfollow tracking and all view states.
-11. [ ] Tags on the account's own page: fan pages, release pages and the band's home page.
+11. [x] Tags on the account's own page: fan pages, release pages and the band's home page.
 12. [x] Tag export/import.
 
 **Done when:** the following tab lists everyone you follow, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, follow/unfollow on our cards works through Bandcamp's own handler, and a followed artist's release page shows its tags.
