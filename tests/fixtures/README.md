@@ -21,3 +21,18 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 Still to capture (needs you, logged in):
 
 - `purchase-confirmation.html`: the page after a purchase completes, and its URL (re-sync trigger; Phase 2 guesses `bandcamp.com/download`)
+
+## Refreshing the public fixtures
+
+```bash
+npm run fixtures:refresh              # capture into tests/fixtures/.fresh/ (gitignored) and report
+npm run fixtures:refresh -- --write   # also overwrite the saved fixtures
+npm run fixtures:refresh -- album-page.html   # only some (p2 files need their first page listed too)
+```
+
+It re-fetches every logged-out fixture above (one request at a time, 1.5–3 s apart, using the builders in `src/bandcamp/requests.ts`), then for each one:
+
+- runs the real parser on the fresh body and reports any `ParserError` / zod failure (`BROKEN`). The error-shape fixtures must still be rejected with `BandcampApiError`;
+- compares structure with the saved fixture, not text: key paths and value types, for JSON bodies and for the `data-tralbum`, `#pagedata`, `#collectors-data` and ld+json blobs of HTML pages (`DRIFT` lists removed, added and retyped paths).
+
+The exit code is 1 on `BROKEN` or `DRIFT`. Fresh data is a different sample, so a field that is sometimes `null` can show up as a harmless type change (`number -> null|number`); a removed or renamed path, or any `BROKEN`, is the real signal. Skipped, since they need a logged-in session: `me-fan-page.html` and the purchase page.
