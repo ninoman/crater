@@ -1,6 +1,7 @@
 import { useSyncStatus } from '../hooks/useSyncStatus';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot } from '../ui';
+import { ScannerSummary } from './ScannerSummary';
 import { SyncSummary } from './SyncSummary';
 
 function Body() {
@@ -44,6 +45,7 @@ export function Popup() {
         </span>
       </header>
       <Body />
+      {worker.state === 'connected' && <ScannerSummary />}
     </div>
   );
 }

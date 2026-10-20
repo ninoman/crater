@@ -59,20 +59,28 @@ describe('DigheadDb', () => {
   });
 
   it('rejects a duplicate queue job for the same target', async () => {
-    const job = { kind: 'fan' as const, target: '42', priority: 1, attempts: 0, nextAttemptAt: 0 };
+    const job = {
+      kind: 'fan' as const,
+      target: '42' as const,
+      priority: 1,
+      attempts: 0,
+      nextAttemptAt: 0,
+      cursor: null,
+    };
     await db.queue.add(job);
 
     await expect(db.queue.add({ ...job })).rejects.toThrow();
   });
 
-  it('orders queue jobs by priority, then next attempt time', async () => {
-    await db.queue.bulkAdd([
-      { kind: 'fan', target: 'late', priority: 2, attempts: 0, nextAttemptAt: 0 },
-      { kind: 'fan', target: 'urgent-later', priority: 1, attempts: 0, nextAttemptAt: 50 },
-      { kind: 'fan', target: 'urgent-now', priority: 1, attempts: 0, nextAttemptAt: 10 },
+  it('indexes release supporters by fan', async () => {
+    await db.releaseSupporters.bulkPut([
+      { itemKey: 'a1', fanIds: [7, 8], fetchedAt: 0 },
+      { itemKey: 'a2', fanIds: [8], fetchedAt: 0 },
     ]);
 
-    const ordered = await db.queue.orderBy('[priority+nextAttemptAt]').toArray();
-    expect(ordered.map((job) => job.target)).toEqual(['urgent-now', 'urgent-later', 'late']);
+    expect(await db.releaseSupporters.where('fanIds').equals(8).primaryKeys()).toEqual([
+      'a1',
+      'a2',
+    ]);
   });
 });

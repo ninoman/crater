@@ -52,6 +52,18 @@ const LIST_SOURCES: Record<CollectionList, string> = {
   wishlist: 'wishlist_items',
 };
 
+/** Fetches and parses one page of a fan's collection or wishlist. */
+export async function fetchCollectionPage(
+  fetchJson: FetchJson,
+  list: CollectionList,
+  fanId: number,
+  olderThanToken: string,
+  count: number,
+): Promise<CollectionPage> {
+  const json = await fetchJson(collectionListRequest(list, fanId, olderThanToken, count));
+  return parseCollectionPage(json, LIST_SOURCES[list]);
+}
+
 /**
  * Pages through a fan's collection or wishlist, newest first, following `last_token`.
  * Lazy: the next request is only sent when the consumer asks for the next page,
@@ -64,11 +76,9 @@ export async function* collectionPages(
   batchSize: number,
   startToken: string = firstPageToken(),
 ): AsyncGenerator<CollectionPage> {
-  const source = LIST_SOURCES[list];
   let token = startToken;
   for (;;) {
-    const json = await fetchJson(collectionListRequest(list, fanId, token, batchSize));
-    const page = parseCollectionPage(json, source);
+    const page = await fetchCollectionPage(fetchJson, list, fanId, token, batchSize);
     yield page;
     // A repeated token would loop forever, so treat it as the end.
     if (!page.moreAvailable || page.nextToken === null || page.nextToken === token) return;

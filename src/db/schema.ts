@@ -66,18 +66,47 @@ export interface TwinRecord {
   computedAt: number;
 }
 
-export type JobKind = 'fan' | 'release';
+/** Where a release job carries on paging supporters. A null token means that list is done. */
+export interface ReleaseCursor {
+  thumbsToken: string | null;
+  reviewsToken: string | null;
+  /** Supporters saved so far, checked against settings.supportersPerReleaseCap. */
+  collected: number;
+}
 
-export interface QueueJob {
+/** Where a fan job carries on paging the collection. */
+export interface FanCursor {
+  token: string;
+  scanned: number;
+}
+
+interface JobBase {
   id?: number;
-  kind: JobKind;
-  /** fanId (as a string) for fan jobs, itemKey for release jobs. */
-  target: string;
   /** Lower runs first. */
   priority: number;
+  /** Failed runs so far, for errors that aren't Bandcamp's fault (see scanner/outcome.ts). */
   attempts: number;
   nextAttemptAt: number;
 }
+
+/** Fetches a release page, then pages its supporters. One request per run. */
+export interface ReleaseJob extends JobBase {
+  kind: 'release';
+  target: ItemKey;
+  url: string;
+  cursor: ReleaseCursor | null;
+}
+
+/** Pages one fan's collection. One request per run. */
+export interface FanJob extends JobBase {
+  kind: 'fan';
+  /** The fanId, as a string so `[kind+target]` stays one key type. */
+  target: `${number}`;
+  cursor: FanCursor | null;
+}
+
+export type QueueJob = ReleaseJob | FanJob;
+export type JobKind = QueueJob['kind'];
 
 export class DigheadDb extends Dexie {
   items!: EntityTable<ItemRecord, 'itemKey'>;
@@ -100,5 +129,10 @@ export class DigheadDb extends Dexie {
       twins: 'fanId, score',
       queue: '++id, &[kind+target], [priority+nextAttemptAt]',
     });
+    // v2: supporters indexed by fan (for progress), and jobs with a url and a cursor.
+    // Phases 1-2 never enqueued anything, so there are no old-shape jobs worth migrating.
+    this.version(2)
+      .stores({ releaseSupporters: 'itemKey, *fanIds' })
+      .upgrade((tx) => tx.table('queue').clear());
   }
 }

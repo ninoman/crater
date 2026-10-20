@@ -1,10 +1,22 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { CollectionItem } from '../../bandcamp';
+import type { CollectionItem, Supporter } from '../../bandcamp';
 import { DigheadDb } from '../schema';
+import { finishFanScan, upsertSupporterFans } from './fans';
 import { upsertCollectionItems } from './items';
 import { getMe, markSynced, saveViewer } from './me';
-import { countOwnership, ownedItemKeys, putOwnership, removeOwnershipExcept } from './ownership';
+import {
+  addSupporterOwnership,
+  countOwnership,
+  ownedItemKeys,
+  putOwnership,
+  removeOwnershipExcept,
+} from './ownership';
+import {
+  appendReleaseSupporters,
+  releasesSupportedBy,
+  saveReleaseSupporters,
+} from './releaseSupporters';
 
 function item(itemKey: CollectionItem['itemKey'], otherOwners: number | null = 4): CollectionItem {
   return {
@@ -79,5 +91,73 @@ describe('me', () => {
     expect((await saveViewer(db, { fanId: 1, username: 'a' })).syncedAt).toBe(100);
     expect((await saveViewer(db, { fanId: 2, username: 'b' })).syncedAt).toBeNull();
     expect(await getMe(db)).toMatchObject({ fanId: 2, username: 'b' });
+  });
+});
+
+function supporter(fanId: number, name = `Fan ${fanId}`): Supporter {
+  return {
+    fanId,
+    username: `fan${fanId}`,
+    name,
+    imageId: null,
+    token: `1:1700000000:${fanId}:0:1:0`,
+    purchasedAt: 1_700_000_000_000,
+    isReviewer: false,
+  };
+}
+
+describe('fans', () => {
+  it('queues new supporters and keeps the scan state of known ones', async () => {
+    await upsertSupporterFans(db, [supporter(1)]);
+    await finishFanScan(db, 1, 'done', 12, 500);
+
+    const [known, fresh] = await upsertSupporterFans(db, [supporter(1, 'Renamed'), supporter(2)]);
+
+    expect(known).toMatchObject({
+      name: 'Renamed',
+      status: 'done',
+      collectionSize: 12,
+      collectionFetchedAt: 500,
+    });
+    expect(fresh).toMatchObject({ status: 'queued', collectionFetchedAt: null });
+  });
+
+  it('does not mark an errored scan as fresh', async () => {
+    await upsertSupporterFans(db, [supporter(1)]);
+    await finishFanScan(db, 1, 'error', 0, 500);
+    await finishFanScan(db, 2, 'done', 3, 500); // unknown fan: no-op
+
+    expect(await db.fans.get(1)).toMatchObject({ status: 'error', collectionFetchedAt: null });
+    expect(await db.fans.get(2)).toBeUndefined();
+  });
+});
+
+describe('releaseSupporters', () => {
+  it('appends pages in order and finds releases by fan', async () => {
+    await saveReleaseSupporters(db, 'a1', [3, 1], 10);
+    await appendReleaseSupporters(db, 'a1', [1, 2], 20);
+    await saveReleaseSupporters(db, 'a2', [2], 10);
+
+    expect(await db.releaseSupporters.get('a1')).toEqual({
+      itemKey: 'a1',
+      fanIds: [3, 1, 2],
+      fetchedAt: 20,
+    });
+    expect(await releasesSupportedBy(db, 2)).toEqual(['a1', 'a2']);
+  });
+
+  it('records supporters as owners without overwriting known rows', async () => {
+    await putOwnership(db, 1, [{ ...item('t5'), albumKey: 'a4', addedAt: 99 }], 'collection');
+
+    await addSupporterOwnership(db, { itemKey: 't5', albumKey: 'a4' }, [
+      supporter(1),
+      supporter(2),
+    ]);
+
+    expect(await db.ownership.get([1, 't5'])).toMatchObject({ addedAt: 99 });
+    expect(await db.ownership.get([2, 't5'])).toMatchObject({
+      matchKey: 'a4',
+      addedAt: 1_700_000_000_000,
+    });
   });
 });

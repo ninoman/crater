@@ -1,7 +1,13 @@
 // Converts parsed Bandcamp data into DB records. Pure, so repositories stay thin.
 
-import { matchKey, type CollectionItem, type ReleasePageItem } from '../bandcamp';
-import type { ItemRecord, OwnershipRecord } from './schema';
+import {
+  matchKey,
+  type CollectionItem,
+  type ReleaseInfo,
+  type ReleasePageItem,
+  type Supporter,
+} from '../bandcamp';
+import type { FanRecord, ItemRecord, OwnershipRecord } from './schema';
 
 export function itemFromCollection(item: CollectionItem, now: number): ItemRecord {
   return {
@@ -36,5 +42,32 @@ export function ownershipFromCollection(
     matchKey: matchKey(item),
     source,
     addedAt: item.addedAt,
+  };
+}
+
+/** A supporter owns the release they're listed under, from the purchase time in their token. */
+export function ownershipFromSupporter(
+  release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
+  supporter: Supporter,
+): OwnershipRecord {
+  return {
+    fanId: supporter.fanId,
+    itemKey: release.itemKey,
+    matchKey: matchKey(release),
+    source: 'collection',
+    addedAt: supporter.purchasedAt,
+  };
+}
+
+export function fanFromSupporter(supporter: Supporter): FanRecord {
+  return {
+    fanId: supporter.fanId,
+    username: supporter.username,
+    name: supporter.name,
+    imageId: supporter.imageId,
+    collectionSize: null,
+    scannedItems: 0,
+    collectionFetchedAt: null,
+    status: 'queued',
   };
 }

@@ -1,5 +1,6 @@
 import type { MessageHandlers } from '../shared/messages';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
+import { getScannerStatus, openRelease } from './scanner';
 
 export const handlers: MessageHandlers = {
   ping: () => ({ version: chrome.runtime.getManifest().version }),
@@ -12,4 +13,6 @@ export const handlers: MessageHandlers = {
     void startSync('full');
     return null;
   },
+  releaseOpened: ({ itemKey, url }) => openRelease(itemKey, url),
+  getScannerStatus: () => getScannerStatus(),
 };

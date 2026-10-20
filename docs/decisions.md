@@ -108,3 +108,36 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 - **Pace:** your own sync waits the scanner's pace (1.5–3 s) between pages but doesn't count against the daily budget. Each wait re-reads settings from `chrome.storage`. Because that's an extension API call, it keeps the service worker alive through a long sync. If the worker is killed anyway, `syncedAt` stays unset and the next trigger runs a full sync again.
 - **Purchase page (unverified):** treated as `https://bandcamp.com/download`. Re-downloads match too, but that only costs an incremental sync. Confirm with `purchase-confirmation.html`.
 - **Confirmed with a real account (2026-10-20):** the worker's session cookies reach the API. A wishlist that is hidden publicly synced in full (137 items), and the collection count was slightly above the logged-out profile's (1,131 vs 1,127).
+
+## 5. Network and the scanner (Phase 3)
+
+Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. Decided 2026-10-20.
+
+- **All network goes through the service worker.** Content-script fetches fail CORS on artist subdomains, so content scripts only send messages.
+- **One request per job run.** A `release` job and a `fan` job each send exactly one request per run and save a `cursor` (the next token) in their `queue` row. Effects:
+  - A killed worker loses at most one request. The job resumes from its cursor rather than starting over.
+  - A release page opened mid-scan gets the very next request, instead of waiting for a 2,000-item fan to finish.
+  - The budget counts each request **before** it's sent, so a request cut off by a kill still counts.
+- **Priority bump = foreground release.** Opening a release page moves its job and its supporters' jobs to priority 1, and moves any other priority-1 jobs back to 2. **This changes the spec**: if nothing moved back, every release you'd ever opened would sit at 1, and "jump to priority 1" would no longer put the new one first. Within a priority, jobs run by `nextAttemptAt`, then insertion order, so supporters are scanned in page order (most recent buyers first).
+- **Failures come in three kinds** (`scanner/outcome.ts`):
+  - *throttled*: HTTP 429, 5xx, **or no response at all** (offline, DNS, 30 s timeout). The whole queue pauses and the job stays as it is, with no attempt counted. Network errors are in this group because being offline is never one job's fault. Counting them per job would burn every job's retries in seconds.
+  - *permanent*: another 4xx, a `ParserError`, or a `{"error": true}` other than a fan's first page. The job is dropped, and a dropped fan gets `status = error`.
+  - *transient*: anything else, which is probably our own bug (e.g. a DB error). The job is retried after 60 s, then 120 s, then dropped.
+- **Back-off:** honour `Retry-After` (seconds or an HTTP date). Without it, wait 60 s and double the wait after each consecutive throttled request, up to 1 h. The first successful request resets it. The pause lives in `chrome.storage.local` (`scanner` key), so it survives a killed worker and a browser restart.
+- **Lock:** `chrome.storage.local` holds the lock as `{owner, heartbeatAt}`, with the heartbeat refreshed before every request. A lock older than 45 s is treated as left behind by a dead worker. Only one worker instance exists at a time, so in practice this only matters after a kill: the queue resumes on the first 1-minute alarm after those 45 s, usually within 1–2 minutes.
+- **Supporter paging:** the first page (up to 80 thumbs and 6 reviews) comes free with the release page. After that, **thumbs come first, then reviews**, 100 per request (fewer for the last one), until the cap. Thumbs are the most recent buyers, which is what the cap means ("500 most recent").
+- **Supporters are owners.** Each supporter gets an `ownership` row for the release (`source = collection`, `addedAt` from the token, as in §3.7). That way a fan counts as an owner even when the release falls outside their newest 2,000 items. An existing row is never overwritten.
+- **Fan status** after a scan:
+  - `done`: the whole collection was read, so `collectionSize` is known.
+  - `partial`: only the newest N items were read, because the cap was hit or the API errored after the first page.
+  - `private`: `collection_items` errored on the first page (§2).
+  - `error`: the job was dropped.
+
+  `done`, `partial` and `private` set `collectionFetchedAt`, so those fans aren't fetched again for 30 days. `error` doesn't set it, so the fan is queued again the next time a release lists them.
+- **Freshness windows are constants, not settings:** 30 days for fans, 7 days for a release's supporter list. If the list is fresh, opening the page sends no request for the release itself. It only re-prioritises the release's fans.
+- **Release pages are fetched logged out** (`credentials: 'omit'`), to match the fixtures. Nothing on them is personal.
+- **Your own sync and the scanner take turns.** The scanner waits while your own sync runs, so only one request is in flight. Your own sync still doesn't count against the budget (§4).
+- **Progress:** progress is sent only for **releases open in a tab** (the last 20 opened, kept in `chrome.storage.session`) and only when a fan finishes, to keep the per-fan cost low. It goes to Bandcamp tabs with `chrome.tabs.query({url})` (host permission, no `tabs` permission needed) and `chrome.tabs.sendMessage`.
+  - `scanned` counts every supporter with a final status, including `private` and `error`.
+  - The event carries one field more than the spec, `listed`, so the UI can tell "not fetched yet" (0 / 0, false) from "no supporters" (0 / 0, true).
+- **Known limitation:** a re-scan after 30 days adds new items but doesn't remove items a fan no longer has. That's rare, and harmless for scoring at this scale.

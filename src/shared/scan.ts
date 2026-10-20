@@ -1,0 +1,26 @@
+// Shapes of scanner state, shared by the worker and the UI.
+
+import type { ItemKey } from '../bandcamp';
+
+/** How far the scan of one release's supporters has got. Broadcast as fans finish. */
+export interface ScanProgress {
+  releaseKey: ItemKey;
+  /** Supporters whose collection has been read (or found private). */
+  scanned: number;
+  /** Supporters listed so far, up to the per-release cap. */
+  total: number;
+  /** False until the release page itself has been fetched, so 0 / 0 means "not started". */
+  listed: boolean;
+}
+
+/** Why the scanner isn't sending requests right now. `until` is ms since epoch. */
+export type ScannerPause =
+  { reason: 'backoff'; until: number } | { reason: 'budget'; until: number };
+
+export interface ScannerStatus {
+  queued: { release: number; fan: number };
+  requestsToday: number;
+  dailyBudget: number;
+  pause: ScannerPause | null;
+  lastError: string | null;
+}

@@ -1,5 +1,5 @@
-import type { CollectionItem } from '../../bandcamp';
-import { itemFromCollection } from '../mappers';
+import type { CollectionItem, ItemKey, ReleasePageItem } from '../../bandcamp';
+import { itemFromCollection, itemFromReleasePage } from '../mappers';
 import type { DigheadDb, ItemRecord } from '../schema';
 
 /**
@@ -20,4 +20,23 @@ export async function upsertCollectionItems(
     return { ...fresh, tags: old.tags, supporterCount: fresh.supporterCount ?? old.supporterCount };
   });
   await db.items.bulkPut(records);
+}
+
+/** Saves what a release page says about itself. Keeps the supporter count from collection pages. */
+export async function upsertReleasePageItem(
+  db: DigheadDb,
+  item: ReleasePageItem,
+  now: number,
+): Promise<void> {
+  await db.transaction('rw', db.items, async () => {
+    const old = await db.items.get(item.itemKey);
+    await db.items.put({
+      ...itemFromReleasePage(item, now),
+      supporterCount: old?.supporterCount ?? null,
+    });
+  });
+}
+
+export function getItem(db: DigheadDb, itemKey: ItemKey): Promise<ItemRecord | undefined> {
+  return db.items.get(itemKey);
 }

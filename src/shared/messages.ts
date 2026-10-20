@@ -1,7 +1,9 @@
 // Typed message bus between UI surfaces (content script, popup) and the service worker.
 // Add a message by extending MessageMap; both sides get checked types for free.
+// Worker-to-tab events go the other way and are listed in EventMap.
 
-import type { Viewer } from '../bandcamp';
+import type { ItemKey, Viewer } from '../bandcamp';
+import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 
 type NoPayload = Record<string, never>;
@@ -16,6 +18,9 @@ export interface MessageMap {
   getSyncStatus: { request: NoPayload; response: SyncStatus };
   /** Full re-sync of your collection and wishlist, from the popup. */
   resync: { request: NoPayload; response: null };
+  /** A release page opened: scan its supporters first. Answers with the progress so far. */
+  releaseOpened: { request: { itemKey: ItemKey; url: string }; response: ScanProgress };
+  getScannerStatus: { request: NoPayload; response: ScannerStatus };
 }
 
 export type MessageType = keyof MessageMap;
@@ -60,4 +65,51 @@ export function listenForMessages(handlers: MessageHandlers): void {
       );
     return true; // keep the channel open for the async response
   });
+}
+
+/** Events the worker pushes to Bandcamp tabs. */
+export interface EventMap {
+  scanProgress: ScanProgress;
+}
+
+export type EventType = keyof EventMap;
+
+interface EventEnvelope<K extends EventType> {
+  event: K;
+  payload: EventMap[K];
+}
+
+function isEventEnvelope(message: unknown): message is EventEnvelope<EventType> {
+  return typeof message === 'object' && message !== null && 'event' in message;
+}
+
+/** Sends an event to every open tab matching `urlPatterns`. Tabs without our script are skipped. */
+export async function broadcastToTabs<K extends EventType>(
+  urlPatterns: string[],
+  event: K,
+  payload: EventMap[K],
+): Promise<void> {
+  const envelope: EventEnvelope<K> = { event, payload };
+  const tabs = await chrome.tabs.query({ url: urlPatterns });
+  await Promise.all(
+    tabs.map(async ({ id }) => {
+      if (id === undefined) return;
+      // A tab opened before the extension loaded has no listener; that's fine.
+      await chrome.tabs.sendMessage(id, envelope).catch(() => undefined);
+    }),
+  );
+}
+
+/** Listens for one kind of worker event in a content script. Returns an unsubscribe function. */
+export function onWorkerEvent<K extends EventType>(
+  event: K,
+  listener: (payload: EventMap[K]) => void,
+): () => void {
+  const handle = (message: unknown) => {
+    if (isEventEnvelope(message) && message.event === event) {
+      listener(message.payload as EventMap[K]);
+    }
+  };
+  chrome.runtime.onMessage.addListener(handle);
+  return () => chrome.runtime.onMessage.removeListener(handle);
 }

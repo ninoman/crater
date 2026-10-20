@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
+import { ScanState } from './ScanState';
 import { useCurrentRelease } from './useCurrentRelease';
 
 function WorkerFooter({ status }: { status: WorkerStatus }) {
@@ -55,12 +56,7 @@ export function ReleaseSidebar() {
             {
               value: 'also-bought',
               label: 'Also bought',
-              content: (
-                <EmptyState
-                  title="No scans yet"
-                  description={`${release.page.supporters.length} supporters found on this page. Scanning their collections comes next.`}
-                />
-              ),
+              content: <ScanState item={release.page.item} />,
             },
             {
               value: 'twins',

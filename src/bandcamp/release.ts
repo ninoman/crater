@@ -1,6 +1,7 @@
 import { ParserError } from './errors';
 import { readBlobById, readDataAttribute, readLdJson } from './html';
 import { itemKey } from './keys';
+import { releasePageRequest, type BandcampRequest } from './requests';
 import { rawCollectorsBlob, rawLdJson, rawTralbum } from './schemas';
 import { toSupporter } from './supporters';
 import type { ReleasePage } from './types';
@@ -49,4 +50,11 @@ export function parseReleasePage(html: string): ReleasePage {
     moreThumbsAvailable: collectors?.more_thumbs_available ?? false,
     moreReviewsAvailable: collectors?.more_reviews_available ?? false,
   };
+}
+
+/** Performs a request and returns the body as text. The service worker supplies this. */
+export type FetchText = (request: BandcampRequest) => Promise<string>;
+
+export async function fetchReleasePage(fetchText: FetchText, url: string): Promise<ReleasePage> {
+  return parseReleasePage(await fetchText(releasePageRequest(url)));
 }

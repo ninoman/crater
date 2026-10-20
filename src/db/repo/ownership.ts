@@ -1,5 +1,5 @@
-import type { CollectionItem, ItemKey } from '../../bandcamp';
-import { ownershipFromCollection } from '../mappers';
+import type { CollectionItem, ItemKey, ReleaseInfo, Supporter } from '../../bandcamp';
+import { ownershipFromCollection, ownershipFromSupporter } from '../mappers';
 import type { DigheadDb, OwnershipRecord } from '../schema';
 
 type Source = OwnershipRecord['source'];
@@ -44,4 +44,21 @@ export async function removeOwnershipExcept(
     .filter((row) => row.source === source && !keep.has(row.itemKey))
     .primaryKeys();
   await db.ownership.bulkDelete(stale);
+}
+
+/**
+ * Records that each supporter owns the release. Rows that already exist are left alone: a
+ * collection scan or your own sync wrote them, with the real purchase date.
+ */
+export async function addSupporterOwnership(
+  db: DigheadDb,
+  release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
+  supporters: Supporter[],
+): Promise<void> {
+  await db.transaction('rw', db.ownership, async () => {
+    const keys = supporters.map((s): [number, ItemKey] => [s.fanId, release.itemKey]);
+    const existing = await db.ownership.bulkGet(keys);
+    const missing = supporters.filter((_, i) => existing[i] === undefined);
+    await db.ownership.bulkPut(missing.map((s) => ownershipFromSupporter(release, s)));
+  });
 }

@@ -87,18 +87,20 @@ Also added: the UI kit in `src/ui/` (tokens, Button, Panel, Tabs (Radix), EmptyS
 
 **Goal:** a polite, persistent background queue that can scan all supporters of one release.
 
-1. [ ] Queue repo over the `queue` store: `enqueue(kind, target, priority)` with de-duplication, `nextJob()` ordered by priority then `nextAttemptAt`, and `complete` / `fail`.
-2. [ ] Scheduler loop: one request at a time, with a random 1.5–3 s delay (from settings).
-3. [ ] Global backoff: on 429 or 5xx, honour `Retry-After`, otherwise use exponential backoff from 60 s. Pause the whole queue and keep the pause state in storage.
-4. [ ] Persistence across service-worker suspension: a `chrome.alarms` alarm every minute resumes the loop, and the loop is safe to re-enter (use a lock flag in storage).
-5. [ ] Job handlers:
+1. [x] Queue repo over the `queue` store: `enqueue(kind, target, priority)` with de-duplication, `nextJob()` ordered by priority then `nextAttemptAt`, and `complete` / `fail`.
+2. [x] Scheduler loop: one request at a time, with a random 1.5–3 s delay (from settings).
+3. [x] Global backoff: on 429 or 5xx, honour `Retry-After`, otherwise use exponential backoff from 60 s. Pause the whole queue and keep the pause state in storage.
+4. [x] Persistence across service-worker suspension: a `chrome.alarms` alarm every minute resumes the loop, and the loop is safe to re-enter (use a lock flag in storage).
+5. [x] Job handlers:
    - `release` job: fetch the page, parse it, page supporters up to the per-release cap (500 most recent by default), save `items` and `releaseSupporters`, and enqueue each supporter as a `fan` job at the same priority
    - `fan` job: skip the profile page and start `collection_items` with a synthetic `<now>::a::` token at batch 100, up to 2,000 items (setting), write `fans` and `ownership`, and set `status` (`partial`, `done`, `private` or `error`)
-6. [ ] Freshness: skip fans scanned within the last 30 days and release supporters within the last 7 days.
-7. [ ] Priority bump: when a release page opens, its job and its supporters jump to priority 1.
-8. [ ] Daily request budget (3,000 by default), with a counter that resets at local midnight.
-9. [ ] Progress events broadcast to listeners: `{releaseKey, scanned, total}`.
-10. [ ] Unit tests for queue ordering, backoff math and budget, using fake timers and a mocked fetch.
+6. [x] Freshness: skip fans scanned within the last 30 days and release supporters within the last 7 days.
+7. [x] Priority bump: when a release page opens, its job and its supporters jump to priority 1.
+8. [x] Daily request budget (3,000 by default), with a counter that resets at local midnight.
+9. [x] Progress events broadcast to listeners: `{releaseKey, scanned, total}`.
+10. [x] Unit tests for queue ordering, backoff math and budget, using fake timers and a mocked fetch.
+
+Also added: the popup shows queued fans, today's requests and the pause reason, and the sidebar shows "Scanning supporters: N / M". Opening a release moves earlier releases' jobs back to priority 2, and network failures pause the queue like a 429 (decisions §5).
 
 **Done when:** opening one album page scans every supporter end to end, survives the service worker being killed (test via `chrome://serviceworker-internals`), and stops correctly on a simulated 429.
 

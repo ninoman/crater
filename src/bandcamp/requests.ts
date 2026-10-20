@@ -61,6 +61,29 @@ export function supportersRequest(
   });
 }
 
+/** Tab URL patterns for album and track pages, e.g. to send them scan progress. */
+export const RELEASE_PAGE_PATTERNS = [
+  'https://*.bandcamp.com/album/*',
+  'https://*.bandcamp.com/track/*',
+];
+
+/** Release pages live on artist subdomains of bandcamp.com (custom domains are out of scope). */
+export function isBandcampUrl(url: string): boolean {
+  try {
+    const { protocol, hostname } = new URL(url);
+    return (
+      protocol === 'https:' && (hostname === 'bandcamp.com' || hostname.endsWith('.bandcamp.com'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** An album or track page. Fetched logged out, like the fixtures, since nothing on it is personal. */
+export function releasePageRequest(url: string): BandcampRequest {
+  return { url, init: { credentials: 'omit' } };
+}
+
 export function fanPageUrl(username: string): string {
   return `https://bandcamp.com/${encodeURIComponent(username)}`;
 }

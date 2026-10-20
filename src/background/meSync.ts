@@ -5,6 +5,7 @@ import { countOwnership, db, getMe, saveViewer } from '../db';
 import { loadSettings } from '../shared/settings';
 import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
+import { paceDelayMs } from './scanner/pace';
 import { syncMe } from './syncMe';
 
 /** A page view re-syncs incrementally when the last sync is older than this. */
@@ -21,6 +22,11 @@ export function startSync(mode: SyncMode): Promise<void> {
   return running;
 }
 
+/** Resolves once no sync of your own is running, however it ends. */
+export async function ownSyncSettled(): Promise<void> {
+  await running?.catch(() => undefined);
+}
+
 async function runSync(requested: SyncMode): Promise<void> {
   const me = await getMe(db);
   if (!me) return;
@@ -35,10 +41,7 @@ async function runSync(requested: SyncMode): Promise<void> {
         fetchJson,
         batchSize: settings.collectionBatchSize,
         // Re-reading settings is also an extension API call, which keeps the worker alive.
-        pause: async () => {
-          const { paceMinMs, paceMaxMs } = await loadSettings();
-          await sleep(paceMinMs + Math.random() * (paceMaxMs - paceMinMs));
-        },
+        pause: async () => sleep(paceDelayMs(await loadSettings(), Math.random)),
         now: Date.now,
         onProgress: (itemsFetched) => {
           activity = { state: 'syncing', mode, itemsFetched };
