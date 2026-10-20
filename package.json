@@ -13,6 +13,10 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p scripts/tsconfig.json",
     "perf": "vitest run --config tests/perf/vitest.config.ts",
     "fixtures:refresh": "tsx scripts/refresh-fixtures.ts",
+    "release:patch": "tsx scripts/release.ts patch",
+    "release:minor": "tsx scripts/release.ts minor",
+    "release:major": "tsx scripts/release.ts major",
+    "release:build": "tsx scripts/release.ts build",
     "storage:estimate": "tsx scripts/estimate-storage.ts"
   },
   "dependencies": {
