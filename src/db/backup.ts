@@ -67,14 +67,32 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
 const READ_ONLY = { acceptNameDiff: true, noTransaction: true } as const;
 
+/** Where the safety copy of the current data waits while an import runs. */
+export interface SnapshotStore {
+  save(file: Blob): Promise<void>;
+  load(): Promise<Blob>;
+  discard(): Promise<void>;
+}
+
+async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
+  await Promise.all(db.tables.map((table) => table.clear()));
+  await importInto(db, file, READ_ONLY);
+}
+
 /**
- * Replaces every table with the file's rows. The file is read end to end first without writing
- * anything, so a corrupt or foreign file leaves the database as it was.
+ * Replaces every table with the file's rows, all or nothing:
+ * 1. the file is read end to end without writing, so a corrupt or foreign file changes nothing;
+ * 2. the current data is exported to `snapshot`, and if that fails nothing has been touched;
+ * 3. tables are cleared and written, and if that fails the snapshot is written back.
  *
- * The write itself isn't one transaction: a service worker can't read the file synchronously, so
- * an IndexedDB transaction would close between chunks (decisions §10).
+ * A single IndexedDB transaction isn't possible here: a service worker can't read the file
+ * synchronously, so a transaction would close between chunks (decisions §10).
  */
-export async function importDatabase(db: DigheadDb, file: Blob): Promise<BackupSummary> {
+export async function importDatabase(
+  db: DigheadDb,
+  file: Blob,
+  snapshot: SnapshotStore,
+): Promise<BackupSummary> {
   ensureFileReader();
   const meta = parseBackupMeta(await peakImportFile(file).catch(() => null));
   assertRestorableVersion(meta.data.databaseVersion, db.verno);
@@ -83,7 +101,34 @@ export async function importDatabase(db: DigheadDb, file: Blob): Promise<BackupS
     throw new Error("That backup is missing some of Dighead's tables.");
   }
   await verifyRows(db, file, meta);
-  await Promise.all(db.tables.map((table) => table.clear()));
-  await importInto(db, file, READ_ONLY);
+
+  try {
+    await snapshot.save((await exportDatabase(db)).file);
+  } catch (error) {
+    await snapshot.discard().catch(() => undefined);
+    throw new Error(
+      `Couldn't save a safety copy of your data first, so nothing was changed. ${reason(error)}`,
+    );
+  }
+
+  try {
+    await replaceAll(db, file);
+  } catch (error) {
+    try {
+      await replaceAll(db, await snapshot.load());
+    } catch {
+      // Keep the snapshot: it's the only copy left of the old data.
+      throw new Error(
+        `The import failed (${reason(error)}) and the old data couldn't be restored automatically.`,
+      );
+    }
+    await snapshot.discard().catch(() => undefined);
+    throw new Error(`The import failed (${reason(error)}). Your previous data was restored.`);
+  }
+  await snapshot.discard().catch(() => undefined);
   return summarizeBackup(meta);
+}
+
+function reason(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

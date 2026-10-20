@@ -10,6 +10,9 @@ function StateLine({ status, stopped }: { status: ScannerStatus; stopped: boolea
   if (pause?.reason === 'manual') {
     return <StatusDot tone="warning">Paused. Nothing is sent until you resume</StatusDot>;
   }
+  if (pause?.reason === 'import') {
+    return <StatusDot tone="warning">Paused while a backup is imported</StatusDot>;
+  }
   if (stopped) return <StatusDot tone="warning">Not scanning right now</StatusDot>;
   if (lastError) return <StatusDot tone="error">Last error: {lastError}</StatusDot>;
   return queued.release + queued.fan > 0 ? (

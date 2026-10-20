@@ -1,7 +1,7 @@
 // Hands a backup between the popup and the service worker. Messages are JSON, so a Blob can't
 // travel in one; both sides share the extension's origin-private file system instead (decisions §10).
 
-export type StagedFile = 'export' | 'import';
+export type StagedFile = 'export' | 'import' | 'snapshot';
 
 async function stagingFile(name: StagedFile, create: boolean): Promise<FileSystemFileHandle> {
   const root = await navigator.storage.getDirectory();

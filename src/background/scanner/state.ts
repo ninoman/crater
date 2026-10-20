@@ -22,6 +22,8 @@ export interface ScannerState {
   parserError: { kind: JobKind; message: string } | null;
   /** Paused from the popup. Stays paused until resumed there. */
   paused: boolean;
+  /** A database import is running. Its own flag, so it never touches your pause. */
+  importing: boolean;
 }
 
 export const INITIAL_SCANNER_STATE: ScannerState = {
@@ -33,6 +35,7 @@ export const INITIAL_SCANNER_STATE: ScannerState = {
   lastError: null,
   parserError: null,
   paused: false,
+  importing: false,
 };
 
 export interface ScannerStore {
@@ -65,6 +68,7 @@ export function pauseFor(
   now: number,
 ): ScannerPause | null {
   if (state.paused) return { reason: 'manual' };
+  if (state.importing) return { reason: 'import' };
   if (state.backoff && state.backoff.until > now) {
     return { reason: state.offline ? 'offline' : 'backoff', until: state.backoff.until };
   }

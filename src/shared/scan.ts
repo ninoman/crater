@@ -16,6 +16,7 @@ export interface ScanProgress {
 /** Why the scanner isn't sending requests right now. `until` is ms since epoch. */
 export type ScannerPause =
   | { reason: 'manual' }
+  | { reason: 'import' }
   | { reason: 'backoff'; until: number }
   /** A request got no answer: retried at `until`, with the same back-off as Bandcamp pushing back. */
   | { reason: 'offline'; until: number }

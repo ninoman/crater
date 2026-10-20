@@ -33,6 +33,7 @@ import { releaseProgress } from './progress';
 import { BACKGROUND, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
+import { withImportPause } from './importPause';
 import { chromeScannerStore, pauseFor } from './state';
 import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
 
@@ -188,4 +189,18 @@ export async function clearScanData(): Promise<void> {
 export async function resetScanDataAfterImport(): Promise<void> {
   await clearWatchedReleases();
   await chromeScannerStore.save({ lastError: null, parserError: null });
+}
+
+/** Runs a database import with the scanner stopped, under its own flag. */
+export function whileScannerPausedForImport<T>(work: () => Promise<T>): Promise<T> {
+  return withImportPause(
+    {
+      store: chromeScannerStore,
+      now: Date.now,
+      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+      ownSyncSettled,
+      resume: kickScanner,
+    },
+    work,
+  );
 }

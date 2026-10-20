@@ -49,7 +49,12 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
 
       if (!(await nextJob(db, deps.now()))) return 'idle';
       const wait = paceWaitMs(state.lastRequestAt, settings, deps.random, deps.now());
-      if (wait > 0) await deps.sleep(wait);
+      if (wait > 0) {
+        await deps.sleep(wait);
+        // An import may have paused the scanner while it waited.
+        state = await store.load();
+        if (pauseFor(state, settings.dailyRequestBudget, deps.now())) return 'paused';
+      }
       // Picked again after the pause, so a release page opened meanwhile goes first.
       const job = await nextJob(db, deps.now());
       if (!job) return 'idle';
