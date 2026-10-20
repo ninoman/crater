@@ -75,6 +75,8 @@ export interface FanPage {
   wishlist: { itemCount: number; hidden: boolean; lastToken: string | null };
   /** First items of the collection, newest first, as embedded in the page. */
   firstItems: CollectionItem[];
+  /** The artists-and-labels and fans lists the fan follows, first rows from the page. */
+  following: { bands: FollowingList; fans: FollowingList };
   /** The fan who is logged in while viewing, or null when logged out. */
   viewer: Viewer | null;
 }
@@ -86,3 +88,34 @@ export interface Viewer {
 }
 
 export type CollectionList = 'collection' | 'wishlist';
+
+/** Artists and labels are both band accounts; nothing marks a label (decisions §8). */
+export type FollowingKind = 'fan' | 'band';
+
+export interface FollowingRow {
+  kind: FollowingKind;
+  /** `band_id` or `fan_id`. */
+  id: number;
+  name: string;
+  /** A fan's profile, or a band's subdomain or custom domain. */
+  url: string;
+  imageId: number | null;
+  location: string | null;
+  /** ms since epoch. */
+  followedAt: number | null;
+}
+
+export interface FollowingPage {
+  rows: FollowingRow[];
+  moreAvailable: boolean;
+  /** older_than_token for the page after this one. */
+  nextToken: string | null;
+}
+
+/** One following list as embedded in a fan page. */
+export interface FollowingList {
+  itemCount: number;
+  lastToken: string | null;
+  /** Newest first. */
+  firstRows: FollowingRow[];
+}

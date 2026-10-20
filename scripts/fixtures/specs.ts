@@ -5,8 +5,11 @@ import {
   collectionListRequest,
   fanPageUrl,
   firstPageToken,
+  FOLLOWING_FIRST_TOKEN,
+  followingRequest,
   parseCollectionPage,
   parseFanPage,
+  parseFollowingPage,
   parseReleasePage,
   parseSupportersPage,
   releasePageRequest,
@@ -28,6 +31,9 @@ const ALBUM = 'https://floatingpoints.bandcamp.com/album/promises';
 const ALBUM_ID = 3149089081;
 const FAN_ID = 1138719;
 const PAGE_SIZE = 40;
+// A public fan who follows 7 fans and enough artists for two small pages (decisions §8).
+const FOLLOWING_FAN_ID = 7027105;
+const FOLLOWING_PAGE_SIZE = 5;
 
 const html = (parse: (html: string) => unknown) => (body: string) => void parse(body);
 const json = (parse: (json: unknown) => unknown) => (body: string) =>
@@ -140,7 +146,33 @@ export const SPECS: Spec[] = [
     parse: json((data) => parseCollectionPage(data)),
     expectApiError: true,
   },
+  {
+    file: 'following_bands-p1.json',
+    request: () =>
+      followingRequest('band', FOLLOWING_FAN_ID, FOLLOWING_FIRST_TOKEN, FOLLOWING_PAGE_SIZE),
+    parse: json((data) => parseFollowingPage(data, 'band')),
+  },
+  {
+    file: 'following_bands-p2.json',
+    request: (fresh) =>
+      after('following_bands-p1.json', fresh, (body) => {
+        const { nextToken } = parseFollowingPage(JSON.parse(body), 'band');
+        if (!nextToken) throw new Error('no next token');
+        return followingRequest('band', FOLLOWING_FAN_ID, nextToken, FOLLOWING_PAGE_SIZE);
+      }),
+    parse: json((data) => parseFollowingPage(data, 'band')),
+  },
+  {
+    file: 'following_fans.json',
+    request: () => followingRequest('fan', FOLLOWING_FAN_ID, FOLLOWING_FIRST_TOKEN, 20),
+    parse: json((data) => parseFollowingPage(data, 'fan')),
+  },
+  {
+    file: 'following_fans-unknown-fan.json',
+    request: () => followingRequest('fan', 1, FOLLOWING_FIRST_TOKEN, 20),
+    parse: json((data) => parseFollowingPage(data, 'fan')),
+  },
 ];
 
 /** Logged-in captures can't be refreshed by a script. */
-export const SKIPPED_LOGGED_IN = ['me-fan-page.html', 'purchase-confirmation.html (not captured yet)'];
+export const SKIPPED_LOGGED_IN = ['me-fan-page.html', 'me-following-tab.html', 'purchase-confirmation.html (not captured yet)'];

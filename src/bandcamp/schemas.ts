@@ -108,3 +108,48 @@ export const rawFanPagedata = z.object({
   item_cache: z.object({ collection: z.record(z.string(), rawCollectionItem) }),
   identities: z.object({ fan: rawViewer.nullable() }),
 });
+
+/** One row of `following_bands` / `following_fans` and of the fan page's `item_cache.following_*`. */
+export const rawFollowee = z.object({
+  /** Set on band rows only. */
+  band_id: z.number().nullish(),
+  /** Set on fan rows only. */
+  fan_id: z.number().nullish(),
+  name: z.string(),
+  image_id: z.number().nullish(),
+  url_hints: z
+    .object({ subdomain: z.string().nullish(), custom_domain: z.string().nullish() })
+    .nullish(),
+  /** A fan's profile URL; username is its path. */
+  trackpipe_url: z.string().nullish(),
+  location: z.string().nullish(),
+  date_followed: z.string().nullish(),
+  token: z.string().nullish(),
+});
+export type RawFollowee = z.infer<typeof rawFollowee>;
+
+export const rawFollowingResponse = z.union([
+  apiError,
+  z.object({
+    followeers: z.array(rawFollowee),
+    more_available: z.boolean(),
+    last_token: z.string().nullable(),
+  }),
+]);
+
+const rawFollowingData = z.object({
+  item_count: z.number(),
+  last_token: z.string().nullable(),
+  /** Display order of the rows in `item_cache`, whose keys JS sorts numerically. */
+  pending_sequence: z.array(z.string()).nullish(),
+});
+
+/** The part of a fan page's `#pagedata` that holds the first followings. */
+export const rawFollowingPagedata = z.object({
+  following_bands_data: rawFollowingData,
+  following_fans_data: rawFollowingData,
+  item_cache: z.object({
+    following_bands: z.record(z.string(), rawFollowee),
+    following_fans: z.record(z.string(), rawFollowee),
+  }),
+});

@@ -17,4 +17,23 @@ export const FAN_PAGE_DOM = {
   tabBar: '.grid-tabs-anchor',
   /** Bandcamp's tab contents and their search and visibility controls. */
   tabContents: ['.grid', '.owner-controls'],
+  /** Bandcamp's following tab; it has `active` while open (me-following-tab.html). */
+  followingGrid: '#following-grid',
+  /** The sub-tabs inside it: artists & labels, fans, genres. `active` marks the open one. */
+  followingSubTab: '#following-tabs li[data-tab]',
+  followingSubTabs: {
+    band: 'li[data-tab="following-bands"]',
+    fan: 'li[data-tab="following-fans"]',
+  },
+  /** Each sub-tab's container, also `active` while open. */
+  followingContainers: {
+    band: '#following-bands-container',
+    fan: '#following-fans-container',
+  },
+  /** Inside a container: Bandcamp's own paged list and "view all" button, both hidden for ours. */
+  followingNativeList: 'ol.followeer-grid',
+  followingExpand: '.expand-container',
+  /** A card and its follow button, which Bandcamp's own handler listens on. */
+  followingCard: 'li.followeer',
+  followButton: 'button.follow-unfollow',
 } as const;

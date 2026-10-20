@@ -1,6 +1,6 @@
 // Request builders for Bandcamp's internal endpoints. Pure: the worker does the actual fetching.
 
-import type { CollectionList, ItemKey, TralbumType } from './types';
+import type { CollectionList, FollowingKind, ItemKey, TralbumType } from './types';
 
 export interface BandcampRequest {
   url: string;
@@ -39,6 +39,28 @@ export function collectionListRequest(
   count: number,
 ) {
   return postJson(`${API}/fancollection/1/${LIST_ENDPOINTS[list]}`, {
+    fan_id: fanId,
+    older_than_token: olderThanToken,
+    count,
+  });
+}
+
+/** A token that starts a following list from the newest follow (decisions §8). */
+export const FOLLOWING_FIRST_TOKEN = '9999999999:';
+
+const FOLLOWING_ENDPOINTS: Record<FollowingKind, string> = {
+  band: 'following_bands',
+  fan: 'following_fans',
+};
+
+/** One page of the artists and labels, or the fans, a fan follows. */
+export function followingRequest(
+  kind: FollowingKind,
+  fanId: number,
+  olderThanToken: string,
+  count: number,
+) {
+  return postJson(`${API}/fancollection/1/${FOLLOWING_ENDPOINTS[kind]}`, {
     fan_id: fanId,
     older_than_token: olderThanToken,
     count,
@@ -102,4 +124,9 @@ export function fanImageUrl(imageId: number): string {
 /** Cover image URL. Sizes in px: 7 → 150, 2 → 350, 5 → 700, 10 → 1200. */
 export function artUrl(artId: number, size: 2 | 5 | 7 | 10 = 7): string {
   return `https://f4.bcbits.com/img/a${artId}_${size}.jpg`;
+}
+
+/** The avatar Bandcamp shows on its following cards, 50×50. */
+export function followingImageUrl(imageId: number): string {
+  return `https://f4.bcbits.com/img/${String(imageId).padStart(10, '0')}_41.jpg`;
 }

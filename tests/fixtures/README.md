@@ -37,4 +37,4 @@ It re-fetches every logged-out fixture above (one request at a time, 1.5–3 s a
 - runs the real parser on the fresh body and reports any `ParserError` / zod failure (`BROKEN`). The error-shape fixtures must still be rejected with `BandcampApiError`;
 - compares structure with the saved fixture, not text: key paths and value types, for JSON bodies and for the `data-tralbum`, `#pagedata`, `#collectors-data` and ld+json blobs of HTML pages (`DRIFT` lists removed, added and retyped paths).
 
-The exit code is 1 on `BROKEN` or `DRIFT`. Fresh data is a different sample, so a field that is sometimes `null` can show up as a harmless type change (`number -> null|number`); a removed or renamed path, or any `BROKEN`, is the real signal. Skipped, since they need a logged-in session: `me-fan-page.html` and the purchase page.
+The exit code is 1 on `BROKEN` or `DRIFT`. Fresh data is a different sample, so a field that is sometimes `null` can show up as a harmless type change (`number -> null|number`); a removed or renamed path, or any `BROKEN`, is the real signal. Skipped, since they need a logged-in session: `me-fan-page.html`, `me-following-tab.html` and the purchase page.

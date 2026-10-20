@@ -6,6 +6,8 @@ export {
   type FetchJson,
 } from './collection';
 export { BandcampApiError, ParserError } from './errors';
+export { followCardHtml } from './followCard';
+export { fetchFollowingPage, parseFollowingPage } from './following';
 export { parseFanPage } from './fanPage';
 export { isPurchaseConfirmationUrl } from './purchase';
 export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
