@@ -16,7 +16,6 @@ import {
   blendPicks,
   coOwnership,
   couldEnter,
-  exclusions,
   fallbackPicks,
   isSmallRelease,
   rankScored,
@@ -24,10 +23,10 @@ import {
   type AlsoBoughtPick,
   type Basis,
   type CoOwned,
-  type Exclusions,
   type FallbackPick,
   type Scored,
 } from '../../scoring/alsoBought';
+import { exclusions, type Exclusions } from '../../scoring/exclusions';
 import { supporters } from '../../scoring/weights';
 import type { AlsoBoughtReason, AlsoBoughtResult, AlsoBoughtRow } from '../../shared/alsoBought';
 

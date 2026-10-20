@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { keyFromNumber, keyToNumber, type ItemKey } from '../bandcamp';
+import { keyToNumber, type ItemKey } from '../bandcamp';
 import {
   blendPicks,
   coOwnership,
   couldEnter,
-  exclusions,
   fallbackPicks,
   isSmallRelease,
   LIFT_CAP,
@@ -12,7 +11,6 @@ import {
   rankScored,
   scoreCeiling,
   scoreCoOwned,
-  type MyRow,
   type SellerItem,
 } from './alsoBought';
 import { supporters, weight } from './weights';
@@ -28,30 +26,6 @@ describe('weights', () => {
     expect(weight(0)).toBe(1);
     expect(weight(2)).toBe(0.5);
     expect(weight(1022)).toBe(0.1);
-  });
-});
-
-describe('exclusions', () => {
-  const mine: MyRow[] = [
-    { itemKey: 'a1', matchKey: 'a1', source: 'collection' },
-    { itemKey: 't21', matchKey: 'a2', source: 'collection' },
-    { itemKey: 't22', matchKey: 'a2', source: 'collection' },
-    { itemKey: 'a3', matchKey: 'a3', source: 'wishlist' },
-    { itemKey: 't41', matchKey: 'a4', source: 'wishlist' },
-    { itemKey: 't51', matchKey: 'a5', source: 'collection' },
-    { itemKey: 'a5', matchKey: 'a5', source: 'collection' },
-  ];
-
-  it('leaves out the release, hidden ones, and whole releases you own or wishlisted', () => {
-    const { excluded } = exclusions(mine, new Set(['a9']), 'a8');
-
-    expect([...excluded].map(keyFromNumber).sort()).toEqual(['a1', 'a3', 'a5', 'a8', 'a9']);
-  });
-
-  it('keeps albums you own some tracks of, with the count', () => {
-    const { ownedTracks } = exclusions(mine, new Set(), 'a8');
-
-    expect(ownedTracks).toEqual(new Map([[keyToNumber('a2'), 2]]));
   });
 });
 

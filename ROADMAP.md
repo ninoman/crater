@@ -157,10 +157,10 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 
 **Goal:** recommendations built from what your top twins own.
 
-1. [ ] `scoring/forYou.ts`: take the top K twins (default 30), with `score(i) = Σ score(F) × w(i)`. Apply the same filters as Also bought.
-2. [ ] Optional diversity rule: at most 2 items per artist in the first 20.
+1. [x] `scoring/forYou.ts`: take the top K twins (default 30), with `score(i) = Σ score(F) × w(i)`. Apply the same filters as Also bought.
+2. [x] Optional diversity rule: at most 2 items per artist in the first 20.
 3. [ ] **For you** tab on your profile (`#for-you`), with ranked rows, the reason line ("owned by 5 of your top twins"), and preview, wishlist and hide buttons.
-4. [ ] Tests on synthetic data.
+4. [x] Tests on synthetic data.
 
 **Done when:** all three features work together on your real data.
 
