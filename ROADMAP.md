@@ -177,18 +177,19 @@ Also added: the scanner seeds itself from your own collection. After each sync, 
 It isn't part of the MVP. Design and data source: decisions §8.
 
 1. [x] Capture the following fixtures (pagedata and the `following_bands` / `following_fans` endpoint) and write the findings into decisions §8.
-2. [ ] Capture the rendered following tab, logged in, and add its selectors to `FAN_PAGE_DOM`.
-3. [ ] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
-4. [ ] Schema v5 migration.
-5. [ ] Following sync inside your own sync (always full, 500 per request).
-6. [ ] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
-7. [ ] Message bus and hooks, including batched `getTwinStandings`.
-8. [ ] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
-9. [ ] Take over the following tab's list: filter bar, cards with tag chips and twin rank, bulk tagging, and all view states.
-10. [ ] Tags on the account's own page: fan pages, release pages and the band's home page.
-11. [ ] Tag export/import.
+2. [x] Capture the rendered following tab and the band follow/unfollow request, logged in (decisions §8).
+3. [x] Find how Bandcamp's follow buttons work, so our cards can reuse its handler instead of sending requests (decisions §8).
+4. [ ] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
+5. [ ] Schema v5 migration.
+6. [ ] Following sync inside your own sync (always full, 500 per request).
+7. [ ] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
+8. [ ] Message bus and hooks, including batched `getTwinStandings`.
+9. [ ] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
+10. [ ] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and twin rank inside each card. Bulk tagging, unfollow tracking and all view states.
+11. [ ] Tags on the account's own page: fan pages, release pages and the band's home page.
+12. [ ] Tag export/import.
 
-**Done when:** the following tab lists everyone you follow, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, and a followed artist's release page shows its tags.
+**Done when:** the following tab lists everyone you follow, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, follow/unfollow on our cards works through Bandcamp's own handler, and a followed artist's release page shows its tags.
 
 ---
 

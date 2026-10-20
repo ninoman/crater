@@ -274,6 +274,26 @@ You create your own tags and assign them to the fans, artists and labels you fol
 - `is_following` is from the viewer's side (false logged out). Ignore it.
 - An unknown `fan_id` gives `{followeers: [], more_available: false, last_token: null}`, not an error.
 
+### Bandcamp's following tab (captured 2026-10-20)
+
+Fixture: `me-following-tab.html`, the rendered `#following-grid` with artists & labels open after "view all".
+
+- **Routes are paths, not hashes:** `/<username>/following/artists_and_labels` and `/<username>/following/fans`. Bandcamp switches them with `history.pushState`, which a content script can't hook, so we watch the DOM instead.
+- **Active state:** `#following-grid` gets `active` when the following tab is open. In `ol#following-tabs`, the open sub-tab's `li[data-tab="following-bands" | "following-fans"]` has `active`, and so does its container (`#following-bands-container` / `#following-fans-container`, `class="grid active"`). A `MutationObserver` on those class attributes tells us which list to show.
+- **What we hide:** in each container, `ol.followeer-grid` and `.expand-container` (the "view all N" button and spinner).
+- **A card** is `li.followeer` with `.fan-image` (avatar link + `img`), `.fan-username` (link and name) and `.fan-location`, then `button.follow-unfollow` with `data-band-id` + `data-band-name` (bands) or `data-fan-id` + `data-view="following_fans"` (fans). Our cards copy this layout, so they look native.
+
+### Follow and unfollow: Bandcamp's own handler
+
+We never send follow or unfollow requests. Bandcamp's fan-page script (read 2026-10-20) binds one delegated handler, `$("#fan-container").on("click", ".followeer .follow-unfollow", …)`. It reads the button's data attributes and does the request, crumb and retry itself:
+
+- **Bands:** `button#follow-unfollow-band_<band_id>[data-band-id][data-band-name]`. Its handler finds the button **by that id**, then toggles `following` on it.
+- **Fans:** `button#follow-unfollow_<fan_id>[data-fan-id][data-view="following_fans"]`. Its handler toggles `following` on the clicked button.
+- So any card in this markup, anywhere inside `#fan-container`, gets a working follow button. Clicks go through Bandcamp's code exactly as on its own cards, including the mailing-list prompt after a band follow.
+- **Duplicate ids:** Bandcamp's hidden list may hold a button with the same id, and `$("#…")` returns the first in document order. So our list goes **before** Bandcamp's `ol.followeer-grid`.
+- **Keeping the DB in step:** a `MutationObserver` on our buttons' `class` sees `following` come and go. An unfollow marks the row `unfollowed` (dimmed, tags kept) so a quick re-follow loses nothing. The next full sync deletes rows still unfollowed, with their tags. A follow clears the mark.
+- For the record, the endpoints behind it: `POST /fan_follow_band_cb` (`fan_id`, `band_id`, `action`, `crumb`) and `POST /fan_follow_cb` (`fan_id`, `follow_id`, `action`, `crumb`). An expired crumb returns `{error: "invalid_crumb", crumb}` and the script retries.
+
 ### Sync
 
 - Followings are part of your own sync (§4): paced and off the budget.
@@ -289,7 +309,7 @@ You create your own tags and assign them to the fans, artists and labels you fol
   ```
   `nameKey` = the trimmed, lowercased name.
   - Tags are stored on the following row. A join table isn't needed, because only followings can be tagged.
-  - Unfollowing removes the row and its tags with it.
+  - A row unfollowed on the tab keeps its tags until the next full sync deletes it (see *Follow and unfollow*).
 - **Sync must not wipe tags:** `putFollowing` merges by key and keeps the existing `tagIds`. This needs its own test.
 - **Deleting a tag:** one transaction deletes the `tags` row and removes its id from every following row, found through the `tagIds` index.
 - **Bulk assign:** one message takes many keys and a tag id, and adds or removes it in one transaction.
@@ -305,17 +325,20 @@ You create your own tags and assign them to the fans, artists and labels you fol
 ### Planned layout
 
 - `bandcamp/following.ts` (`parseFollowingPage` + zod schema + fixture tests), the pagedata part in the fan page parser, and a request builder in `bandcamp/requests.ts`
+- `bandcamp/followCard.ts`: builds a card in Bandcamp's markup from a following row. Like `FAN_PAGE_DOM`, it's the one place that knows that HTML, tested against `me-following-tab.html`.
 - `db/repo/tags.ts` and `db/repo/following.ts`
 - messages, named like the rest of `shared/messages.ts`: `listTags`, `createTag`, `renameTag`, `deleteTag`, `assignTag` (many keys, add or remove), `listFollowing`, `getFollowTags { kind, id }`, `exportTags`, `importTags`, and `getTwinStandings { fanIds }`, a batched `getTwinStanding`, so a list of fans is one message
 - hooks `useFollowing(tagIds, mode)`, `useTags()`, `useFollowTags(kind, id)`
 
 ### UI: Bandcamp's following tab, modified
 
-We change Bandcamp's own **following** tab on your profile instead of adding a tab of ours.
+We change Bandcamp's own **following** tab on your profile instead of adding a tab of ours, and reuse its cards.
 
-- **Why not decorate Bandcamp's rows:** they're rendered client-side, 20 at a time, behind "view all N" and scrolling. A tag filter over the rows Bandcamp happens to have loaded would be wrong.
-- **So we take over the list:** inside `#following-grid`, Bandcamp's sub-tab bar (artists & labels / fans / genres) stays. Under it, in the artists & labels and fans sub-tabs, our filter bar and list replace Bandcamp's `ol.followeer-grid` and its "view all" button, rendered from the DB in a shadow root. The genres sub-tab is untouched. Selectors live in `FAN_PAGE_DOM`, next to the profile tabs'.
-- **Cards match Bandcamp's follow grid:** avatar, name, location, plus tag chips and "+ tag". Fan cards also show twin rank ("#4 twin") when the fan is on the board.
+- **Why not decorate only Bandcamp's loaded rows:** it renders them 20 at a time, behind "view all N" and scrolling. A tag filter over whatever happens to be loaded would be wrong, and making Bandcamp load all of it is slow and fragile.
+- **So we render the whole list in Bandcamp's markup:** inside `#following-grid`, Bandcamp's sub-tab bar (artists & labels / fans / genres) stays. In the artists & labels and fans containers, we hide Bandcamp's `ol.followeer-grid` and `.expand-container` (so its paging never runs), and insert our own `ol.followeer-grid` before them. It holds every following row from the DB as a light-DOM `li.followeer` built by `followCard.ts`. Bandcamp's CSS styles the cards, and its handler runs their follow buttons. The genres sub-tab is untouched. Selectors live in `FAN_PAGE_DOM`.
+- **Card details:** the avatar is `https://f4.bcbits.com/img/<image_id, 10 digits>_41.jpg` for fans and bands alike. The link is `trackpipe_url` for fans and the band's subdomain or custom domain for bands.
+- **Our additions sit in shadow roots:** the filter bar sits above our list. Each card gets one small host element holding its checkbox, tag chips, "+ tag" and, on fan cards, twin rank ("#4 twin"). The card itself must stay light DOM, because events from inside a shadow root don't match Bandcamp's `.followeer .follow-unfollow` selector. That's the one exception to "all injected UI in a shadow root". One React root renders into every card's host through portals, not one root per card.
+- **Filtering** hides non-matching cards (`hidden`) instead of re-rendering, so Bandcamp's button state stays put.
 - **Bulk tagging:** each card has a checkbox. With any checked, a bar shows "N selected · Tag… · Clear".
 - **Tag colours** come from a fixed set of design tokens (`--dh-tag-1` … `--dh-tag-8`), picked by tag id, so a rename keeps the colour. No colour picker.
 - New `src/ui/` components: `Chip`, `Checkbox`, and `TagPicker` (a wrapped Radix Popover with a combobox, where Enter creates a tag). Its portal goes to the shadow-root container.
