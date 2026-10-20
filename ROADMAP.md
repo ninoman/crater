@@ -15,7 +15,7 @@ P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also b
 
 **Goal:** remove the unknowns that could force a schema or architecture change later.
 
-1. [x] **Capture live traffic.** Done with curl and by reading Bandcamp's `tralbum.js`; see `tests/fixtures/README.md`. Still needed from you: `me-fan-page.html` and `purchase-confirmation.html`, captured logged in. Do this on a public fan page, your own fan page (logged in), an album page and a track page. Save the raw responses to `tests/fixtures/`:
+1. [x] **Capture live traffic.** Done with curl and by reading Bandcamp's `tralbum.js`; see `tests/fixtures/README.md`. Still needed from you: `purchase-confirmation.html`, captured logged in. Do this on a public fan page, your own fan page (logged in), an album page and a track page. Save the raw responses to `tests/fixtures/`:
    - `fan-page.html` (the `#pagedata` data-blob with `fan_data` and `item_cache`)
    - `collection_items.json` page 1 and page 2, so the `older_than_token` round trip is covered
    - `wishlist_items.json`
@@ -72,7 +72,7 @@ Also added: the UI kit in `src/ui/` (tokens, Button, Panel, Tabs (Radix), EmptyS
 
 **Goal:** the extension knows who you are and what you own.
 
-1. [x] Detect the logged-in fan from page data on any bandcamp.com page, then store `fan_id` and `username` in `me`. Reads `#pagedata` `identities.fan`; the logged-in shape `{id, username}` is assumed until `me-fan-page.html` is captured.
+1. [x] Detect the logged-in fan from page data on any bandcamp.com page, then store `fan_id` and `username` in `me`. Reads `#pagedata` `identities.fan`; the logged-in shape `{id, username}` is confirmed by `me-fan-page.html`.
 2. [x] Write a paginated collection fetcher in `bandcamp/collection.ts`: loop on `older_than_token` and yield pages.
 3. [x] Pull your full collection and wishlist (no cap for yourself). Write to `items`, `ownership` (with `source`) and `me` (owned and wishlist key sets). Your owned and wishlisted sets are your `ownership` rows, not copies in `me`.
 4. [ ] Re-sync triggers: `chrome.runtime.onStartup`, and the purchase confirmation page (record a fixture of it and match on URL or DOM). `onStartup` is done, plus a re-sync on any page view when the last sync is over 24 h old. The purchase page match (`bandcamp.com/download`) is a guess until `purchase-confirmation.html` is captured.

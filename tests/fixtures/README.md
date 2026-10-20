@@ -16,8 +16,8 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `wishlist_items-hidden.json` | wishlist_items for a fan whose wishlist is hidden (`fan_id` 11705655) | hidden wishlist gives `{"error":true}` |
 | `collection_items-unknown-fan.json` | collection_items with `fan_id: 1` | empty result: `items: []`, `last_token: null` |
 | `collection_items-bad-token.json` | collection_items with `older_than_token: "garbage"` | error shape: HTTP 200 with `{"error":true}` |
+| `me-fan-page.html` | `GET https://bandcamp.com/randoom_taker` in a logged-in browser (2026-10-20). Scrubbed: email, re-download `sig`/`payment_id` and CSRF crumbs are placeholders | `parseViewer` on a logged-in page: `identities.fan` is `{id, username, name, photo, private, url, verified}`; also `is_own_page`, `hidden_data` |
 
 Still to capture (needs you, logged in):
 
-- `me-fan-page.html`: your own profile while logged in (`identities.fan`, `is_own_page`, hidden items). Phase 2 assumes `identities.fan` is `{id, username, …}`.
 - `purchase-confirmation.html`: the page after a purchase completes, and its URL (re-sync trigger; Phase 2 guesses `bandcamp.com/download`)

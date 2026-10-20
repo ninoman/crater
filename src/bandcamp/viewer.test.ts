@@ -17,6 +17,13 @@ describe('parseViewer', () => {
     },
   );
 
+  it('reads the logged-in fan from your own fan page', () => {
+    expect(parseViewer(fixtureText('me-fan-page.html'))).toEqual({
+      fanId: 7027105,
+      username: 'randoom_taker',
+    });
+  });
+
   it('reads the logged-in fan', () => {
     const html = pagedataHtml({
       identities: { fan: { id: 42, username: 'digger', name: 'D & G' } },
