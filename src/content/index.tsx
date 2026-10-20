@@ -1,6 +1,7 @@
 // Content script entry: detects the page type and mounts the matching UI.
 // Content scripts never fetch; all network goes through the service worker (decisions §5).
 
+import { mountFan } from './fan/mountFan';
 import { detectPageKind } from './pageKind';
 import { mountProfile } from './profile/mountProfile';
 import { ReleaseSidebar } from './release/ReleaseSidebar';
@@ -18,6 +19,8 @@ switch (detectPageKind(document)) {
     mountProfile(document);
     break;
   case 'fan':
+    mountFan(document);
+    break;
   case 'other':
     break;
 }

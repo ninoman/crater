@@ -85,6 +85,11 @@ export const rawOwnPagePagedata = z.object({
   fan_data: z.object({ is_own_page: z.boolean().nullish() }).nullish(),
 });
 
+/** The part of a fan page's `#pagedata` that says whose page it is. */
+export const rawViewedFanPagedata = z.object({
+  fan_data: z.object({ fan_id: z.number() }),
+});
+
 const rawListData = z.object({
   item_count: z.number(),
   last_token: z.string().nullable(),

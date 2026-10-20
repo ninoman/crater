@@ -148,7 +148,7 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
    - put tab state in the URL hash (`#twins`), and hide Bandcamp's grid while the tab is active
    - leaderboard with avatar, name, overlap, % match, score and flag, plus sort (score / overlap / Jaccard) and filter
    - one tab injector (`src/content/profile/`) that For you (6.3) and Following reuse by adding an entry to `PROFILE_TABS`
-6. [ ] On other fans' profiles, show a badge such as "your #4 twin · 37 in common".
+6. [x] On other fans' profiles, show a badge such as "your #4 twin · 37 in common".
 7. [ ] "Add release to queue" button, so you can deliberately grow the dataset.
 
 Also added: the scanner seeds itself from your own collection. After each sync, your owned releases' supporters are queued at a third, lowest priority, newest purchase first, with a setting to turn it off and "N / M your releases scanned" in the popup (decisions §5).
