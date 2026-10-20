@@ -37,3 +37,17 @@
 .dh-also-bought__notice {
   padding: var(--dh-space-2) var(--dh-space-4) 0;
 }
+
+.dh-twin-rank {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--dh-cover-sm);
+  height: var(--dh-cover-sm);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg-subtle);
+  font-size: var(--dh-text-md);
+  font-weight: var(--dh-weight-bold);
+  color: var(--dh-color-muted);
+}

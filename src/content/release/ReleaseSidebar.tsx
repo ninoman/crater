@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
 import type { ReleasePageItem } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
+import { useReleaseTwins } from '../../hooks/useReleaseTwins';
 import { useScannerStatus } from '../../hooks/useScannerStatus';
 import { useScanProgress } from '../../hooks/useScanProgress';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { AlsoBoughtList } from './AlsoBoughtList';
+import { ReleaseTwinsList } from './ReleaseTwinsList';
 import { ScanHeader } from './ScanHeader';
 import { useCurrentRelease } from './useCurrentRelease';
 
@@ -37,7 +39,9 @@ export function ReleaseSidebar() {
 function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const progress = useScanProgress(item);
   const scanner = useScannerStatus(SCANNER_POLL_MS);
-  const { view, hide } = useAlsoBought(item.itemKey, progress.state !== 'loading');
+  const releaseSaved = progress.state !== 'loading';
+  const { view, hide } = useAlsoBought(item.itemKey, releaseSaved);
+  const twins = useReleaseTwins(item.itemKey, releaseSaved);
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
@@ -55,12 +59,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
           {
             value: 'twins',
             label: 'Twins who own this',
-            content: (
-              <EmptyState
-                title="No taste twins yet"
-                description="Twins appear once your collection is synced and fans are scanned."
-              />
-            ),
+            content: <ReleaseTwinsList view={twins} />,
           },
         ]}
       />

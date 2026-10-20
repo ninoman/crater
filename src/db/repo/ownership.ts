@@ -22,6 +22,21 @@ export async function putOwnership(
   });
 }
 
+/**
+ * Fans with the release in their collection, by its matchKey, so a track page finds album
+ * buyers and an album page finds track buyers.
+ */
+export async function collectorsOf(db: DigheadDb, releaseKey: ItemKey): Promise<Set<number>> {
+  return db.transaction('r', [db.items, db.ownership], async () => {
+    const release = await db.items.get(releaseKey);
+    const rows = await db.ownership
+      .where('matchKey')
+      .equals(release?.albumKey ?? releaseKey)
+      .toArray();
+    return new Set(rows.filter((row) => row.source === 'collection').map((row) => row.fanId));
+  });
+}
+
 /** Item keys a fan has in their collection or wishlist. */
 export async function ownedItemKeys(
   db: DigheadDb,

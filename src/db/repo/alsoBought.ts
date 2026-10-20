@@ -15,6 +15,10 @@ export interface AlsoBoughtData {
   knownOwners: number;
   /** The match ids of each owner whose collection has been read: the "supporters" N. */
   ownerLists: Float64Array[];
+  /** Those owners who are also your taste twins, with their twin score. */
+  twinSupporters: { score: number; matchIds: Float64Array }[];
+  /** Your best twin's score, which twin scores are scaled by. 0 with no twins. */
+  bestTwinScore: number;
   /** Fans other than you with any known collection: the base rate's population. */
   population: number;
   /** Your own ownership rows, collection and wishlist. Empty when nobody is logged in. */
@@ -29,7 +33,7 @@ export async function gatherAlsoBought(
 ): Promise<AlsoBoughtData> {
   return db.transaction(
     'r',
-    [db.items, db.ownership, db.fans, db.fanMatches, db.hidden],
+    [db.items, db.ownership, db.fans, db.fanMatches, db.hidden, db.twins],
     async () => {
       const release = await db.items.get(releaseKey);
       const matchKey = release?.albumKey ?? releaseKey;
@@ -43,13 +47,20 @@ export async function gatherAlsoBought(
       const fans = await db.fans.bulkGet(ownerIds);
       const readIds = ownerIds.filter((_, i) => collectionRead(fans[i]?.status));
 
-      const [lists, listed, myList, mine, hidden] = await Promise.all([
+      const [lists, twins, best, listed, myList, mine, hidden] = await Promise.all([
         db.fanMatches.bulkGet(readIds),
+        db.twins.bulkGet(readIds),
+        db.twins.orderBy('score').last(),
         db.fanMatches.count(),
         meFanId === null ? undefined : db.fanMatches.get(meFanId),
         meFanId === null ? [] : db.ownership.where('fanId').equals(meFanId).toArray(),
         hiddenMatchKeys(db),
       ]);
+
+      const twinSupporters = lists.flatMap((record, i) => {
+        const twin = twins[i];
+        return record && twin ? [{ score: twin.score, matchIds: record.matchIds }] : [];
+      });
 
       return {
         matchKey,
@@ -57,6 +68,8 @@ export async function gatherAlsoBought(
         album,
         knownOwners: ownerIds.length,
         ownerLists: lists.flatMap((record) => (record ? [record.matchIds] : [])),
+        twinSupporters,
+        bestTwinScore: best?.score ?? 0,
         population: listed - (myList ? 1 : 0),
         mine,
         hidden,

@@ -8,9 +8,12 @@ import {
   isSmallRelease,
   LIFT_CAP,
   lift,
+  maxTwinShare,
   rankScored,
   scoreCeiling,
   scoreCoOwned,
+  TWIN_BOOST_MAX,
+  twinBoosts,
   type SellerItem,
 } from './alsoBought';
 import { supporters, weight } from './weights';
@@ -72,6 +75,7 @@ describe('lift and score', () => {
       co: 5,
       owners: 20,
       lift: expect.closeTo(2.5) as number,
+      twins: 0,
       score: expect.closeTo(5 * Math.log(3.5)) as number,
     });
   });
@@ -85,12 +89,58 @@ describe('lift and score', () => {
 
   it('breaks ties on co, then id', () => {
     const scored = [
-      { id: 3, co: 2, owners: 2, lift: 1, score: 1 },
-      { id: 2, co: 2, owners: 2, lift: 1, score: 1 },
-      { id: 1, co: 1, owners: 1, lift: 1, score: 1 },
+      { id: 3, co: 2, owners: 2, lift: 1, twins: 0, score: 1 },
+      { id: 2, co: 2, owners: 2, lift: 1, twins: 0, score: 1 },
+      { id: 1, co: 1, owners: 1, lift: 1, twins: 0, score: 1 },
     ];
 
     expect(rankScored(scored, 2).map((s) => s.id)).toEqual([2, 3]);
+  });
+});
+
+describe('twin boost', () => {
+  const list = (...ids: number[]) => Float64Array.from(ids);
+  const basis = { supporters: 10, population: 100 };
+
+  it('scales twin scores by your best twin and caps the share at 1', () => {
+    const boosts = twinBoosts(
+      [
+        { score: 0.2, matchIds: list(1, 2) },
+        { score: 0.1, matchIds: list(2, 3) },
+        { score: 0.4, matchIds: list(3) },
+      ],
+      0.4,
+    );
+
+    expect(boosts.get(1)).toEqual({ share: 0.5, twins: 1 });
+    expect(boosts.get(2)).toEqual({ share: expect.closeTo(0.75) as number, twins: 2 });
+    expect(boosts.get(3)).toEqual({ share: 1, twins: 2 });
+    expect(boosts.has(4)).toBe(false);
+    expect(maxTwinShare(boosts)).toBe(1);
+  });
+
+  it('does nothing without twins', () => {
+    expect(twinBoosts([{ score: 0.2, matchIds: list(1) }], 0).size).toBe(0);
+    expect(maxTwinShare(new Map())).toBe(0);
+  });
+
+  it('multiplies the score by at most 1 + TWIN_BOOST_MAX', () => {
+    const plain = scoreCoOwned({ id: 1, co: 5 }, 20, basis);
+    const full = scoreCoOwned({ id: 1, co: 5 }, 20, basis, { share: 1, twins: 2 });
+    const half = scoreCoOwned({ id: 1, co: 5 }, 20, basis, { share: 0.5, twins: 1 });
+
+    expect(full.score).toBeCloseTo(plain.score * (1 + TWIN_BOOST_MAX));
+    expect(half.score).toBeCloseTo(plain.score * (1 + TWIN_BOOST_MAX / 2));
+    expect(full.twins).toBe(2);
+  });
+
+  it('lets a release your closest twin owns pass one with an extra co-owner', () => {
+    // Same lift for all three: 5 × 1.5 = 7.5 co-owners' worth beats 6, but not 8.
+    const twinOwned = scoreCoOwned({ id: 1, co: 5 }, 10, basis, { share: 1, twins: 1 });
+    const more = scoreCoOwned({ id: 2, co: 6 }, 12, basis);
+    const most = scoreCoOwned({ id: 3, co: 8 }, 16, basis);
+
+    expect(rankScored([more, twinOwned, most], 10).map((s) => s.id)).toEqual([3, 1, 2]);
   });
 });
 
@@ -98,13 +148,19 @@ describe('couldEnter', () => {
   const top = [scoreCoOwned({ id: 1, co: 10 }, 10, { supporters: 10, population: 10 })];
 
   it('admits anything while the list has room', () => {
-    expect(couldEnter(top, 2, 1)).toBe(true);
+    expect(couldEnter(top, 2, 1, 0)).toBe(true);
   });
 
   it('stops once the best possible score is below the last place', () => {
     // The leader scores 10 × ln 2 ≈ 6.9; 2 co-owners reach at most 2 × ln 11 ≈ 4.8.
-    expect(couldEnter(top, 1, 2)).toBe(false);
-    expect(couldEnter(top, 1, 3)).toBe(scoreCeiling(3) >= (top[0]?.score ?? 0));
+    expect(couldEnter(top, 1, 2, 0)).toBe(false);
+    expect(couldEnter(top, 1, 3, 0)).toBe(scoreCeiling(3, 0) >= (top[0]?.score ?? 0));
+  });
+
+  it('leaves room for the twin boost', () => {
+    // With a full twin share, 2 co-owners reach 2 × ln 11 × 1.5 ≈ 7.2, past the leader's 6.9.
+    expect(couldEnter(top, 1, 2, 0)).toBe(false);
+    expect(couldEnter(top, 1, 2, 1)).toBe(true);
   });
 });
 
@@ -152,7 +208,7 @@ describe('small-release fallback', () => {
     ];
 
     expect(blendPicks(scored, fallback, 10)).toEqual([
-      { matchKey: 'a2', kind: 'co-owned', co: 2 },
+      { matchKey: 'a2', kind: 'co-owned', co: 2, twins: 0 },
       { matchKey: 'a1', kind: 'same-artist' },
     ]);
   });

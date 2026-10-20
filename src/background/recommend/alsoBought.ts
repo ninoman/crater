@@ -18,13 +18,16 @@ import {
   couldEnter,
   fallbackPicks,
   isSmallRelease,
+  maxTwinShare,
   rankScored,
   scoreCoOwned,
+  twinBoosts,
   type AlsoBoughtPick,
   type Basis,
   type CoOwned,
   type FallbackPick,
   type Scored,
+  type TwinBoost,
 } from '../../scoring/alsoBought';
 import { exclusions, type Exclusions } from '../../scoring/exclusions';
 import { supporters } from '../../scoring/weights';
@@ -42,7 +45,9 @@ export async function computeAlsoBought(
   const mine = exclusions(data.mine, data.hidden, data.matchKey);
   const basis = { supporters: data.ownerLists.length, population: data.population };
 
-  const scored = await scoreTop(db, coOwnership(data.ownerLists, mine.excluded), basis);
+  const boosts = twinBoosts(data.twinSupporters, data.bestTwinScore);
+  const candidates = coOwnership(data.ownerLists, mine.excluded);
+  const scored = await scoreTop(db, candidates, basis, boosts);
   const fallback = isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, mine) : [];
   const picks = blendPicks(scored, fallback, ALSO_BOUGHT_LIMIT);
 
@@ -62,19 +67,31 @@ export async function computeAlsoBought(
 
 /**
  * Scores candidates in falling co order, fetching owner counts a chunk at a time, and stops
- * once no remaining candidate can reach the top list (decisions §6).
+ * once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
+ * candidates whose own twin share still lets them in are looked up.
  */
-async function scoreTop(db: DigheadDb, candidates: CoOwned[], basis: Basis): Promise<Scored[]> {
+async function scoreTop(
+  db: DigheadDb,
+  candidates: CoOwned[],
+  basis: Basis,
+  boosts: ReadonlyMap<number, TwinBoost>,
+): Promise<Scored[]> {
+  const maxShare = maxTwinShare(boosts);
+  const boostOf = (id: number) => boosts.get(id) ?? { share: 0, twins: 0 };
   let top: Scored[] = [];
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
-    if (!first || !couldEnter(top, ALSO_BOUGHT_LIMIT, first.co)) break;
-    const chunk = candidates.slice(start, start + CHUNK);
+    if (!first || !couldEnter(top, ALSO_BOUGHT_LIMIT, first.co, maxShare)) break;
+    const chunk = candidates
+      .slice(start, start + CHUNK)
+      .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co, boostOf(c.id).share));
     const owners = await getOwnerCounts(
       db,
       chunk.map((c) => c.id),
     );
-    const scored = chunk.map((c) => scoreCoOwned(c, owners.get(c.id) ?? c.co, basis));
+    const scored = chunk.map((c) =>
+      scoreCoOwned(c, owners.get(c.id) ?? c.co, basis, boostOf(c.id)),
+    );
     top = rankScored([...top, ...scored], ALSO_BOUGHT_LIMIT);
   }
   return top;
@@ -109,7 +126,7 @@ function reasonFor(
 ): AlsoBoughtReason {
   switch (pick.kind) {
     case 'co-owned':
-      return { kind: 'co-owned', owners: pick.co, of: scannedSupporters };
+      return { kind: 'co-owned', owners: pick.co, of: scannedSupporters, twins: pick.twins };
     case 'same-artist':
       return { kind: 'same-artist' };
     case 'same-label':

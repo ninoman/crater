@@ -7,8 +7,8 @@ import { keyFromNumber, keyToNumber, type ItemKey } from '../bandcamp';
 export const MIN_CO_OWNERS = 2;
 /** Past this, a higher lift is mostly a tiny base rate, not a stronger link. */
 export const LIFT_CAP = 10;
-/** Stub until Phase 5, which boosts releases your taste twins own. */
-export const TWIN_BOOST = 0;
+/** Releases your taste twins own score up to this much more: ×(1 + TWIN_BOOST_MAX) at most. */
+export const TWIN_BOOST_MAX = 0.5;
 /** Releases with fewer known owners than this get same-artist and same-label picks blended in. */
 export const SMALL_RELEASE_OWNERS = 8;
 export const ALSO_BOUGHT_LIMIT = 30;
@@ -69,26 +69,82 @@ export function lift(co: number, owners: number, basis: Basis): number {
   return Math.min(LIFT_CAP, co / n / base);
 }
 
+/** One of the release's scanned supporters who is also one of your taste twins. */
+export interface TwinSupporter {
+  /** Their twin score (scoring/twins.ts). */
+  score: number;
+  /** Their distinct collection match ids. */
+  matchIds: Float64Array;
+}
+
+export interface TwinBoost {
+  /** min(1, Σ score(F) / your best twin's score) over the twin supporters owning it. */
+  share: number;
+  /** How many of them own it, for the reason line. */
+  twins: number;
+}
+
+const NO_TWINS: TwinBoost = { share: 0, twins: 0 };
+
+/**
+ * Per match id, how strongly your twins among the release's supporters own it. Scores are
+ * scaled by your best twin's, so your closest twin alone, or two half as close, gives the full
+ * boost. Only supporters count: they're the fans whose collections the co-counts come from.
+ */
+export function twinBoosts(
+  twins: readonly TwinSupporter[],
+  bestTwinScore: number,
+): Map<number, TwinBoost> {
+  const boosts = new Map<number, TwinBoost>();
+  if (bestTwinScore <= 0) return boosts;
+  for (const twin of twins) {
+    const part = twin.score / bestTwinScore;
+    for (const id of twin.matchIds) {
+      const boost = boosts.get(id);
+      if (boost) {
+        boost.share = Math.min(1, boost.share + part);
+        boost.twins++;
+      } else boosts.set(id, { share: Math.min(1, part), twins: 1 });
+    }
+  }
+  return boosts;
+}
+
+/** The highest share any release reaches, which bounds what the rest can score. */
+export function maxTwinShare(boosts: ReadonlyMap<number, TwinBoost>): number {
+  let max = 0;
+  for (const { share } of boosts.values()) if (share > max) max = share;
+  return max;
+}
+
 export interface Scored extends CoOwned {
   owners: number;
   lift: number;
+  /** Twin supporters owning it, for the reason line. */
+  twins: number;
   score: number;
 }
 
-/** score = co × ln(1 + lift), plus the twin boost (0 until Phase 5). */
-export function scoreCoOwned(candidate: CoOwned, owners: number, basis: Basis): Scored {
+/** score = co × ln(1 + lift) × (1 + TWIN_BOOST_MAX × twin share), decisions §6. */
+export function scoreCoOwned(
+  candidate: CoOwned,
+  owners: number,
+  basis: Basis,
+  twin: TwinBoost = NO_TWINS,
+): Scored {
   const value = lift(candidate.co, owners, basis);
   return {
     ...candidate,
     owners,
     lift: value,
-    score: candidate.co * Math.log1p(value) + TWIN_BOOST,
+    twins: twin.twins,
+    score: candidate.co * Math.log1p(value) * (1 + TWIN_BOOST_MAX * twin.share),
   };
 }
 
-/** The best score `co` co-owners can reach, whatever the base rate. */
-export function scoreCeiling(co: number): number {
-  return co * Math.log1p(LIFT_CAP) + TWIN_BOOST;
+/** The best score `co` co-owners can reach, whatever the base rate, at a given twin share. */
+export function scoreCeiling(co: number, twinShare: number): number {
+  return co * Math.log1p(LIFT_CAP) * (1 + TWIN_BOOST_MAX * twinShare);
 }
 
 /** Best first. Ties break on co, then id, so the same data always ranks the same way. */
@@ -99,12 +155,18 @@ export function rankScored(scored: readonly Scored[], limit: number): Scored[] {
 }
 
 /**
- * Whether a candidate with `co` co-owners could still enter a full `top` list. Candidates come
- * in falling co order, so the first one that can't means none of the rest can either.
+ * Whether a candidate with `co` co-owners and up to `twinShare` could still enter a full `top`
+ * list. Candidates come in falling co order, so with the highest share any of them has, the
+ * first one that can't means none of the rest can either.
  */
-export function couldEnter(top: readonly Scored[], limit: number, co: number): boolean {
+export function couldEnter(
+  top: readonly Scored[],
+  limit: number,
+  co: number,
+  twinShare: number,
+): boolean {
   const last = top[limit - 1];
-  return top.length < limit || last === undefined || scoreCeiling(co) >= last.score;
+  return top.length < limit || last === undefined || scoreCeiling(co, twinShare) >= last.score;
 }
 
 export function isSmallRelease(knownOwners: number): boolean {
@@ -166,7 +228,8 @@ export function fallbackPicks(
     .map(({ item, kind }) => ({ matchKey: item.itemKey, kind }));
 }
 
-export type AlsoBoughtPick = { matchKey: ItemKey; kind: 'co-owned'; co: number } | FallbackPick;
+export type AlsoBoughtPick =
+  { matchKey: ItemKey; kind: 'co-owned'; co: number; twins: number } | FallbackPick;
 
 /** Co-owned picks first, then fallback picks they don't already cover. */
 export function blendPicks(
@@ -174,10 +237,11 @@ export function blendPicks(
   fallback: readonly FallbackPick[],
   limit: number,
 ): AlsoBoughtPick[] {
-  const picks: AlsoBoughtPick[] = scored.map(({ id, co }) => ({
+  const picks: AlsoBoughtPick[] = scored.map(({ id, co, twins }) => ({
     matchKey: keyFromNumber(id),
     kind: 'co-owned',
     co,
+    twins,
   }));
   const taken = new Set(picks.map((pick) => pick.matchKey));
   return [...picks, ...fallback.filter((pick) => !taken.has(pick.matchKey))].slice(0, limit);
