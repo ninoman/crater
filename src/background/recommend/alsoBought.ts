@@ -14,19 +14,23 @@ import {
 import {
   ALSO_BOUGHT_LIMIT,
   blendPicks,
+  coOwnerVotes,
   coOwnership,
   couldEnter,
   fallbackPicks,
+  isConfident,
   isSmallRelease,
   maxTwinShare,
   rankScored,
   scoreCoOwned,
   twinBoosts,
+  warmup,
   type AlsoBoughtPick,
   type Basis,
   type CoOwned,
   type FallbackPick,
   type Scored,
+  type SupporterList,
   type TwinBoost,
 } from '../../scoring/alsoBought';
 import { exclusions, type Exclusions } from '../../scoring/exclusions';
@@ -43,13 +47,22 @@ export async function computeAlsoBought(
 ): Promise<AlsoBoughtResult> {
   const data = await gatherAlsoBought(db, releaseKey, meFanId);
   const mine = exclusions(data.mine, data.hidden, data.matchKey);
-  const basis = { supporters: data.ownerLists.length, population: data.population };
+  const basis = { supporters: data.supporters.length, population: data.population };
 
   const boosts = twinBoosts(data.twinSupporters, data.bestTwinScore);
-  const candidates = coOwnership(data.ownerLists, mine.excluded);
-  const scored = await scoreTop(db, candidates, basis, boosts);
-  const fallback = isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, mine) : [];
-  const picks = blendPicks(scored, fallback, ALSO_BOUGHT_LIMIT);
+  const candidates = coOwnership(
+    data.supporters.map((s) => s.matchIds),
+    mine.excluded,
+  );
+  const scored = await scoreTop(db, candidates, data.supporters, basis, boosts);
+  const wait = warmup(
+    { read: data.supporters.length, allScanned: data.allScanned, listed: data.listed },
+    scored.filter(isConfident).length,
+  );
+  // While warming up, same-artist and same-label picks fill the panel for any release.
+  const fallback =
+    wait !== null || isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, mine) : [];
+  const picks = blendPicks(wait === null ? scored : [], fallback, ALSO_BOUGHT_LIMIT);
 
   const items = await getDisplayItems(
     db,
@@ -60,17 +73,18 @@ export async function computeAlsoBought(
     const item = items.get(pick.matchKey);
     return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label), mine)] : [];
   });
-  return { releaseKey, rows };
+  return { releaseKey, rows, warmup: wait };
 }
 
 /**
- * Scores candidates in falling co order, fetching owner counts a chunk at a time, and stops
- * once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
+ * Scores candidates in falling co order, fetching owner counts and weighing votes a chunk at a
+ * time, and stops once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
  * candidates whose own twin share still lets them in are looked up.
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: CoOwned[],
+  supporters: readonly SupporterList[],
   basis: Basis,
   boosts: ReadonlyMap<number, TwinBoost>,
 ): Promise<Scored[]> {
@@ -83,12 +97,16 @@ async function scoreTop(
     const chunk = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co, boostOf(c.id).share));
-    const owners = await getOwnerCounts(
-      db,
-      chunk.map((c) => c.id),
-    );
+    const ids = chunk.map((c) => c.id);
+    const owners = await getOwnerCounts(db, ids);
+    const votes = coOwnerVotes(ids, supporters);
     const scored = chunk.map((c) =>
-      scoreCoOwned(c, owners.get(c.id) ?? c.co, basis, boostOf(c.id)),
+      scoreCoOwned(
+        { ...c, votes: votes.get(c.id) ?? c.co },
+        owners.get(c.id) ?? c.co,
+        basis,
+        boostOf(c.id),
+      ),
     );
     top = rankScored([...top, ...scored], ALSO_BOUGHT_LIMIT);
   }

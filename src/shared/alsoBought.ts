@@ -24,7 +24,20 @@ export interface AlsoBoughtRow {
   ownedTracks: number;
 }
 
+/** How far the wait for trustworthy co-owned rows has got (decisions §12). */
+export interface AlsoBoughtWarmup {
+  /** Supporters read, up to `readTarget`. */
+  read: number;
+  readTarget: number;
+  /** Rows passing the confidence bar, up to `confidentTarget`. */
+  confident: number;
+  confidentTarget: number;
+}
+
 export interface AlsoBoughtResult {
   releaseKey: ItemKey;
+  /** During the warm-up, only same-artist and same-label picks. */
   rows: AlsoBoughtRow[];
+  /** Null once co-owned rows show. */
+  warmup: AlsoBoughtWarmup | null;
 }

@@ -7,6 +7,7 @@ import {
   hideRelease,
   putOwnership,
   replaceTwins,
+  saveReleaseSupporters,
   upsertCollectionItems,
   upsertSupporterFans,
   type FanStatus,
@@ -107,18 +108,28 @@ async function seedBigRelease() {
   await putOwnership(db, ME, [item('a600')], 'wishlist');
   await hideRelease(db, 'a700', 0);
 
-  // A private fan and a queued one own the release but tell us nothing more.
+  // A private fan and a queued one own the release but tell us nothing more. Fan 41 turned
+  // up elsewhere, so the listed supporters are all scanned and the warm-up is over.
   await fans([40], [item('a100'), item('a300')], 'private');
   await fans([41], [item('a100'), item('a300')], 'queued');
+  await listSupporters('a100', [...range(10, 19), 40]);
+}
+
+/** The release's supporter list, as its release job saves it. */
+async function listSupporters(releaseKey: ItemKey, ids: number[]) {
+  await saveReleaseSupporters(db, releaseKey, ids, 0);
 }
 
 describe('computeAlsoBought', () => {
   it('ranks by co-ownership and lift, folding tracks into albums', async () => {
     await seedBigRelease();
 
-    // Population: fans 10–41 = 32, you left out. Scores: a300 5·ln(1+2.3) ≈ 5.9 (fans 40 and
-    // 41 own it too), a400 4·ln(1+3.2) ≈ 5.7, a200 8·ln(1+0.91) ≈ 5.2, a900 3·ln(1+2.4) ≈ 3.7.
-    expect(await ranking('a100')).toEqual(['a300', 'a400', 'a200', 'a900']);
+    // Population: fans 10–41 = 32, you left out. N = 10, so shares are Wilson lower bounds:
+    // a300 5 of 10 → 0.27, lift 1.23 (fans 40 and 41 own it too), score 5·ln(2.23) ≈ 4.0;
+    // a200 8 of 10 → 0.54, lift 0.62, ≈ 3.85; a400 4 of 10 → 0.19, lift 1.55, ≈ 3.75;
+    // a900 3 of 10 → 0.13, lift 1.0, ≈ 2.1. The staple's 8 owners now count for more than
+    // a400's 4: more evidence, so less shrinkage.
+    expect(await ranking('a100')).toEqual(['a300', 'a200', 'a400', 'a900']);
   });
 
   it('explains each row and tags albums you own tracks of', async () => {
@@ -141,6 +152,7 @@ describe('computeAlsoBought', () => {
 
   it('shows a track when only tracks of the album are known', async () => {
     await fans(range(10, 12), [item('a100'), track('t401', 'a400')]);
+    await listSupporters('a100', range(10, 12));
 
     const [row] = (await computeAlsoBought(db, 'a100', ME)).rows;
 
@@ -150,6 +162,7 @@ describe('computeAlsoBought', () => {
   it('scores a track page against its album', async () => {
     await seedBigRelease();
     await upsertCollectionItems(db, [track('t101', 'a100')], 0);
+    await listSupporters('t101', [...range(10, 19), 40]);
 
     expect(await ranking('t101')).toEqual(await ranking('a100'));
   });
@@ -158,7 +171,7 @@ describe('computeAlsoBought', () => {
     await seedBigRelease();
 
     // Hidden still applies. a500 ranks below a600: your copy makes it one owner more common.
-    expect(await ranking('a100', null)).toEqual(['a300', 'a400', 'a200', 'a600', 'a500', 'a900']);
+    expect(await ranking('a100', null)).toEqual(['a300', 'a200', 'a400', 'a600', 'a500', 'a900']);
   });
 
   it('boosts releases your twins among the supporters own', async () => {
@@ -204,8 +217,8 @@ describe('computeAlsoBought', () => {
       [],
     );
 
-    // a200 (fan 17, share 0.5): 5.2 × 1.25 ≈ 6.5 jumps from third to first, past a300's 5.9.
-    // a900 (fans 17 and 18, share 1): 3.7 × 1.5 ≈ 5.5, just short of a400's 5.7.
+    // a200 (fan 17, share 0.5): 3.85 × 1.25 ≈ 4.8 passes a300's 4.0.
+    // a900 (fans 17 and 18, share 1): 2.1 × 1.5 ≈ 3.15, still short of a400's 3.75.
     const { rows } = await computeAlsoBought(db, 'a100', ME);
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
       ['a200', { kind: 'co-owned', owners: 8, twins: 1 }],
@@ -215,10 +228,59 @@ describe('computeAlsoBought', () => {
     ]);
   });
 
-  it('returns nothing before any supporter is scanned', async () => {
+  it('has no co-owned rows before any supporter is scanned', async () => {
     await fans(range(10, 19), [item('a100'), item('a200')], 'queued');
+    await listSupporters('a100', range(10, 19));
 
-    expect(await ranking('a100')).toEqual([]);
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    expect(rows.filter((row) => row.reason.kind === 'co-owned')).toEqual([]);
+    expect(warmup).toEqual({ read: 0, readTarget: 10, confident: 0, confidentTarget: 5 });
+  });
+
+  it('weighs omnivores down by collection size', async () => {
+    await fans(range(10, 15), [item('a100')]);
+    await fans(range(10, 12), [item('a200')]);
+    await fans(range(13, 15), [item('a300')]);
+    await listSupporters('a100', range(10, 15));
+    // Fans 13–15 have 2,000 items each: their shared a300 is likelier chance.
+    await db.fans.where('fanId').between(13, 15, true, true).modify({ collectionSize: 2000 });
+
+    expect(await ranking('a100')).toEqual(['a200', 'a300']);
+  });
+});
+
+describe('warm-up', () => {
+  const other = { artist: 'Other', bandId: 2 };
+  const release = item('a100', { artist: 'Solo', bandId: 5 });
+
+  /** 30 listed supporters; `read` of them scanned, all owning a200 and 6 rare releases. */
+  async function seed(read: number) {
+    await upsertCollectionItems(db, [release, item('a101', { artist: 'Solo', bandId: 5 })], 0);
+    const rare = range(300, 305).map((n) => item(`a${n}`, other));
+    await fans(range(10, 9 + read), [release, item('a200', other), ...rare]);
+    await fans(range(10 + read, 39), [release], 'queued');
+    await listSupporters('a100', range(10, 39));
+    // A big population makes the rare releases stand out.
+    await fans(range(100, 299), [item('a999', other)]);
+  }
+
+  it('holds co-owned rows back until 20 supporters are read, showing the same artist meanwhile', async () => {
+    await seed(12);
+
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    expect(warmup).toEqual({ read: 12, readTarget: 20, confident: 5, confidentTarget: 5 });
+    expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
+      ['a101', { kind: 'same-artist' }],
+    ]);
+  });
+
+  it('shows co-owned rows once enough supporters are read and enough rows stand out', async () => {
+    await seed(20);
+
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    expect(warmup).toBeNull();
+    expect(rows.every((row) => row.reason.kind === 'co-owned')).toBe(true);
+    expect(rows.map((row) => row.matchKey)).toContain('a300');
   });
 });
 
@@ -241,6 +303,7 @@ describe('small-release fallback', () => {
       0,
     );
     await fans([10, 11], [release, item('a2000')]);
+    await listSupporters('a1000', [10, 11]);
     await putOwnership(db, ME, [item('a1005', solo)], 'collection');
     await hideRelease(db, 'a1006', 0);
   }
@@ -261,6 +324,7 @@ describe('small-release fallback', () => {
   it('leaves big releases alone', async () => {
     await seedSmallRelease();
     await fans(range(12, 17), [release]);
+    await listSupporters('a1000', range(10, 17));
 
     expect(await ranking('a1000')).toEqual(['a2000']);
   });
