@@ -12,6 +12,7 @@ export { ExternalIcon, HideIcon, PauseIcon, PlayIcon, QueueIcon, StopIcon } from
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';
+export { PlayableCover, type PlayableCoverProps } from './PlayableCover';
 export { PortalContainerProvider, usePortalContainer } from './portal';
 export { Progress, type ProgressProps } from './Progress';
 export { ReleaseRow, type ReleaseRowProps, type ReleaseRowRelease } from './ReleaseRow';
@@ -27,3 +28,4 @@ export { TagPicker, type TagPickerProps } from './TagPicker';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { Toggle, type ToggleProps } from './Toggle';
 export { Tooltip, type TooltipProps } from './Tooltip';
+export { TruncatedText, type TruncatedTextProps } from './TruncatedText';

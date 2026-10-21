@@ -1,5 +1,5 @@
 // Taste twins: fans whose collections overlap most with yours, weighted towards rare releases.
-// Pure: lists are sorted match ids (keyToNumber), as stored in `fanMatches` (decisions §6).
+// Pure: lists are sorted ids (keyToNumber), as stored in `fanMatches` (decisions §6).
 
 import {
   boughtSince,
@@ -21,20 +21,30 @@ export const LABEL_CLUSTER_CATALOG_SHARE = 0.6;
  */
 export const LABEL_CLUSTER_MIN_SHARED = 3;
 
-export interface Candidate {
-  fanId: number;
+/** One collection's lists, as a `fanMatches` record holds them. */
+export interface CollectionLists {
   matchIds: Float64Array;
-  /** Purchase time of each of `matchIds`, 0 when unknown. */
+  /** Tracks owned that belong to an album. */
+  trackIds: Float64Array;
+  /** matchIds held only through tracks, not the album itself. */
+  partialIds: Float64Array;
+  /** Newest purchase time under each of `matchIds`, 0 when unknown. */
   matchTimes: Float64Array;
+}
+
+export interface Candidate extends CollectionLists {
+  fanId: number;
   /** Their collection size as far as we know it, for the size filter. */
   size: number;
 }
 
+export interface MyCollection extends CollectionLists {
+  /** The album match id of each of your trackIds. */
+  albumOfTrack: ReadonlyMap<number, number>;
+}
+
 export interface TwinInput {
-  /** Your collection, sorted. */
-  mine: Float64Array;
-  /** Purchase time of each of `mine`, 0 when unknown. */
-  mineTimes: Float64Array;
+  mine: MyCollection;
   /** w(i) for each of your match ids. Overlap only ever touches yours. */
   weights: ReadonlyMap<number, number>;
   /** Label of a match id: label_id, else the selling account (decisions §3.3). */
@@ -61,7 +71,7 @@ export interface Twin {
   latelyOverlap: number;
 }
 
-/** Where the ids both sorted lists hold sit in each. Linear merge of two sorted lists. */
+/** Where the ids both sorted lists hold sit in each. Same merge as `intersect`. */
 export function sharedPositions(mine: Float64Array, theirs: Float64Array): SharedPosition[] {
   const shared: SharedPosition[] = [];
   let i = 0;
@@ -79,9 +89,46 @@ export function sharedPositions(mine: Float64Array, theirs: Float64Array): Share
   return shared;
 }
 
-/** Your match ids that the fan's sorted list also holds. */
+/** Your match ids that the fan's sorted list also holds. Linear merge of two sorted lists. */
 export function intersect(mine: Float64Array, theirs: Float64Array): number[] {
-  return sharedPositions(mine, theirs).map((at) => mine[at.mine] as number);
+  const shared: number[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < mine.length && j < theirs.length) {
+    const a = mine[i] as number;
+    const b = theirs[j] as number;
+    if (a === b) {
+      shared.push(a);
+      i++;
+      j++;
+    } else if (a < b) i++;
+    else j++;
+  }
+  return shared;
+}
+
+/**
+ * Where each release you and a fan share sits in your and their `matchIds`. An exact item
+ * matches, and so does an album against one of its tracks, but two different tracks of one album
+ * don't (decisions §7).
+ */
+export function sharedReleasePositions(
+  mine: MyCollection,
+  theirs: CollectionLists,
+): SharedPosition[] {
+  const tracksOnly = new Set(intersect(mine.partialIds, theirs.partialIds));
+  for (const track of intersect(mine.trackIds, theirs.trackIds)) {
+    const album = mine.albumOfTrack.get(track);
+    if (album !== undefined) tracksOnly.delete(album);
+  }
+  const shared = sharedPositions(mine.matchIds, theirs.matchIds);
+  if (tracksOnly.size === 0) return shared;
+  return shared.filter((at) => !tracksOnly.has(mine.matchIds[at.mine] as number));
+}
+
+/** The match ids of the releases you and a fan share (`sharedReleasePositions`). */
+export function sharedReleases(mine: MyCollection, theirs: CollectionLists): number[] {
+  return sharedReleasePositions(mine, theirs).map((at) => mine.matchIds[at.mine] as number);
 }
 
 /**
@@ -116,14 +163,15 @@ export function isLabelCluster(
 
 /** Scores one fan against you, or null if they're filtered out or share nothing. */
 export function scoreTwin(candidate: Candidate, input: TwinInput): Twin | null {
-  const { mine, weights } = input;
+  const { weights } = input;
+  const mine = input.mine.matchIds;
   const theirs = candidate.matchIds;
   if (candidate.size < input.minCollectionSize || candidate.size > input.maxCollectionSize) {
     return null;
   }
   if (mine.length === 0 || theirs.length === 0) return null;
 
-  const positions = sharedPositions(mine, theirs);
+  const positions = sharedReleasePositions(input.mine, candidate);
   if (positions.length === 0) return null;
   const shared = positions.map((at) => mine[at.mine] as number);
 
@@ -132,7 +180,14 @@ export function scoreTwin(candidate: Candidate, input: TwinInput): Twin | null {
   const labelCluster = isLabelCluster(shared, theirs, input.labelOf, input.catalogSize);
   const factor = labelCluster && input.labelClusterDownweight ? LABEL_CLUSTER_FACTOR : 1;
   const latelyAt = (when: LatelyInput['now']) => {
-    const score = latelyScore(positions, input.mineTimes, candidate, weights, when, input.lately);
+    const score = latelyScore(
+      positions,
+      input.mine.matchTimes,
+      candidate,
+      weights,
+      when,
+      input.lately,
+    );
     return score === null ? null : score * factor;
   };
 
@@ -146,7 +201,7 @@ export function scoreTwin(candidate: Candidate, input: TwinInput): Twin | null {
     yearAgo: latelyAt(input.lately.yearAgo),
     latelyOverlap: boughtSince(
       positions,
-      input.mineTimes,
+      input.mine.matchTimes,
       candidate.matchTimes,
       input.lately.now.at - TREND_LOOKBACK_MS,
     ),

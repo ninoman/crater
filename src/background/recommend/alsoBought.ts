@@ -58,9 +58,7 @@ export async function computeAlsoBought(
   const label = data.album?.label ?? data.release?.label ?? null;
   const rows = picks.flatMap((pick) => {
     const item = items.get(pick.matchKey);
-    return item
-      ? [toRow(pick, item, reasonFor(pick, basis.supporters, item.label ?? label), mine)]
-      : [];
+    return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label), mine)] : [];
   });
   return { releaseKey, rows };
 }
@@ -119,14 +117,10 @@ async function fallbackFor(
   );
 }
 
-function reasonFor(
-  pick: AlsoBoughtPick,
-  scannedSupporters: number,
-  label: string | null,
-): AlsoBoughtReason {
+function reasonFor(pick: AlsoBoughtPick, label: string | null): AlsoBoughtReason {
   switch (pick.kind) {
     case 'co-owned':
-      return { kind: 'co-owned', owners: pick.co, of: scannedSupporters, twins: pick.twins };
+      return { kind: 'co-owned', owners: pick.co, twins: pick.twins };
     case 'same-artist':
       return { kind: 'same-artist' };
     case 'same-label':

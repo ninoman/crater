@@ -199,7 +199,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 
 Design: decisions §11.
 
-1. [x] Purchase times in the match index (schema v6), and restoring v5 backups.
+1. [x] Purchase times in the match index (schema v7), and restoring v5 and v6 backups.
 2. [x] `scoring/lately.ts`: time-faded overlap, a co-timing bonus, and the trend against a year ago.
 3. [x] A second leaderboard (`latelyTwins`) from the same recompute pass.
 4. [x] Twins tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.

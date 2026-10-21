@@ -10,8 +10,7 @@ import {
   type BackupMeta,
   type BackupSummary,
 } from '../shared/backupFile';
-import { rebuildMatchIndex } from './repo/matchIndex';
-import { blankLately, TABLES_ADDED, type DigheadDb } from './schema';
+import { blankLately, type DigheadDb, rebuildFanMatchLists, TABLES_ADDED } from './schema';
 
 /** The library reads blob slices with FileReader, which service workers don't have. */
 function ensureFileReader(): void {
@@ -67,8 +66,19 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 }
 
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
-// Versions are checked by assertRestorableVersion instead, which lets older backups through.
+// The version is checked by assertRestorableVersion, and older rows migrated after writing.
 const READ_ONLY = { acceptNameDiff: true, acceptVersionDiff: true, noTransaction: true } as const;
+
+/** Brings rows written by an older schema up to this one, as its Dexie upgrades would have. */
+async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
+  // v6 added track lists and v7 purchase times to fanMatches: one rebuild covers both.
+  if (fromVersion < 7) {
+    await db.transaction('rw', [db.fanMatches, db.ownership], () =>
+      rebuildFanMatchLists(db.fanMatches, db.ownership),
+    );
+    await db.twins.toCollection().modify(blankLately);
+  }
+}
 
 /** Where the safety copy of the current data waits while an import runs. */
 export interface SnapshotStore {
@@ -127,7 +137,7 @@ export async function importDatabase(
   await onPhase('writing');
   try {
     await replaceAll(db, file);
-    await upgradeRestored(db, fileVersion);
+    await migrateRows(db, fileVersion);
   } catch (error) {
     try {
       await replaceAll(db, await snapshot.load());
@@ -146,14 +156,6 @@ export async function importDatabase(
   await snapshot.discard().catch(() => undefined);
   await onPhase(null);
   return summarizeBackup(meta);
-}
-
-/** Does to rows restored from an older backup what the version upgrades in schema.ts do. */
-async function upgradeRestored(db: DigheadDb, fileVersion: number): Promise<void> {
-  if (fileVersion < 6) {
-    await rebuildMatchIndex(db);
-    await db.twins.toCollection().modify(blankLately);
-  }
 }
 
 function reason(error: unknown): string {

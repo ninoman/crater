@@ -9,24 +9,33 @@ import {
   LABEL_CLUSTER_FACTOR,
   scoreTwin,
   sharedPositions,
+  sharedReleases,
   type Candidate,
+  type MyCollection,
   type Twin,
   type TwinInput,
 } from './twins';
 
 const ids = (...values: number[]) => Float64Array.from(values).sort();
+const NONE = ids();
 
 // You own 1–10. Releases 1–5 are rare (w = 1), 6–10 are hits (w = 0.1).
 // Label 100 is releases 1–4 plus 20–22 (a 7-release catalog), label 200 is everything else.
-const mine = ids(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-const weights = new Map([...mine].map((id) => [id, id <= 5 ? 1 : 0.1]));
+const mine: MyCollection = {
+  matchIds: ids(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+  trackIds: NONE,
+  partialIds: NONE,
+  // Undated unless a test says otherwise, so lately stays out of the all-time tests.
+  matchTimes: new Float64Array(10),
+  albumOfTrack: new Map(),
+};
+const weights = new Map([...mine.matchIds].map((id) => [id, id <= 5 ? 1 : 0.1]));
 const labelOf = new Map<number, number>();
 for (let id = 1; id <= 40; id++) labelOf.set(id, id <= 4 || (id >= 20 && id <= 22) ? 100 : 200);
 const catalogSize = new Map([
   [100, 7],
   [200, 33],
 ]);
-// Undated unless a test says otherwise, so lately stays out of the all-time tests.
 const NOW = 100 * TREND_LOOKBACK_MS;
 const HALF_LIFE = 6 * MONTH_MS;
 const lately = (mineTimes: Float64Array): TwinInput['lately'] => ({
@@ -35,11 +44,9 @@ const lately = (mineTimes: Float64Array): TwinInput['lately'] => ({
   now: moment(NOW, mineTimes, HALF_LIFE),
   yearAgo: moment(NOW - TREND_LOOKBACK_MS, mineTimes, HALF_LIFE),
 });
-const undated = new Float64Array(mine.length);
 const input: TwinInput = {
   mine,
-  mineTimes: undated,
-  lately: lately(undated),
+  lately: lately(mine.matchTimes),
   weights,
   labelOf,
   catalogSize,
@@ -50,6 +57,8 @@ const input: TwinInput = {
 const fan = (fanId: number, ...values: number[]): Candidate => ({
   fanId,
   matchIds: ids(...values),
+  trackIds: NONE,
+  partialIds: NONE,
   matchTimes: new Float64Array(values.length),
   size: values.length,
 });
@@ -74,7 +83,51 @@ describe('intersect', () => {
   });
 });
 
+describe('sharedReleases', () => {
+  // Albums are positive ids, tracks negative (keyToNumber). Album 1 has tracks -11 and -12.
+  // You own album 2 whole, and only track -11 of album 1.
+  const you: MyCollection = {
+    matchIds: ids(1, 2, 3),
+    trackIds: ids(-11),
+    partialIds: ids(1),
+    matchTimes: new Float64Array(3),
+    albumOfTrack: new Map([[-11, 1]]),
+  };
+  const them = (matchIds: number[], trackIds: number[], partialIds: number[]) => ({
+    matchIds: ids(...matchIds),
+    trackIds: ids(...trackIds),
+    partialIds: ids(...partialIds),
+    matchTimes: new Float64Array(matchIds.length),
+  });
+
+  it('matches exact items, and an album against one of its tracks', () => {
+    expect(sharedReleases(you, them([1, 2], [], []))).toEqual([1, 2]);
+    expect(sharedReleases(you, them([1, 2], [-21], [2]))).toEqual([1, 2]);
+    expect(sharedReleases(you, them([1], [-11], [1]))).toEqual([1]);
+  });
+
+  it('does not match different tracks of the same album', () => {
+    expect(sharedReleases(you, them([1, 3], [-12], [1]))).toEqual([3]);
+  });
+
+  it('matches when one shared track is among several', () => {
+    expect(sharedReleases(you, them([1], [-11, -12], [1]))).toEqual([1]);
+  });
+});
+
 describe('scoreTwin', () => {
+  it('scores only the releases sharedReleases keeps', () => {
+    const you = {
+      ...mine,
+      trackIds: ids(-11),
+      partialIds: ids(1),
+      albumOfTrack: new Map([[-11, 1]]),
+    };
+    const other = { ...fan(1, 1, 5, 30), trackIds: ids(-12), partialIds: ids(1) };
+
+    expect(scoreTwin(other, { ...input, mine: you })).toMatchObject({ overlap: 1 });
+  });
+
   it('computes overlap, Jaccard and the normalised weighted score', () => {
     const twin = scoreTwin(fan(1, 5, 6, 30, 31), input);
 
@@ -160,14 +213,18 @@ describe('compareTwins', () => {
 describe('lately in scoreTwin', () => {
   const MONTH = MONTH_MS;
   // You bought 1–5 this past month and 6–10 four years ago.
-  const mineTimes = Float64Array.from([...mine].map((id) => NOW - (id <= 5 ? 1 : 48) * MONTH));
-  const dated: TwinInput = { ...input, mineTimes, lately: lately(mineTimes) };
+  const matchTimes = Float64Array.from(
+    [...mine.matchIds].map((id) => NOW - (id <= 5 ? 1 : 48) * MONTH),
+  );
+  const dated: TwinInput = { ...input, mine: { ...mine, matchTimes }, lately: lately(matchTimes) };
   /** A fan who bought each [id, months ago]. */
   const datedFan = (fanId: number, ...bought: [id: number, monthsAgo: number][]): Candidate => {
     const sorted = [...bought].sort((a, b) => a[0] - b[0]);
     return {
       fanId,
       matchIds: Float64Array.from(sorted.map(([id]) => id)),
+      trackIds: NONE,
+      partialIds: NONE,
       matchTimes: Float64Array.from(sorted.map(([, ago]) => NOW - ago * MONTH)),
       size: sorted.length,
     };
@@ -180,7 +237,9 @@ describe('lately in scoreTwin', () => {
 
   it('ranks a fan in step with you now above an old twin with more in common', () => {
     // Old twin: all ten releases in common, all bought four years ago.
-    const old = scoredDated(datedFan(1, ...[...mine].map((id): [number, number] => [id, 48])));
+    const old = scoredDated(
+      datedFan(1, ...[...mine.matchIds].map((id): [number, number] => [id, 48])),
+    );
     // Now: two of your new rare releases, bought this month too, among other recent buys.
     const now = scoredDated(datedFan(2, [1, 1], [2, 1], [30, 1], [31, 2], [32, 3]));
 

@@ -30,8 +30,10 @@ async function seed(target: DigheadDb): Promise<void> {
   });
   await target.fanMatches.put({
     fanId: 1,
-    matchIds: new Float64Array([1, 2, 3]),
-    matchTimes: new Float64Array([0, 5, 9]),
+    matchIds: new Float64Array([1]),
+    trackIds: new Float64Array(),
+    partialIds: new Float64Array(),
+    matchTimes: new Float64Array([0]),
   });
   await target.me.put({ id: 'self', fanId: 1, username: 'a', syncedAt: 5 });
   await target.tags.put({ id: 7, name: 'Ambient', nameKey: 'ambient' });
@@ -111,6 +113,74 @@ describe('import phases', () => {
   });
 });
 
+describe('older backups', () => {
+  it('imports a v5 file and rebuilds its fanMatches track lists', async () => {
+    await seed(db);
+    await db.ownership.put({
+      fanId: 1,
+      itemKey: 't4',
+      matchKey: 'a3',
+      source: 'collection',
+      addedAt: null,
+    });
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 5;
+    for (const table of json.data.data) {
+      if (table.tableName !== 'fanMatches') continue;
+      for (const row of table.rows) {
+        delete row.trackIds;
+        delete row.partialIds;
+        delete row.matchTimes;
+      }
+    }
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: new Float64Array([1, 3]),
+      trackIds: new Float64Array([-4]),
+      partialIds: new Float64Array([3]),
+      matchTimes: new Float64Array([0, 0]),
+    });
+  });
+
+  it('imports a v6 file without the lately table, adding purchase times', async () => {
+    await seed(db);
+    await db.ownership.put({
+      fanId: 1,
+      itemKey: 'a2',
+      matchKey: 'a2',
+      source: 'collection',
+      addedAt: 400,
+    });
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 6;
+    json.data.tables = json.data.tables.filter((t: { name: string }) => t.name !== 'latelyTwins');
+    json.data.data = json.data.data.filter(
+      (t: { tableName: string }) => t.tableName !== 'latelyTwins',
+    );
+    for (const table of json.data.data) {
+      if (table.tableName !== 'fanMatches') continue;
+      for (const row of table.rows) delete row.matchTimes;
+    }
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: Float64Array.from([1, 2]),
+      trackIds: new Float64Array(),
+      partialIds: new Float64Array(),
+      matchTimes: Float64Array.from([0, 400]),
+    });
+    expect(await db.tags.count()).toBe(1);
+  });
+});
+
 describe('refused files', () => {
   it('refuses a newer schema version and keeps the data', async () => {
     await seed(db);
@@ -123,35 +193,6 @@ describe('refused files', () => {
       importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase),
     ).rejects.toThrow('newer version');
     expect(await snapshot(db)).toEqual(before);
-  });
-
-  it('restores a v5 backup, rebuilding what v6 added', async () => {
-    await seed(db);
-    await db.ownership.put({
-      fanId: 1,
-      itemKey: 'a2',
-      matchKey: 'a2',
-      source: 'collection',
-      addedAt: 400,
-    });
-    const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
-    json.data.databaseVersion = 5;
-    json.data.tables = json.data.tables.filter((t: { name: string }) => t.name !== 'latelyTwins');
-    json.data.data = json.data.data.filter(
-      (t: { tableName: string }) => t.tableName !== 'latelyTwins',
-    );
-    await clearAllData(db);
-
-    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
-
-    // Rebuilt from ownership, so the seeded stand-in list is replaced by the real one.
-    expect(await db.fanMatches.get(1)).toEqual({
-      fanId: 1,
-      matchIds: Float64Array.from([1, 2]),
-      matchTimes: Float64Array.from([0, 400]),
-    });
-    expect(await db.tags.count()).toBe(1);
   });
 
   it('refuses a backup older than any build that made backups', async () => {

@@ -1,7 +1,7 @@
 // Reads what the twins scorer needs, as plain data, and stores the leaderboard it produces.
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
-import type { DigheadDb, ItemRecord, TwinRecord } from '../schema';
+import type { DigheadDb, FanMatchesRecord, ItemRecord, TwinRecord } from '../schema';
 import { collectionRead } from './fans';
 
 /** What rarity weighs a release by: Bandcamp's counts (album first) and the owners we've seen. */
@@ -10,11 +10,11 @@ export interface SupporterCounts {
   knownOwners: number;
 }
 
+type MatchLists = Omit<FanMatchesRecord, 'fanId'>;
+
 export interface TwinBasis {
-  /** Your collection as sorted match ids. */
-  mine: Float64Array;
-  /** When you bought each of `mine`, 0 when unknown. */
-  mineTimes: Float64Array;
+  /** Your collection's sorted lists, and the album of each track in them. */
+  mine: MatchLists & { albumOfTrack: Map<number, number> };
   counts: Map<number, SupporterCounts>;
   /** Label of every match id in the catalog of a label you own something from. */
   labelOf: Map<number, number>;
@@ -23,10 +23,8 @@ export interface TwinBasis {
 }
 
 /** A fan whose collection we've read, as the scorer takes it. */
-export interface TwinCandidate {
+export interface TwinCandidate extends MatchLists {
   fanId: number;
-  matchIds: Float64Array;
-  matchTimes: Float64Array;
   /** The full collection size once known, else what we've scanned. */
   size: number;
 }
@@ -35,6 +33,14 @@ export interface TwinCandidate {
 function labelKey(item: ItemRecord): number {
   return item.labelId ?? item.bandId;
 }
+
+const EMPTY = new Float64Array();
+const NO_LISTS: MatchLists = {
+  matchIds: EMPTY,
+  trackIds: EMPTY,
+  partialIds: EMPTY,
+  matchTimes: EMPTY,
+};
 
 function matchId(item: ItemRecord): number {
   return keyToNumber(item.albumKey ?? item.itemKey);
@@ -47,19 +53,24 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
       db.fanMatches.get(meFanId),
       db.ownership.where('fanId').equals(meFanId).toArray(),
     ]);
-    const mine = list?.matchIds ?? new Float64Array();
-    const mineTimes = list?.matchTimes ?? new Float64Array();
+    const lists = list ?? NO_LISTS;
     const owned = rows.filter((row) => row.source === 'collection');
+    const albumOfTrack = new Map<number, number>();
+    for (const row of owned) {
+      if (row.itemKey !== row.matchKey) {
+        albumOfTrack.set(keyToNumber(row.itemKey), keyToNumber(row.matchKey));
+      }
+    }
     const keys = [...new Set(owned.flatMap((row) => [row.matchKey, row.itemKey]))];
     const [items, owners] = await Promise.all([
       db.items.bulkGet(keys),
-      db.matchOwners.bulkGet([...mine]),
+      db.matchOwners.bulkGet([...lists.matchIds]),
     ]);
     const byKey = new Map<ItemKey, ItemRecord>();
     for (const item of items) if (item) byKey.set(item.itemKey, item);
 
     const counts = new Map<number, SupporterCounts>();
-    mine.forEach((id, i) => {
+    lists.matchIds.forEach((id, i) => {
       counts.set(id, { bandcampCounts: [], knownOwners: owners[i]?.owners ?? 0 });
     });
     const labels = new Set<number>();
@@ -75,7 +86,14 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
     }
 
     const { labelOf, catalogSize } = await labelCatalogs(db, labels);
-    return { mine, mineTimes, counts, labelOf, catalogSize };
+    const mine = {
+      matchIds: lists.matchIds,
+      trackIds: lists.trackIds,
+      partialIds: lists.partialIds,
+      matchTimes: lists.matchTimes,
+      albumOfTrack,
+    };
+    return { mine, counts, labelOf, catalogSize };
   });
 }
 
@@ -120,6 +138,8 @@ export async function readTwinCandidates(
       candidates.push({
         fanId: fan.fanId,
         matchIds: list.matchIds,
+        trackIds: list.trackIds,
+        partialIds: list.partialIds,
         matchTimes: list.matchTimes,
         size: fan.collectionSize ?? fan.scannedItems,
       });

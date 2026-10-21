@@ -1,27 +1,37 @@
-// The match index: each fan's distinct collection matchKeys with when they bought them and, per
-// matchKey, how many fans hold it. Derived from `ownership`; these pure helpers compute it, repo/matchIndex.ts stores it.
+// The match index: each fan's distinct collection matchKeys (plus the album tracks behind them
+// and when they bought each) and, per matchKey, how many fans hold it. Derived from `ownership`; these pure helpers compute it, repo/matchIndex.ts stores it.
 // Keys are stored as numbers (keyToNumber): reading and counting them is about twice as fast.
 
 import { keyToNumber } from '../bandcamp';
 import type { FanMatchesRecord, MatchOwnersRecord, OwnershipRecord } from './schema';
 
-export type FanMatches = Pick<FanMatchesRecord, 'matchIds' | 'matchTimes'>;
+const sorted = (ids: Set<number>) => Float64Array.from(ids).sort();
 
 /**
- * What a fan owns, as sorted match ids, with the newest purchase under each (0 when no row is
- * dated). Newest, because buying more of a release lately says it's on their mind now.
- * Wishlists don't count as owning.
+ * What a fan owns, as sorted lists. Wishlists don't count as owning. `matchTimes` holds the
+ * newest purchase under each matchId (0 when no row is dated): buying more of a release lately
+ * says it's on their mind now.
  */
-export function collectionMatches(rows: Iterable<OwnershipRecord>): FanMatches {
+export function fanMatchLists(rows: Iterable<OwnershipRecord>): Omit<FanMatchesRecord, 'fanId'> {
   const newest = new Map<number, number>();
+  const wholes = new Set<number>();
+  const tracks = new Set<number>();
   for (const row of rows) {
     if (row.source !== 'collection') continue;
     const id = keyToNumber(row.matchKey);
     newest.set(id, Math.max(newest.get(id) ?? 0, row.addedAt ?? 0));
+    if (row.itemKey === row.matchKey) wholes.add(id);
+    else tracks.add(keyToNumber(row.itemKey));
   }
-  const matchIds = Float64Array.from(newest.keys()).sort();
-  const matchTimes = matchIds.map((id) => newest.get(id) ?? 0);
-  return { matchIds, matchTimes };
+  const partials = new Set<number>();
+  for (const id of newest.keys()) if (!wholes.has(id)) partials.add(id);
+  const matchIds = sorted(new Set(newest.keys()));
+  return {
+    matchIds,
+    trackIds: sorted(tracks),
+    partialIds: sorted(partials),
+    matchTimes: matchIds.map((id) => newest.get(id) ?? 0),
+  };
 }
 
 /** Adds the owner-count changes of one fan's sorted list going from `before` to `after`. */
@@ -63,10 +73,10 @@ export function buildMatchIndex(rows: Iterable<OwnershipRecord>): {
   const fanMatches: FanMatchesRecord[] = [];
   const owners = new Map<number, number>();
   for (const [fanId, fanRows] of byFan) {
-    const matches = collectionMatches(fanRows);
-    if (matches.matchIds.length === 0) continue;
-    fanMatches.push({ fanId, ...matches });
-    for (const id of matches.matchIds) owners.set(id, (owners.get(id) ?? 0) + 1);
+    const lists = fanMatchLists(fanRows);
+    if (lists.matchIds.length === 0) continue;
+    fanMatches.push({ fanId, ...lists });
+    for (const id of lists.matchIds) owners.set(id, (owners.get(id) ?? 0) + 1);
   }
   return {
     fanMatches,

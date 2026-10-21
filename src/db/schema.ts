@@ -2,7 +2,7 @@
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
 import type { ItemKey } from '../bandcamp';
-import { buildMatchIndex } from './matchIndex';
+import { buildMatchIndex, fanMatchLists } from './matchIndex';
 
 export interface ItemRecord {
   itemKey: ItemKey;
@@ -50,12 +50,19 @@ export interface OwnershipRecord {
 
 /**
  * A fan's distinct collection matchKeys, kept in step with their `ownership` rows. Scoring reads
- * these compact lists instead of every ownership row (decisions §6).
+ * these compact lists instead of every ownership row (decisions §6). All lists hold keys as
+ * numbers (keyToNumber), sorted ascending.
  */
 export interface FanMatchesRecord {
   fanId: number;
-  /** matchKeys as numbers (keyToNumber), sorted ascending. */
   matchIds: Float64Array;
+  /**
+   * Tracks they own that belong to an album. Twin overlap needs them: two fans holding only
+   * different tracks of one album don't match (decisions §7).
+   */
+  trackIds: Float64Array;
+  /** The matchIds they hold only through tracks, not the album itself. */
+  partialIds: Float64Array;
   /** Newest purchase time (ms) under each of `matchIds`, in the same order. 0 when unknown. */
   matchTimes: Float64Array;
 }
@@ -173,7 +180,7 @@ export interface TagRecord {
   nameKey: string;
 }
 
-/** Blanks the v6 fields on a twin stored before them, until the next recompute fills them. */
+/** Blanks the v7 fields on a twin stored before them, until the next recompute fills them. */
 export function blankLately(twin: TwinRecord): void {
   twin.lately ??= null;
   twin.yearAgo ??= null;
@@ -181,7 +188,7 @@ export function blankLately(twin: TwinRecord): void {
 }
 
 /** Tables newer than the oldest restorable backup, by the version that added them. */
-export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 6 };
+export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 7 };
 
 export class DigheadDb extends Dexie {
   items!: EntityTable<ItemRecord, 'itemKey'>;
@@ -253,15 +260,33 @@ export class DigheadDb extends Dexie {
       following: '[kind+id], kind, *tagIds',
       tags: '++id, &nameKey',
     });
-    // v6: purchase times in the match index and a second leaderboard for recent taste (§11).
-    // Restoring a v5 backup does the same (backup.ts), so keep the two in step.
+    // v6: track lists on fanMatches, so twin overlap can tell tracks of one album apart (§7).
     this.version(6)
+      .stores({})
+      .upgrade((tx) => rebuildFanMatchLists(tx.table('fanMatches'), tx.table('ownership')));
+    // v7: purchase times on fanMatches and a second leaderboard for recent taste (§11).
+    // Importing an older backup does the same (migrateRows in backup.ts).
+    this.version(7)
       .stores({ latelyTwins: 'fanId, lately' })
       .upgrade(async (tx) => {
-        const index = buildMatchIndex(await tx.table<OwnershipRecord>('ownership').toArray());
-        await tx.table('fanMatches').clear();
-        await tx.table('fanMatches').bulkPut(index.fanMatches);
+        await rebuildFanMatchLists(tx.table('fanMatches'), tx.table('ownership'));
         await tx.table<TwinRecord>('twins').toCollection().modify(blankLately);
       });
+  }
+}
+
+/**
+ * Recomputes every stored fanMatches record from its fan's ownership rows. Owner counts don't
+ * change, since matchIds come out the same. Used by the v6 and v7 upgrades and by importing an
+ * older backup.
+ */
+export async function rebuildFanMatchLists(
+  fanMatches: EntityTable<FanMatchesRecord, 'fanId'>,
+  ownership: Table<OwnershipRecord, [number, ItemKey]>,
+): Promise<void> {
+  const fanIds = await fanMatches.toCollection().primaryKeys();
+  for (const fanId of fanIds) {
+    const rows = await ownership.where('fanId').equals(fanId).toArray();
+    await fanMatches.put({ fanId, ...fanMatchLists(rows) });
   }
 }

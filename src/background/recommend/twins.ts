@@ -44,7 +44,6 @@ export async function computeTwins(deps: TwinsDeps, meFanId: number): Promise<Tw
   const halfLifeMs = settings.latelyHalfLifeMonths * MONTH_MS;
   const input: TwinInput = {
     mine: basis.mine,
-    mineTimes: basis.mineTimes,
     weights,
     labelOf: basis.labelOf,
     catalogSize: basis.catalogSize,
@@ -54,14 +53,14 @@ export async function computeTwins(deps: TwinsDeps, meFanId: number): Promise<Tw
     lately: {
       halfLifeMs,
       minPurchases: settings.latelyMinPurchases,
-      now: moment(now, basis.mineTimes, halfLifeMs),
-      yearAgo: moment(now - TREND_LOOKBACK_MS, basis.mineTimes, halfLifeMs),
+      now: moment(now, basis.mine.matchTimes, halfLifeMs),
+      yearAgo: moment(now - TREND_LOOKBACK_MS, basis.mine.matchTimes, halfLifeMs),
     },
   };
 
   let best: Twin[] = [];
   let bestLately: Twin[] = [];
-  for (let after: number | null = -Infinity; after !== null && basis.mine.length > 0; ) {
+  for (let after: number | null = -Infinity; after !== null && basis.mine.matchIds.length > 0; ) {
     const page = await readTwinCandidates(db, after, PAGE, meFanId);
     for (const candidate of page.candidates) {
       const twin = scoreTwin(candidate, input);

@@ -22,17 +22,19 @@ const STYLE_ID = 'dighead-following';
 /**
  * Bandcamp's list and "view all" go while ours is up, so its paging never runs. Bandcamp's CSS
  * may give cards a display, so `hidden` needs the push. An unfollowed card is dimmed; its
- * button then reads "Follow". Bandcamp's paging can still append a page of its own cards to the
- * first `ol.followeer-grid` it finds, which is ours; those stay hidden.
+ * button then reads "Follow". The avatar is the containing block for our select box. Bandcamp's
+ * paging can still append a page of its own cards to the first `ol.followeer-grid` it finds,
+ * which is ours; those stay hidden.
  */
 function pageCss(): string {
-  const { followingNativeList, followingExpand, followingCard } = FAN_PAGE_DOM;
+  const { followingNativeList, followingExpand, followingCard, followingImage } = FAN_PAGE_DOM;
   const { list, card, taken, unfollowed } = FOLLOWING_CLASSES;
   return `.${taken} ${followingNativeList}:not(.${list}),
 .${taken} ${followingExpand} { display: none !important; }
 .${list} ${followingCard}[hidden],
 .${list} > ${followingCard}:not(.${card}) { display: none !important; }
 .${list} ${followingCard}.${unfollowed} { opacity: 0.5; }
+.${list} ${followingImage} { position: relative; }
 dighead-following-bar { display: block; }`;
 }
 

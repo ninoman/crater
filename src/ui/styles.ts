@@ -14,6 +14,7 @@ import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
+import playableCover from './PlayableCover.css?inline';
 import progress from './Progress.css?inline';
 import releaseRow from './ReleaseRow.css?inline';
 import row from './Row.css?inline';
@@ -38,6 +39,7 @@ export const uiStyles = [
   statusDot,
   badge,
   cover,
+  playableCover,
   audioPlayer,
   notice,
   progress,

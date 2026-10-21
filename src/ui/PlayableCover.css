@@ -1,0 +1,29 @@
+.dh-playable-cover {
+  position: relative;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dh-radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+.dh-playable-cover__icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-overlay);
+  color: var(--dh-color-on-overlay);
+  opacity: 0;
+  transition: opacity var(--dh-duration);
+}
+
+/* Hidden until wanted, so the artwork reads cleanly in a long list. */
+.dh-playable-cover--playing .dh-playable-cover__icon,
+.dh-playable-cover:hover .dh-playable-cover__icon,
+.dh-playable-cover:focus-visible .dh-playable-cover__icon {
+  opacity: 1;
+}

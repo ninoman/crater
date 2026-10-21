@@ -10,6 +10,7 @@ import { Button, EmptyState, Notice, NoticeStack, PortalContainerProvider } from
 import { followTagHandlers } from '../shared/followTagActions';
 import { BulkBar } from './BulkBar';
 import { CardExtras } from './CardExtras';
+import { CardSelect } from './CardSelect';
 import { EmptyFollowing } from './EmptyFollowing';
 import { FilterControls } from './FilterControls';
 import {
@@ -84,24 +85,34 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
   );
 
   const rowsById = useMemo(() => new Map(allRows.map((row) => [row.id, row])), [allRows]);
-  const portals = cards.map((card) => {
+  const portals = cards.flatMap((card) => {
     const row = rowsById.get(card.id);
-    if (!row) return null;
-    return createPortal(
-      <PortalContainerProvider container={card.slot}>
-        <CardExtras
-          row={row}
-          tags={tags}
+    if (!row) return [];
+    return [
+      createPortal(
+        <CardSelect
+          id={row.id}
+          name={row.name}
           selected={selected.has(row.id)}
           onSelect={onSelect}
-          mutations={mutations}
-          onError={setError}
-          standing={standings.state === 'ready' ? (standings.data[row.id] ?? null) : null}
-        />
-      </PortalContainerProvider>,
-      card.slot,
-      String(card.id),
-    );
+        />,
+        card.selectSlot,
+        `${card.id}-select`,
+      ),
+      createPortal(
+        <PortalContainerProvider container={card.slot}>
+          <CardExtras
+            row={row}
+            tags={tags}
+            mutations={mutations}
+            onError={setError}
+            standing={standings.state === 'ready' ? (standings.data[row.id] ?? null) : null}
+          />
+        </PortalContainerProvider>,
+        card.slot,
+        String(card.id),
+      ),
+    ];
   });
 
   const picked = actionable(selected, visible);

@@ -26,22 +26,37 @@ export function AudioPlayer({ state, label, onToggle, onSeek }: AudioPlayerProps
   const fill = duration > 0 ? Math.min(100, (position / duration) * 100) : 0;
 
   return (
-    <div className="dh-player">
-      <Button
-        variant="ghost"
-        icon
-        aria-label={`${playing ? 'Pause' : 'Play'} ${label}`}
-        disabled={!ready}
-        onClick={onToggle}
-      >
-        {playing ? <PauseIcon /> : <PlayIcon />}
-      </Button>
-      <div className="dh-player__body">
-        {state.kind === 'ready' ? (
-          <>
-            <span className="dh-player__title" title={state.title}>
-              {state.title}
-            </span>
+    // Opens with a height reveal; the inner box clips the player while it grows.
+    <div className="dh-player-reveal">
+      <div className="dh-player-reveal__inner">
+        <div className="dh-player">
+          <Button
+            variant="ghost"
+            icon
+            aria-label={`${playing ? 'Pause' : 'Play'} ${label}`}
+            disabled={!ready}
+            onClick={onToggle}
+          >
+            {playing ? <PauseIcon /> : <PlayIcon />}
+          </Button>
+          {/* Loading and error keep the title and timeline lines, so the box doesn't jump. */}
+          <div className="dh-player__body">
+            {state.kind === 'ready' ? (
+              <span className="dh-player__title" title={state.title}>
+                {state.title}
+              </span>
+            ) : (
+              <span
+                className={cx(
+                  'dh-player__title',
+                  'dh-player__status',
+                  state.kind === 'error' && 'dh-player__status--error',
+                )}
+                role={state.kind === 'error' ? 'alert' : 'status'}
+              >
+                {state.kind === 'error' ? state.message : 'Loading preview…'}
+              </span>
+            )}
             <div className="dh-player__timeline">
               <input
                 type="range"
@@ -61,18 +76,8 @@ export function AudioPlayer({ state, label, onToggle, onSeek }: AudioPlayerProps
                 {formatTime(position)} / {formatTime(duration)}
               </span>
             </div>
-          </>
-        ) : (
-          <span
-            className={cx(
-              'dh-player__status',
-              state.kind === 'error' && 'dh-player__status--error',
-            )}
-            role={state.kind === 'error' ? 'alert' : 'status'}
-          >
-            {state.kind === 'error' ? state.message : 'Loading preview…'}
-          </span>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

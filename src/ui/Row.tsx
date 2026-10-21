@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TruncatedText } from './TruncatedText';
 
 export function RowList({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -31,9 +32,9 @@ export function Row({ media, title, meta = [], badges, actions, children }: RowP
           <span className="dh-row__title">{title}</span>
           {meta.map((line, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: meta lines are static and never reorder.
-            <span key={i} className="dh-row__meta">
+            <TruncatedText key={i} className="dh-row__meta">
               {line}
-            </span>
+            </TruncatedText>
           ))}
           {badges && <span className="dh-row__badges">{badges}</span>}
         </div>

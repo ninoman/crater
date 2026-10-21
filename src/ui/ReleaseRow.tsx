@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button, LinkButton } from './Button';
-import { Cover } from './Cover';
-import { ExternalIcon, HideIcon, PlayIcon, StopIcon } from './icons';
+import { ExternalIcon, HideIcon } from './icons';
+import { PlayableCover } from './PlayableCover';
 import { Row } from './Row';
 import { Tooltip } from './Tooltip';
 
@@ -16,7 +16,7 @@ export interface ReleaseRowRelease {
 
 export interface ReleaseRowProps {
   release: ReleaseRowRelease;
-  /** Why it's recommended, e.g. "7 of 48 supporters own this". */
+  /** Why it's recommended, e.g. "7 supporters have this so far". */
   reason: string;
   /** Place in a ranked list, shown before the cover. */
   rank?: number;
@@ -32,7 +32,7 @@ export interface ReleaseRowProps {
   onHide: () => void;
 }
 
-/** A recommended release: cover, artist and label, reason, and preview / open / hide. */
+/** A recommended release: playable cover, artist and label, reason, and open / hide. */
 export function ReleaseRow({
   release,
   reason,
@@ -51,7 +51,12 @@ export function ReleaseRow({
       media={
         <>
           {rank !== undefined && <span className="dh-release-row__rank">{rank}</span>}
-          <Cover src={release.coverUrl} />
+          <PlayableCover
+            src={release.coverUrl}
+            playing={previewing}
+            label={name}
+            onToggle={() => onPreview(!previewing)}
+          />
         </>
       }
       title={
@@ -67,17 +72,6 @@ export function ReleaseRow({
       badges={badges}
       actions={
         <>
-          <Tooltip content={previewing ? 'Stop preview' : 'Preview'}>
-            <Button
-              variant="ghost"
-              icon
-              aria-label={`Preview ${name}`}
-              aria-pressed={previewing}
-              onClick={() => onPreview(!previewing)}
-            >
-              {previewing ? <StopIcon /> : <PlayIcon />}
-            </Button>
-          </Tooltip>
           <Tooltip content="Open in a new tab">
             <LinkButton
               variant="ghost"

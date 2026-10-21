@@ -6,14 +6,16 @@ import { FAN_PAGE_DOM, followCardHtml } from '../../bandcamp';
 import type { Following } from '../../shared/following';
 import { createShadowSlot } from '../shared/shadowSlot';
 import { followChange } from './followChange';
-import { followingCss } from './followingStyles';
+import { cardSelectCss, followingCss } from './followingStyles';
 import { FOLLOWING_CLASSES } from './takeOverList';
 
 export interface Card {
   id: number;
   item: HTMLLIElement;
-  /** Inside the card's shadow root: where the checkbox, tags and twin rank render. */
+  /** Inside the card's shadow root: where its tags and twin rank render. */
   slot: HTMLElement;
+  /** Inside a second shadow root over the avatar: where the select box renders. */
+  selectSlot: HTMLElement;
 }
 
 export interface CardList {
@@ -39,9 +41,11 @@ function buildCard(doc: Document, row: Following): Card {
       .querySelector(FAN_PAGE_DOM.followButton)
       ?.classList.remove(FAN_PAGE_DOM.followingButtonClass);
   }
+  const select = createShadowSlot(doc, 'dighead-card-select', cardSelectCss);
+  item.querySelector(FAN_PAGE_DOM.followingImage)?.append(select.host);
   const { host, container } = createShadowSlot(doc, 'dighead-card', followingCss);
   item.append(host);
-  return { id: row.id, item, slot: container };
+  return { id: row.id, item, slot: container, selectSlot: select.container };
 }
 
 export function createCardList(list: HTMLOListElement): CardList {

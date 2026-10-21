@@ -31,6 +31,7 @@
   --dh-color-tooltip-bg: #333333;
   --dh-color-on-tooltip: #ffffff;
   --dh-color-overlay: rgba(0, 0, 0, 0.35);
+  --dh-color-on-overlay: #ffffff;
 
   /* Tag colours, picked by tag id (see tag.ts). Chips are filled with these and carry
      --dh-color-on-tag text, so they read the same on light and dark pages.
@@ -71,6 +72,7 @@
   --dh-picker-width: 220px;
   --dh-picker-list-height: 200px;
   --dh-duration: 120ms;
+  --dh-duration-reveal: 180ms;
 
   --dh-z-panel: 2147483000;
   --dh-z-tooltip: 2147483001;
