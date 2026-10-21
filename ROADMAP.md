@@ -193,6 +193,24 @@ It isn't part of the MVP. Design and data source: decisions §8.
 
 ---
 
+## Lately twins (not MVP)
+
+**Goal:** find the fans whose *recent* buying is in step with yours, not just the ones you overlapped with years ago, and see which twins are drifting apart or getting closer.
+
+Design: decisions §11.
+
+1. [x] Purchase times in the match index (schema v6), and restoring v5 backups.
+2. [x] `scoring/lately.ts`: time-faded overlap, a co-timing bonus, and the trend against a year ago.
+3. [x] A second leaderboard (`latelyTwins`) from the same recompute pass.
+4. [x] Twins tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.
+5. [ ] For you *Fresh* mode, built from lately twins and their recent buys.
+6. [ ] Lately rank in the profile badge ("your #2 twin lately").
+7. [ ] Re-scan top lately twins more often than every 30 days, and a "Twins' latest" feed of what they just bought.
+
+**Done when:** on your real data the Lately board puts fans you're buying alongside now at the top, and long-standing twins you've drifted from show "apart".
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".
@@ -222,7 +240,7 @@ Also added: full database export and import on the popup's Settings tab (backup,
 - Export picks as CSV or M3U-style text for DJ library tools
 - Followers / following as an extra signal. The following sync from *Following tags* would provide its data.
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
-- Better scoring: recency weighting, ignoring compilations
+- Better scoring: ignoring compilations (recency: see *Lately twins*)
 
 ---
 
