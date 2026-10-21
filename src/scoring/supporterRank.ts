@@ -36,3 +36,19 @@ export function passZeroOrder(input: PassZeroInput): number[] {
   scored.sort((a, b) => b.score - a.score || a.position - b.position);
   return scored.map(({ fanId }) => fanId);
 }
+
+/**
+ * Pass 1: Bandcamp's in-common count scaled by both collection sizes, count / √(yours · theirs),
+ * so a fan who owns everything doesn't win on volume. 0 when either side is empty.
+ */
+export function inCommonSimilarity(inCommon: number, yours: number, theirs: number): number {
+  return yours > 0 && theirs > 0 ? inCommon / Math.sqrt(yours * theirs) : 0;
+}
+
+/**
+ * Whether a profiled fan's collection should be read before the profiles still waiting: a
+ * similarity of at least half the best among this release's profiled supporters so far.
+ */
+export function readsAhead(similarity: number, best: number): boolean {
+  return similarity > 0 && similarity >= best / 2;
+}

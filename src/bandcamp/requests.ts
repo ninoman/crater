@@ -110,6 +110,14 @@ export function fanPageUrl(username: string): string {
   return `https://bandcamp.com/${encodeURIComponent(username)}`;
 }
 
+/**
+ * A fan's profile page, signed in: Bandcamp only renders "N items in common" for a viewer
+ * (decisions §12), unlike release pages, which are fetched logged out.
+ */
+export function fanProfileRequest(username: string): BandcampRequest {
+  return { url: fanPageUrl(username), init: { credentials: 'include' } };
+}
+
 /** A fan's avatar (`image_id`), 50×50 as on Bandcamp's supporter thumbnails. */
 export function fanImageUrl(imageId: number): string {
   return `https://f4.bcbits.com/img/${String(imageId).padStart(10, '0')}_42.jpg`;

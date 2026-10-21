@@ -3,6 +3,8 @@
 
 import { ParserError } from './errors';
 import { decodeEntities, readBlobById } from './html';
+import type { FetchText } from './release';
+import { fanProfileRequest } from './requests';
 import { rawFanProfilePagedata } from './schemas';
 import type { FanProfile } from './types';
 import { validate } from './validate';
@@ -54,4 +56,8 @@ export function parseFanProfile(html: string): FanProfile {
     location: fan.location || null,
     signedIn,
   };
+}
+
+export async function fetchFanProfile(fetchText: FetchText, username: string): Promise<FanProfile> {
+  return parseFanProfile(await fetchText(fanProfileRequest(username)));
 }

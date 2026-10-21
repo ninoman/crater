@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { passZeroOrder, type PassZeroInput } from './supporterRank';
+import { inCommonSimilarity, passZeroOrder, readsAhead, type PassZeroInput } from './supporterRank';
 
 const ids = (...values: number[]) => Float64Array.from(values).sort();
 
@@ -63,5 +63,22 @@ describe('passZeroOrder', () => {
     );
 
     expect(order).toEqual([3, 1, 2]);
+  });
+});
+
+describe('inCommonSimilarity', () => {
+  it('scales the count by both collection sizes, so volume alone does not win', () => {
+    expect(inCommonSimilarity(20, 400, 100)).toBeCloseTo(0.1);
+    expect(inCommonSimilarity(40, 400, 1600)).toBeCloseTo(0.05);
+    expect(inCommonSimilarity(5, 0, 100)).toBe(0);
+    expect(inCommonSimilarity(5, 100, 0)).toBe(0);
+  });
+});
+
+describe('readsAhead', () => {
+  it('reads ahead from half the best similarity so far, never at 0', () => {
+    expect(readsAhead(0.05, 0.1)).toBe(true);
+    expect(readsAhead(0.049, 0.1)).toBe(false);
+    expect(readsAhead(0, 0)).toBe(false);
   });
 });

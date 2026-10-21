@@ -1,4 +1,4 @@
-import type { Supporter } from '../../bandcamp';
+import type { ItemKey, Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
 import type { DigheadDb, FanRecord, FanStatus } from '../schema';
 import { refreshFanMatches } from './matchIndex';
@@ -44,6 +44,10 @@ export function countReadFans(db: DigheadDb): Promise<number> {
   return db.fans.where('status').anyOf(READ_STATUSES).count();
 }
 
+export function getFan(db: DigheadDb, fanId: number): Promise<FanRecord | undefined> {
+  return db.fans.get(fanId);
+}
+
 export async function getFans(db: DigheadDb, fanIds: number[]): Promise<(FanRecord | undefined)[]> {
   return db.fans.bulkGet(fanIds);
 }
@@ -70,6 +74,38 @@ export async function finishFanScan(
     collectionFetchedAt: now,
     ...(status === 'done' ? { collectionSize: scannedItems } : {}),
   });
+}
+
+/** What a fan's profile page told us (pass 1, decisions §12). */
+export async function saveFanProfile(
+  db: DigheadDb,
+  fanId: number,
+  profile: Pick<FanRecord, 'itemCount' | 'inCommon'>,
+): Promise<void> {
+  await db.fans.update(fanId, { itemCount: profile.itemCount, inCommon: profile.inCommon });
+}
+
+/**
+ * Bandcamp's in-common counts for a release's supporters whose profile was read signed in,
+ * with their collection sizes.
+ */
+export async function profiledSupporters(
+  db: DigheadDb,
+  releaseKey: ItemKey,
+): Promise<{ inCommon: number; itemCount: number }[]> {
+  const list = await db.releaseSupporters.get(releaseKey);
+  if (!list) return [];
+  const fans = await db.fans.bulkGet(list.fanIds);
+  return fans.flatMap((fan) =>
+    fan?.inCommon != null && fan.itemCount !== undefined
+      ? [{ inCommon: fan.inCommon, itemCount: fan.itemCount }]
+      : [],
+  );
+}
+
+/** How many releases your collection holds, as one side of the in-common ratio. */
+export async function collectionMatchCount(db: DigheadDb, fanId: number): Promise<number> {
+  return (await db.fanMatches.get(fanId))?.matchIds.length ?? 0;
 }
 
 /** Fans whose scan has ended, whatever the outcome. */

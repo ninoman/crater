@@ -26,6 +26,7 @@ import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled, type SyncResult } from '../meSync';
 import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
+import type { StepEvent } from './context';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
@@ -40,20 +41,24 @@ import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
 
 export const SCANNER_ALARM = 'scanner';
 
-/** Sends progress for watched releases after each step, and re-scores them when a job ends. */
-async function reportProgress(job: QueueJob, finished: boolean): Promise<void> {
+/**
+ * Sends progress for watched releases after each step, and re-scores them when a job ends or a
+ * fan's collection becomes usable.
+ */
+async function reportProgress(job: QueueJob, event: StepEvent): Promise<void> {
+  const changed = event !== 'continued';
   try {
     const releases: ItemKey[] =
       job.kind === 'release'
         ? [job.target]
-        : finished
+        : changed
           ? await releasesSupportedBy(db, fanIdOf(job))
           : [];
     const watched = new Set(await watchedReleases());
     for (const key of releases.filter((release) => watched.has(release))) {
       const progress = await releaseProgress(db, key);
       await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'scanProgress', progress);
-      if (finished) await onScanStep(key, job.kind, progress);
+      if (changed) await onScanStep(key, job.kind, progress);
     }
   } catch (error) {
     console.warn('dighead: could not report scan progress', error);
@@ -71,9 +76,9 @@ const deps: SchedulerDeps = {
   random: Math.random,
   owner: crypto.randomUUID(),
   waitForOwnSync: ownSyncSettled,
-  onStep: async (job, finished) => {
-    if (finished && job.kind === 'fan') onFanScanned();
-    await reportProgress(job, finished);
+  onStep: async (job, event) => {
+    if (event === 'finished' && job.kind === 'fan') onFanScanned();
+    await reportProgress(job, event);
   },
 };
 
