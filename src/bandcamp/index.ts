@@ -11,6 +11,7 @@ export { BandcampApiError, ParserError } from './errors';
 export { followCardHtml } from './followCard';
 export { fetchFollowingPage, parseFollowingPage } from './following';
 export { parseFanPage } from './fanPage';
+export { fetchFanProfile, parseFanProfile } from './fanProfile';
 export { isPurchaseConfirmationUrl } from './purchase';
 export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
 export { fetchReleasePreview, parseReleasePreview } from './preview';

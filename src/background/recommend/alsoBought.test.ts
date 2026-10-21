@@ -4,6 +4,7 @@ import type { CollectionItem, ItemKey, Supporter } from '../../bandcamp';
 import {
   DigheadDb,
   finishFanScan,
+  markQuickRead,
   hideRelease,
   putOwnership,
   replaceTwins,
@@ -58,7 +59,8 @@ async function fans(ids: number[], items: CollectionItem[], status: FanStatus = 
   for (const fanId of ids) {
     await upsertSupporterFans(db, [supporter(fanId)], 0);
     await putOwnership(db, fanId, items, 'collection');
-    if (status !== 'queued') await finishFanScan(db, fanId, status, items.length, 0);
+    if (status === 'quick') await markQuickRead(db, fanId, items.length, 0);
+    else if (status !== 'queued') await finishFanScan(db, fanId, status, items.length, 0);
   }
 }
 
@@ -121,6 +123,12 @@ async function listSupporters(releaseKey: ItemKey, ids: number[]) {
 }
 
 describe('computeAlsoBought', () => {
+  it('counts supporters whose collection was only quick-read so far', async () => {
+    await fans([50, 51], [item('a100'), item('a300')], 'quick');
+
+    expect(await ranking('a100')).toEqual(['a300']);
+  });
+
   it('ranks by co-ownership and lift, folding tracks into albums', async () => {
     await seedBigRelease();
 

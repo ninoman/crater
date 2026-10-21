@@ -2,14 +2,24 @@ import type { ItemKey } from '../../bandcamp';
 import type { DigheadDb, FanJob, QueueJob, ReleaseJob } from '../schema';
 
 /** What to scan. A job is unique per kind and target. */
-export type JobSpec = Pick<ReleaseJob, 'kind' | 'target' | 'url'> | Pick<FanJob, 'kind' | 'target'>;
+export type JobSpec =
+  | Pick<ReleaseJob, 'kind' | 'target' | 'url'>
+  | Pick<FanJob, 'kind' | 'target' | 'via'>;
 
-export function fanJob(fanId: number): JobSpec {
-  return { kind: 'fan', target: `${fanId}` };
+/** A fan's scan, queued from `via`'s supporter list (null when no release queued it). */
+export function fanJob(fanId: number, via: ItemKey | null = null): JobSpec {
+  return { kind: 'fan', target: `${fanId}`, via };
 }
 
-function newJob(spec: JobSpec, priority: number, at: number): QueueJob {
-  return { ...spec, priority, attempts: 0, nextAttemptAt: at, cursor: null } as QueueJob;
+/** Where a job waits in line within its priority, and its tie-break there. */
+export interface JobPlace {
+  spec: JobSpec;
+  at: number;
+  rank?: number;
+}
+
+function newJob({ spec, at, rank = 0 }: JobPlace, priority: number): QueueJob {
+  return { ...spec, priority, rank, attempts: 0, nextAttemptAt: at, cursor: null } as QueueJob;
 }
 
 /** Adds jobs that are due from `now`, skipping ones already queued (see enqueueAt). */
@@ -32,7 +42,7 @@ export function enqueue(
  */
 export async function enqueueAt(
   db: DigheadDb,
-  entries: { spec: JobSpec; at: number }[],
+  entries: JobPlace[],
   priority: number,
 ): Promise<void> {
   if (entries.length === 0) return;
@@ -43,11 +53,12 @@ export async function enqueueAt(
       .toArray();
     const byKey = new Map(existing.map((job) => [`${job.kind}:${job.target}`, job]));
     const fresh: QueueJob[] = [];
-    for (const { spec, at } of entries) {
+    for (const entry of entries) {
+      const { spec } = entry;
       const key = `${spec.kind}:${spec.target}`;
       const job = byKey.get(key);
       if (!job) {
-        const added = newJob(spec, priority, at);
+        const added = newJob(entry, priority);
         fresh.push(added);
         byKey.set(key, added);
       } else if (job.id !== undefined && priority < job.priority) {
@@ -66,10 +77,13 @@ export function getQueuedJob(
   return db.queue.where('[kind+target]').equals([kind, target]).first();
 }
 
-/** The most urgent job that is due: lowest priority first, then earliest nextAttemptAt. */
+/**
+ * The most urgent job that is due: lowest priority first, then earliest nextAttemptAt, then
+ * lowest rank, then insertion order.
+ */
 export function nextJob(db: DigheadDb, now: number): Promise<QueueJob | undefined> {
   return db.queue
-    .orderBy('[priority+nextAttemptAt]')
+    .orderBy('[priority+nextAttemptAt+rank]')
     .filter((job) => job.nextAttemptAt <= now)
     .first();
 }
@@ -85,9 +99,33 @@ export async function failJob(db: DigheadDb, job: QueueJob, retryAt: number | nu
   else await db.queue.update(job.id, { attempts: job.attempts + 1, nextAttemptAt: retryAt });
 }
 
+/** Where a multi-request job carries on, and optionally a new place in the queue. */
+export interface JobProgress {
+  cursor: NonNullable<QueueJob['cursor']>;
+  rank?: number;
+  priority?: number;
+}
+
 /** Saves how far a multi-request job got, so a killed worker resumes instead of restarting. */
-export async function saveCursor(db: DigheadDb, job: QueueJob, cursor: QueueJob['cursor']) {
-  if (job.id !== undefined) await db.queue.update(job.id, { cursor });
+export async function saveProgress(db: DigheadDb, job: QueueJob, progress: JobProgress) {
+  if (job.id !== undefined) await db.queue.update(job.id, { ...progress });
+}
+
+/**
+ * Re-orders fan jobs within their place in line. Only jobs that haven't started (no cursor)
+ * move: a started job already has its rank from what its first step learned.
+ */
+export async function rankFanJobs(db: DigheadDb, ranks: Map<number, number>): Promise<void> {
+  if (ranks.size === 0) return;
+  await db.transaction('rw', db.queue, async () => {
+    await db.queue
+      .where('[kind+target]')
+      .anyOf([...ranks.keys()].map((fanId) => ['fan', `${fanId}`]))
+      .filter((job) => job.cursor === null)
+      .modify((job) => {
+        job.rank = ranks.get(Number(job.target)) ?? job.rank;
+      });
+  });
 }
 
 /**
@@ -104,8 +142,8 @@ export async function focusRelease(
   const mine = new Set<string>([`release:${release}`, ...supporterIds.map((id) => `fan:${id}`)]);
   await db.transaction('rw', db.queue, async () => {
     await db.queue
-      .where('[priority+nextAttemptAt]')
-      .between([priority, -Infinity], [priority, Infinity])
+      .where('[priority+nextAttemptAt+rank]')
+      .between([priority, -Infinity, -Infinity], [priority, Infinity, Infinity])
       .filter((job) => !mine.has(`${job.kind}:${job.target}`))
       .modify({ priority: otherwise });
     await db.queue

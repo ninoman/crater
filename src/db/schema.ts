@@ -23,7 +23,11 @@ export interface ItemRecord {
   fetchedAt: number;
 }
 
-export type FanStatus = 'queued' | 'partial' | 'done' | 'private' | 'error';
+/**
+ * `quick`: only the 100 items around their purchase of a release were read (decisions §12). Also
+ * bought uses them; twins wait for the full scan, which is still queued.
+ */
+export type FanStatus = 'queued' | 'quick' | 'partial' | 'done' | 'private' | 'error';
 
 export interface FanRecord {
   fanId: number;
@@ -37,6 +41,13 @@ export interface FanRecord {
   status: FanStatus;
   /** Last time a supporter list or a scan showed this fan. Long-unseen fans are forgotten. */
   lastSeenAt: number;
+  /** `collection_data.item_count` from their profile page (pass 1, decisions §12). */
+  itemCount?: number;
+  /**
+   * Bandcamp's "N items in common" with you, from their profile page read signed in.
+   * Null when the page was read logged out.
+   */
+  inCommon?: number | null;
 }
 
 export interface OwnershipRecord {
@@ -118,16 +129,22 @@ export interface ReleaseCursor {
   collected: number;
 }
 
-/** Where a fan job carries on paging the collection. */
-export interface FanCursor {
-  token: string;
-  scanned: number;
-}
+/**
+ * Where a fan job carries on (decisions §12). No cursor yet: the profile page (pass 1) is next.
+ * `quick`: one collection page around when they bought the release. `full`: paging the whole
+ * collection.
+ */
+export type FanCursor = { stage: 'quick' } | { stage: 'full'; token: string; scanned: number };
 
 interface JobBase {
   id?: number;
   /** Lower runs first. */
   priority: number;
+  /**
+   * Lower runs first among jobs with the same priority and place in line (`nextAttemptAt`):
+   * how a release's supporters are ordered by expected overlap (decisions §12).
+   */
+  rank: number;
   /** Failed runs so far, for errors that aren't Bandcamp's fault (see scanner/outcome.ts). */
   attempts: number;
   nextAttemptAt: number;
@@ -146,6 +163,8 @@ export interface FanJob extends JobBase {
   kind: 'fan';
   /** The fanId, as a string so `[kind+target]` stays one key type. */
   target: `${number}`;
+  /** The release whose supporter list queued them. Its purchase anchors the quick read. */
+  via: ItemKey | null;
   cursor: FanCursor | null;
 }
 
@@ -185,6 +204,15 @@ export function blankLately(twin: TwinRecord): void {
   twin.lately ??= null;
   twin.yearAgo ??= null;
   twin.latelyOverlap ??= 0;
+}
+
+/** Gives a job from before v8 its rank, and a fan job its `via` and a staged cursor. */
+export function upgradeJobToV8(job: QueueJob): void {
+  job.rank ??= 0;
+  if (job.kind !== 'fan') return;
+  job.via ??= null;
+  const cursor = job.cursor as FanCursor | { token: string; scanned: number } | null;
+  if (cursor && !('stage' in cursor)) job.cursor = { stage: 'full', ...cursor };
 }
 
 /** Tables newer than the oldest restorable backup, by the version that added them. */
@@ -272,6 +300,11 @@ export class DigheadDb extends Dexie {
         await rebuildFanMatchLists(tx.table('fanMatches'), tx.table('ownership'));
         await tx.table<TwinRecord>('twins').toCollection().modify(blankLately);
       });
+    // v8: a rank tie-break in the queue and staged fan jobs (decisions §12). Every old job
+    // gets rank 0, so the order stays as it was.
+    this.version(8)
+      .stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt+rank]' })
+      .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(upgradeJobToV8));
   }
 }
 

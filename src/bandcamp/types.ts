@@ -66,6 +66,22 @@ export interface CollectionPage {
   nextToken: string | null;
 }
 
+/** A fan's profile page as pass 1 reads it (decisions §12). */
+export interface FanProfile {
+  fanId: number;
+  username: string;
+  /** Collection size, `collection_data.item_count`. */
+  itemCount: number;
+  /**
+   * Bandcamp's "N items in common" with the viewer. 0 when signed in and the line is missing;
+   * null logged out or on your own page, where there's nothing to compare.
+   */
+  inCommon: number | null;
+  favouriteGenre: string | null;
+  location: string | null;
+  signedIn: boolean;
+}
+
 export interface FanPage {
   fanId: number;
   username: string;

@@ -99,3 +99,12 @@ export async function addSupporterOwnership(
     );
   });
 }
+
+/** When a fan bought an item, from their ownership row. Null when unknown or not owned. */
+export async function purchasedAt(
+  db: DigheadDb,
+  fanId: number,
+  itemKey: ItemKey,
+): Promise<number | null> {
+  return (await db.ownership.get([fanId, itemKey]))?.addedAt ?? null;
+}

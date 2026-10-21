@@ -211,6 +211,21 @@ Design: decisions §11.
 
 ---
 
+## Smarter supporter scanning (not MVP)
+
+**Goal:** opening a release with hundreds of supporters reads the ones likely to share your taste first, so Also bought fills in with relevant rows within the first minute.
+
+Design: decisions §12. The scoring half (confidence bound, omnivore damping, warm-up) is tracked separately.
+
+1. [x] Fan-profile parser for Bandcamp's "N items in common", with a signed-in fixture.
+2. [x] Pass 0: rank a release's supporters by what they're known to own of yours, with a `rank` tie-break in the queue (schema v8).
+3. [x] Pass 1: one signed-in profile page per supporter, ranked by in-common count over both collection sizes.
+4. [x] Pass 2: a quick 100-item read around each fan's purchase, best match first, then full scans in the background. Quick-read fans stay out of twins until then.
+
+**Done when:** opening a large release reads high-overlap supporters first, and their full scans still complete in the background.
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".

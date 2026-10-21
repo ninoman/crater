@@ -10,7 +10,13 @@ import {
   type BackupMeta,
   type BackupSummary,
 } from '../shared/backupFile';
-import { blankLately, type DigheadDb, rebuildFanMatchLists, TABLES_ADDED } from './schema';
+import {
+  blankLately,
+  type DigheadDb,
+  rebuildFanMatchLists,
+  TABLES_ADDED,
+  upgradeJobToV8,
+} from './schema';
 
 /** The library reads blob slices with FileReader, which service workers don't have. */
 function ensureFileReader(): void {
@@ -78,6 +84,8 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
     );
     await db.twins.toCollection().modify(blankLately);
   }
+  // v8 ranked queued jobs and staged fan scans.
+  if (fromVersion < 8) await db.queue.toCollection().modify(upgradeJobToV8);
 }
 
 /** Where the safety copy of the current data waits while an import runs. */

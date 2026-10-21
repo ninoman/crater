@@ -149,7 +149,8 @@ describe('drainQueue', () => {
 
     const reason = await drainQueue(
       deps({
-        onStep: async (job, finished) => void steps.push(`${job.target}${finished ? ' done' : ''}`),
+        onStep: async (job, event) =>
+          void steps.push(`${job.target}${event === 'finished' ? ' done' : ''}`),
       }),
     );
 

@@ -7,6 +7,9 @@ import type { Backoff } from './backoff';
 import { budgetExhausted, nextLocalMidnight, type Budget } from './budget';
 import type { Lock } from './lock';
 
+/** Which parser broke: a job's own, or the profile page that only ranks fans (decisions §12). */
+export type ParserKind = JobKind | 'profile';
+
 export interface ScannerState {
   backoff: Backoff | null;
   /** The back-off came from a request that got no answer, so it's us that are offline. */
@@ -19,7 +22,7 @@ export interface ScannerState {
    * The last ParserError, meaning Bandcamp changed something we read. Cleared once a job of
    * the same kind succeeds, so one odd page doesn't look like a broken parser for good.
    */
-  parserError: { kind: JobKind; message: string } | null;
+  parserError: { kind: ParserKind; message: string } | null;
   /** Paused from the popup. Stays paused until resumed there. */
   paused: boolean;
   /** A database import is running. Its own flag, so it never touches your pause. */

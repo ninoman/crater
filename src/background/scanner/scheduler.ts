@@ -2,11 +2,18 @@
 // when Bandcamp pushes back. Every run is one request, so a killed worker loses at most one.
 
 import { ParserError, type FetchJson, type FetchText } from '../../bandcamp';
-import { completeJob, failJob, nextJob, saveCursor, type DigheadDb, type QueueJob } from '../../db';
+import {
+  completeJob,
+  failJob,
+  nextJob,
+  saveProgress,
+  type DigheadDb,
+  type QueueJob,
+} from '../../db';
 import type { Settings } from '../../shared/settings';
 import { jobRetryAt, nextBackoff } from './backoff';
 import { spend } from './budget';
-import type { StepContext } from './context';
+import type { StepContext, StepEvent, StepResult } from './context';
 import { abandonFan, runFanStep } from './fanJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
@@ -27,8 +34,8 @@ export interface SchedulerDeps {
   owner: string;
   /** Your own collection sync uses the network too; waiting keeps one request in flight. */
   waitForOwnSync: () => Promise<void>;
-  /** After each run that changed something. `finished`: the job has left the queue. */
-  onStep: (job: QueueJob, finished: boolean) => Promise<void>;
+  /** After each run that changed something. */
+  onStep: (job: QueueJob, event: StepEvent) => Promise<void>;
 }
 
 /** idle: queue empty. paused: back-off or budget. locked: another loop holds the lock. */
@@ -74,23 +81,42 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
   }
 }
 
+async function runStep(job: QueueJob, ctx: StepContext): Promise<StepResult> {
+  if (job.kind === 'fan') return runFanStep(ctx, job);
+  const cursor = await runReleaseStep(ctx, job);
+  return cursor
+    ? { next: { cursor }, event: 'continued', parsed: 'release' }
+    : { next: null, event: 'finished', parsed: 'release' };
+}
+
 async function runJob(
   deps: SchedulerDeps,
   job: QueueJob,
   ctx: StepContext,
   state: ScannerState,
 ): Promise<ScannerState> {
-  let cursor: QueueJob['cursor'];
+  let result: StepResult;
   try {
-    cursor = job.kind === 'release' ? await runReleaseStep(ctx, job) : await runFanStep(ctx, job);
+    result = await runStep(job, ctx);
   } catch (error) {
     return handleFailure(deps, job, ctx, state, error);
   }
 
-  if (cursor) await saveCursor(ctx.db, job, cursor);
+  if (result.next) await saveProgress(ctx.db, job, result.next);
   else await completeJob(ctx.db, job);
-  await deps.onStep(job, cursor === null);
-  const parserFixed = state.parserError?.kind === job.kind;
+  await deps.onStep(job, result.event);
+
+  const skipped = result.skippedParserError;
+  if (skipped) {
+    const message = `${job.kind} ${job.target}: ${skipped.message}`;
+    console.warn(`dighead: ${message}. Carried on without it.`);
+    return deps.store.save({
+      backoff: null,
+      offline: false,
+      parserError: { kind: 'profile', message },
+    });
+  }
+  const parserFixed = state.parserError !== null && state.parserError.kind === result.parsed;
   return state.backoff || state.offline || state.lastError || parserFixed
     ? deps.store.save({
         backoff: null,
@@ -122,7 +148,7 @@ async function handleFailure(
   await failJob(ctx.db, job, retryAt);
   if (retryAt === null) {
     if (job.kind === 'fan') await abandonFan(ctx, job);
-    await deps.onStep(job, true);
+    await deps.onStep(job, 'finished');
   }
   return deps.store.save({
     lastError: message,

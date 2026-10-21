@@ -11,7 +11,7 @@ import {
 import {
   addSupporterOwnership,
   appendReleaseSupporters,
-  enqueue,
+  enqueueAt,
   fanJob,
   getItem,
   saveReleaseSupporters,
@@ -22,6 +22,7 @@ import {
 } from '../../db';
 import type { StepContext } from './context';
 import { needsFanScan } from './freshness';
+import { rankSupporters } from './passZero';
 
 /** The site pages supporters 100 at a time too. */
 const SUPPORTERS_PAGE_SIZE = 100;
@@ -47,11 +48,11 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
     supporters.map((s) => s.fanId),
     ctx.now,
   );
-  await recordSupporters(ctx, job, page.item, supporters);
+  await recordSupporters(ctx, job, page.item, supporters, 0);
 
   const lastToken = (reviewer: boolean) =>
     supporters.filter((s) => s.isReviewer === reviewer).at(-1)?.token ?? null;
-  return carryOn(ctx, {
+  return carryOn(ctx, job, {
     thumbsToken: page.moreThumbsAvailable ? lastToken(false) : null,
     reviewsToken: page.moreReviewsAvailable ? lastToken(true) : null,
     collected: supporters.length,
@@ -85,34 +86,47 @@ async function nextSupportersPage(
     supporters.map((s) => s.fanId),
     ctx.now,
   );
-  await recordSupporters(ctx, job, release, supporters);
+  await recordSupporters(ctx, job, release, supporters, cursor.collected);
 
   const next = page.moreAvailable ? (supporters.at(-1)?.token ?? null) : null;
-  return carryOn(ctx, {
+  return carryOn(ctx, job, {
     thumbsToken: kind === 'thumbs' ? next : null,
     reviewsToken: kind === 'reviews' ? next : cursor.reviewsToken,
     collected: cursor.collected + supporters.length,
   });
 }
 
-function carryOn(ctx: StepContext, cursor: ReleaseCursor): ReleaseCursor | null {
+/** Carries on paging, or, with the whole list in, ranks its supporters' scans (pass 0). */
+async function carryOn(
+  ctx: StepContext,
+  job: ReleaseJob,
+  cursor: ReleaseCursor,
+): Promise<ReleaseCursor | null> {
   const exhausted = cursor.thumbsToken === null && cursor.reviewsToken === null;
-  return exhausted || cursor.collected >= ctx.settings.supportersPerReleaseCap ? null : cursor;
+  if (!exhausted && cursor.collected < ctx.settings.supportersPerReleaseCap) return cursor;
+  await rankSupporters(ctx.db, job.target);
+  return null;
 }
 
 /**
  * Saves the fans and what they own, and queues the ones not scanned recently. They take the
  * release job's priority and place in line, so a release's fans run before the next release at
- * that priority: your newest seed releases fill in fully before older ones start.
+ * that priority: your newest seed releases fill in fully before older ones start. Within it they
+ * keep page order (`offset` is where this page starts) until pass 0 ranks them.
  */
 async function recordSupporters(
   ctx: StepContext,
   job: ReleaseJob,
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   supporters: Supporter[],
+  offset: number,
 ): Promise<void> {
   const fans = await upsertSupporterFans(ctx.db, supporters, ctx.now);
   await addSupporterOwnership(ctx.db, release, supporters);
-  const stale = fans.filter((fan) => needsFanScan(fan, ctx.now)).map((fan) => fanJob(fan.fanId));
-  await enqueue(ctx.db, stale, job.priority, job.nextAttemptAt);
+  const stale = fans.flatMap((fan, i) =>
+    needsFanScan(fan, ctx.now)
+      ? [{ spec: fanJob(fan.fanId, job.target), at: job.nextAttemptAt, rank: offset + i + 1 }]
+      : [],
+  );
+  await enqueueAt(ctx.db, stale, job.priority);
 }
