@@ -7,9 +7,11 @@ import type { FollowKind } from '../../shared/following';
 import { createShadowSlot, type ShadowSlot } from '../shared/shadowSlot';
 import { followingCss } from './followingStyles';
 
-/** Our classes in Bandcamp's light DOM. Cards use the last two. */
+/** Our classes in Bandcamp's light DOM. Cards use the last three. */
 export const FOLLOWING_CLASSES = {
   list: 'dighead-following-list',
+  /** On every card we build, so any other card in our list stands out. */
+  card: 'dighead-following-card',
   /** On the sub-tab container while Bandcamp's own list is hidden. */
   taken: 'dighead-following-taken',
   unfollowed: 'dighead-unfollowed',
@@ -20,14 +22,16 @@ const STYLE_ID = 'dighead-following';
 /**
  * Bandcamp's list and "view all" go while ours is up, so its paging never runs. Bandcamp's CSS
  * may give cards a display, so `hidden` needs the push. An unfollowed card is dimmed; its
- * button then reads "Follow".
+ * button then reads "Follow". Bandcamp's paging can still append a page of its own cards to the
+ * first `ol.followeer-grid` it finds, which is ours; those stay hidden.
  */
 function pageCss(): string {
   const { followingNativeList, followingExpand, followingCard } = FAN_PAGE_DOM;
-  const { list, taken, unfollowed } = FOLLOWING_CLASSES;
+  const { list, card, taken, unfollowed } = FOLLOWING_CLASSES;
   return `.${taken} ${followingNativeList}:not(.${list}),
 .${taken} ${followingExpand} { display: none !important; }
-.${list} ${followingCard}[hidden] { display: none !important; }
+.${list} ${followingCard}[hidden],
+.${list} > ${followingCard}:not(.${card}) { display: none !important; }
 .${list} ${followingCard}.${unfollowed} { opacity: 0.5; }
 dighead-following-bar { display: block; }`;
 }

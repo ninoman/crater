@@ -110,6 +110,22 @@ describe('createCardList', () => {
     cardList.show(new Set(BANDS.map((row) => row.id)));
     expect(cards.some((card) => card.item.hidden)).toBe(false);
   });
+
+  it('hides cards Bandcamp’s paging appends to our list', () => {
+    const { list } = takeOver('band');
+    const cardList = createCardList(list);
+    const [ours] = cardList.update(BANDS.slice(0, 1));
+    // Bandcamp fills the first `ol.followeer-grid` it finds, which is ours.
+    const foreign = doc.querySelector(
+      'ol.followeer-grid:not(.dighead-following-list) li.followeer',
+    );
+    if (!foreign) throw new Error('no Bandcamp card');
+    list.append(foreign.cloneNode(true));
+
+    const display = (el: Element) => doc.defaultView?.getComputedStyle(el).display;
+    expect(display(ours?.item as Element)).not.toBe('none');
+    expect(display(list.lastElementChild as Element)).toBe('none');
+  });
 });
 
 describe('watchFollows', () => {

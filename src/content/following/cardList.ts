@@ -29,6 +29,7 @@ function buildCard(doc: Document, row: Following): Card {
   const template = doc.createElement('template');
   template.innerHTML = followCardHtml(row);
   const item = template.content.firstElementChild as HTMLLIElement;
+  item.classList.add(FOLLOWING_CLASSES.card);
   // Hundreds of avatars, most of them below the fold.
   item.querySelector('img')?.setAttribute('loading', 'lazy');
   // The markup says "following"; a row unfollowed since the last sync must offer "Follow",
