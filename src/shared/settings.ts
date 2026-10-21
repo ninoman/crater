@@ -26,7 +26,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   paceMinMs: 1500,
   paceMaxMs: 3000,
-  dailyRequestBudget: 3000,
+  dailyRequestBudget: 10_000,
   collectionCap: 2000,
   collectionBatchSize: 100,
   supportersPerReleaseCap: 500,
