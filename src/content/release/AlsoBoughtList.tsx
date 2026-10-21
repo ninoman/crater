@@ -2,8 +2,10 @@ import { useState } from 'react';
 import type { ItemKey } from '../../bandcamp';
 import type { AlsoBoughtView } from '../../hooks/useAlsoBought';
 import type { ScanProgressView } from '../../hooks/useScanProgress';
-import { EmptyState, RowList, type EmptyStateProps } from '../../ui';
+import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
+import { EmptyState, RowList, SectionHeading, type EmptyStateProps } from '../../ui';
 import { AlsoBoughtRow } from './AlsoBoughtRow';
+import { WarmupProgress } from './WarmupProgress';
 
 export interface AlsoBoughtListProps {
   view: AlsoBoughtView;
@@ -27,14 +29,10 @@ export function AlsoBoughtList({ view, progress, scanStopped, onHide }: AlsoBoug
       />
     );
   }
-  const { rows } = view.result;
-  if (rows.length === 0) {
-    return <EmptyState {...waiting(progress, scanStopped)} />;
-  }
-
-  return (
-    <RowList label="Also bought">
-      {rows.map((row) => (
+  const { rows, warmup } = view.result;
+  const list = (label: string, shown: readonly RowData[]) => (
+    <RowList label={label}>
+      {shown.map((row) => (
         <AlsoBoughtRow
           key={row.matchKey}
           row={row}
@@ -45,6 +43,30 @@ export function AlsoBoughtList({ view, progress, scanStopped, onHide }: AlsoBoug
       ))}
     </RowList>
   );
+
+  if (warmup) {
+    // Before the supporter list is in there's nothing to warm up yet: say what we're waiting for.
+    const listed = progress.state === 'ready' && progress.progress.listed;
+    return (
+      <>
+        {listed ? (
+          <WarmupProgress warmup={warmup} scanStopped={scanStopped} />
+        ) : (
+          <EmptyState {...waiting(progress, scanStopped)} />
+        )}
+        {rows.length > 0 && (
+          <>
+            <SectionHeading>Meanwhile, from the same artist and label</SectionHeading>
+            {list('Same artist and label', rows)}
+          </>
+        )}
+      </>
+    );
+  }
+  if (rows.length === 0) {
+    return <EmptyState {...waiting(progress, scanStopped)} />;
+  }
+  return list('Also bought', rows);
 }
 
 const SCAN_STOPPED: EmptyStateProps = {

@@ -18,6 +18,7 @@ export { Progress, type ProgressProps } from './Progress';
 export { ReleaseRow, type ReleaseRowProps, type ReleaseRowRelease } from './ReleaseRow';
 export { Row, RowList, type RowProps } from './Row';
 export { SearchField, type SearchFieldProps } from './SearchField';
+export { SectionHeading } from './SectionHeading';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { Stat, type StatProps } from './Stat';
 export { StatusDot, type StatusDotProps } from './StatusDot';

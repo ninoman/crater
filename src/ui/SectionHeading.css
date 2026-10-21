@@ -1,0 +1,8 @@
+.dh-section-heading {
+  margin: 0;
+  padding: var(--dh-space-2) var(--dh-space-4) var(--dh-space-1);
+  border-top: 1px solid var(--dh-color-border);
+  font-size: var(--dh-text-xs);
+  font-weight: var(--dh-weight-bold);
+  color: var(--dh-color-muted);
+}

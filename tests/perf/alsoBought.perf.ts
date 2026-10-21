@@ -126,6 +126,11 @@ beforeAll(async () => {
     [db.fans, fans],
     [db.items, items],
     [db.twins, twins],
+    // Every supporter listed and scanned, so the warm-up is over and co-owned rows show.
+    [
+      db.releaseSupporters,
+      [{ itemKey: RELEASE, fanIds: fans.slice(0, SUPPORTERS).map((f) => f.fanId), fetchedAt: 0 }],
+    ],
   ] as const) {
     for (let start = 0; start < records.length; start += SEED_CHUNK) {
       await (table as Table).bulkPut(records.slice(start, start + SEED_CHUNK));
@@ -146,14 +151,18 @@ it(`re-scores a release with ${SUPPORTERS} scanned supporters in under ${BUDGET_
 
   const times: number[] = [];
   let rows = 0;
+  let coOwned = 0;
   for (let run = 0; run < 5; run++) {
     const started = performance.now();
-    rows = (await computeAlsoBought(db, RELEASE, ME)).rows.length;
+    const result = await computeAlsoBought(db, RELEASE, ME);
+    rows = result.rows.length;
+    coOwned = result.rows.filter((row) => row.reason.kind === 'co-owned').length;
     times.push(performance.now() - started);
   }
   const median = times.sort((a, b) => a - b)[2] ?? Infinity;
   console.log(`re-score: median ${median.toFixed(1)} ms, runs ${times.map(Math.round).join(', ')}`);
 
   expect(rows).toBe(30);
+  expect(coOwned).toBe(30);
   expect(median).toBeLessThan(BUDGET_MS);
 });

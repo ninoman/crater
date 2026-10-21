@@ -52,3 +52,22 @@
   margin: 0;
   padding: var(--dh-space-2) var(--dh-space-4) 0;
 }
+
+.dh-warmup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dh-space-1);
+  padding: var(--dh-space-3) var(--dh-space-4);
+}
+
+.dh-warmup__title {
+  margin: 0;
+  font-size: var(--dh-text-sm);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-warmup__line {
+  margin: 0;
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
