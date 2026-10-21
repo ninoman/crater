@@ -40,7 +40,17 @@ function item(itemKey: ItemKey, album: ItemKey | null = null): CollectionItem {
 }
 
 function twin(fanId: number, score: number, labelCluster = false): TwinRecord {
-  return { fanId, overlap: fanId, jaccard: 0.1, score, labelCluster, computedAt: 0 };
+  return {
+    fanId,
+    overlap: fanId,
+    jaccard: 0.1,
+    score,
+    labelCluster,
+    lately: null,
+    yearAgo: null,
+    latelyOverlap: 0,
+    computedAt: 0,
+  };
 }
 
 async function fan(fanId: number, items: CollectionItem[], source: 'collection' | 'wishlist') {
@@ -66,7 +76,7 @@ async function fan(fanId: number, items: CollectionItem[], source: 'collection' 
 describe('computeReleaseTwins', () => {
   beforeEach(async () => {
     // Twins by rank: 11, 12, 13, 14. Fan 20 owns the album but isn't a twin.
-    await replaceTwins(db, [twin(12, 0.5), twin(11, 0.9), twin(14, 0.1), twin(13, 0.2, true)]);
+    await replaceTwins(db, [twin(12, 0.5), twin(11, 0.9), twin(14, 0.1), twin(13, 0.2, true)], []);
     await fan(11, [item('a1')], 'collection');
     await fan(12, [item('a2')], 'collection');
     await fan(13, [item('t2', 'a1')], 'collection');
@@ -109,7 +119,7 @@ describe('computeReleaseTwins', () => {
 
   it('tells "no twins" apart from "none own this"', async () => {
     expect(await computeReleaseTwins(db, 'a9')).toMatchObject({ rows: [], twinCount: 4 });
-    await replaceTwins(db, []);
+    await replaceTwins(db, [], []);
     expect(await computeReleaseTwins(db, 'a1')).toMatchObject({ rows: [], twinCount: 0 });
   });
 });

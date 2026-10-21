@@ -164,11 +164,45 @@ describe('computeAlsoBought', () => {
   it('boosts releases your twins among the supporters own', async () => {
     await seedBigRelease();
     // Fan 30 is your best twin but doesn't own a100, so their a200 copy doesn't count.
-    await replaceTwins(db, [
-      { fanId: 30, overlap: 9, jaccard: 0.1, score: 0.8, labelCluster: false, computedAt: 0 },
-      { fanId: 17, overlap: 5, jaccard: 0.1, score: 0.4, labelCluster: false, computedAt: 0 },
-      { fanId: 18, overlap: 5, jaccard: 0.1, score: 0.4, labelCluster: false, computedAt: 0 },
-    ]);
+    await replaceTwins(
+      db,
+      [
+        {
+          fanId: 30,
+          overlap: 9,
+          jaccard: 0.1,
+          score: 0.8,
+          labelCluster: false,
+          lately: null,
+          yearAgo: null,
+          latelyOverlap: 0,
+          computedAt: 0,
+        },
+        {
+          fanId: 17,
+          overlap: 5,
+          jaccard: 0.1,
+          score: 0.4,
+          labelCluster: false,
+          lately: null,
+          yearAgo: null,
+          latelyOverlap: 0,
+          computedAt: 0,
+        },
+        {
+          fanId: 18,
+          overlap: 5,
+          jaccard: 0.1,
+          score: 0.4,
+          labelCluster: false,
+          lately: null,
+          yearAgo: null,
+          latelyOverlap: 0,
+          computedAt: 0,
+        },
+      ],
+      [],
+    );
 
     // a200 (fan 17, share 0.5): 5.2 × 1.25 ≈ 6.5 jumps from third to first, past a300's 5.9.
     // a900 (fans 17 and 18, share 1): 3.7 × 1.5 ≈ 5.5, just short of a400's 5.7.

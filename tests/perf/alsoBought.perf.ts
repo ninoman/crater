@@ -110,6 +110,9 @@ beforeAll(async () => {
       jaccard: 0.05,
       score: 1 / (1 + i),
       labelCluster: false,
+      lately: null,
+      yearAgo: null,
+      latelyOverlap: 0,
       computedAt: 0,
     }),
   );

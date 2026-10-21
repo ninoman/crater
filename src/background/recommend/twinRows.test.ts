@@ -42,6 +42,9 @@ function twin(fanId: number, score: number, overrides: Partial<TwinRecord> = {})
     jaccard: 0.1,
     score,
     labelCluster: false,
+    lately: null,
+    yearAgo: null,
+    latelyOverlap: 0,
     computedAt: 7,
     ...overrides,
   };
@@ -49,9 +52,11 @@ function twin(fanId: number, score: number, overrides: Partial<TwinRecord> = {})
 
 describe('readTwinsResult', () => {
   it('says there is no viewer before you are seen logged in', async () => {
-    expect(await readTwinsResult(db)).toEqual({
+    expect(await readTwinsResult(db, 6)).toEqual({
       basis: 'no-viewer',
       rows: [],
+      latelyRows: [],
+      latelyHalfLifeMonths: 6,
       computedAt: null,
       fansRead: 0,
     });
@@ -59,10 +64,10 @@ describe('readTwinsResult', () => {
 
   it('says your collection is unsynced until the first sync ends', async () => {
     await saveViewer(db, { fanId: 1, username: 'me' });
-    expect((await readTwinsResult(db)).basis).toBe('unsynced');
+    expect((await readTwinsResult(db, 6)).basis).toBe('unsynced');
 
     await markSynced(db, 5);
-    expect((await readTwinsResult(db)).basis).toBe('ready');
+    expect((await readTwinsResult(db, 6)).basis).toBe('ready');
   });
 
   it('ranks by score and adds names, avatars and profile links', async () => {
@@ -70,9 +75,9 @@ describe('readTwinsResult', () => {
     await upsertSupporterFans(db, [supporter(10, 'Ten', 2053905), supporter(11, '')], 0);
     await finishFanScan(db, 10, 'done', 40, 0);
     await finishFanScan(db, 11, 'partial', 20, 0);
-    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, { labelCluster: true })]);
+    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, { labelCluster: true })], []);
 
-    const result = await readTwinsResult(db);
+    const result = await readTwinsResult(db, 6);
 
     expect(result.computedAt).toBe(7);
     expect(result.fansRead).toBe(2);
@@ -88,8 +93,30 @@ describe('readTwinsResult', () => {
         jaccard: 0.1,
         score: 0.5,
         labelCluster: true,
+        lately: null,
+        latelyOverlap: 0,
+        trend: 'quiet',
       },
       expect.objectContaining({ fanId: 11, rank: 2, name: 'fan11', avatarUrl: null }),
+    ]);
+  });
+
+  it('ranks the lately board by lately score, with its own ranks and trends', async () => {
+    await saveViewer(db, { fanId: 1, username: 'me' });
+    await upsertSupporterFans(db, [supporter(10, 'Ten'), supporter(11, 'Eleven')], 0);
+    const ten = twin(10, 0.5, { lately: 0.1, yearAgo: 0.4, latelyOverlap: 2 });
+    const eleven = twin(11, 0.2, { lately: 0.3, yearAgo: null, latelyOverlap: 6 });
+    await replaceTwins(db, [ten, eleven], [eleven, ten]);
+
+    const result = await readTwinsResult(db, 6);
+
+    expect(result.rows.map((row) => [row.fanId, row.rank])).toEqual([
+      [10, 1],
+      [11, 2],
+    ]);
+    expect(result.latelyRows).toEqual([
+      expect.objectContaining({ fanId: 11, rank: 1, lately: 0.3, latelyOverlap: 6, trend: 'new' }),
+      expect.objectContaining({ fanId: 10, rank: 2, lately: 0.1, trend: 'drifting' }),
     ]);
   });
 });

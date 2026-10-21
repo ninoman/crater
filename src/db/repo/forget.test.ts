@@ -77,6 +77,7 @@ describe('forgetFansNotSeenSince', () => {
     await replaceTwins(
       db,
       [2, 3].map((fanId) => twin(fanId)),
+      [2, 3].map((fanId) => twin(fanId)),
     );
     await enqueue(db, [fanJob(4), fanJob(3)], 2, 0);
 
@@ -127,5 +128,15 @@ describe('clearAllData', () => {
 });
 
 function twin(fanId: number) {
-  return { fanId, overlap: 1, jaccard: 0.1, score: 1, labelCluster: false, computedAt: 0 };
+  return {
+    fanId,
+    overlap: 1,
+    jaccard: 0.1,
+    score: 1,
+    labelCluster: false,
+    lately: null,
+    yearAgo: null,
+    latelyOverlap: 0,
+    computedAt: 0,
+  };
 }

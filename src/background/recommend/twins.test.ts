@@ -4,6 +4,7 @@ import type { CollectionItem, ItemKey, Supporter } from '../../bandcamp';
 import {
   DigheadDb,
   finishFanScan,
+  getLatelyTwins,
   getTwins,
   putOwnership,
   readTwinCandidates,
@@ -12,6 +13,7 @@ import {
   upsertSupporterFans,
   type FanStatus,
 } from '../../db';
+import { MONTH_MS } from '../../scoring/lately';
 import { LABEL_CLUSTER_FACTOR } from '../../scoring/twins';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { computeTwins } from './twins';
@@ -79,12 +81,12 @@ async function mine(items: CollectionItem[]) {
 const filler = (from: number, count: number, bandId = 9) =>
   Array.from({ length: count }, (_, i) => item(`a${from + i}`, bandId, 1000));
 
-async function run(settings: Partial<Settings> = {}) {
+async function run(settings: Partial<Settings> = {}, now = 5) {
   return computeTwins(
     {
       db,
       settings: { ...DEFAULT_SETTINGS, minCollectionSize: 1, ...settings },
-      now: 5,
+      now,
       yieldNow: async () => undefined,
     },
     ME,
@@ -160,6 +162,39 @@ describe('computeTwins', () => {
 
     expect(await run()).toEqual([]);
     expect(await getTwins(db)).toEqual([]);
+  });
+});
+
+describe('computeTwins lately', () => {
+  const NOW = 1000 * MONTH_MS;
+  /** `item`, bought that many months before NOW. */
+  const bought = (monthsAgo: number, key: ItemKey, bandId = 1, owners = 3): CollectionItem => ({
+    ...item(key, bandId, owners),
+    addedAt: NOW - monthsAgo * MONTH_MS,
+  });
+  const recent = (from: number, count: number) =>
+    Array.from({ length: count }, (_, i) => bought(1, `a${from + i}`, 9, 1000));
+
+  it('keeps a second leaderboard of the fans in step with you lately', async () => {
+    // You bought a1, a2 this month, a3–a6 four years ago.
+    await mine([bought(1, 'a1'), bought(1, 'a2'), ...[3, 4, 5, 6].map((n) => bought(48, `a${n}`))]);
+    // Old twin: four releases in common, all from four years ago, and nothing bought since.
+    await fan(
+      10,
+      [3, 4, 5, 6].map((n) => bought(48, `a${n}`)),
+    );
+    // Lately: one release in common, bought this month, among other recent buys.
+    await fan(11, [bought(1, 'a1'), ...recent(100, 6)]);
+    // Bought a lot lately, but shares only an old release with you.
+    await fan(12, [bought(48, 'a3'), ...recent(200, 8)]);
+
+    const twins = await run({}, NOW);
+    const lately = await getLatelyTwins(db);
+
+    expect(twins.map((twin) => twin.fanId)).toEqual([10, 11, 12]);
+    expect(twins[0]).toMatchObject({ lately: null, latelyOverlap: 0 });
+    expect(lately.map((twin) => twin.fanId)).toEqual([11]);
+    expect(lately[0]).toMatchObject({ latelyOverlap: 1, yearAgo: null, computedAt: NOW });
   });
 });
 

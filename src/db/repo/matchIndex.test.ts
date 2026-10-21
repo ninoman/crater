@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import Dexie from 'dexie';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { keyFromNumber, type CollectionItem, type ItemKey, type Supporter } from '../../bandcamp';
-import { buildMatchIndex } from '../matchIndex';
+import { buildMatchIndex, collectionMatches } from '../matchIndex';
 import { DigheadDb, type OwnershipRecord } from '../schema';
 import { hiddenMatchKeys, hideRelease } from './hidden';
 import { getOwnerCounts } from './matchIndex';
@@ -65,10 +65,27 @@ describe('buildMatchIndex', () => {
 
     expect(buildMatchIndex(rows)).toEqual({
       fanMatches: [
-        { fanId: 1, matchIds: Float64Array.from([1]) },
-        { fanId: 2, matchIds: Float64Array.from([1]) },
+        { fanId: 1, matchIds: Float64Array.from([1]), matchTimes: Float64Array.from([0]) },
+        { fanId: 2, matchIds: Float64Array.from([1]), matchTimes: Float64Array.from([0]) },
       ],
       matchOwners: [{ matchId: 1, owners: 2 }],
+    });
+  });
+});
+
+describe('collectionMatches', () => {
+  it('keeps the newest purchase under each release, 0 when none is dated', () => {
+    const rows: OwnershipRecord[] = [
+      { fanId: 1, itemKey: 't2', matchKey: 'a1', source: 'collection', addedAt: 100 },
+      { fanId: 1, itemKey: 'a1', matchKey: 'a1', source: 'collection', addedAt: 300 },
+      { fanId: 1, itemKey: 't3', matchKey: 'a1', source: 'collection', addedAt: null },
+      { fanId: 1, itemKey: 'a5', matchKey: 'a5', source: 'collection', addedAt: null },
+      { fanId: 1, itemKey: 'a4', matchKey: 'a4', source: 'wishlist', addedAt: 900 },
+    ];
+
+    expect(collectionMatches(rows)).toEqual({
+      matchIds: Float64Array.from([1, 5]),
+      matchTimes: Float64Array.from([300, 0]),
     });
   });
 });
@@ -120,6 +137,41 @@ describe('hidden', () => {
 
     expect(await hiddenMatchKeys(db)).toEqual(new Set(['a1']));
     expect(await db.hidden.get('a1')).toEqual({ matchKey: 'a1', hiddenAt: 10 });
+  });
+});
+
+describe('upgrade to v6', () => {
+  it('adds purchase times to the match index and blanks lately on stored twins', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(5).stores({
+      ownership: '[fanId+itemKey], fanId, itemKey, matchKey',
+      twins: 'fanId, score',
+      fanMatches: 'fanId',
+    });
+    await old.table('ownership').bulkPut([
+      { fanId: 1, itemKey: 'a1', matchKey: 'a1', source: 'collection', addedAt: 500 },
+      { fanId: 1, itemKey: 'a2', matchKey: 'a2', source: 'collection', addedAt: null },
+    ]);
+    await old.table('fanMatches').put({ fanId: 1, matchIds: Float64Array.from([1, 2]) });
+    await old.table('twins').put({ fanId: 2, overlap: 1, jaccard: 1, score: 1, computedAt: 0 });
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+
+    expect(await upgraded.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: Float64Array.from([1, 2]),
+      matchTimes: Float64Array.from([500, 0]),
+    });
+    expect(await upgraded.twins.get(2)).toMatchObject({
+      lately: null,
+      yearAgo: null,
+      latelyOverlap: 0,
+    });
+    expect(await upgraded.latelyTwins.count()).toBe(0);
+    await upgraded.delete();
   });
 });
 

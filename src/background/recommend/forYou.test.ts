@@ -63,8 +63,12 @@ async function twins(scores: [fanId: number, score: number][]) {
       jaccard: 0.1,
       score,
       labelCluster: false,
+      lately: null,
+      yearAgo: null,
+      latelyOverlap: 0,
       computedAt: 0,
     })),
+    [],
   );
 }
 

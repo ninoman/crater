@@ -28,7 +28,11 @@ async function seed(target: DigheadDb): Promise<void> {
     source: 'collection',
     addedAt: null,
   });
-  await target.fanMatches.put({ fanId: 1, matchIds: new Float64Array([1, 2, 3]) });
+  await target.fanMatches.put({
+    fanId: 1,
+    matchIds: new Float64Array([1, 2, 3]),
+    matchTimes: new Float64Array([0, 5, 9]),
+  });
   await target.me.put({ id: 'self', fanId: 1, username: 'a', syncedAt: 5 });
   await target.tags.put({ id: 7, name: 'Ambient', nameKey: 'ambient' });
   await target.following.put({
@@ -119,6 +123,46 @@ describe('refused files', () => {
       importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase),
     ).rejects.toThrow('newer version');
     expect(await snapshot(db)).toEqual(before);
+  });
+
+  it('restores a v5 backup, rebuilding what v6 added', async () => {
+    await seed(db);
+    await db.ownership.put({
+      fanId: 1,
+      itemKey: 'a2',
+      matchKey: 'a2',
+      source: 'collection',
+      addedAt: 400,
+    });
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 5;
+    json.data.tables = json.data.tables.filter((t: { name: string }) => t.name !== 'latelyTwins');
+    json.data.data = json.data.data.filter(
+      (t: { tableName: string }) => t.tableName !== 'latelyTwins',
+    );
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    // Rebuilt from ownership, so the seeded stand-in list is replaced by the real one.
+    expect(await db.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: Float64Array.from([1, 2]),
+      matchTimes: Float64Array.from([0, 400]),
+    });
+    expect(await db.tags.count()).toBe(1);
+  });
+
+  it('refuses a backup older than any build that made backups', async () => {
+    await seed(db);
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 4;
+
+    await expect(
+      importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase),
+    ).rejects.toThrow('older version');
   });
 
   it('changes nothing for a file cut off mid-rows', async () => {

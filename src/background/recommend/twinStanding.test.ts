@@ -4,7 +4,17 @@ import { DigheadDb, replaceTwins, type TwinRecord } from '../../db';
 import { getTwinStanding, getTwinStandings, twinStanding, twinStandings } from './twinStanding';
 
 function twin(fanId: number, score: number, overlap = 3, jaccard = 0.1): TwinRecord {
-  return { fanId, overlap, jaccard, score, labelCluster: false, computedAt: 7 };
+  return {
+    fanId,
+    overlap,
+    jaccard,
+    score,
+    labelCluster: false,
+    lately: null,
+    yearAgo: null,
+    latelyOverlap: 0,
+    computedAt: 7,
+  };
 }
 
 describe('twinStanding', () => {
@@ -48,7 +58,7 @@ describe('getTwinStanding', () => {
   });
 
   it('ranks by stored score, not insertion order', async () => {
-    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, 5, 0.25)]);
+    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, 5, 0.25)], []);
 
     expect(await getTwinStanding(db, 10)).toEqual({ rank: 1, overlap: 5, matchPct: 25 });
     expect(await getTwinStanding(db, 11)).toMatchObject({ rank: 2 });
@@ -56,7 +66,7 @@ describe('getTwinStanding', () => {
   });
 
   it('batches the same answers in one read', async () => {
-    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, 5, 0.25)]);
+    await replaceTwins(db, [twin(11, 0.2), twin(10, 0.5, 5, 0.25)], []);
 
     expect(await getTwinStandings(db, [10, 11, 12])).toEqual({
       10: await getTwinStanding(db, 10),

@@ -14,6 +14,9 @@ function row(rank: number, overrides: Partial<TwinRow> = {}): TwinRow {
     jaccard: 0.1,
     score: 1 / rank,
     labelCluster: false,
+    lately: null,
+    latelyOverlap: 0,
+    trend: 'quiet',
     ...overrides,
   };
 }
@@ -31,6 +34,16 @@ describe('sortTwins', () => {
     expect(ranks(sortTwins(ROWS, 'score'))).toEqual([1, 2, 3]);
     expect(ranks(sortTwins(ROWS, 'overlap'))).toEqual([2, 1, 3]);
     expect(ranks(sortTwins(ROWS, 'jaccard'))).toEqual([3, 1, 2]);
+  });
+
+  it('sorts by lately score with missing scores last', () => {
+    const rows = [
+      row(1, { lately: null }),
+      row(2, { lately: 0.1, latelyOverlap: 4 }),
+      row(3, { lately: 0.3, latelyOverlap: 1 }),
+    ];
+    expect(ranks(sortTwins(rows, 'lately'))).toEqual([3, 2, 1]);
+    expect(ranks(sortTwins(rows, 'latelyOverlap'))).toEqual([2, 3, 1]);
   });
 
   it('keeps leaderboard order for ties and leaves the input alone', () => {
