@@ -4,6 +4,7 @@ import type { CollectionItem, ItemKey, Supporter } from '../../bandcamp';
 import {
   DigheadDb,
   finishFanScan,
+  markQuickRead,
   getLatelyTwins,
   getTwins,
   putOwnership,
@@ -70,7 +71,8 @@ async function fan(fanId: number, items: CollectionItem[], status: FanStatus = '
   await upsertCollectionItems(db, items, 0);
   await upsertSupporterFans(db, [supporter(fanId)], 0);
   await putOwnership(db, fanId, items, 'collection');
-  if (status !== 'queued') await finishFanScan(db, fanId, status, items.length, 0);
+  if (status === 'quick') await markQuickRead(db, fanId, items.length, 0);
+  else if (status !== 'queued') await finishFanScan(db, fanId, status, items.length, 0);
 }
 
 async function mine(items: CollectionItem[]) {
@@ -125,10 +127,11 @@ describe('computeTwins', () => {
     expect(twin?.score).toBeCloseTo(0.5 / Math.sqrt(1 * 4));
   });
 
-  it('leaves out you, unread fans and fans outside the size range', async () => {
+  it('leaves out you, unread or quick-read fans and fans outside the size range', async () => {
     await mine([item('a1')]);
     await fan(10, [item('a1')], 'private');
     await fan(11, [item('a1')], 'queued');
+    await fan(14, [item('a1'), ...filler(300, 2)], 'quick');
     await fan(12, [item('a1'), ...filler(100, 5)]);
     await fan(13, [item('a1'), ...filler(200, 1)], 'partial');
 

@@ -3,11 +3,23 @@ import { fanFromSupporter } from '../mappers';
 import type { DigheadDb, FanRecord, FanStatus } from '../schema';
 import { refreshFanMatches } from './matchIndex';
 
-const READ_STATUSES: FanStatus[] = ['done', 'partial'];
+const FULLY_READ: FanStatus[] = ['done', 'partial'];
+const READ: FanStatus[] = [...FULLY_READ, 'quick'];
 
-/** Fans whose collection we've actually read. Private and failed fans own nothing we can see. */
+/**
+ * Fans whose collection we've read, if only the quick read. Private and failed fans own
+ * nothing we can see.
+ */
 export function collectionRead(status: FanStatus | undefined): boolean {
-  return status !== undefined && READ_STATUSES.includes(status);
+  return status !== undefined && READ.includes(status);
+}
+
+/**
+ * Fans read from the newest item on: what twins compare. A quick read is 100 items from one
+ * moment, too narrow a sample of their taste.
+ */
+export function collectionFullyRead(status: FanStatus | undefined): boolean {
+  return status !== undefined && FULLY_READ.includes(status);
 }
 
 /**
@@ -39,9 +51,9 @@ export async function upsertSupporterFans(
   });
 }
 
-/** How many fans' collections we've read: the pool twins and Also bought draw from. */
+/** How many fans' collections we've fully read: the pool twins draw from. */
 export function countReadFans(db: DigheadDb): Promise<number> {
-  return db.fans.where('status').anyOf(READ_STATUSES).count();
+  return db.fans.where('status').anyOf(FULLY_READ).count();
 }
 
 export function getFan(db: DigheadDb, fanId: number): Promise<FanRecord | undefined> {
@@ -59,7 +71,7 @@ export async function getFans(db: DigheadDb, fanIds: number[]): Promise<(FanReco
 export async function finishFanScan(
   db: DigheadDb,
   fanId: number,
-  status: Exclude<FanStatus, 'queued'>,
+  status: Exclude<FanStatus, 'queued' | 'quick'>,
   scannedItems: number,
   now: number,
 ): Promise<void> {
@@ -74,6 +86,19 @@ export async function finishFanScan(
     collectionFetchedAt: now,
     ...(status === 'done' ? { collectionSize: scannedItems } : {}),
   });
+}
+
+/**
+ * A quick read is in (decisions §12). Not a fresh read: the full scan is still queued, and if
+ * it's lost the fan is queued again the next time a release lists them.
+ */
+export async function markQuickRead(
+  db: DigheadDb,
+  fanId: number,
+  scannedItems: number,
+  now: number,
+): Promise<void> {
+  await db.fans.update(fanId, { status: 'quick', scannedItems, lastSeenAt: now });
 }
 
 /** What a fan's profile page told us (pass 1, decisions §12). */

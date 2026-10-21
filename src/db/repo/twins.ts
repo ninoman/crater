@@ -2,7 +2,7 @@
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { DigheadDb, FanMatchesRecord, ItemRecord, TwinRecord } from '../schema';
-import { collectionRead } from './fans';
+import { collectionFullyRead } from './fans';
 
 /** What rarity weighs a release by: Bandcamp's counts (album first) and the owners we've seen. */
 export interface SupporterCounts {
@@ -134,7 +134,7 @@ export async function readTwinCandidates(
     const candidates: TwinCandidate[] = [];
     lists.forEach((list, i) => {
       const fan = fans[i];
-      if (!fan || fan.fanId === meFanId || !collectionRead(fan.status)) return;
+      if (!fan || fan.fanId === meFanId || !collectionFullyRead(fan.status)) return;
       candidates.push({
         fanId: fan.fanId,
         matchIds: list.matchIds,

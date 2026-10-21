@@ -4,7 +4,8 @@ import type { ItemKey } from '../../bandcamp';
 import { DigheadDb, enqueueAt, fanJob, refreshFanMatches } from '../../db';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
-import { FOREGROUND, SEED } from './priority';
+import type { StepEvent } from './context';
+import { BACKGROUND, FOREGROUND, FULL_SCAN_RANK, SEED } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { INITIAL_SCANNER_STATE, type ScannerState, type ScannerStore } from './state';
 
@@ -108,7 +109,7 @@ let db: DigheadDb;
 let store: ReturnType<typeof memoryStore>;
 let settings: Settings;
 
-function deps(): SchedulerDeps {
+function deps(overrides: Partial<SchedulerDeps> = {}): SchedulerDeps {
   return {
     db,
     fetchJson,
@@ -121,6 +122,7 @@ function deps(): SchedulerDeps {
     owner: 'worker-1',
     waitForOwnSync: async () => {},
     onStep: async () => {},
+    ...overrides,
   };
 }
 
@@ -262,5 +264,104 @@ describe('pass 1: profile pages', () => {
     await drainQueue(deps());
 
     expect(store.state.parserError).toBeNull();
+  });
+});
+
+describe('pass 2: quick read, then full scan', () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const token = (ms: number) => `${Math.floor(ms / 1000)}::a::`;
+
+  async function bought(fanId: number, at: number) {
+    await db.ownership.put({
+      fanId,
+      itemKey: RELEASE,
+      matchKey: RELEASE,
+      source: 'collection',
+      addedAt: at,
+    });
+  }
+
+  it('reads 100 items from a few months after the purchase, then the rest in the background', async () => {
+    await signIn();
+    const requests = fakeBandcamp({
+      11: { inCommon: 40, items: 250 },
+      12: { inCommon: 0, items: 250 },
+    });
+    await listSupporters([11, 12]);
+    await bought(11, START - 400 * DAY);
+    await bought(12, START - 10 * DAY);
+    const events: string[] = [];
+    const record = async (job: { target: string }, event: StepEvent) =>
+      void events.push(`${job.target} ${event}`);
+
+    // Stop once both quick reads are in, to look at the queue between passes.
+    let quickReads = 0;
+    await drainQueue(
+      deps({
+        onStep: async (job, event) => {
+          await record(job, event);
+          if (event === 'read' && ++quickReads === 2) store.state.paused = true;
+        },
+      }),
+    );
+
+    expect(requests).toEqual([
+      'profile 11',
+      `fan 11 ${token(START - 310 * DAY)}`,
+      'profile 12',
+      // A purchase 10 days ago anchors at now, not in the future.
+      expect.stringMatching(/^fan 12 \d+::a::$/),
+    ]);
+    expect((await db.fans.bulkGet([11, 12])).map((fan) => fan?.status)).toEqual(['quick', 'quick']);
+    const jobs = await db.queue.orderBy('[priority+nextAttemptAt+rank]').toArray();
+    expect(jobs.map((job) => job.target)).toEqual(['11', '12']);
+    expect(jobs.every((job) => job.priority === BACKGROUND && job.rank > FULL_SCAN_RANK)).toBe(
+      true,
+    );
+
+    store.state.paused = false;
+    await drainQueue(deps({ onStep: record }));
+
+    expect(requests.slice(4)).toEqual([
+      expect.stringMatching(/^fan 11 \d+::a::$/),
+      'fan 11 p:11:100',
+      'fan 11 p:11:200',
+      // Bought lately, so the quick read was the top of the collection: carry on from it.
+      'fan 12 p:12:100',
+      'fan 12 p:12:200',
+    ]);
+    expect((await db.fans.bulkGet([11, 12])).map((fan) => fan?.status)).toEqual(['done', 'done']);
+    expect(events.filter((event) => !event.endsWith('continued'))).toEqual([
+      '11 read',
+      '12 read',
+      '11 finished',
+      '12 finished',
+    ]);
+  });
+
+  it('finishes in one read a collection that fits', async () => {
+    await signIn();
+    const requests = fakeBandcamp({ 11: { inCommon: 3, items: 80 } });
+    await listSupporters([11]);
+    await bought(11, START - 400 * DAY);
+
+    await drainQueue(deps());
+
+    expect(requests).toEqual(['profile 11', expect.stringMatching(/^fan 11 \d+::a::$/)]);
+    expect(await db.fans.get(11)).toMatchObject({ status: 'done', collectionSize: 80 });
+  });
+
+  it('logged out, reads from the top and carries the full scan on from there', async () => {
+    const requests = fakeBandcamp({ 11: { inCommon: null, items: 250 } });
+    await listSupporters([11]);
+
+    await drainQueue(deps());
+
+    expect(requests).toEqual([
+      expect.stringMatching(/^fan 11 \d+::a::$/),
+      'fan 11 p:11:100',
+      'fan 11 p:11:200',
+    ]);
+    expect(await db.fans.get(11)).toMatchObject({ status: 'done', scannedItems: 250 });
   });
 });

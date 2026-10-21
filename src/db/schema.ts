@@ -23,7 +23,11 @@ export interface ItemRecord {
   fetchedAt: number;
 }
 
-export type FanStatus = 'queued' | 'partial' | 'done' | 'private' | 'error';
+/**
+ * `quick`: only the 100 items around their purchase of a release were read (decisions §12). Also
+ * bought uses them; twins wait for the full scan, which is still queued.
+ */
+export type FanStatus = 'queued' | 'quick' | 'partial' | 'done' | 'private' | 'error';
 
 export interface FanRecord {
   fanId: number;
