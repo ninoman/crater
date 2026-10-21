@@ -1,5 +1,5 @@
 // Re-captures the public (logged-out) fixtures, runs the real parsers on them and diffs their
-// structure against the saved ones. Usage: npm run fixtures:refresh [-- --write] [-- <file>...]
+// structure against the saved ones. Usage: pnpm fixtures:refresh [--write] [<file>...]
 //
 //   (no flags)  capture into tests/fixtures/.fresh/ and report, saved fixtures untouched
 //   --write     also overwrite the saved fixtures with the fresh captures

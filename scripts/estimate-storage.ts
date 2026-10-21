@@ -1,4 +1,4 @@
-// Estimates how big the IndexedDB database gets for a heavy user. Usage: npm run storage:estimate
+// Estimates how big the IndexedDB database gets for a heavy user. Usage: pnpm storage:estimate
 //
 // Record sizes come from real fixture data run through the real mappers, serialized the way
 // Chrome stores IndexedDB values (V8 structured clone). Each index adds an entry holding its

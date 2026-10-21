@@ -36,15 +36,18 @@ jobs:
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
 
+      # Takes the pnpm version from packageManager in package.json.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
 
       - name: Zip the build
         run: cd dist && zip -r "../dighead-$TAG.zip" .
@@ -62,4 +65,4 @@ jobs:
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-        run: npx --yes chrome-webstore-upload-cli@4.0.2 --source "dighead-$TAG.zip"
+        run: pnpm dlx chrome-webstore-upload-cli@4.0.2 --source "dighead-$TAG.zip"

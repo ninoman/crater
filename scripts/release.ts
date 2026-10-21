@@ -1,4 +1,4 @@
-// Zips a Web Store build of the current version: npm run release:build.
+// Zips a Web Store build of the current version: pnpm release:build.
 // Versioning, the changelog and store submission are done by release-please in CI
 // (docs/releasing.md); this is for the first listing, which the store API can't create.
 
@@ -11,8 +11,8 @@ const path = (file: string) => new URL(file, root);
 const run = (command: string, args: string[], cwd = root) =>
   execFileSync(command, args, { cwd, stdio: 'inherit' });
 
-run('npm', ['test']);
-run('npm', ['run', 'build']);
+run('pnpm', ['test']);
+run('pnpm', ['build']);
 
 // Name and version come from the built manifest, so renaming the extension (ROADMAP 8.1) needs
 // no edit here and the zip name can't disagree with what ships.

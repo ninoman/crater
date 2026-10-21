@@ -65,7 +65,7 @@ P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also b
 
 Also added: the UI kit in `src/ui/` (tokens, Button, Panel, Tabs (Radix), EmptyState, StatusDot), zod schemas for every Bandcamp shape, and pure request builders in `bandcamp/requests.ts`.
 
-**Done when:** `npm run build` produces a loadable extension, `npm test` is green, and a "hello" panel renders in a shadow root on an album page.
+**Done when:** `pnpm build` produces a loadable extension, `pnpm test` is green, and a "hello" panel renders in a shadow root on an album page.
 
 ---
 
@@ -127,7 +127,7 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
    - "hide" saves a hidden-items set that the scorers respect
 6. [x] "Parser broken" state: if a `ParserError` comes up, show a clear message instead of an empty panel.
 7. [x] Scoring tests on a small synthetic dataset with known expected rankings.
-8. [x] Performance check: seed around 300k `ownership` rows and confirm a re-score stays under about 200 ms. `npm run perf`: 39 ms at 300k rows, 88 ms at 1M. Uses a precomputed match index (decisions §6).
+8. [x] Performance check: seed around 300k `ownership` rows and confirm a re-score stays under about 200 ms. `pnpm perf`: 39 ms at 300k rows, 88 ms at 1M. Uses a precomputed match index (decisions §6).
 
 Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match index and the `hidden` store), a "queue paused" notice in the sidebar, and the collapsed state kept across pages.
 
@@ -179,7 +179,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 1. [x] Capture the following fixtures (pagedata and the `following_bands` / `following_fans` endpoint) and write the findings into decisions §8.
 2. [x] Capture the rendered following tab and the band follow/unfollow request, logged in (decisions §8).
 3. [x] Find how Bandcamp's follow buttons work, so our cards can reuse its handler instead of sending requests (decisions §8).
-4. [x] Parser with fixture tests, plus the fixtures in `npm run fixtures:refresh`.
+4. [x] Parser with fixture tests, plus the fixtures in `pnpm fixtures:refresh`.
 5. [x] Schema v5 migration.
 6. [x] Following sync inside your own sync (always full, 500 per request).
 7. [x] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.

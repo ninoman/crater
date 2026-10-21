@@ -14,7 +14,7 @@ The manifest reads its version from `package.json`, so there is nothing else to 
 
 ## One-time setup
 
-1. **First listing.** Run `npm run release:build` (tests, builds and zips `dist/` into `releases/`) and upload that 0.1.0 zip by hand in the [developer dashboard](https://chrome.google.com/webstore/devconsole). The API can only update an existing item. Note the extension ID and your publisher ID.
+1. **First listing.** Run `pnpm release:build` (tests, builds and zips `dist/` into `releases/`) and upload that 0.1.0 zip by hand in the [developer dashboard](https://chrome.google.com/webstore/devconsole). The API can only update an existing item. Note the extension ID and your publisher ID.
 2. **API credentials.** Enable the Chrome Web Store API in a Google Cloud project and create an OAuth client and refresh token ([guide](https://github.com/fregante/chrome-webstore-upload-keys)).
 3. **Repo secrets.** In GitHub → Settings → Secrets and variables → Actions, add `CWS_EXTENSION_ID`, `CWS_PUBLISHER_ID`, `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET` and `CWS_REFRESH_TOKEN`.
 4. **Actions permission.** In GitHub → Settings → Actions → General, enable *Allow GitHub Actions to create and approve pull requests*, or release-please can't open its PR.
@@ -23,9 +23,9 @@ The manifest reads its version from `package.json`, so there is nothing else to 
 
 Symptoms: the sidebar shows "parser broken", or a scan fails with a `ParserError`.
 
-1. Diff the live responses against the saved fixtures with `npm run fixtures:refresh`. It captures fresh copies into `tests/fixtures/.fresh/` and prints which keys were added, removed or changed type, and which parser now rejects the body. Saved fixtures are untouched.
+1. Diff the live responses against the saved fixtures with `pnpm fixtures:refresh`. It captures fresh copies into `tests/fixtures/.fresh/` and prints which keys were added, removed or changed type, and which parser now rejects the body. Saved fixtures are untouched.
 2. Update the zod schema and the parser in `src/bandcamp/`. Bandcamp knowledge stays in that folder only.
-3. Adopt the new samples with `npm run fixtures:refresh -- --write` (or name single files) and review the fixture diff. Logged-in fixtures aren't refreshed by the script: recapture those by hand per `tests/fixtures/README.md`.
-4. Update the fixture tests to cover the new shape, then `npm test`.
+3. Adopt the new samples with `pnpm fixtures:refresh --write` (or name single files) and review the fixture diff. Logged-in fixtures aren't refreshed by the script: recapture those by hand per `tests/fixtures/README.md`.
+4. Update the fixture tests to cover the new shape, then `pnpm test`.
 5. Commit as `fix: …` (for example `fix: parse the new supporters payload`) and push to `main`.
 6. Merge the release PR. CI submits the patch, and the store review usually takes hours to days; users on the old version stay broken until it's approved and Chrome auto-updates.

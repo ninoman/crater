@@ -168,7 +168,7 @@ Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering
   - `matchOwners`: per matchKey, how many fans' collections hold it.
 - **They're derived from `ownership` and never drift from it.** Every ownership write (`putOwnership`, `removeOwnershipExcept`, `addSupporterOwnership`) recomputes the touched fans' lists from their rows in the same transaction (`refreshFanMatches`). Wishlists don't count as owning. The v3 upgrade builds both tables from existing rows.
 - **Keys are stored as numbers.** `keyToNumber` maps albums to `+id` and tracks to `−id`, and each fan's list is a sorted `Float64Array`. Strings cost about twice as much to read and count, and made garbage collection the bottleneck in a big heap.
-- **The roadmap's "move scoring to an offscreen document" wasn't needed.** A re-score takes 39 ms at 300k rows and 88 ms at the caps (500 supporters × 2,000 items, about 1M rows), both in fake-indexeddb, which is slower than Chrome's IndexedDB. Check: `npm run perf` (`tests/perf/`, kept out of `npm test` because it seeds for ~10 s). An earlier string-based version measured ~580 ms at full size; part of that gap was the test seeding everything in one huge transaction, which fake-indexeddb handles badly.
+- **The roadmap's "move scoring to an offscreen document" wasn't needed.** A re-score takes 39 ms at 300k rows and 88 ms at the caps (500 supporters × 2,000 items, about 1M rows), both in fake-indexeddb, which is slower than Chrome's IndexedDB. Check: `pnpm perf` (`tests/perf/`, kept out of `pnpm test` because it seeds for ~10 s). An earlier string-based version measured ~580 ms at full size; part of that gap was the test seeding everything in one huge transaction, which fake-indexeddb handles badly.
 
 ### Scoring
 
@@ -186,7 +186,7 @@ Code: `twinBoosts` in `src/scoring/alsoBought.ts`; `gatherAlsoBought` reads the 
 - **twinShare(i) = min(1, Σ score(F) / score(best twin))** over the twin supporters F who own i, using every twin on the stored leaderboard (top 200, §7). Your closest twin alone, or two twins half as close, gives the full share. Dividing by your best twin's score keeps the boost independent of how big twin scores happen to be, which varies with collection sizes.
 - **Multiplier `1 + 0.5 × twinShare`, so at most ×1.5** (`TWIN_BOOST_MAX`). It's multiplicative so it scales with the evidence: at the same lift, a release your twins own can pass one with up to 1.5 times as many co-owners, never more. Bounded, so twins re-order close calls without drowning out what the supporters as a whole bought. Twins flagged as label clusters already carry ×0.3 in their score, so they barely move anything.
 - **The reason line says so:** "7 of 48 supporters own this, 2 are your twins".
-- **Cost:** none measurable. `npm run perf` now also seeds a full 200-twin leaderboard with 50 twins among the 300 supporters, and medians were the same with and without it (~70 ms on a loaded machine).
+- **Cost:** none measurable. `pnpm perf` now also seeds a full 200-twin leaderboard with 50 twins among the 300 supporters, and medians were the same with and without it (~70 ms on a loaded machine).
 - **Filters:** the release itself, hidden releases, and releases you own or wishlisted *as a whole*. Owning tracks of an album keeps the album in, tagged "you own N tracks" (§3.8). Wishlisting a single track keeps the album in, untagged.
 - **Display:** rows point at the album. If no scanned collection holds the album itself, only tracks of it, the row shows one of those tracks (title and link) until the album turns up. The reason line doesn't say whether owners bought the album or only tracks.
 - **`weights.ts`** implements `w(i)` and `supporters(i)` (album count, then track count, then owners we've seen). Phase 4 only uses `supporters(i)`, to order fallback picks. `w(i)` is for twins and For you.
@@ -387,7 +387,7 @@ Code: `src/popup/`, `src/shared/settings.ts`, `src/background/maintenance.ts`, `
 
 ### Storage estimate
 
-`npm run storage:estimate` sizes records from real fixtures through the real mappers, serialized as V8 structured clones (Chrome's IndexedDB value format), and adds one entry per index (index key + primary key + ~16 B LevelDB overhead). Compression is ignored, so it leans high.
+`pnpm storage:estimate` sizes records from real fixtures through the real mappers, serialized as V8 structured clones (Chrome's IndexedDB value format), and adds one entry per index (index key + primary key + ~16 B LevelDB overhead). Compression is ignored, so it leans high.
 
 | Scenario (5k own items, 20k fans) | Ownership rows | Items | Total |
 | --- | --- | --- | --- |
@@ -395,7 +395,7 @@ Code: `src/popup/`, `src/shared/settings.ts`, `src/background/maintenance.ts`, `
 | 500 items per fan on average | 10M | 1.5M | **~4 GB** |
 
 - **`ownership` is ~89% of it**, at ~360 B per row: the value (~100 B) plus four entries (primary key and three indexes), each carrying the `[fanId+itemKey]` primary key.
-- **Cheapest win, not done yet:** the `ownership.itemKey` index is never queried outside tests, and `ownership.fanId` duplicates the primary key's prefix (`where('[fanId+itemKey]').between([id, Dexie.minKey], [id, Dexie.maxKey])`). Dropping both cuts about 40% of ownership. That's a schema version of its own, measured with `npm run perf` first.
+- **Cheapest win, not done yet:** the `ownership.itemKey` index is never queried outside tests, and `ownership.fanId` duplicates the primary key's prefix (`where('[fanId+itemKey]').between([id, Dexie.minKey], [id, Dexie.maxKey])`). Dropping both cuts about 40% of ownership. That's a schema version of its own, measured with `pnpm perf` first.
 - No quota problem at these sizes: Chrome lets an origin use a large share of free disk. If the Web Store build ever needs a guarantee, that's the `unlimitedStorage` permission (Phase 8).
 - A real-browser check is still worth doing in dogfooding: `navigator.storage.estimate()` from the worker console after a few weeks of use.
 
@@ -410,7 +410,7 @@ Code: `src/popup/`, `src/shared/settings.ts`, `src/background/maintenance.ts`, `
 
 Code: `src/db/backup.ts`, `src/shared/backupFile.ts`, `src/shared/backupStaging.ts`, `src/background/backupHandlers.ts`, `src/popup/DatabaseBackup.tsx`. Decided 2026-10-21.
 
-- **Why a library:** `npm run storage:estimate` puts a heavy user at ~4 GB (§9), far too much for one JSON string in the worker. `dexie-export-import` 4.4.1 (published 2026-09-10) streams rows into a Blob, which Chrome keeps on disk. The file is its format: `formatName`, `formatVersion`, `databaseVersion`, every table's rows (typed arrays such as `fanMatches` included). It has no export time; the date is in the filename.
+- **Why a library:** `pnpm storage:estimate` puts a heavy user at ~4 GB (§9), far too much for one JSON string in the worker. `dexie-export-import` 4.4.1 (published 2026-09-10) streams rows into a Blob, which Chrome keeps on disk. The file is its format: `formatName`, `formatVersion`, `databaseVersion`, every table's rows (typed arrays such as `fanMatches` included). It has no export time; the date is in the filename.
 - **Validation:** `backupMetaSchema` (zod) checks the header. Then the file is read end to end without writing anything, counting rows per table against the header, because the library doesn't notice a file cut short. A corrupt or foreign file changes nothing. A backup from a newer schema version is refused with an "update the extension" message. An older one is refused too until a schema bump adds a migration (none exists yet).
 - **All or nothing by snapshot, not one transaction:** the library only keeps an IndexedDB transaction open across file reads with `FileReaderSync`, which service workers don't have (so `db/backup.ts` also shims `FileReader` with `Blob.arrayBuffer()`). Import therefore runs: read-through (above), then export the current data to `backup-snapshot.json` in OPFS, then clear and write, and on any failure write the snapshot back and delete it. If the snapshot can't be saved (disk full), nothing was touched. If the restore itself fails, the snapshot is kept and the error says the old data couldn't be restored automatically. Chosen over an offscreen document with a dedicated worker, which would add a manifest permission, a second runtime and a Blob-less handoff, for the same guarantee.
 - **Disk cost:** at the ~4 GB heavy-user size an import briefly holds the staged file, the snapshot and the new database: roughly 3x the database size free, on top of what the old data uses. Short of that, the snapshot step fails cleanly.

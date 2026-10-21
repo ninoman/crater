@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
-// Perf checks seed big databases, so they run apart from `npm test`: `npm run perf`.
+// Perf checks seed big databases, so they run apart from `pnpm test`: `pnpm perf`.
 export default defineConfig({
   test: {
     include: ['tests/perf/**/*.perf.ts'],

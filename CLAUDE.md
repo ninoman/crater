@@ -23,7 +23,7 @@ The goal is code that stays clean, modular and maintainable as the project grows
 - **Types first.** Define the shapes of data in one place and reuse them. No `any`. Use discriminated unions for messages and job kinds.
 - **Pure where possible.** Keep side effects at the edges (worker, repositories) and logic in pure functions.
 - **No dead code, no speculative abstractions.** Build what the current phase needs, and name things for what they do.
-- **Tests:** every parser has a fixture test, and every scorer has a test on a small synthetic dataset. Run `npm test` before calling a step done.
+- **Tests:** every parser has a fixture test, and every scorer has a test on a small synthetic dataset. Run `pnpm test` before calling a step done.
 - Comments explain *why*, not *what*. Keep them short.
 
 ## UI principles
