@@ -22,3 +22,10 @@ export async function discardStagedFile(name: StagedFile): Promise<void> {
   const root = await navigator.storage.getDirectory();
   await root.removeEntry(`backup-${name}.json`).catch(() => undefined);
 }
+
+export async function hasStagedFile(name: StagedFile): Promise<boolean> {
+  return stagingFile(name, false).then(
+    () => true,
+    () => false,
+  );
+}

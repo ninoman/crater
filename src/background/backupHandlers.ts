@@ -1,16 +1,26 @@
 // Message handlers for full-database backup. The file travels through staging (shared/backupStaging).
 
 import { exportDatabase, importDatabase, type DigheadDb, type SnapshotStore } from '../db';
-import { discardStagedFile, readStagedFile, stageFile } from '../shared/backupStaging';
+import {
+  discardStagedFile,
+  hasStagedFile,
+  readStagedFile,
+  stageFile,
+} from '../shared/backupStaging';
 import type { MessageHandlers } from '../shared/messages';
+import { chromeImportStateStore } from './importState';
 import { refreshTwins } from './recommend';
 import { resetScanDataAfterImport, whileScannerPausedForImport } from './scanner';
 
-export type BackupHandlers = Pick<MessageHandlers, 'exportBackup' | 'importBackup'>;
+export type BackupHandlers = Pick<
+  MessageHandlers,
+  'exportBackup' | 'importBackup' | 'getImportNotice' | 'dismissImportNotice'
+>;
 
-const opfsSnapshot: SnapshotStore = {
+export const opfsSnapshot: SnapshotStore = {
   save: (file) => stageFile('snapshot', file),
   load: () => readStagedFile('snapshot'),
+  exists: () => hasStagedFile('snapshot'),
   discard: () => discardStagedFile('snapshot'),
 };
 
@@ -24,7 +34,12 @@ export function backupHandlers(db: DigheadDb): BackupHandlers {
     importBackup: async () => {
       try {
         return await whileScannerPausedForImport(async () => {
-          const summary = await importDatabase(db, await readStagedFile('import'), opfsSnapshot);
+          const summary = await importDatabase(
+            db,
+            await readStagedFile('import'),
+            opfsSnapshot,
+            (phase) => chromeImportStateStore.save({ phase, notice: null }),
+          );
           await resetScanDataAfterImport();
           return summary;
         });
@@ -32,6 +47,11 @@ export function backupHandlers(db: DigheadDb): BackupHandlers {
         await discardStagedFile('import');
         refreshTwins();
       }
+    },
+    getImportNotice: async () => (await chromeImportStateStore.load()).notice,
+    dismissImportNotice: async () => {
+      await chromeImportStateStore.save({ notice: null });
+      return null;
     },
   };
 }

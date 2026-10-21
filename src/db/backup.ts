@@ -4,6 +4,7 @@
 import { exportDB, importInto, peakImportFile } from 'dexie-export-import';
 import {
   assertRestorableVersion,
+  type ImportPhase,
   parseBackupMeta,
   summarizeBackup,
   type BackupMeta,
@@ -71,10 +72,13 @@ const READ_ONLY = { acceptNameDiff: true, noTransaction: true } as const;
 export interface SnapshotStore {
   save(file: Blob): Promise<void>;
   load(): Promise<Blob>;
+  exists(): Promise<boolean>;
   discard(): Promise<void>;
 }
 
-async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
+/** Clears every table and writes the file's rows. Also how a snapshot is put back. */
+export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
+  ensureFileReader();
   await Promise.all(db.tables.map((table) => table.clear()));
   await importInto(db, file, READ_ONLY);
 }
@@ -85,6 +89,8 @@ async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
  * 2. the current data is exported to `snapshot`, and if that fails nothing has been touched;
  * 3. tables are cleared and written, and if that fails the snapshot is written back.
  *
+ * `onPhase` records how far it got, so a worker killed midway can be recovered (importRecovery).
+ *
  * A single IndexedDB transaction isn't possible here: a service worker can't read the file
  * synchronously, so a transaction would close between chunks (decisions §10).
  */
@@ -92,6 +98,7 @@ export async function importDatabase(
   db: DigheadDb,
   file: Blob,
   snapshot: SnapshotStore,
+  onPhase: (phase: ImportPhase | null) => Promise<void>,
 ): Promise<BackupSummary> {
   ensureFileReader();
   const meta = parseBackupMeta(await peakImportFile(file).catch(() => null));
@@ -102,15 +109,18 @@ export async function importDatabase(
   }
   await verifyRows(db, file, meta);
 
+  await onPhase('snapshotting');
   try {
     await snapshot.save((await exportDatabase(db)).file);
   } catch (error) {
     await snapshot.discard().catch(() => undefined);
+    await onPhase(null);
     throw new Error(
       `Couldn't save a safety copy of your data first, so nothing was changed. ${reason(error)}`,
     );
   }
 
+  await onPhase('writing');
   try {
     await replaceAll(db, file);
   } catch (error) {
@@ -118,14 +128,18 @@ export async function importDatabase(
       await replaceAll(db, await snapshot.load());
     } catch {
       // Keep the snapshot: it's the only copy left of the old data.
+      await onPhase(null);
       throw new Error(
         `The import failed (${reason(error)}) and the old data couldn't be restored automatically.`,
       );
     }
     await snapshot.discard().catch(() => undefined);
+    await onPhase(null);
     throw new Error(`The import failed (${reason(error)}). Your previous data was restored.`);
   }
+  await onPhase('cleanup');
   await snapshot.discard().catch(() => undefined);
+  await onPhase(null);
   return summarizeBackup(meta);
 }
 

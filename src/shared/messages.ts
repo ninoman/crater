@@ -4,7 +4,7 @@
 
 import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
-import type { BackupSummary } from './backupFile';
+import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouResult } from './forYou';
 import type {
   Following,
@@ -95,6 +95,9 @@ export interface MessageMap {
   exportBackup: { request: NoPayload; response: BackupSummary };
   /** Replaces the whole database with the staged file the popup wrote. */
   importBackup: { request: NoPayload; response: BackupSummary };
+  /** What startup recovery did about an interrupted import, until dismissed. */
+  getImportNotice: { request: NoPayload; response: ImportNotice | null };
+  dismissImportNotice: { request: NoPayload; response: null };
   /** Stops the scanner until resumed, from the popup. */
   pauseScanner: { request: NoPayload; response: null };
   resumeScanner: { request: NoPayload; response: null };

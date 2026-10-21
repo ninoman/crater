@@ -1,28 +1,13 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { exportDatabase, importDatabase, type SnapshotStore } from './backup';
+import { memorySnapshot } from '../../tests/memorySnapshot';
+import { exportDatabase, importDatabase } from './backup';
 import { clearAllData } from './repo';
 import { DigheadDb } from './schema';
 
-let db: DigheadDb;
+const noPhase = async () => {};
 
-function memorySnapshot(overrides: Partial<SnapshotStore> = {}) {
-  let held: Blob | null = null;
-  const store: SnapshotStore = {
-    save: async (file) => {
-      held = file;
-    },
-    load: async () => {
-      if (!held) throw new Error('no snapshot');
-      return held;
-    },
-    discard: async () => {
-      held = null;
-    },
-    ...overrides,
-  };
-  return { store, held: () => held };
-}
+let db: DigheadDb;
 
 async function seed(target: DigheadDb): Promise<void> {
   await target.fans.put({
@@ -91,7 +76,7 @@ describe('backup round trip', () => {
     expect(summary).toEqual({ tables: db.tables.length, rows: 7 });
 
     await clearAllData(db);
-    const restored = await importDatabase(db, file, memorySnapshot().store);
+    const restored = await importDatabase(db, file, memorySnapshot().store, noPhase);
 
     expect(restored).toEqual(summary);
     expect(await snapshot(db)).toEqual(before);
@@ -102,9 +87,23 @@ describe('backup round trip', () => {
     const { file } = await exportDatabase(db);
     await db.tags.put({ id: 8, name: 'Extra', nameKey: 'extra' });
 
-    await importDatabase(db, file, memorySnapshot().store);
+    await importDatabase(db, file, memorySnapshot().store, noPhase);
 
     expect(await db.tags.toArray()).toEqual([{ id: 7, name: 'Ambient', nameKey: 'ambient' }]);
+  });
+});
+
+describe('import phases', () => {
+  it('walks snapshotting, writing, cleanup and clears', async () => {
+    await seed(db);
+    const { file } = await exportDatabase(db);
+    const phases: unknown[] = [];
+
+    await importDatabase(db, file, memorySnapshot().store, async (phase) => {
+      phases.push(phase);
+    });
+
+    expect(phases).toEqual(['snapshotting', 'writing', 'cleanup', null]);
   });
 });
 
@@ -117,7 +116,7 @@ describe('refused files', () => {
     json.data.databaseVersion = db.verno + 1;
 
     await expect(
-      importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store),
+      importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase),
     ).rejects.toThrow('newer version');
     expect(await snapshot(db)).toEqual(before);
   });
@@ -133,6 +132,7 @@ describe('refused files', () => {
         db,
         new Blob([text.slice(0, Math.floor(text.length * 0.8))]),
         memorySnapshot().store,
+        noPhase,
       ),
     ).rejects.toThrow('damaged');
     expect(await snapshot(db)).toEqual(before);
@@ -143,10 +143,10 @@ describe('refused files', () => {
     const before = await snapshot(db);
 
     await expect(
-      importDatabase(db, new Blob(['{"tags":[]}']), memorySnapshot().store),
+      importDatabase(db, new Blob(['{"tags":[]}']), memorySnapshot().store, noPhase),
     ).rejects.toThrow("isn't a Dighead backup");
     await expect(
-      importDatabase(db, new Blob(['not json']), memorySnapshot().store),
+      importDatabase(db, new Blob(['not json']), memorySnapshot().store, noPhase),
     ).rejects.toThrow();
     expect(await snapshot(db)).toEqual(before);
   });
@@ -182,13 +182,17 @@ describe('all or nothing', () => {
     await seed(db);
     const before = await snapshot(db);
     const { store, held } = memorySnapshot();
+    const phases: unknown[] = [];
 
-    await expect(importDatabase(db, await failingWriteFile(), store)).rejects.toThrow(
-      'Your previous data was restored',
-    );
+    await expect(
+      importDatabase(db, await failingWriteFile(), store, async (phase) => {
+        phases.push(phase);
+      }),
+    ).rejects.toThrow('Your previous data was restored');
 
     expect(await snapshot(db)).toEqual(before);
     expect(held()).toBeNull();
+    expect(phases).toEqual(['snapshotting', 'writing', null]);
   });
 
   it('keeps the snapshot when restoring fails too', async () => {
@@ -199,7 +203,7 @@ describe('all or nothing', () => {
       },
     });
 
-    await expect(importDatabase(db, await failingWriteFile(), store)).rejects.toThrow(
+    await expect(importDatabase(db, await failingWriteFile(), store, noPhase)).rejects.toThrow(
       "couldn't be restored automatically",
     );
     expect(held()).not.toBeNull();
@@ -217,7 +221,7 @@ describe('all or nothing', () => {
       },
     });
 
-    await expect(importDatabase(db, file, store)).rejects.toThrow('nothing was changed');
+    await expect(importDatabase(db, file, store, noPhase)).rejects.toThrow('nothing was changed');
     expect(await snapshot(db)).toEqual(withExtra);
     expect(withExtra).not.toEqual(before);
   });

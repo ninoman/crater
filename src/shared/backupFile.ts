@@ -59,3 +59,29 @@ export function assertRestorableVersion(fileVersion: number, buildVersion: numbe
     throw new Error('That backup was made by an older version of Dighead and can’t be imported.');
   }
 }
+
+/** How far an import got, kept durably so a worker that dies mid-import can be put right. */
+export type ImportPhase = 'snapshotting' | 'writing' | 'cleanup';
+
+/** What startup recovery found after an interrupted import. */
+export type ImportNotice =
+  | 'rolled-back'
+  | 'completed'
+  | 'cancelled'
+  | 'restore-failed'
+  | 'snapshot-left';
+
+export function importNoticeText(notice: ImportNotice): string {
+  switch (notice) {
+    case 'rolled-back':
+      return 'An interrupted import was rolled back. Your previous data is back.';
+    case 'completed':
+      return 'An interrupted import had finished writing, so it was kept.';
+    case 'cancelled':
+      return 'An interrupted import was cancelled before it changed anything.';
+    case 'restore-failed':
+      return 'An interrupted import couldn’t be rolled back automatically. Your data may be incomplete; a safety copy was kept.';
+    case 'snapshot-left':
+      return 'A safety copy from an earlier import is still stored and wasn’t restored.';
+  }
+}

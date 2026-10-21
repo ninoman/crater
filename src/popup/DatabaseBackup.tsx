@@ -1,10 +1,13 @@
 import { useRef, useState } from 'react';
 import { useDatabaseBackup } from '../hooks/useDatabaseBackup';
+import { useImportNotice } from '../hooks/useImportNotice';
+import { importNoticeText } from '../shared/backupFile';
 import { Button, ConfirmDialog, StatusDot } from '../ui';
 
 /** Export and import of the whole database; import replaces everything, behind a confirm dialog. */
 export function DatabaseBackup() {
   const { status, exportBackup, importBackup } = useDatabaseBackup();
+  const { notice, dismiss } = useImportNotice();
   const input = useRef<HTMLInputElement>(null);
   const [confirming, setConfirming] = useState(false);
   const working = status.state === 'working';
@@ -23,6 +26,16 @@ export function DatabaseBackup() {
             'Everything Dighead has stored, to a file you can restore here or on another machine.'}
         </span>
       </div>
+      {notice && (
+        <div className="dh-danger__text">
+          <StatusDot tone={notice === 'restore-failed' ? 'error' : 'warning'}>
+            {importNoticeText(notice)}
+          </StatusDot>
+          <Button variant="ghost" onClick={dismiss}>
+            Dismiss
+          </Button>
+        </div>
+      )}
       <input
         ref={input}
         type="file"

@@ -7,6 +7,7 @@ import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
 import { refreshTwins } from './recommend';
 import { paceDelayMs } from './scanner/pace';
+import { chromeScannerStore } from './scanner/state';
 import { syncMe } from './syncMe';
 
 /** A page view re-syncs incrementally when the last sync is older than this. */
@@ -43,6 +44,8 @@ export async function ownSyncSettled(): Promise<void> {
 }
 
 async function runSync(requested: SyncMode): Promise<void> {
+  // An import is replacing every table. Skipped, not queued: the next trigger syncs as usual.
+  if ((await chromeScannerStore.load()).importing) return;
   const me = await getMe(db);
   if (!me) return;
   // Without a finished sync there's nothing to be incremental against.
