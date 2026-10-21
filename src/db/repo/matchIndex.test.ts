@@ -62,11 +62,12 @@ describe('buildMatchIndex', () => {
       { fanId: 2, itemKey: 'a9', matchKey: 'a9', source: 'wishlist', addedAt: null },
       { fanId: 3, itemKey: 'a9', matchKey: 'a9', source: 'wishlist', addedAt: null },
     ];
+    const list = (...values: number[]) => Float64Array.from(values);
 
     expect(buildMatchIndex(rows)).toEqual({
       fanMatches: [
-        { fanId: 1, matchIds: Float64Array.from([1]) },
-        { fanId: 2, matchIds: Float64Array.from([1]) },
+        { fanId: 1, matchIds: list(1), trackIds: list(-2), partialIds: list() },
+        { fanId: 2, matchIds: list(1), trackIds: list(-3), partialIds: list(1) },
       ],
       matchOwners: [{ matchId: 1, owners: 2 }],
     });
@@ -149,6 +150,44 @@ describe('upgrade to v3', () => {
     expect(await upgraded.items.get('a1')).toMatchObject({ label: null, labelId: null });
     expect(await upgraded.matchOwners.get(1)).toEqual({ matchId: 1, owners: 2 });
     expect(await upgraded.fanMatches.count()).toBe(2);
+    await upgraded.delete();
+  });
+});
+
+describe('upgrade to v6', () => {
+  it('adds track lists to existing fanMatches records', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const v5 = new Dexie(name);
+    v5.version(5).stores({
+      items: 'itemKey, bandId, albumKey, labelId',
+      fans: 'fanId, status, collectionFetchedAt, lastSeenAt',
+      ownership: '[fanId+itemKey], fanId, itemKey, matchKey',
+      releaseSupporters: 'itemKey, *fanIds',
+      me: 'id',
+      twins: 'fanId, score',
+      queue: '++id, &[kind+target], [priority+nextAttemptAt]',
+      fanMatches: 'fanId',
+      matchOwners: 'matchId',
+      hidden: 'matchKey',
+      following: '[kind+id], kind, *tagIds',
+      tags: '++id, &nameKey',
+    });
+    await v5.table('ownership').bulkPut([
+      { fanId: 1, itemKey: 't2', matchKey: 'a1', source: 'collection', addedAt: null },
+      { fanId: 1, itemKey: 'a5', matchKey: 'a5', source: 'collection', addedAt: null },
+    ]);
+    await v5.table('fanMatches').put({ fanId: 1, matchIds: Float64Array.from([1, 5]) });
+    v5.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+
+    expect(await upgraded.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: Float64Array.from([1, 5]),
+      trackIds: Float64Array.from([-2]),
+      partialIds: Float64Array.from([1]),
+    });
     await upgraded.delete();
   });
 });

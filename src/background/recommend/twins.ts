@@ -43,7 +43,7 @@ export async function computeTwins(deps: TwinsDeps, meFanId: number): Promise<Tw
   };
 
   let best: Twin[] = [];
-  for (let after: number | null = -Infinity; after !== null && basis.mine.length > 0; ) {
+  for (let after: number | null = -Infinity; after !== null && basis.mine.matchIds.length > 0; ) {
     const page = await readTwinCandidates(db, after, PAGE, meFanId);
     for (const candidate of page.candidates) {
       const twin = scoreTwin(candidate, input);

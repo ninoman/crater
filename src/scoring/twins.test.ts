@@ -5,16 +5,24 @@ import {
   isLabelCluster,
   LABEL_CLUSTER_FACTOR,
   scoreTwin,
+  sharedReleases,
   type Candidate,
+  type MyCollection,
   type TwinInput,
 } from './twins';
 
 const ids = (...values: number[]) => Float64Array.from(values).sort();
+const NONE = ids();
 
 // You own 1–10. Releases 1–5 are rare (w = 1), 6–10 are hits (w = 0.1).
 // Label 100 is releases 1–4 plus 20–22 (a 7-release catalog), label 200 is everything else.
-const mine = ids(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-const weights = new Map([...mine].map((id) => [id, id <= 5 ? 1 : 0.1]));
+const mine: MyCollection = {
+  matchIds: ids(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+  trackIds: NONE,
+  partialIds: NONE,
+  albumOfTrack: new Map(),
+};
+const weights = new Map([...mine.matchIds].map((id) => [id, id <= 5 ? 1 : 0.1]));
 const labelOf = new Map<number, number>();
 for (let id = 1; id <= 40; id++) labelOf.set(id, id <= 4 || (id >= 20 && id <= 22) ? 100 : 200);
 const catalogSize = new Map([
@@ -33,6 +41,8 @@ const input: TwinInput = {
 const fan = (fanId: number, ...values: number[]): Candidate => ({
   fanId,
   matchIds: ids(...values),
+  trackIds: NONE,
+  partialIds: NONE,
   size: values.length,
 });
 /** scoreTwin for fans the test expects to score. */
@@ -49,7 +59,49 @@ describe('intersect', () => {
   });
 });
 
+describe('sharedReleases', () => {
+  // Albums are positive ids, tracks negative (keyToNumber). Album 1 has tracks -11 and -12.
+  // You own album 2 whole, and only track -11 of album 1.
+  const you: MyCollection = {
+    matchIds: ids(1, 2, 3),
+    trackIds: ids(-11),
+    partialIds: ids(1),
+    albumOfTrack: new Map([[-11, 1]]),
+  };
+  const them = (matchIds: number[], trackIds: number[], partialIds: number[]) => ({
+    matchIds: ids(...matchIds),
+    trackIds: ids(...trackIds),
+    partialIds: ids(...partialIds),
+  });
+
+  it('matches exact items, and an album against one of its tracks', () => {
+    expect(sharedReleases(you, them([1, 2], [], []))).toEqual([1, 2]);
+    expect(sharedReleases(you, them([1, 2], [-21], [2]))).toEqual([1, 2]);
+    expect(sharedReleases(you, them([1], [-11], [1]))).toEqual([1]);
+  });
+
+  it('does not match different tracks of the same album', () => {
+    expect(sharedReleases(you, them([1, 3], [-12], [1]))).toEqual([3]);
+  });
+
+  it('matches when one shared track is among several', () => {
+    expect(sharedReleases(you, them([1], [-11, -12], [1]))).toEqual([1]);
+  });
+});
+
 describe('scoreTwin', () => {
+  it('scores only the releases sharedReleases keeps', () => {
+    const you = {
+      ...mine,
+      trackIds: ids(-11),
+      partialIds: ids(1),
+      albumOfTrack: new Map([[-11, 1]]),
+    };
+    const other = { ...fan(1, 1, 5, 30), trackIds: ids(-12), partialIds: ids(1) };
+
+    expect(scoreTwin(other, { ...input, mine: you })).toMatchObject({ overlap: 1 });
+  });
+
   it('computes overlap, Jaccard and the normalised weighted score', () => {
     const twin = scoreTwin(fan(1, 5, 6, 30, 31), input);
 

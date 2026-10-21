@@ -1,4 +1,4 @@
-import { addOwnerDeltas, collectionMatchIds } from '../matchIndex';
+import { addOwnerDeltas, fanMatchLists } from '../matchIndex';
 import type { DigheadDb, FanMatchesRecord } from '../schema';
 
 const EMPTY = new Float64Array();
@@ -20,9 +20,9 @@ export async function refreshFanMatches(db: DigheadDb, fanIds: Iterable<number>)
   const put: FanMatchesRecord[] = [];
   const emptied: number[] = [];
   for (const [i, fanId] of ids.entries()) {
-    const matchIds = collectionMatchIds(rows[i] ?? []);
-    addOwnerDeltas(before[i]?.matchIds ?? EMPTY, matchIds, deltas);
-    if (matchIds.length > 0) put.push({ fanId, matchIds });
+    const lists = fanMatchLists(rows[i] ?? []);
+    addOwnerDeltas(before[i]?.matchIds ?? EMPTY, lists.matchIds, deltas);
+    if (lists.matchIds.length > 0) put.push({ fanId, ...lists });
     else if (before[i]) emptied.push(fanId);
   }
   await db.fanMatches.bulkPut(put);

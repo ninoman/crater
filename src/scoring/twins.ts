@@ -1,5 +1,5 @@
 // Taste twins: fans whose collections overlap most with yours, weighted towards rare releases.
-// Pure: lists are sorted match ids (keyToNumber), as stored in `fanMatches` (decisions §6).
+// Pure: lists are sorted ids (keyToNumber), as stored in `fanMatches` (decisions §6).
 
 /** A twin whose overlap is mostly one label's catalog is down-weighted by this. */
 export const LABEL_CLUSTER_FACTOR = 0.3;
@@ -13,16 +13,28 @@ export const LABEL_CLUSTER_CATALOG_SHARE = 0.6;
  */
 export const LABEL_CLUSTER_MIN_SHARED = 3;
 
-export interface Candidate {
-  fanId: number;
+/** One collection's lists, as a `fanMatches` record holds them. */
+export interface CollectionLists {
   matchIds: Float64Array;
+  /** Tracks owned that belong to an album. */
+  trackIds: Float64Array;
+  /** matchIds held only through tracks, not the album itself. */
+  partialIds: Float64Array;
+}
+
+export interface Candidate extends CollectionLists {
+  fanId: number;
   /** Their collection size as far as we know it, for the size filter. */
   size: number;
 }
 
+export interface MyCollection extends CollectionLists {
+  /** The album match id of each of your trackIds. */
+  albumOfTrack: ReadonlyMap<number, number>;
+}
+
 export interface TwinInput {
-  /** Your collection, sorted. */
-  mine: Float64Array;
+  mine: MyCollection;
   /** w(i) for each of your match ids. Overlap only ever touches yours. */
   weights: ReadonlyMap<number, number>;
   /** Label of a match id: label_id, else the selling account (decisions §3.3). */
@@ -62,6 +74,20 @@ export function intersect(mine: Float64Array, theirs: Float64Array): number[] {
 }
 
 /**
+ * The releases you and a fan share. An exact item matches, and so does an album against one of
+ * its tracks, but two different tracks of one album don't (decisions §7).
+ */
+export function sharedReleases(mine: MyCollection, theirs: CollectionLists): number[] {
+  const tracksOnly = new Set(intersect(mine.partialIds, theirs.partialIds));
+  for (const track of intersect(mine.trackIds, theirs.trackIds)) {
+    const album = mine.albumOfTrack.get(track);
+    if (album !== undefined) tracksOnly.delete(album);
+  }
+  const shared = intersect(mine.matchIds, theirs.matchIds);
+  return tracksOnly.size === 0 ? shared : shared.filter((id) => !tracksOnly.has(id));
+}
+
+/**
  * Flags a fan whose overlap with you is mostly one label they collect wholesale: a label
  * subscriber, not a taste match. Only the dominant label can pass the overlap share test.
  */
@@ -93,14 +119,15 @@ export function isLabelCluster(
 
 /** Scores one fan against you, or null if they're filtered out or share nothing. */
 export function scoreTwin(candidate: Candidate, input: TwinInput): Twin | null {
-  const { mine, weights } = input;
+  const { weights } = input;
+  const mine = input.mine.matchIds;
   const theirs = candidate.matchIds;
   if (candidate.size < input.minCollectionSize || candidate.size > input.maxCollectionSize) {
     return null;
   }
   if (mine.length === 0 || theirs.length === 0) return null;
 
-  const shared = intersect(mine, theirs);
+  const shared = sharedReleases(input.mine, candidate);
   if (shared.length === 0) return null;
 
   let weighted = 0;
