@@ -22,7 +22,9 @@ export function Checkbox({ label, checked, onChange, hideLabel = false }: Checkb
         onCheckedChange={(next) => onChange(next === true)}
         aria-label={hideLabel ? label : undefined}
       >
-        <RadixCheckbox.Indicator className="dh-checkbox__indicator">
+        {/* Always mounted: an empty box takes its baseline from its bottom edge, so mounting the
+            icon on check would shift a baseline-aligned row (Bandcamp's follow cards). */}
+        <RadixCheckbox.Indicator className="dh-checkbox__indicator" forceMount>
           <CheckIcon />
         </RadixCheckbox.Indicator>
       </RadixCheckbox.Root>

@@ -41,6 +41,10 @@
   display: inline-flex;
 }
 
+.dh-checkbox__indicator[data-state='unchecked'] {
+  visibility: hidden;
+}
+
 .dh-checkbox__indicator .dh-icon {
   width: 10px;
   height: 10px;
