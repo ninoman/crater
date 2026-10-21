@@ -146,7 +146,7 @@ describe('the following tab', () => {
     await settle();
 
     const box = ourCards(doc)[1]
-      ?.querySelector('dighead-card')
+      ?.querySelector('.fan-image dighead-card-select')
       ?.shadowRoot?.querySelector('button[role="checkbox"]') as HTMLButtonElement | undefined;
     await act(async () => box?.click());
 
