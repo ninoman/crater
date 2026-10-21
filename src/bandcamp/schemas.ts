@@ -128,6 +128,19 @@ export const rawFanPagedata = z.object({
   identities: z.object({ fan: rawViewer.nullable() }),
 });
 
+/** What a fan page's `#pagedata` says about the fan for ranking them (decisions §12). */
+export const rawFanProfilePagedata = z.object({
+  fan_data: z.object({
+    fan_id: z.number(),
+    username: z.string(),
+    is_own_page: z.boolean().nullish(),
+    location: z.string().nullish(),
+    fav_genre: z.string().nullish(),
+  }),
+  collection_data: z.object({ item_count: z.number() }),
+  identities: z.object({ fan: rawViewer.nullable() }),
+});
+
 /** One row of `following_bands` / `following_fans` and of the fan page's `item_cache.following_*`. */
 export const rawFollowee = z.object({
   /** Set on band rows only. */
