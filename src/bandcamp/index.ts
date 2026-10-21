@@ -13,6 +13,7 @@ export { fetchFollowingPage, parseFollowingPage } from './following';
 export { parseFanPage } from './fanPage';
 export { isPurchaseConfirmationUrl } from './purchase';
 export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
+export { fetchReleasePreview, parseReleasePreview } from './preview';
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';

@@ -69,6 +69,19 @@ export const rawTralbum = z.object({
   }),
 });
 
+/** The tracks a release page can stream. `file` is null for tracks Bandcamp won't play. */
+export const rawTralbumTracks = z.object({
+  featured_track_id: z.number().nullish(),
+  trackinfo: z.array(
+    z.object({
+      track_id: z.number().nullish(),
+      title: z.string().nullish(),
+      duration: z.number().nullish(),
+      file: z.object({ 'mp3-128': z.string().nullish() }).nullish(),
+    }),
+  ),
+});
+
 export const rawLdJson = z.object({
   keywords: z.union([z.array(z.string()), z.string()]).nullish(),
 });

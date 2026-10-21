@@ -1,7 +1,9 @@
+import { fetchReleasePreview } from '../bandcamp';
 import { db, hideRelease } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
+import { fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import {
   getAlsoBought,
@@ -35,6 +37,7 @@ export const handlers: MessageHandlers = {
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
   getAlsoBought: ({ itemKey }) => getAlsoBought(itemKey),
+  getPreview: ({ url }) => fetchReleasePreview(fetchText, url),
   hideRelease: async ({ matchKey }) => {
     await hideRelease(db, matchKey, Date.now());
     return null;

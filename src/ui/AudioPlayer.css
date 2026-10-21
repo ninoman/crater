@@ -1,0 +1,81 @@
+.dh-player {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  margin-top: var(--dh-space-2);
+  padding: var(--dh-space-1) var(--dh-space-2) var(--dh-space-1) var(--dh-space-1);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+}
+
+.dh-player__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dh-space-1);
+}
+
+.dh-player__title {
+  overflow: hidden;
+  font-size: var(--dh-text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-player__timeline {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+}
+
+.dh-player__time,
+.dh-player__status {
+  flex: none;
+  font-size: var(--dh-text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dh-color-muted);
+}
+
+.dh-player__status--error {
+  color: var(--dh-color-danger);
+}
+
+/* The input is as tall as the thumb, for an easy target; the track inside stays thin. */
+.dh-player__seek {
+  flex: 1;
+  min-width: 0;
+  height: var(--dh-seek-thumb);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+}
+
+.dh-player__seek:disabled {
+  cursor: default;
+}
+
+.dh-player__seek::-webkit-slider-runnable-track {
+  height: var(--dh-progress-height);
+  border-radius: var(--dh-radius-pill);
+  background: linear-gradient(
+    to right,
+    var(--dh-color-accent) var(--dh-seek-fill, 0%),
+    var(--dh-color-bg-hover) var(--dh-seek-fill, 0%)
+  );
+}
+
+.dh-player__seek::-webkit-slider-thumb {
+  width: var(--dh-seek-thumb);
+  height: var(--dh-seek-thumb);
+  margin-top: calc((var(--dh-progress-height) - var(--dh-seek-thumb)) / 2);
+  border: 0;
+  border-radius: var(--dh-radius-pill);
+  background: var(--dh-color-accent);
+  appearance: none;
+}
+
+.dh-player__seek:disabled::-webkit-slider-thumb {
+  background: var(--dh-color-subtle);
+}

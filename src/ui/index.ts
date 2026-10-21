@@ -1,3 +1,4 @@
+export { AudioPlayer, type AudioPlayerProps, type AudioPlayerState } from './AudioPlayer';
 export { Badge } from './Badge';
 export { Button, LinkButton, type ButtonProps, type LinkButtonProps } from './Button';
 export { Checkbox, type CheckboxProps } from './Checkbox';
@@ -5,10 +6,9 @@ export { Chip, type ChipProps } from './Chip';
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog';
 export { Cover } from './Cover';
 export { cx } from './cx';
-export { EmbedFrame, type EmbedFrameProps } from './EmbedFrame';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
-export { ExternalIcon, HeartIcon, HideIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
+export { ExternalIcon, HideIcon, PauseIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';

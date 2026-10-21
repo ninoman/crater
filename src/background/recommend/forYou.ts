@@ -1,13 +1,7 @@
 // Runs the For-you scorer: what your top twins own, scored with pruning, diversified, then
 // dressed for display.
 
-import {
-  artUrl,
-  embeddedPlayerUrl,
-  keyFromNumber,
-  keyToNumber,
-  type ItemKey,
-} from '../../bandcamp';
+import { artUrl, keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherForYou,
   getDisplayItems,
@@ -123,7 +117,6 @@ function toRow(
     label: item.label,
     url: item.url,
     coverUrl: item.artId === null ? null : artUrl(item.artId),
-    previewUrl: embeddedPlayerUrl(matchKey),
     twins,
     ownedTracks: ownedTracks.get(keyToNumber(matchKey)) ?? 0,
   };

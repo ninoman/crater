@@ -133,7 +133,6 @@ describe('computeAlsoBought', () => {
       label: null,
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
-      previewUrl: expect.stringContaining('/album=300/') as string,
       reason: { kind: 'co-owned', owners: 5, of: 10, twins: 0 },
       ownedTracks: 0,
     });

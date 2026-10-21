@@ -1,7 +1,7 @@
 // Runs the Also-bought scorer for one release: gather, score with pruning, blend, then dress
 // the picks for display.
 
-import { artUrl, embeddedPlayerUrl, keyToNumber, type ItemKey } from '../../bandcamp';
+import { artUrl, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherAlsoBought,
   getDisplayItems,
@@ -147,7 +147,6 @@ function toRow(
     label: item.label,
     url: item.url,
     coverUrl: item.artId === null ? null : artUrl(item.artId),
-    previewUrl: embeddedPlayerUrl(pick.matchKey),
     reason,
     ownedTracks: mine.ownedTracks.get(keyToNumber(pick.matchKey)) ?? 0,
   };

@@ -3,6 +3,7 @@ import type { ItemKey } from '../../../bandcamp';
 import type { ForYouResult } from '../../../shared/forYou';
 import { Badge, ReleaseRow, RowList } from '../../../ui';
 import { formatOwnedTracks } from '../../shared/formatOwnedTracks';
+import { ReleasePreview } from '../../shared/ReleasePreview';
 import { formatForYouSummary, formatTwinOwners } from './forYouText';
 
 export interface ForYouListProps {
@@ -31,6 +32,7 @@ export function ForYouList({ result, onHide }: ForYouListProps) {
               reason={formatTwinOwners(row.twins)}
               badges={row.ownedTracks > 0 && <Badge>{formatOwnedTracks(row.ownedTracks)}</Badge>}
               previewing={previewing === row.matchKey}
+              preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
               onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
               onHide={() => onHide(row.matchKey)}
             />

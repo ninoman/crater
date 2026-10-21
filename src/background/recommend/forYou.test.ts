@@ -133,7 +133,6 @@ describe('computeForYou', () => {
       label: null,
       url: 'https://artist.bandcamp.com/album/a2',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
-      previewUrl: expect.stringContaining('/album=2/') as string,
       twins: 2,
       ownedTracks: 0,
     });

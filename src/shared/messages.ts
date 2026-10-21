@@ -2,7 +2,7 @@
 // Add a message by extending MessageMap; both sides get checked types for free.
 // Worker-to-tab events go the other way and are listed in EventMap.
 
-import type { ItemKey, ReleasePageItem, Viewer } from '../bandcamp';
+import type { ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouResult } from './forYou';
@@ -47,6 +47,8 @@ export interface MessageMap {
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Scores Also bought for a release from what's in the database now. */
   getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };
+  /** A release's streamable tracks, read fresh from its page because stream URLs expire. */
+  getPreview: { request: { url: string }; response: ReleasePreview };
   /** Never recommend this release again, in any list. */
   hideRelease: { request: { matchKey: ItemKey }; response: null };
   /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */

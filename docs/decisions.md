@@ -206,9 +206,9 @@ Code: `twinBoosts` in `src/scoring/alsoBought.ts`; `gatherAlsoBought` reads the 
 
 ### Gaps
 
-- **Wishlist from the sidebar isn't wired up.** Adding to a wishlist needs a logged-in Bandcamp API call that we haven't captured. The ♡ button opens the release page in a new tab, where Bandcamp's own Wishlist button works. To fix it, capture the request Bandcamp sends when you click Wishlist on a release page (logged in) and save it as a fixture.
+- **Wishlist from the sidebar isn't wired up.** Adding to a wishlist needs a logged-in Bandcamp API call that we haven't captured, so rows have no wishlist button; *Open in a new tab* gets you to Bandcamp's own. To add one, capture the request Bandcamp sends when you click Wishlist on a release page (logged in) and save it as a fixture.
 - **Track-only buyers of an album aren't listed as its supporters** (§3.8). This is still unmeasured: watch for albums whose supporter list looks small next to their `also_collected_count`.
-- **Preview:** Bandcamp's release-page CSP sets no `frame-src`, and the EmbeddedPlayer sends no `X-Frame-Options` (checked 2026-10-20), so the iframe loads on artist pages.
+- **Preview plays in our own `<audio>`, not Bandcamp's EmbeddedPlayer** (changed 2026-10-21). The embed is a cross-origin iframe, so we couldn't start it from the Preview click or give it a seek bar. Now the worker fetches the release page (`getPreview`) and reads each track's `file["mp3-128"]` from `data-tralbum`. Those URLs are signed and expire, so they're fetched when a preview opens, never stored. Playback starts at `featured_track_id` and moves on to the next track at the end. Media loads aren't subject to CORS, so the content script plays the bcbits.com stream directly.
 
 ## 7. Taste twins (Phase 5)
 

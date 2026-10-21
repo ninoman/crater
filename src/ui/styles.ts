@@ -1,6 +1,7 @@
 // All UI CSS as one string, so the same styles go into shadow roots and the popup document.
 // Add each new component's stylesheet here.
 
+import audioPlayer from './AudioPlayer.css?inline';
 import badge from './Badge.css?inline';
 import base from './base.css?inline';
 import button from './Button.css?inline';
@@ -8,7 +9,6 @@ import checkbox from './Checkbox.css?inline';
 import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
-import embedFrame from './EmbedFrame.css?inline';
 import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
 import identity from './Identity.css?inline';
@@ -38,7 +38,7 @@ export const uiStyles = [
   statusDot,
   badge,
   cover,
-  embedFrame,
+  audioPlayer,
   notice,
   progress,
   row,

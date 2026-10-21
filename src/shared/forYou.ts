@@ -12,7 +12,6 @@ export interface ForYouRow {
   /** The album's page, or one of its tracks' when only tracks of it have turned up. */
   url: string;
   coverUrl: string | null;
-  previewUrl: string;
   /** How many of your top twins own it: "owned by 5 of your top twins". */
   twins: number;
   /** Tracks of this album you already own. */

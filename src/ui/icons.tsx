@@ -32,9 +32,10 @@ export const StopIcon = () => (
   </Icon>
 );
 
-export const HeartIcon = () => (
+export const PauseIcon = () => (
   <Icon>
-    <path d="M8 13.5S2.5 10.2 2.5 6.2A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.2c0 4-5.5 7.3-5.5 7.3z" />
+    <rect x="4" y="3.5" width="2.5" height="9" rx="0.5" fill="currentColor" />
+    <rect x="9.5" y="3.5" width="2.5" height="9" rx="0.5" fill="currentColor" />
   </Icon>
 );
 

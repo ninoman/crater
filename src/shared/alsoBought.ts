@@ -19,7 +19,6 @@ export interface AlsoBoughtRow {
   /** The album's page, or one of its tracks' when only tracks of it have turned up. */
   url: string;
   coverUrl: string | null;
-  previewUrl: string;
   reason: AlsoBoughtReason;
   /** Tracks of this album you already own. */
   ownedTracks: number;

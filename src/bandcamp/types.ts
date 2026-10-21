@@ -119,3 +119,18 @@ export interface FollowingList {
   /** Newest first. */
   firstRows: FollowingRow[];
 }
+
+/** One streamable track, for the preview player. */
+export interface PreviewTrack {
+  title: string;
+  /** Seconds. */
+  duration: number;
+  /** A signed mp3 URL that expires, so fetch it shortly before playing. */
+  streamUrl: string;
+}
+
+export interface ReleasePreview {
+  tracks: PreviewTrack[];
+  /** The track Bandcamp features on the page, where playback starts. */
+  startIndex: number;
+}

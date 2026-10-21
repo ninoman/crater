@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button, LinkButton } from './Button';
 import { Cover } from './Cover';
-import { EmbedFrame } from './EmbedFrame';
-import { ExternalIcon, HeartIcon, HideIcon, PlayIcon, StopIcon } from './icons';
+import { ExternalIcon, HideIcon, PlayIcon, StopIcon } from './icons';
 import { Row } from './Row';
 import { Tooltip } from './Tooltip';
 
@@ -13,7 +12,6 @@ export interface ReleaseRowRelease {
   label: string | null;
   url: string;
   coverUrl: string | null;
-  previewUrl: string;
 }
 
 export interface ReleaseRowProps {
@@ -28,11 +26,13 @@ export interface ReleaseRowProps {
   /** More action buttons, shown before Hide. */
   extraActions?: ReactNode;
   previewing: boolean;
+  /** The player, shown under the row while previewing. */
+  preview: ReactNode;
   onPreview: (open: boolean) => void;
   onHide: () => void;
 }
 
-/** A recommended release: cover, artist and label, reason, and preview / wishlist / open / hide. */
+/** A recommended release: cover, artist and label, reason, and preview / open / hide. */
 export function ReleaseRow({
   release,
   reason,
@@ -41,6 +41,7 @@ export function ReleaseRow({
   status,
   extraActions,
   previewing,
+  preview,
   onPreview,
   onHide,
 }: ReleaseRowProps) {
@@ -77,19 +78,6 @@ export function ReleaseRow({
               {previewing ? <StopIcon /> : <PlayIcon />}
             </Button>
           </Tooltip>
-          {/* Wishlisting needs a logged-in API call we haven't captured (decisions §6). */}
-          <Tooltip content="Open on Bandcamp to wishlist it">
-            <LinkButton
-              variant="ghost"
-              icon
-              href={release.url}
-              target="_blank"
-              rel="noopener"
-              aria-label={`Wishlist ${name} on Bandcamp (opens in a new tab)`}
-            >
-              <HeartIcon />
-            </LinkButton>
-          </Tooltip>
           <Tooltip content="Open in a new tab">
             <LinkButton
               variant="ghost"
@@ -111,7 +99,7 @@ export function ReleaseRow({
         </>
       }
     >
-      {previewing && <EmbedFrame src={release.previewUrl} title={`Preview of ${name}`} />}
+      {previewing && preview}
     </Row>
   );
 }
