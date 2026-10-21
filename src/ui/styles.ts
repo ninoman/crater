@@ -19,6 +19,7 @@ import progress from './Progress.css?inline';
 import releaseRow from './ReleaseRow.css?inline';
 import row from './Row.css?inline';
 import searchField from './SearchField.css?inline';
+import sectionHeading from './SectionHeading.css?inline';
 import segmented from './Segmented.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
@@ -55,6 +56,7 @@ export const uiStyles = [
   checkbox,
   tagPicker,
   segmented,
+  sectionHeading,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */
