@@ -119,7 +119,7 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
   - A killed worker loses at most one request. The job resumes from its cursor rather than starting over.
   - A release page opened mid-scan gets the very next request, instead of waiting for a 2,000-item fan to finish.
   - The budget counts each request **before** it's sent, so a request cut off by a kill still counts.
-- **Priority bump = foreground release.** Opening a release page moves its job and its supporters' jobs to priority 1, and moves any other priority-1 jobs back to 2. **This changes the spec**: if nothing moved back, every release you'd ever opened would sit at 1, and "jump to priority 1" would no longer put the new one first. Within a priority, jobs run by `nextAttemptAt`, then insertion order, so supporters are scanned in page order (most recent buyers first).
+- **Priority bump = foreground release.** Opening a release page moves its job and its supporters' jobs to priority 1, and moves any other priority-1 jobs back to 2. **This changes the spec**: if nothing moved back, every release you'd ever opened would sit at 1, and "jump to priority 1" would no longer put the new one first. Within a priority, jobs run by `nextAttemptAt`, then `rank`, then insertion order (changed 2026-10-21: `rank` orders a release's supporters by expected overlap, §12; before it, supporters were scanned in page order).
 - **Seeding from your own collection** (`scanner/seed.ts`). Without it, the twins pool only held supporters of pages you happened to open. After each successful sync of your own collection, a `release` job is queued for each release you own:
   - Collection only, not the wishlist. There's one job per matchKey: the album itself when you own it, otherwise your newest item under it.
   - Releases whose supporter list is fresh (7 days) are skipped. A full sync seeds every release you own. An incremental sync seeds only the releases holding items it added, so the daily resync doesn't re-list your whole collection each week.
@@ -139,6 +139,7 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
 - **Supporter paging:** the first page (up to 80 thumbs and 6 reviews) comes free with the release page. After that, **thumbs come first, then reviews**, 100 per request (fewer for the last one), until the cap. Thumbs are the most recent buyers, which is what the cap means ("500 most recent").
 - **Supporters are owners.** Each supporter gets an `ownership` row for the release (`source = collection`, `addedAt` from the token, as in §3.7). That way a fan counts as an owner even when the release falls outside their newest 2,000 items. An existing row is never overwritten.
 - **Fan status** after a scan:
+  - `quick` (added 2026-10-21, §12): only the quick read is in and the full scan is still queued. Also bought counts them, twins don't.
   - `done`: the whole collection was read, so `collectionSize` is known.
   - `partial`: only the newest N items were read, because the cap was hit or the API errored after the first page.
   - `private`: `collection_items` errored on the first page (§2).
@@ -437,9 +438,9 @@ Code: `src/scoring/lately.ts` (pure), lately parts of `src/scoring/twins.ts`, `s
 - **A second table, `latelyTwins`,** holds the top 200 by lately score from the same recompute pass (one intersect per fan feeds both). The all-time `twins` table and everything that reads it (For you, Also bought's twin boost, twins who own this, profile badges) are unchanged; its rows just carry the lately fields too, for the trend column.
 - **Limits:** fans are re-read every 30 days (§5), so a fan's last month of purchases may be missing; the 6-month half-life keeps that from mattering much. Bandcamp Friday sprees aren't capped.
 
-## 12. Smarter supporter scanning (planned)
+## 12. Smarter supporter scanning
 
-Not built yet. Findings checked 2026-10-21 against live bandcamp.com; the plan replaces "scan supporters in page order, each collection in full" (§5) for the open release.
+Findings checked 2026-10-21 against live bandcamp.com. The scanning half (passes 0–2 below) was built the same day and replaces "scan supporters in page order, each collection in full" (§5) for releases you open. The scoring half ("Scoring and the wait") is tracked separately.
 
 ### Why
 
@@ -452,14 +453,33 @@ Opening a release with hundreds of supporters showed unrelated Also-bought rows 
 
 ### Findings
 
-- **Bandcamp's own "in common" count is on the fan profile page, for a signed-in viewer only.** The server renders it into the header: `<ol class="info-items">` → `<li class="genre-wrapper">Electronic, 8 items in common</li>` (favourite genre, then the count), next to the location `<li>`. It is text only, not in `#pagedata`. Bandcamp's template leaves it out when the count is 0, and it isn't there logged out, so "no line" means 0 only when `identities.fan` is set. Checked on `bandcamp.com/otfx`, a supporter of one of the viewer's releases.
+- **Bandcamp's own "in common" count is on the fan profile page, for a signed-in viewer only.** The server renders it into the header: `<ol class="info-items">` → `<li class="genre-wrapper">Electronic, 8 items in common</li>` (favourite genre, then the count), next to the location `<li>`. It is text only, not in `#pagedata`. Bandcamp's template leaves it out when the count is 0, and it isn't there logged out, so "no line" means 0 only when `identities.fan` is set. Checked on `bandcamp.com/otfx`, a supporter of one of the viewer's releases (fixture `fan-page-in-common.html`).
+- **The genre and location are also in `#pagedata`** (`fan_data.fav_genre`, `fan_data.location`), so the parser reads those from JSON and only the count from the header. Logged out, the genre line holds the genre alone ("Alternative" in `fan-page-medium.html`).
 - **Bandcamp computes it over both full collections**, which our local overlap can't. It counts differently from our twin overlap (one real fan: Bandcamp 21, ours 30, §7), which is fine for ranking.
 - **Supporter rows don't carry it, signed in or not.** Signed-in `tralbumcollectors/2/initial` rows have the same fields as logged out. The only client-side `num_items_in_common` in Bandcamp's scripts is on suggested-fan and follower/following cards.
 - **A fan page is one request of about 400 KB.** Besides the count it gives `collection_data.item_count` (collection size, unknown to scans until their last page, §3.4), the favourite genre, the location and the 20 newest items (`item_cache.collection`).
 - **A date-anchored collection token works.** `collection_items` with `older_than_token: "<unix ts>::a::"` returns purchases made before that time, so one request can read the 100 items around when a fan bought a given release.
 - **Collection items carry `genre_id`** (Bandcamp's top-level genre), on every item and for free. We don't store it yet. Fine tags exist only for releases whose page was fetched (§1, `items.tags`).
 
-### Plan: rank first, then read
+### As built: rank first, then read
+
+Code: `src/bandcamp/fanProfile.ts`, `src/scoring/supporterRank.ts` (pure), `src/db/repo/supporterRank.ts`, `src/background/scanner/passZero.ts`, `fanJob.ts`, `fanProfileStep.ts`, `fanCollectionStep.ts`, ranks in `priority.ts`.
+
+- **Queue order (schema v8):** jobs carry a `rank`, and the queue runs by `[priority+nextAttemptAt+rank]`, then insertion order. Rank breaks ties *within one place in line*, so a release's fans still run before the next release at that priority (§5); within a release, a lower rank goes first. Release jobs are rank 0, so the whole supporter list is in before any of its fans run. The upgrade (and `migrateRows` for a v7 backup) gives every job rank 0, which keeps the old order exactly. Fan jobs also gain `via` (the release whose list queued them) and a staged cursor.
+- **Pass 0:** supporters are queued in page order (rank 1, 2, …). When the release job reads its last supporter page, and whenever you reopen a release whose list is fresh, `rankSupporters` re-ranks its fans that haven't started: Σ w(i) over releases they're known to share with you (their `fanMatches`, which supporter lists of your seeded releases fill before any collection is read), plus **half weight** for other releases from the release's seller or label (`bandId` or `labelId`) that you don't own. The release itself doesn't count. Ties, including "nothing known", keep page order. Fans read in the last 30 days aren't queued at all, so they skip passes 1 and 2 and Also bought uses what we have.
+- **Pass 1, one fan page per supporter** (`fanProfileRequest`, `credentials: 'include'`, from the worker only), in pass-0 order. The count, `item_count` and genre are parsed by `parseFanProfile`; `itemCount` and `inCommon` are stored on the fan. Similarity = count / √(yours · theirs), where *yours* is your number of collection matchKeys. **Deviation, how the read is interleaved:** reading all 500 profiles before any collection would take ~19 minutes, so each fan's collection read is placed as soon as their profile is in. It goes **ahead of the profiles still waiting** when its similarity is at least half the best so far among that release's profiled supporters (`readsAhead`), else **behind all of them**; best similarity first either way (`profiledRank`). The first profile with any overlap is therefore read right away, and fans with nothing in common wait until every profile is done.
+  - Logged out (no `me`) there's no profile step. A page that comes back logged out keeps the fan's pass-0 rank.
+  - A 404 (renamed fan) skips to the collection. A header we can't read throws `ParserError` in the parser, never 0, but the scanner **doesn't drop the fan** for it: the profile only ranks. It records `parserError` with kind `profile` (so "Parser broken" shows) and carries on; the next profile that parses clears it.
+  - **Seed scans skip passes 1 and 2** (deviation): seed fans fill twins, not a page you're looking at, so they go straight to the full scan and spend no extra requests. They still get pass-0 order. If you open the release, `focusRelease` lifts their jobs, but a seed job that has started its full scan carries on as it is.
+- **Pass 2, quick read:** one `collection_items` request for 100 items with `older_than_token = "<purchase + 90 days>::a::"`, the purchase being the supporter token's time on their row for the `via` release. The fan gets the new status **`quick`**: Also bought and release progress count them (`collectionRead`), twins don't (`collectionFullyRead`, also behind the Twins tab's "fans read" count), and `collectionFetchedAt` stays unset, so a fan whose job is lost is queued again later.
+  - Read from the top instead when the anchor would be now or later (a purchase in the last 90 days), when there's no known purchase, or when the profile says the whole collection fits (`item_count ≤ 100`). A top read that reaches the end is the full read (`done`); one that doesn't hands its next token to the full scan, so nothing is read twice.
+  - The step reports `read`, which re-scores watched releases and sends progress like a finished fan, but doesn't count toward the twins recompute.
+- **Full scans follow in the same job** (one job per fan, `&[kind+target]`): after the quick read it moves to `max(priority, BACKGROUND)` with rank `FULL_SCAN_RANK + its rank`, so it runs after every quick read and profile of releases at that priority, best match first, and twins and For you get the whole collection in the end. An anchored quick read means the full scan re-reads those items from the top: one extra request per fan, against up to 20 saved before the first useful rows.
+- **Steps report what changed** (`StepResult`: `continued`, `read`, `finished`), so the scheduler stays one request per run.
+
+Measured by tests, not yet on the live site: `supporterPasses.test.ts` runs passes 1–2 end to end on a fake bandcamp.com, and `releaseJob.test.ts` checks pass 0 puts a fan who owns one of your releases first.
+
+### Original plan
 
 1. **Pass 0, free.** When the supporter list is in (the release job already reads all of it before any fan, §5), rank every supporter by what we already know they own of yours: supporter lists of your seeded releases put rows in their `fanMatches` before their collection is read. Weight by w(i). Bonus for owning other releases from this release's seller or label. Fans read recently skip pass 1 and get their overlap from our own data. With nothing known (logged out, nothing seeded), keep page order. The queue needs a `rank` tie-break within priority, since `nextAttemptAt` is the order today.
 2. **Pass 1, one fan page per supporter**, in pass-0 order, signed in (`credentials: 'include'`, unlike release pages, §5). Rank by Bandcamp's count scaled by both collection sizes (count / √(yours · theirs)). Logged out, fall back to pass 0's ranking.
@@ -479,7 +499,7 @@ Doing pass 1 for all 500 supporters before showing anything would take about 19 
 - First store `genre_id` and apply a mild penalty when it differs from the release's.
 - Then fetch release pages for the ~30 shown candidates at low priority and keep their tags. Compare with the release's tags weighted by rarity across local items, so broad genres and place names barely count. Apply as a capped boost like the twin boost (about ×1.3) and name the shared tags in the reason line. Cost: about 30 requests per newly opened release, falling as tags accumulate.
 
-### To do before building
+### Done before building
 
-- Save a signed-in fan page as a fixture with personal data scrubbed, and parse the count from it. The text may be localized, so the parser must fail loudly (`ParserError`) rather than read 0.
-- Check how the line reads for a fan with no favourite genre.
+- Saved a signed-in fan page as a fixture with personal data scrubbed (`fan-page-in-common.html`) and parsed the count from it. Text with a number in it that isn't the English pattern, or that mentions "common" without a count, throws `ParserError` rather than reading 0.
+- **Still unchecked live:** how the line reads for a fan with no favourite genre. The parser accepts "8 items in common" without the genre, and "1 item in common", both covered by synthetic tests; capture a real one when it turns up.
