@@ -58,6 +58,9 @@ describe('createCardList', () => {
     // Our additions sit in a shadow root inside the light-DOM card.
     expect(cards[0]?.slot.getRootNode()).toBeInstanceOf(ShadowRoot);
     expect(cards[0]?.slot.classList.contains('dh-root')).toBe(true);
+    // The select box gets its own, over the avatar.
+    const selectHost = (cards[0]?.selectSlot.getRootNode() as ShadowRoot | undefined)?.host;
+    expect(selectHost?.parentElement?.classList.contains('fan-image')).toBe(true);
   });
 
   it('wins the id lookup Bandcamp’s band handler does', () => {

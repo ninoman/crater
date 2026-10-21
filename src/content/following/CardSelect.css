@@ -1,0 +1,17 @@
+/* Over the top-left corner of Bandcamp's avatar, which the page CSS makes positioned. */
+:host {
+  position: absolute;
+  top: var(--dh-space-2);
+  left: var(--dh-space-2);
+  z-index: 1;
+}
+
+/* Flex, so the box sits flush in the corner instead of on a line box. */
+.dh-card-select {
+  display: flex;
+}
+
+/* Lifts the box off busy artwork. */
+.dh-card-select .dh-checkbox__box {
+  box-shadow: var(--dh-shadow-tooltip);
+}

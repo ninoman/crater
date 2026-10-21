@@ -37,6 +37,8 @@ export const FAN_PAGE_DOM = {
   followingExpand: '.expand-container',
   /** A card and its follow button, which Bandcamp's own handler listens on. */
   followingCard: 'li.followeer',
+  /** A card's avatar box; our select box sits over its corner. */
+  followingImage: '.fan-image',
   followButton: 'button.follow-unfollow',
   /** Class on a follow button while you follow; Bandcamp's handler toggles it. */
   followingButtonClass: 'following',
