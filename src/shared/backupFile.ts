@@ -47,15 +47,17 @@ export function parseBackupMeta(json: unknown): BackupMeta {
   return parsed.data;
 }
 
-/** Throws unless a backup's schema version is the one this build runs. */
+/** The oldest schema whose backups can still be imported; db/backup.ts migrates their rows. */
+export const OLDEST_RESTORABLE_VERSION = 5;
+
+/** Throws unless a backup's schema version is one this build can restore. */
 export function assertRestorableVersion(fileVersion: number, buildVersion: number): void {
   if (fileVersion > buildVersion) {
     throw new Error(
       'That backup was made by a newer version of Dighead. Update the extension, then import it again.',
     );
   }
-  // No older schema has produced a backup yet; a schema bump that adds one must migrate rows here.
-  if (fileVersion < buildVersion) {
+  if (fileVersion < OLDEST_RESTORABLE_VERSION) {
     throw new Error('That backup was made by an older version of Dighead and can’t be imported.');
   }
 }

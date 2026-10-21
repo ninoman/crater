@@ -45,15 +45,16 @@ describe('parseBackupMeta', () => {
 });
 
 describe('assertRestorableVersion', () => {
-  it('accepts the build version', () => {
-    expect(() => assertRestorableVersion(5, 5)).not.toThrow();
+  it('accepts the build version, and older ones back to the oldest restorable', () => {
+    expect(() => assertRestorableVersion(6, 6)).not.toThrow();
+    expect(() => assertRestorableVersion(5, 6)).not.toThrow();
   });
 
   it('refuses a newer file with an update hint', () => {
-    expect(() => assertRestorableVersion(6, 5)).toThrow('newer version');
+    expect(() => assertRestorableVersion(7, 6)).toThrow('newer version');
   });
 
-  it('refuses an older file until a migration exists', () => {
-    expect(() => assertRestorableVersion(4, 5)).toThrow('older version');
+  it('refuses a file older than any migration covers', () => {
+    expect(() => assertRestorableVersion(4, 6)).toThrow('older version');
   });
 });

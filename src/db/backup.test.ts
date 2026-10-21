@@ -28,7 +28,12 @@ async function seed(target: DigheadDb): Promise<void> {
     source: 'collection',
     addedAt: null,
   });
-  await target.fanMatches.put({ fanId: 1, matchIds: new Float64Array([1, 2, 3]) });
+  await target.fanMatches.put({
+    fanId: 1,
+    matchIds: new Float64Array([1]),
+    trackIds: new Float64Array(),
+    partialIds: new Float64Array(),
+  });
   await target.me.put({ id: 'self', fanId: 1, username: 'a', syncedAt: 5 });
   await target.tags.put({ id: 7, name: 'Ambient', nameKey: 'ambient' });
   await target.following.put({
@@ -104,6 +109,38 @@ describe('import phases', () => {
     });
 
     expect(phases).toEqual(['snapshotting', 'writing', 'cleanup', null]);
+  });
+});
+
+describe('older backups', () => {
+  it('imports a v5 file and rebuilds its fanMatches track lists', async () => {
+    await seed(db);
+    await db.ownership.put({
+      fanId: 1,
+      itemKey: 't4',
+      matchKey: 'a3',
+      source: 'collection',
+      addedAt: null,
+    });
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 5;
+    for (const table of json.data.data) {
+      if (table.tableName !== 'fanMatches') continue;
+      for (const row of table.rows) {
+        delete row.trackIds;
+        delete row.partialIds;
+      }
+    }
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.fanMatches.get(1)).toEqual({
+      fanId: 1,
+      matchIds: new Float64Array([1, 3]),
+      trackIds: new Float64Array([-4]),
+      partialIds: new Float64Array([3]),
+    });
   });
 });
 

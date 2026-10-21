@@ -10,7 +10,7 @@ import {
   type BackupMeta,
   type BackupSummary,
 } from '../shared/backupFile';
-import type { DigheadDb } from './schema';
+import { type DigheadDb, rebuildFanMatchLists } from './schema';
 
 /** The library reads blob slices with FileReader, which service workers don't have. */
 function ensureFileReader(): void {
@@ -66,7 +66,17 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 }
 
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
-const READ_ONLY = { acceptNameDiff: true, noTransaction: true } as const;
+// The version is checked by assertRestorableVersion, and older rows migrated after writing.
+const READ_ONLY = { acceptNameDiff: true, acceptVersionDiff: true, noTransaction: true } as const;
+
+/** Brings rows written by an older schema up to this one, as its Dexie upgrades would have. */
+async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
+  if (fromVersion < 6) {
+    await db.transaction('rw', [db.fanMatches, db.ownership], () =>
+      rebuildFanMatchLists(db.fanMatches, db.ownership),
+    );
+  }
+}
 
 /** Where the safety copy of the current data waits while an import runs. */
 export interface SnapshotStore {
@@ -123,6 +133,7 @@ export async function importDatabase(
   await onPhase('writing');
   try {
     await replaceAll(db, file);
+    await migrateRows(db, meta.data.databaseVersion);
   } catch (error) {
     try {
       await replaceAll(db, await snapshot.load());
