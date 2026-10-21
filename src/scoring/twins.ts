@@ -158,9 +158,12 @@ export function compareTwins(a: Twin, b: Twin): number {
   return b.score - a.score || b.overlap - a.overlap || a.fanId - b.fanId;
 }
 
-/** Whether a twin belongs on the lately leaderboard: active lately, with something in common. */
+/**
+ * Whether a twin belongs on the lately leaderboard: active lately, and sharing a release you
+ * both bought this past year. Old overlap alone still scores a sliver above 0.
+ */
 export function isLatelyTwin(twin: Twin): boolean {
-  return twin.lately !== null && twin.lately > 0;
+  return twin.lately !== null && twin.latelyOverlap > 0;
 }
 
 /** Best first by lately, then the all-time order. Twins without a lately score go last. */

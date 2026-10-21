@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import { MONTH_MS, moment, TREND_LOOKBACK_MS } from './lately';
 import {
+  compareLately,
   compareTwins,
   intersect,
+  isLatelyTwin,
   isLabelCluster,
   LABEL_CLUSTER_FACTOR,
   scoreTwin,
+  sharedPositions,
   type Candidate,
+  type Twin,
   type TwinInput,
 } from './twins';
 
@@ -21,8 +26,20 @@ const catalogSize = new Map([
   [100, 7],
   [200, 33],
 ]);
+// Undated unless a test says otherwise, so lately stays out of the all-time tests.
+const NOW = 100 * TREND_LOOKBACK_MS;
+const HALF_LIFE = 6 * MONTH_MS;
+const lately = (mineTimes: Float64Array): TwinInput['lately'] => ({
+  halfLifeMs: HALF_LIFE,
+  minPurchases: 1,
+  now: moment(NOW, mineTimes, HALF_LIFE),
+  yearAgo: moment(NOW - TREND_LOOKBACK_MS, mineTimes, HALF_LIFE),
+});
+const undated = new Float64Array(mine.length);
 const input: TwinInput = {
   mine,
+  mineTimes: undated,
+  lately: lately(undated),
   weights,
   labelOf,
   catalogSize,
@@ -33,6 +50,7 @@ const input: TwinInput = {
 const fan = (fanId: number, ...values: number[]): Candidate => ({
   fanId,
   matchIds: ids(...values),
+  matchTimes: new Float64Array(values.length),
   size: values.length,
 });
 /** scoreTwin for fans the test expects to score. */
@@ -46,6 +64,13 @@ describe('intersect', () => {
   it('returns the ids both sorted lists hold', () => {
     expect(intersect(ids(1, 3, 5, 7), ids(2, 3, 4, 7, 9))).toEqual([3, 7]);
     expect(intersect(ids(), ids(1))).toEqual([]);
+  });
+
+  it('knows where each shared id sits in both lists', () => {
+    expect(sharedPositions(ids(1, 3, 5, 7), ids(2, 3, 4, 7, 9))).toEqual([
+      { mine: 1, theirs: 1 },
+      { mine: 3, theirs: 3 },
+    ]);
   });
 });
 
@@ -129,5 +154,97 @@ describe('compareTwins', () => {
       .sort(compareTwins);
 
     expect(ranked.map((twin) => twin.fanId)).toEqual([3, 4, 5, 2, 1]);
+  });
+});
+
+describe('lately in scoreTwin', () => {
+  const MONTH = MONTH_MS;
+  // You bought 1–5 this past month and 6–10 four years ago.
+  const mineTimes = Float64Array.from([...mine].map((id) => NOW - (id <= 5 ? 1 : 48) * MONTH));
+  const dated: TwinInput = { ...input, mineTimes, lately: lately(mineTimes) };
+  /** A fan who bought each [id, months ago]. */
+  const datedFan = (fanId: number, ...bought: [id: number, monthsAgo: number][]): Candidate => {
+    const sorted = [...bought].sort((a, b) => a[0] - b[0]);
+    return {
+      fanId,
+      matchIds: Float64Array.from(sorted.map(([id]) => id)),
+      matchTimes: Float64Array.from(sorted.map(([, ago]) => NOW - ago * MONTH)),
+      size: sorted.length,
+    };
+  };
+  const scoredDated = (candidate: Candidate) => {
+    const twin = scoreTwin(candidate, dated);
+    if (!twin) throw new Error(`fan ${candidate.fanId} was filtered out`);
+    return twin;
+  };
+
+  it('ranks a fan in step with you now above an old twin with more in common', () => {
+    // Old twin: all ten releases in common, all bought four years ago.
+    const old = scoredDated(datedFan(1, ...[...mine].map((id): [number, number] => [id, 48])));
+    // Now: two of your new rare releases, bought this month too, among other recent buys.
+    const now = scoredDated(datedFan(2, [1, 1], [2, 1], [30, 1], [31, 2], [32, 3]));
+
+    expect(old.score).toBeGreaterThan(now.score);
+    // Four years of fading leave the old twin too little to score at all.
+    expect(old.lately).toBeNull();
+    expect(now.lately).toBeGreaterThan(0);
+    expect(now.latelyOverlap).toBe(2);
+    expect(old.latelyOverlap).toBe(0);
+  });
+
+  it('takes the year-ago score from purchases made by then', () => {
+    // Shared 1 and 2 this month; 30–34 bought 13 months ago keep the fan active back then.
+    const twin = scoredDated(
+      datedFan(1, [1, 0], [2, 0], [30, 13], [31, 13], [32, 13], [33, 13], [34, 13]),
+    );
+
+    expect(twin.lately).toBeGreaterThan(0);
+    expect(twin.yearAgo).toBe(0);
+  });
+
+  it('has no lately score for a fan who bought too little lately', () => {
+    const quiet = scoreTwin(datedFan(1, [1, 40], [2, 40], [30, 40]), {
+      ...dated,
+      lately: { ...dated.lately, minPurchases: 2 },
+    });
+
+    expect(quiet?.lately).toBeNull();
+    expect(quiet && isLatelyTwin(quiet)).toBe(false);
+  });
+
+  it('applies the label-cluster factor to the lately score too', () => {
+    const subscriber = datedFan(1, [1, 1], [2, 1], [3, 1], [20, 1], [21, 1], [30, 1]);
+    const twin = scoredDated(subscriber);
+    const unweighted = scoreTwin(subscriber, { ...dated, labelClusterDownweight: false });
+
+    expect(twin.labelCluster).toBe(true);
+    expect(twin.lately).toBeCloseTo((unweighted?.lately ?? 0) * LABEL_CLUSTER_FACTOR);
+  });
+});
+
+describe('compareLately', () => {
+  const twin = (fanId: number, latelyScore: number | null, score = 0.1): Twin => ({
+    fanId,
+    overlap: 1,
+    jaccard: 0.1,
+    score,
+    labelCluster: false,
+    lately: latelyScore,
+    yearAgo: null,
+    latelyOverlap: 0,
+  });
+
+  it('orders by lately score, then the all-time order, missing scores last', () => {
+    const ranked = [twin(1, null, 0.9), twin(2, 0.2), twin(3, 0.5), twin(4, 0.2, 0.3)].sort(
+      compareLately,
+    );
+
+    expect(ranked.map((t) => t.fanId)).toEqual([3, 4, 2, 1]);
+  });
+
+  it('keeps active fans sharing a release bought this year on the lately board', () => {
+    expect(isLatelyTwin({ ...twin(1, 0.1), latelyOverlap: 1 })).toBe(true);
+    expect(isLatelyTwin(twin(1, 0.1))).toBe(false);
+    expect(isLatelyTwin({ ...twin(1, null), latelyOverlap: 1 })).toBe(false);
   });
 });
