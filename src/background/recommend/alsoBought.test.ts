@@ -133,7 +133,7 @@ describe('computeAlsoBought', () => {
       label: null,
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
-      reason: { kind: 'co-owned', owners: 5, of: 10, twins: 0 },
+      reason: { kind: 'co-owned', owners: 5, twins: 0 },
       ownedTracks: 0,
     });
     expect(rows.find((row) => row.matchKey === 'a900')?.ownedTracks).toBe(1);
@@ -174,10 +174,10 @@ describe('computeAlsoBought', () => {
     // a900 (fans 17 and 18, share 1): 3.7 × 1.5 ≈ 5.5, just short of a400's 5.7.
     const { rows } = await computeAlsoBought(db, 'a100', ME);
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a200', { kind: 'co-owned', owners: 8, of: 10, twins: 1 }],
-      ['a300', { kind: 'co-owned', owners: 5, of: 10, twins: 0 }],
-      ['a400', { kind: 'co-owned', owners: 4, of: 10, twins: 0 }],
-      ['a900', { kind: 'co-owned', owners: 3, of: 10, twins: 2 }],
+      ['a200', { kind: 'co-owned', owners: 8, twins: 1 }],
+      ['a300', { kind: 'co-owned', owners: 5, twins: 0 }],
+      ['a400', { kind: 'co-owned', owners: 4, twins: 0 }],
+      ['a900', { kind: 'co-owned', owners: 3, twins: 2 }],
     ]);
   });
 
@@ -217,7 +217,7 @@ describe('small-release fallback', () => {
     const { rows } = await computeAlsoBought(db, 'a1000', ME);
 
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a2000', { kind: 'co-owned', owners: 2, of: 2, twins: 0 }],
+      ['a2000', { kind: 'co-owned', owners: 2, twins: 0 }],
       ['a1001', { kind: 'same-artist' }],
       ['a1002', { kind: 'same-label', label: 'Tiny Label' }],
       ['a1003', { kind: 'same-label', label: 'Tiny Label' }],

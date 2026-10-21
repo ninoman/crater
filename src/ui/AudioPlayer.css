@@ -1,3 +1,31 @@
+/* Grows from nothing when a preview opens: grid rows animate from 0fr to the content height. */
+.dh-player-reveal {
+  display: grid;
+  animation: dh-player-reveal var(--dh-duration-reveal) ease-out;
+}
+
+.dh-player-reveal__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@keyframes dh-player-reveal {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-player-reveal {
+    animation: none;
+  }
+}
+
 .dh-player {
   display: flex;
   align-items: center;
@@ -29,11 +57,14 @@
   gap: var(--dh-space-2);
 }
 
-.dh-player__time,
-.dh-player__status {
+.dh-player__time {
   flex: none;
   font-size: var(--dh-text-xs);
   font-variant-numeric: tabular-nums;
+  color: var(--dh-color-muted);
+}
+
+.dh-player__status {
   color: var(--dh-color-muted);
 }
 
