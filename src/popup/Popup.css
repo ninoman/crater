@@ -110,6 +110,20 @@ body {
   gap: var(--dh-space-2);
 }
 
+/* Share label / input / error rows across the group, so a label that wraps
+   to two lines doesn't push its input below its neighbours. */
+.dh-settings__fields > .dh-field {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 2px;
+  align-items: end;
+}
+
+.dh-settings__fields > .dh-field > .dh-field__error {
+  align-self: start;
+}
+
 .dh-settings__footer {
   display: flex;
   align-items: center;
