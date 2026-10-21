@@ -56,6 +56,8 @@ export interface FanMatchesRecord {
   fanId: number;
   /** matchKeys as numbers (keyToNumber), sorted ascending. */
   matchIds: Float64Array;
+  /** Newest purchase time (ms) under each of `matchIds`, in the same order. 0 when unknown. */
+  matchTimes: Float64Array;
 }
 
 /** How many fans' collections hold a matchKey: the base rate for lift (decisions §6). */
@@ -92,6 +94,12 @@ export interface TwinRecord {
   jaccard: number;
   score: number;
   labelCluster: boolean;
+  /** In step with your recent buying (decisions §11). Null when either of you bought too little lately. */
+  lately: number | null;
+  /** `lately` as it stood a year ago, for the trend. */
+  yearAgo: number | null;
+  /** Releases you both bought within the last year. */
+  latelyOverlap: number;
   computedAt: number;
 }
 
@@ -165,6 +173,16 @@ export interface TagRecord {
   nameKey: string;
 }
 
+/** Blanks the v6 fields on a twin stored before them, until the next recompute fills them. */
+export function blankLately(twin: TwinRecord): void {
+  twin.lately ??= null;
+  twin.yearAgo ??= null;
+  twin.latelyOverlap ??= 0;
+}
+
+/** Tables newer than the oldest restorable backup, by the version that added them. */
+export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 6 };
+
 export class DigheadDb extends Dexie {
   items!: EntityTable<ItemRecord, 'itemKey'>;
   fans!: EntityTable<FanRecord, 'fanId'>;
@@ -172,6 +190,8 @@ export class DigheadDb extends Dexie {
   releaseSupporters!: EntityTable<ReleaseSupportersRecord, 'itemKey'>;
   me!: EntityTable<MeRecord, 'id'>;
   twins!: EntityTable<TwinRecord, 'fanId'>;
+  /** The leaderboard by `lately` rather than `score`: the fans most in step with you now. */
+  latelyTwins!: EntityTable<TwinRecord, 'fanId'>;
   queue!: EntityTable<QueueJob, 'id'>;
   fanMatches!: EntityTable<FanMatchesRecord, 'fanId'>;
   matchOwners!: EntityTable<MatchOwnersRecord, 'matchId'>;
@@ -233,5 +253,15 @@ export class DigheadDb extends Dexie {
       following: '[kind+id], kind, *tagIds',
       tags: '++id, &nameKey',
     });
+    // v6: purchase times in the match index and a second leaderboard for recent taste (§11).
+    // Restoring a v5 backup does the same (backup.ts), so keep the two in step.
+    this.version(6)
+      .stores({ latelyTwins: 'fanId, lately' })
+      .upgrade(async (tx) => {
+        const index = buildMatchIndex(await tx.table<OwnershipRecord>('ownership').toArray());
+        await tx.table('fanMatches').clear();
+        await tx.table('fanMatches').bulkPut(index.fanMatches);
+        await tx.table<TwinRecord>('twins').toCollection().modify(blankLately);
+      });
   }
 }

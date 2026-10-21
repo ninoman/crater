@@ -103,12 +103,13 @@ export async function forgetFansNotSeenSince(
     if (ids.length === 0) return forgotten;
     await db.transaction(
       'rw',
-      [db.fans, db.ownership, db.fanMatches, db.matchOwners, db.twins, db.queue],
+      [db.fans, db.ownership, db.fanMatches, db.matchOwners, db.twins, db.latelyTwins, db.queue],
       async () => {
         await db.ownership.where('fanId').anyOf(ids).delete();
         // Their rows are gone, so this drops their lists and lowers the owner counts.
         await refreshFanMatches(db, ids);
         await db.twins.bulkDelete(ids);
+        await db.latelyTwins.bulkDelete(ids);
         await db.queue
           .where('[kind+target]')
           .anyOf(ids.map((fanId) => ['fan', `${fanId}`]))

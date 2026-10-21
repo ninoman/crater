@@ -1,4 +1,4 @@
-import { addOwnerDeltas, collectionMatchIds } from '../matchIndex';
+import { addOwnerDeltas, buildMatchIndex, collectionMatches } from '../matchIndex';
 import type { DigheadDb, FanMatchesRecord } from '../schema';
 
 const EMPTY = new Float64Array();
@@ -20,14 +20,24 @@ export async function refreshFanMatches(db: DigheadDb, fanIds: Iterable<number>)
   const put: FanMatchesRecord[] = [];
   const emptied: number[] = [];
   for (const [i, fanId] of ids.entries()) {
-    const matchIds = collectionMatchIds(rows[i] ?? []);
-    addOwnerDeltas(before[i]?.matchIds ?? EMPTY, matchIds, deltas);
-    if (matchIds.length > 0) put.push({ fanId, matchIds });
+    const matches = collectionMatches(rows[i] ?? []);
+    addOwnerDeltas(before[i]?.matchIds ?? EMPTY, matches.matchIds, deltas);
+    if (matches.matchIds.length > 0) put.push({ fanId, ...matches });
     else if (before[i]) emptied.push(fanId);
   }
   await db.fanMatches.bulkPut(put);
   await db.fanMatches.bulkDelete(emptied);
   await applyOwnerDeltas(db, deltas);
+}
+
+/** Builds the whole index again from `ownership`, e.g. after restoring an older backup. */
+export async function rebuildMatchIndex(db: DigheadDb): Promise<void> {
+  await db.transaction('rw', [db.ownership, db.fanMatches, db.matchOwners], async () => {
+    const index = buildMatchIndex(await db.ownership.toArray());
+    await Promise.all([db.fanMatches.clear(), db.matchOwners.clear()]);
+    await db.fanMatches.bulkPut(index.fanMatches);
+    await db.matchOwners.bulkPut(index.matchOwners);
+  });
 }
 
 async function applyOwnerDeltas(db: DigheadDb, deltas: Map<number, number>): Promise<void> {

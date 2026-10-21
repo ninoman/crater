@@ -1,15 +1,27 @@
-// The match index: each fan's distinct collection matchKeys and, per matchKey, how many fans
-// hold it. Derived from `ownership`; these pure helpers compute it, repo/matchIndex.ts stores it.
+// The match index: each fan's distinct collection matchKeys with when they bought them and, per
+// matchKey, how many fans hold it. Derived from `ownership`; these pure helpers compute it, repo/matchIndex.ts stores it.
 // Keys are stored as numbers (keyToNumber): reading and counting them is about twice as fast.
 
 import { keyToNumber } from '../bandcamp';
 import type { FanMatchesRecord, MatchOwnersRecord, OwnershipRecord } from './schema';
 
-/** What a fan owns, as sorted match ids. Wishlists don't count as owning. */
-export function collectionMatchIds(rows: Iterable<OwnershipRecord>): Float64Array {
-  const ids = new Set<number>();
-  for (const row of rows) if (row.source === 'collection') ids.add(keyToNumber(row.matchKey));
-  return Float64Array.from(ids).sort();
+export type FanMatches = Pick<FanMatchesRecord, 'matchIds' | 'matchTimes'>;
+
+/**
+ * What a fan owns, as sorted match ids, with the newest purchase under each (0 when no row is
+ * dated). Newest, because buying more of a release lately says it's on their mind now.
+ * Wishlists don't count as owning.
+ */
+export function collectionMatches(rows: Iterable<OwnershipRecord>): FanMatches {
+  const newest = new Map<number, number>();
+  for (const row of rows) {
+    if (row.source !== 'collection') continue;
+    const id = keyToNumber(row.matchKey);
+    newest.set(id, Math.max(newest.get(id) ?? 0, row.addedAt ?? 0));
+  }
+  const matchIds = Float64Array.from(newest.keys()).sort();
+  const matchTimes = matchIds.map((id) => newest.get(id) ?? 0);
+  return { matchIds, matchTimes };
 }
 
 /** Adds the owner-count changes of one fan's sorted list going from `before` to `after`. */
@@ -51,10 +63,10 @@ export function buildMatchIndex(rows: Iterable<OwnershipRecord>): {
   const fanMatches: FanMatchesRecord[] = [];
   const owners = new Map<number, number>();
   for (const [fanId, fanRows] of byFan) {
-    const matchIds = collectionMatchIds(fanRows);
-    if (matchIds.length === 0) continue;
-    fanMatches.push({ fanId, matchIds });
-    for (const id of matchIds) owners.set(id, (owners.get(id) ?? 0) + 1);
+    const matches = collectionMatches(fanRows);
+    if (matches.matchIds.length === 0) continue;
+    fanMatches.push({ fanId, ...matches });
+    for (const id of matches.matchIds) owners.set(id, (owners.get(id) ?? 0) + 1);
   }
   return {
     fanMatches,

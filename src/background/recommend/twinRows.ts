@@ -1,17 +1,46 @@
-// Dresses the stored twins leaderboard for display: names, avatars and profile links.
+// Dresses the stored twins leaderboards for display: names, avatars, profile links and trends.
 
 import { fanImageUrl, fanPageUrl } from '../../bandcamp';
-import { countReadFans, getFans, getMe, getTwins, type DigheadDb, type MeRecord } from '../../db';
+import {
+  countReadFans,
+  getFans,
+  getLatelyTwins,
+  getMe,
+  getTwins,
+  type DigheadDb,
+  type MeRecord,
+  type TwinRecord,
+} from '../../db';
+import { trendOf } from '../../scoring/lately';
 import type { TwinRow, TwinsBasis, TwinsResult } from '../../shared/twins';
 
-export async function readTwinsResult(db: DigheadDb): Promise<TwinsResult> {
-  const [me, twins, fansRead] = await Promise.all([getMe(db), getTwins(db), countReadFans(db)]);
+export async function readTwinsResult(
+  db: DigheadDb,
+  latelyHalfLifeMonths: number,
+): Promise<TwinsResult> {
+  const [me, twins, latelyTwins, fansRead] = await Promise.all([
+    getMe(db),
+    getTwins(db),
+    getLatelyTwins(db),
+    countReadFans(db),
+  ]);
+  return {
+    basis: twinsBasis(me),
+    rows: await twinRows(db, twins),
+    latelyRows: await twinRows(db, latelyTwins),
+    latelyHalfLifeMonths,
+    computedAt: twins[0]?.computedAt ?? latelyTwins[0]?.computedAt ?? null,
+    fansRead,
+  };
+}
+
+/** One leaderboard's rows, ranked in the order given. */
+async function twinRows(db: DigheadDb, twins: readonly TwinRecord[]): Promise<TwinRow[]> {
   const fans = await getFans(
     db,
     twins.map((twin) => twin.fanId),
   );
-
-  const rows = twins.flatMap((twin, i): TwinRow[] => {
+  return twins.flatMap((twin, i): TwinRow[] => {
     const fan = fans[i];
     if (!fan) return [];
     return [
@@ -26,11 +55,12 @@ export async function readTwinsResult(db: DigheadDb): Promise<TwinsResult> {
         jaccard: twin.jaccard,
         score: twin.score,
         labelCluster: twin.labelCluster,
+        lately: twin.lately,
+        latelyOverlap: twin.latelyOverlap,
+        trend: trendOf(twin.lately, twin.yearAgo),
       },
     ];
   });
-
-  return { basis: twinsBasis(me), rows, computedAt: twins[0]?.computedAt ?? null, fansRead };
 }
 
 /** Whether there's a synced collection of yours for twins to be worked out from. */

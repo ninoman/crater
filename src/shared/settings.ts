@@ -15,6 +15,10 @@ export interface Settings {
   maxCollectionSize: number;
   topTwinsK: number;
   labelClusterDownweight: boolean;
+  /** Lately twins: a purchase counts half as much after this many months (decisions §11). */
+  latelyHalfLifeMonths: number;
+  /** Fans who bought less than this lately (purchases weighed by age) get no lately score. */
+  latelyMinPurchases: number;
   /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
   seedFromCollection: boolean;
 }
@@ -30,6 +34,8 @@ export const DEFAULT_SETTINGS: Settings = {
   maxCollectionSize: 20000,
   topTwinsK: 30,
   labelClusterDownweight: true,
+  latelyHalfLifeMonths: 6,
+  latelyMinPurchases: 5,
   seedFromCollection: true,
 };
 
@@ -55,6 +61,8 @@ export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }
   minCollectionSize: { min: 1, max: 1000 },
   maxCollectionSize: { min: 100, max: 1_000_000 },
   topTwinsK: { min: 5, max: 200 },
+  latelyHalfLifeMonths: { min: 1, max: 36 },
+  latelyMinPurchases: { min: 1, max: 100 },
 };
 
 export type SettingsErrors = Partial<Record<keyof Settings, string>>;

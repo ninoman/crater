@@ -13,6 +13,8 @@ export interface SupporterCounts {
 export interface TwinBasis {
   /** Your collection as sorted match ids. */
   mine: Float64Array;
+  /** When you bought each of `mine`, 0 when unknown. */
+  mineTimes: Float64Array;
   counts: Map<number, SupporterCounts>;
   /** Label of every match id in the catalog of a label you own something from. */
   labelOf: Map<number, number>;
@@ -24,6 +26,7 @@ export interface TwinBasis {
 export interface TwinCandidate {
   fanId: number;
   matchIds: Float64Array;
+  matchTimes: Float64Array;
   /** The full collection size once known, else what we've scanned. */
   size: number;
 }
@@ -45,6 +48,7 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
       db.ownership.where('fanId').equals(meFanId).toArray(),
     ]);
     const mine = list?.matchIds ?? new Float64Array();
+    const mineTimes = list?.matchTimes ?? new Float64Array();
     const owned = rows.filter((row) => row.source === 'collection');
     const keys = [...new Set(owned.flatMap((row) => [row.matchKey, row.itemKey]))];
     const [items, owners] = await Promise.all([
@@ -71,7 +75,7 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
     }
 
     const { labelOf, catalogSize } = await labelCatalogs(db, labels);
-    return { mine, counts, labelOf, catalogSize };
+    return { mine, mineTimes, counts, labelOf, catalogSize };
   });
 }
 
@@ -116,6 +120,7 @@ export async function readTwinCandidates(
       candidates.push({
         fanId: fan.fanId,
         matchIds: list.matchIds,
+        matchTimes: list.matchTimes,
         size: fan.collectionSize ?? fan.scannedItems,
       });
     });
@@ -124,14 +129,25 @@ export async function readTwinCandidates(
   });
 }
 
-export async function replaceTwins(db: DigheadDb, twins: TwinRecord[]): Promise<void> {
-  await db.transaction('rw', db.twins, async () => {
-    await db.twins.clear();
+/** Swaps in both leaderboards at once, so they always come from the same pass. */
+export async function replaceTwins(
+  db: DigheadDb,
+  twins: TwinRecord[],
+  latelyTwins: TwinRecord[],
+): Promise<void> {
+  await db.transaction('rw', [db.twins, db.latelyTwins], async () => {
+    await Promise.all([db.twins.clear(), db.latelyTwins.clear()]);
     await db.twins.bulkPut(twins);
+    await db.latelyTwins.bulkPut(latelyTwins);
   });
 }
 
 /** The leaderboard, best first. */
 export function getTwins(db: DigheadDb): Promise<TwinRecord[]> {
   return db.twins.orderBy('score').reverse().toArray();
+}
+
+/** The lately leaderboard, most in step first. */
+export function getLatelyTwins(db: DigheadDb): Promise<TwinRecord[]> {
+  return db.latelyTwins.orderBy('lately').reverse().toArray();
 }

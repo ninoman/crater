@@ -1,5 +1,5 @@
-// Recomputes the taste-twins leaderboard: your basis once, then every read fan in pages, with a
-// yield between pages so the worker never blocks for long.
+// Recomputes the taste-twins leaderboards, all-time and lately: your basis once, then every read
+// fan in pages, with a yield between pages so the worker never blocks for long.
 
 import {
   gatherTwinBasis,
@@ -8,11 +8,19 @@ import {
   type DigheadDb,
   type TwinRecord,
 } from '../../db';
-import { compareTwins, scoreTwin, type Twin, type TwinInput } from '../../scoring/twins';
+import { moment, MONTH_MS, TREND_LOOKBACK_MS } from '../../scoring/lately';
+import {
+  compareLately,
+  compareTwins,
+  isLatelyTwin,
+  scoreTwin,
+  type Twin,
+  type TwinInput,
+} from '../../scoring/twins';
 import { supporters, weight } from '../../scoring/weights';
 import type { Settings } from '../../shared/settings';
 
-/** The leaderboard keeps this many. For you only reads the top `topTwinsK`. */
+/** Each leaderboard keeps this many. For you only reads the top `topTwinsK`. */
 export const TWINS_KEPT = 200;
 /** Fans scored per page between yields. */
 const PAGE = 500;
@@ -25,39 +33,56 @@ export interface TwinsDeps {
   yieldNow: () => Promise<void>;
 }
 
+/** Recomputes and stores both leaderboards. Returns the all-time one. */
 export async function computeTwins(deps: TwinsDeps, meFanId: number): Promise<TwinRecord[]> {
-  const { db, settings } = deps;
+  const { db, settings, now } = deps;
   const basis = await gatherTwinBasis(db, meFanId);
   const weights = new Map<number, number>();
   for (const [id, counts] of basis.counts) {
     weights.set(id, weight(supporters(counts.bandcampCounts, counts.knownOwners)));
   }
+  const halfLifeMs = settings.latelyHalfLifeMonths * MONTH_MS;
   const input: TwinInput = {
     mine: basis.mine,
+    mineTimes: basis.mineTimes,
     weights,
     labelOf: basis.labelOf,
     catalogSize: basis.catalogSize,
     minCollectionSize: settings.minCollectionSize,
     maxCollectionSize: settings.maxCollectionSize,
     labelClusterDownweight: settings.labelClusterDownweight,
+    lately: {
+      halfLifeMs,
+      minPurchases: settings.latelyMinPurchases,
+      now: moment(now, basis.mineTimes, halfLifeMs),
+      yearAgo: moment(now - TREND_LOOKBACK_MS, basis.mineTimes, halfLifeMs),
+    },
   };
 
   let best: Twin[] = [];
+  let bestLately: Twin[] = [];
   for (let after: number | null = -Infinity; after !== null && basis.mine.length > 0; ) {
     const page = await readTwinCandidates(db, after, PAGE, meFanId);
     for (const candidate of page.candidates) {
       const twin = scoreTwin(candidate, input);
-      if (twin) best.push(twin);
+      if (!twin) continue;
+      best.push(twin);
+      if (isLatelyTwin(twin)) bestLately.push(twin);
     }
-    if (best.length > TWINS_KEPT * 2) best = best.sort(compareTwins).slice(0, TWINS_KEPT);
+    best = keepBest(best, compareTwins);
+    bestLately = keepBest(bestLately, compareLately);
     after = page.next;
     await deps.yieldNow();
   }
 
-  const records = best
-    .sort(compareTwins)
-    .slice(0, TWINS_KEPT)
-    .map((twin): TwinRecord => ({ ...twin, computedAt: deps.now }));
-  await replaceTwins(db, records);
+  const record = (twin: Twin): TwinRecord => ({ ...twin, computedAt: now });
+  const records = best.sort(compareTwins).slice(0, TWINS_KEPT).map(record);
+  const latelyRecords = bestLately.sort(compareLately).slice(0, TWINS_KEPT).map(record);
+  await replaceTwins(db, records, latelyRecords);
   return records;
+}
+
+/** Trims a growing list back to the leaders once it's twice the size kept. */
+function keepBest(twins: Twin[], compare: (a: Twin, b: Twin) => number): Twin[] {
+  return twins.length > TWINS_KEPT * 2 ? twins.sort(compare).slice(0, TWINS_KEPT) : twins;
 }

@@ -6,6 +6,7 @@ import { db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
 import type { ForYouResult } from '../../shared/forYou';
 import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
+import type { TwinsResult } from '../../shared/twins';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
@@ -13,9 +14,9 @@ import { computeAlsoBought } from './alsoBought';
 import { computeForYou } from './forYou';
 import { computeReleaseTwins } from './releaseTwins';
 import { rescoreDue } from './rescore';
+import { readTwinsResult } from './twinRows';
 import { computeTwins } from './twins';
 
-export { readTwinsResult } from './twinRows';
 export { getTwinStanding, getTwinStandings } from './twinStanding';
 
 /** Twins are recomputed after this many fans finish scanning. */
@@ -37,6 +38,11 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
 export async function getForYou(): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   return computeForYou(db, me, settings.topTwinsK);
+}
+
+/** Both twins leaderboards for the Twins tab on your profile. */
+export async function getTwinsResult(): Promise<TwinsResult> {
+  return readTwinsResult(db, (await loadSettings()).latelyHalfLifeMonths);
 }
 
 export function getReleaseTwins(releaseKey: ItemKey): Promise<ReleaseTwinsResult> {

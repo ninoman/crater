@@ -11,7 +11,7 @@ import {
   getReleaseTwins,
   getTwinStanding,
   getTwinStandings,
-  readTwinsResult,
+  getTwinsResult,
 } from './recommend';
 import {
   clearScanData,
@@ -42,7 +42,7 @@ export const handlers: MessageHandlers = {
     await hideRelease(db, matchKey, Date.now());
     return null;
   },
-  getTwins: () => readTwinsResult(db),
+  getTwins: () => getTwinsResult(),
   getTwinStanding: ({ fanId }) => getTwinStanding(db, fanId),
   getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),

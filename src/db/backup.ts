@@ -10,7 +10,8 @@ import {
   type BackupMeta,
   type BackupSummary,
 } from '../shared/backupFile';
-import type { DigheadDb } from './schema';
+import { rebuildMatchIndex } from './repo/matchIndex';
+import { blankLately, TABLES_ADDED, type DigheadDb } from './schema';
 
 /** The library reads blob slices with FileReader, which service workers don't have. */
 function ensureFileReader(): void {
@@ -66,7 +67,8 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 }
 
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
-const READ_ONLY = { acceptNameDiff: true, noTransaction: true } as const;
+// Versions are checked by assertRestorableVersion instead, which lets older backups through.
+const READ_ONLY = { acceptNameDiff: true, acceptVersionDiff: true, noTransaction: true } as const;
 
 /** Where the safety copy of the current data waits while an import runs. */
 export interface SnapshotStore {
@@ -102,9 +104,11 @@ export async function importDatabase(
 ): Promise<BackupSummary> {
   ensureFileReader();
   const meta = parseBackupMeta(await peakImportFile(file).catch(() => null));
-  assertRestorableVersion(meta.data.databaseVersion, db.verno);
+  const fileVersion = meta.data.databaseVersion;
+  assertRestorableVersion(fileVersion, db.verno);
   const exported = new Set(meta.data.tables.map((table) => table.name));
-  if (db.tables.some((table) => !exported.has(table.name))) {
+  const expected = db.tables.filter((table) => (TABLES_ADDED[table.name] ?? 0) <= fileVersion);
+  if (expected.some((table) => !exported.has(table.name))) {
     throw new Error("That backup is missing some of Dighead's tables.");
   }
   await verifyRows(db, file, meta);
@@ -123,6 +127,7 @@ export async function importDatabase(
   await onPhase('writing');
   try {
     await replaceAll(db, file);
+    await upgradeRestored(db, fileVersion);
   } catch (error) {
     try {
       await replaceAll(db, await snapshot.load());
@@ -141,6 +146,14 @@ export async function importDatabase(
   await snapshot.discard().catch(() => undefined);
   await onPhase(null);
   return summarizeBackup(meta);
+}
+
+/** Does to rows restored from an older backup what the version upgrades in schema.ts do. */
+async function upgradeRestored(db: DigheadDb, fileVersion: number): Promise<void> {
+  if (fileVersion < 6) {
+    await rebuildMatchIndex(db);
+    await db.twins.toCollection().modify(blankLately);
+  }
 }
 
 function reason(error: unknown): string {

@@ -11,6 +11,13 @@
   margin-bottom: var(--dh-space-2);
 }
 
+.dh-profile__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-2);
+}
+
 .dh-profile__summary,
 .dh-profile__note {
   margin: 0;

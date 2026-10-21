@@ -37,6 +37,8 @@ const GROUPS: Group[] = [
       { key: 'minCollectionSize', label: 'Min collection' },
       { key: 'maxCollectionSize', label: 'Max collection' },
       { key: 'topTwinsK', label: 'Twins used (K)' },
+      { key: 'latelyHalfLifeMonths', label: 'Lately half-life (months)' },
+      { key: 'latelyMinPurchases', label: 'Lately min purchases' },
     ],
     toggles: [{ key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' }],
   },

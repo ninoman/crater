@@ -1,13 +1,16 @@
 // Sorting, filtering and number formats for the twins leaderboard. Pure, so the table stays dumb.
 
 import { foldText as fold } from '../../../shared/fold';
-import type { TwinRow } from '../../../shared/twins';
+import type { Trend, TwinRow } from '../../../shared/twins';
 
-export type TwinSort = 'score' | 'overlap' | 'jaccard';
+/** All time ranks by overall overlap, Lately by how in step your recent buying is (§11). */
+export type TwinBoard = 'all' | 'lately';
 
-/** Highest first. Ties keep leaderboard order. */
+export type TwinSort = 'score' | 'overlap' | 'jaccard' | 'lately' | 'latelyOverlap';
+
+/** Highest first, a missing lately score lowest. Ties keep leaderboard order. */
 export function sortTwins(rows: readonly TwinRow[], by: TwinSort): TwinRow[] {
-  return [...rows].sort((a, b) => b[by] - a[by] || a.rank - b.rank);
+  return [...rows].sort((a, b) => (b[by] ?? -1) - (a[by] ?? -1) || a.rank - b.rank);
 }
 
 /** Twins whose name or username contains the query. A blank query keeps everyone. */
@@ -31,3 +34,12 @@ export function formatMatch(jaccard: number): string {
 export function formatScore(score: number): string {
   return decimal.format(score);
 }
+
+/** A trend as an arrow (decoration only) and a word that carries the meaning. */
+export const TREND_LABELS: Record<Trend, { arrow: string; word: string }> = {
+  converging: { arrow: '↑', word: 'closer' },
+  steady: { arrow: '→', word: 'steady' },
+  drifting: { arrow: '↓', word: 'apart' },
+  new: { arrow: '', word: 'new' },
+  quiet: { arrow: '', word: 'quiet' },
+};
