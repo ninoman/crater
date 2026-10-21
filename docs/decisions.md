@@ -436,3 +436,50 @@ Code: `src/scoring/lately.ts` (pure), lately parts of `src/scoring/twins.ts`, `s
 - **This year** (`latelyOverlap`): shared releases you both bought within the last 365 days. It's also the bar for the Lately board: a fan needs a lately score **and** at least one such release. Old overlap alone still scores a sliver above 0, which would fill the bottom of the board with noise.
 - **A second table, `latelyTwins`,** holds the top 200 by lately score from the same recompute pass (one intersect per fan feeds both). The all-time `twins` table and everything that reads it (For you, Also bought's twin boost, twins who own this, profile badges) are unchanged; its rows just carry the lately fields too, for the trend column.
 - **Limits:** fans are re-read every 30 days (§5), so a fan's last month of purchases may be missing; the 6-month half-life keeps that from mattering much. Bandcamp Friday sprees aren't capped.
+
+## 12. Smarter supporter scanning (planned)
+
+Not built yet. Findings checked 2026-10-21 against live bandcamp.com; the plan replaces "scan supporters in page order, each collection in full" (§5) for the open release.
+
+### Why
+
+Opening a release with hundreds of supporters showed unrelated Also-bought rows for minutes:
+
+- Supporters are scanned in page order (newest buyers), not by how much they tell us.
+- Each fan is read to the end before the next starts: up to 20 requests (about 45 s at our pace) for a 2,000-item collection. The first handful read are often the biggest omnivores.
+- With N = 8 supporters read, an item 2 or 3 of them own easily reaches the lift cap (§6). Nothing in the score says how little it has seen.
+- Whole collections count, so someone who bought the release in 2019 adds what they bought in 2026.
+
+### Findings
+
+- **Bandcamp's own "in common" count is on the fan profile page, for a signed-in viewer only.** The server renders it into the header: `<ol class="info-items">` → `<li class="genre-wrapper">Electronic, 8 items in common</li>` (favourite genre, then the count), next to the location `<li>`. It is text only, not in `#pagedata`. Bandcamp's template leaves it out when the count is 0, and it isn't there logged out, so "no line" means 0 only when `identities.fan` is set. Checked on `bandcamp.com/otfx`, a supporter of one of the viewer's releases.
+- **Bandcamp computes it over both full collections**, which our local overlap can't. It counts differently from our twin overlap (one real fan: Bandcamp 21, ours 30, §7), which is fine for ranking.
+- **Supporter rows don't carry it, signed in or not.** Signed-in `tralbumcollectors/2/initial` rows have the same fields as logged out. The only client-side `num_items_in_common` in Bandcamp's scripts is on suggested-fan and follower/following cards.
+- **A fan page is one request of about 400 KB.** Besides the count it gives `collection_data.item_count` (collection size, unknown to scans until their last page, §3.4), the favourite genre, the location and the 20 newest items (`item_cache.collection`).
+- **A date-anchored collection token works.** `collection_items` with `older_than_token: "<unix ts>::a::"` returns purchases made before that time, so one request can read the 100 items around when a fan bought a given release.
+- **Collection items carry `genre_id`** (Bandcamp's top-level genre), on every item and for free. We don't store it yet. Fine tags exist only for releases whose page was fetched (§1, `items.tags`).
+
+### Plan: rank first, then read
+
+1. **Pass 0, free.** When the supporter list is in (the release job already reads all of it before any fan, §5), rank every supporter by what we already know they own of yours: supporter lists of your seeded releases put rows in their `fanMatches` before their collection is read. Weight by w(i). Bonus for owning other releases from this release's seller or label. Fans read recently skip pass 1 and get their overlap from our own data. With nothing known (logged out, nothing seeded), keep page order. The queue needs a `rank` tie-break within priority, since `nextAttemptAt` is the order today.
+2. **Pass 1, one fan page per supporter**, in pass-0 order, signed in (`credentials: 'include'`, unlike release pages, §5). Rank by Bandcamp's count scaled by both collection sizes (count / √(yours · theirs)). Logged out, fall back to pass 0's ranking.
+3. **Pass 2, collections, best match first.** The quick read is 100 items anchored a few months after the fan's purchase of this release. Full scans follow at background priority for twins and For you. Low-overlap fans can stop at the quick read, which saves most of today's up-to-20-requests-per-fan cost. A quick-read-only fan needs a new status, and twins must leave them out until their full scan.
+
+Doing pass 1 for all 500 supporters before showing anything would take about 19 minutes and 500 requests. Pass 0 decides which fan pages go first, and results show early.
+
+### Scoring and the wait
+
+- **Confidence:** use a lower confidence bound on co / N in place of the raw share before lift, so "3 of 8" shrinks and "30 of 80" barely moves.
+- **Omnivores:** scale each co-owner's vote down with collection size. The quick read limits this anyway, since every fan then contributes about 100 items.
+- **Warm-up:** hold back co-owned rows until about 20 supporters are read (or all, if fewer) and about 5 rows pass the confidence bar. Until then show progress toward that point, with same-artist and same-label picks below, labelled. Both numbers are to tune.
+
+### Tags (later)
+
+- Re-rank only, never a candidate source: tag matches alone mean "sounds similar", not "fans also bought".
+- First store `genre_id` and apply a mild penalty when it differs from the release's.
+- Then fetch release pages for the ~30 shown candidates at low priority and keep their tags. Compare with the release's tags weighted by rarity across local items, so broad genres and place names barely count. Apply as a capped boost like the twin boost (about ×1.3) and name the shared tags in the reason line. Cost: about 30 requests per newly opened release, falling as tags accumulate.
+
+### To do before building
+
+- Save a signed-in fan page as a fixture with personal data scrubbed, and parse the count from it. The text may be localized, so the parser must fail loudly (`ParserError`) rather than read 0.
+- Check how the line reads for a fan with no favourite genre.
