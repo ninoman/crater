@@ -218,7 +218,7 @@ Design: decisions §11.
 Design: decisions §12. The scoring half (confidence bound, omnivore damping, warm-up) is tracked separately.
 
 1. [x] Fan-profile parser for Bandcamp's "N items in common", with a signed-in fixture.
-2. [ ] Pass 0: rank a release's supporters by what they're known to own of yours, with a `rank` tie-break in the queue (schema v8).
+2. [x] Pass 0: rank a release's supporters by what they're known to own of yours, with a `rank` tie-break in the queue (schema v8).
 3. [ ] Pass 1: one signed-in profile page per supporter, ranked by in-common count over both collection sizes.
 4. [ ] Pass 2: a quick 100-item read around each fan's purchase, best match first, then full scans in the background. Quick-read fans stay out of twins until then.
 

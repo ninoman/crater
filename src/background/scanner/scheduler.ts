@@ -2,7 +2,14 @@
 // when Bandcamp pushes back. Every run is one request, so a killed worker loses at most one.
 
 import { ParserError, type FetchJson, type FetchText } from '../../bandcamp';
-import { completeJob, failJob, nextJob, saveCursor, type DigheadDb, type QueueJob } from '../../db';
+import {
+  completeJob,
+  failJob,
+  nextJob,
+  saveProgress,
+  type DigheadDb,
+  type QueueJob,
+} from '../../db';
 import type { Settings } from '../../shared/settings';
 import { jobRetryAt, nextBackoff } from './backoff';
 import { spend } from './budget';
@@ -87,7 +94,7 @@ async function runJob(
     return handleFailure(deps, job, ctx, state, error);
   }
 
-  if (cursor) await saveCursor(ctx.db, job, cursor);
+  if (cursor) await saveProgress(ctx.db, job, { cursor });
   else await completeJob(ctx.db, job);
   await deps.onStep(job, cursor === null);
   const parserFixed = state.parserError?.kind === job.kind;

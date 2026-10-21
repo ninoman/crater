@@ -28,6 +28,7 @@ import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
+import { rankSupporters } from './passZero';
 import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
 import { BACKGROUND, FOREGROUND } from './priority';
@@ -115,6 +116,9 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
   const supporters = await getReleaseSupporters(db, itemKey);
   if (!supportersAreFresh(supporters, now)) {
     await enqueue(db, [{ kind: 'release', target: itemKey, url }], FOREGROUND, now);
+  } else {
+    // What we know has grown since the list came in, so rank its waiting fans again.
+    await rankSupporters(db, itemKey);
   }
   await focusRelease(db, itemKey, supporters?.fanIds ?? [], FOREGROUND, BACKGROUND);
   kickScanner();

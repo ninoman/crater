@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureJson, fixtureText } from '../../../tests/fixtures';
 import { ParserError, type BandcampRequest } from '../../bandcamp';
-import { DigheadDb, type ReleaseJob } from '../../db';
+import { DigheadDb, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
 import { runReleaseStep } from './releaseJob';
@@ -48,6 +48,7 @@ function job(cursor: ReleaseJob['cursor'] = null): ReleaseJob {
     target: PROMISES,
     url: 'https://floatingpoints.bandcamp.com/album/promises',
     priority: 1,
+    rank: 0,
     attempts: 0,
     nextAttemptAt: 0,
     cursor,
@@ -114,6 +115,37 @@ describe('runReleaseStep', () => {
     const queued = await db.queue.toArray();
     expect(queued).toHaveLength(86);
     expect(queued.every((q) => q.priority === 3 && q.nextAttemptAt === -500)).toBe(true);
+  });
+
+  it('keeps page order, then ranks supporters by what they own of yours once the list is in', async () => {
+    const ctx = context(86);
+    await runReleaseStep(ctx, job());
+    const fanIds = (await db.releaseSupporters.get(PROMISES))?.fanIds ?? [];
+    const order = async () =>
+      (await db.queue.orderBy('[priority+nextAttemptAt+rank]').toArray()).map((q) =>
+        Number(q.target),
+      );
+    expect(await order()).toEqual(fanIds);
+    expect((await db.queue.toArray()).every((q) => q.kind === 'fan' && q.via === PROMISES)).toBe(
+      true,
+    );
+
+    const keen = fanIds[40] as number;
+    await db.me.put({ id: 'self', fanId: 1, username: 'me', syncedAt: NOW });
+    await db.ownership.bulkPut(
+      [1, keen].map((fanId) => ({
+        fanId,
+        itemKey: 'a5' as const,
+        matchKey: 'a5' as const,
+        source: 'collection' as const,
+        addedAt: null,
+      })),
+    );
+    await refreshFanMatches(db, [1, keen]);
+    await db.queue.clear();
+    await runReleaseStep(ctx, job());
+
+    expect(await order()).toEqual([keen, ...fanIds.filter((id) => id !== keen)]);
   });
 
   it('refuses a page that is a different release than the job asked for', async () => {

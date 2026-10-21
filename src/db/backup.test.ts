@@ -52,6 +52,7 @@ async function seed(target: DigheadDb): Promise<void> {
     kind: 'fan',
     target: '1',
     priority: 1,
+    rank: 0,
     attempts: 0,
     nextAttemptAt: 0,
     cursor: null,
@@ -178,6 +179,31 @@ describe('older backups', () => {
       matchTimes: Float64Array.from([0, 400]),
     });
     expect(await db.tags.count()).toBe(1);
+  });
+
+  it('imports a v7 file, ranking its jobs and staging fan cursors', async () => {
+    await seed(db);
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 7;
+    for (const table of json.data.data) {
+      if (table.tableName !== 'queue') continue;
+      for (const row of table.rows) {
+        delete row.rank;
+        row.cursor = { token: 't', scanned: 100 };
+      }
+    }
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.queue.toArray()).toEqual([
+      expect.objectContaining({
+        rank: 0,
+        via: null,
+        cursor: { stage: 'full', token: 't', scanned: 100 },
+      }),
+    ]);
   });
 });
 

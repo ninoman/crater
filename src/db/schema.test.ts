@@ -65,7 +65,9 @@ describe('DigheadDb', () => {
     const job = {
       kind: 'fan' as const,
       target: '42' as const,
+      via: null,
       priority: 1,
+      rank: 0,
       attempts: 0,
       nextAttemptAt: 0,
       cursor: null,
@@ -149,6 +151,33 @@ describe('DigheadDb', () => {
     expect(await upgraded.hidden.get('a1')).toEqual({ matchKey: 'a1', hiddenAt: 5 });
     expect(await upgraded.following.count()).toBe(0);
     expect(await upgraded.tags.count()).toBe(0);
+    await upgraded.delete();
+  });
+
+  it('ranks v7 jobs at 0 and stages their fan cursors in v8', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(7).stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt]' });
+    const base = { priority: 1, attempts: 0, nextAttemptAt: 5 };
+    await old.table('queue').bulkAdd([
+      { ...base, kind: 'release', target: 'a1', url: 'u', cursor: null },
+      { ...base, kind: 'fan', target: '2', cursor: { token: 't', scanned: 100 } },
+      { ...base, kind: 'fan', target: '3', cursor: null },
+    ]);
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    const jobs = await upgraded.queue.orderBy('[priority+nextAttemptAt+rank]').toArray();
+    expect(jobs.map((job) => [job.target, job.rank])).toEqual([
+      ['a1', 0],
+      ['2', 0],
+      ['3', 0],
+    ]);
+    expect(jobs[1]).toMatchObject({
+      via: null,
+      cursor: { stage: 'full', token: 't', scanned: 100 },
+    });
+    expect(jobs[2]).toMatchObject({ via: null, cursor: null });
     await upgraded.delete();
   });
 });

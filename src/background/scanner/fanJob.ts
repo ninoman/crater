@@ -19,8 +19,9 @@ export function fanIdOf(job: FanJob): number {
 export async function runFanStep(ctx: StepContext, job: FanJob): Promise<FanCursor | null> {
   const { db, now, settings } = ctx;
   const fanId = fanIdOf(job);
-  const token = job.cursor?.token ?? firstPageToken(now);
-  const scanned = job.cursor?.scanned ?? 0;
+  const cursor = job.cursor?.stage === 'full' ? job.cursor : null;
+  const token = cursor?.token ?? firstPageToken(now);
+  const scanned = cursor?.scanned ?? 0;
   const count = Math.max(
     1,
     Math.min(settings.collectionBatchSize, settings.collectionCap - scanned),
@@ -33,7 +34,7 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<FanCurs
     if (!(error instanceof BandcampApiError)) throw error;
     // On the first page this is a collection we can't read (decisions §2). Later on, keep
     // what we already have.
-    await finishFanScan(db, fanId, job.cursor ? 'partial' : 'private', scanned, now);
+    await finishFanScan(db, fanId, cursor ? 'partial' : 'private', scanned, now);
     return null;
   }
 
@@ -51,10 +52,11 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<FanCurs
     await finishFanScan(db, fanId, 'partial', total, now);
     return null;
   }
-  return { token: next, scanned: total };
+  return { stage: 'full', token: next, scanned: total };
 }
 
 /** A fan whose job was dropped after failing. */
 export async function abandonFan(ctx: StepContext, job: FanJob): Promise<void> {
-  await finishFanScan(ctx.db, fanIdOf(job), 'error', job.cursor?.scanned ?? 0, ctx.now);
+  const scanned = job.cursor?.stage === 'full' ? job.cursor.scanned : 0;
+  await finishFanScan(ctx.db, fanIdOf(job), 'error', scanned, ctx.now);
 }

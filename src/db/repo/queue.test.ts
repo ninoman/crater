@@ -10,7 +10,8 @@ import {
   fanJob,
   focusRelease,
   nextJob,
-  saveCursor,
+  rankFanJobs,
+  saveProgress,
 } from './queue';
 
 let db: DigheadDb;
@@ -37,6 +38,59 @@ async function order(now = Infinity): Promise<string[]> {
 const release = (target: `a${number}`) => ({ kind: 'release' as const, target, url: 'u' });
 
 describe('queue', () => {
+  it('breaks ties within one place in line by rank, before insertion order', async () => {
+    await enqueueAt(
+      db,
+      [
+        { spec: release('a1'), at: 10, rank: 0 },
+        { spec: fanJob(1, 'a1'), at: 10, rank: 3 },
+        { spec: fanJob(2, 'a1'), at: 10, rank: 1 },
+        { spec: fanJob(3, 'a1'), at: 10, rank: 2 },
+        { spec: fanJob(4), at: 5, rank: 99 },
+      ],
+      1,
+    );
+
+    expect(await order()).toEqual(['4', 'a1', '2', '3', '1']);
+  });
+
+  it('re-ranks only fan jobs that have not started', async () => {
+    await enqueueAt(
+      db,
+      [1, 2, 3].map((fanId) => ({ spec: fanJob(fanId), at: 0, rank: fanId })),
+      1,
+    );
+    const started = await nextJob(db, 0);
+    if (!started) throw new Error('expected a job');
+    await saveProgress(db, started, { cursor: { stage: 'quick' }, rank: 1 });
+
+    await rankFanJobs(
+      db,
+      new Map([
+        [1, 9],
+        [2, 8],
+        [3, 0.5],
+      ]),
+    );
+
+    expect(await order()).toEqual(['3', '1', '2']);
+  });
+
+  it('moves a started job to a new rank and priority', async () => {
+    await enqueue(db, [fanJob(1), fanJob(2)], 1, 0);
+    const first = await nextJob(db, 0);
+    if (!first) throw new Error('expected a job');
+
+    await saveProgress(db, first, { cursor: { stage: 'quick' }, rank: 5, priority: 2 });
+
+    expect(await db.queue.get(first.id ?? -1)).toMatchObject({
+      rank: 5,
+      priority: 2,
+      cursor: { stage: 'quick' },
+    });
+    expect(await order()).toEqual(['2', '1']);
+  });
+
   it('runs jobs by priority, then next attempt time, then insertion order', async () => {
     await enqueue(db, [fanJob(1)], 2, 0);
     await enqueue(db, [fanJob(2)], 1, 50);
@@ -87,7 +141,7 @@ describe('queue', () => {
     await enqueue(db, [fanJob(1), release('a1')], 3, 0);
     const first = await nextJob(db, 0);
     if (!first) throw new Error('expected a job');
-    await saveCursor(db, first, { token: 't', scanned: 100 });
+    await saveProgress(db, first, { cursor: { stage: 'full', token: 't', scanned: 100 } });
 
     await enqueue(db, [fanJob(1), fanJob(1)], 1, 99);
     await enqueue(db, [fanJob(1)], 5, 99);
@@ -98,7 +152,7 @@ describe('queue', () => {
         target: '1',
         priority: 1,
         nextAttemptAt: 0,
-        cursor: { token: 't', scanned: 100 },
+        cursor: { stage: 'full', token: 't', scanned: 100 },
       }),
     );
   });

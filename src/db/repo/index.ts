@@ -11,5 +11,6 @@ export * from './me';
 export * from './ownership';
 export * from './queue';
 export * from './releaseSupporters';
+export * from './supporterRank';
 export * from './tags';
 export * from './twins';
