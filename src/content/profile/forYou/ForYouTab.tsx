@@ -9,7 +9,14 @@ import { formatForYouSummary } from './forYouText';
 const MODES = [
   { value: 'all', label: 'All time' },
   { value: 'fresh', label: 'Fresh' },
+  { value: 'deep', label: 'Deep cuts' },
 ] as const;
+
+const LOADING_TITLES: Record<ForYouMode, string> = {
+  all: 'Finding releases for you…',
+  fresh: 'Finding fresh releases for you…',
+  deep: 'Digging for deep cuts…',
+};
 
 /**
  * The For you tab on your profile: picks from your top twins, or from what your lately twins
@@ -48,11 +55,7 @@ interface ForYouBodyProps {
 function ForYouBody({ view, mode, reload, hide }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
-      return (
-        <EmptyState
-          title={mode === 'fresh' ? 'Finding fresh releases for you…' : 'Finding releases for you…'}
-        />
-      );
+      return <EmptyState title={LOADING_TITLES[mode]} />;
     case 'unreachable':
       return (
         <EmptyState
@@ -88,6 +91,7 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
       />
     );
   }
+  if (mode === 'deep') return <NoDeepCuts twinsUsed={result.twinsUsed} />;
   if (mode === 'fresh') return <NoFreshPicks twinsUsed={result.twinsUsed} />;
   if (result.twinsUsed === 0) {
     return (
@@ -121,6 +125,25 @@ function NoFreshPicks({ twinsUsed }: { twinsUsed: number }) {
     <EmptyState
       title="Nothing fresh from your lately twins"
       description={`Your ${twinsUsed} lately ${twinsUsed === 1 ? 'twin has' : 'twins have'} bought nothing in the last year that you haven't already got, wishlisted or hidden. Try All time, or check back after Dighead scans more fans.`}
+      action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+    />
+  );
+}
+
+function NoDeepCuts({ twinsUsed }: { twinsUsed: number }) {
+  if (twinsUsed === 0) {
+    return (
+      <EmptyState
+        title="No taste twins yet"
+        description="Deep cuts are built from what your closest twins own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
+        action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+      />
+    );
+  }
+  return (
+    <EmptyState
+      title="No deep cuts yet"
+      description="Your twins' rare records show up as more of them are scanned. You can raise the owner limit in Dighead's settings."
       action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
     />
   );

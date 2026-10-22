@@ -4,7 +4,7 @@ import type { ForYouMode, ForYouRow } from '../../../shared/forYou';
 import { ReleaseRow, RowList } from '../../../ui';
 import { withFollowed } from '../../shared/followedText';
 import { ReleasePreview } from '../../shared/ReleasePreview';
-import { formatPickReason } from './forYouText';
+import { formatDeepCutReason, formatPickReason } from './forYouText';
 
 export interface ForYouListProps {
   rows: readonly ForYouRow[];
@@ -14,6 +14,23 @@ export interface ForYouListProps {
   onHide: (matchKey: ItemKey) => void;
 }
 
+const LIST_LABELS: Record<ForYouMode, string> = {
+  all: 'For you',
+  fresh: 'For you, fresh',
+  deep: 'For you, deep cuts',
+};
+
+const NOTES: Record<ForYouMode, string> = {
+  all: "Releases your closest twins own and you don't, weighted by how alike each twin is and how rare the release is.",
+  fresh:
+    'What the fans most in step with you lately bought in the last year, weighted by how in step each twin is, how recently they bought it and how rare it is.',
+  deep: "Releases few people own on Bandcamp but your closest twins do. The owner limit is in Dighead's settings.",
+};
+
+function reasonFor(row: ForYouRow, mode: ForYouMode, now: number): string {
+  return mode === 'deep' ? formatDeepCutReason(row) : formatPickReason(row, now);
+}
+
 /** The ranked picks, one preview open at a time. */
 export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
@@ -21,13 +38,13 @@ export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
   return (
     <>
       <div className="dh-profile__list">
-        <RowList label={mode === 'fresh' ? 'For you, fresh' : 'For you'}>
+        <RowList label={LIST_LABELS[mode]}>
           {rows.map((row, i) => (
             <ReleaseRow
               key={row.matchKey}
               release={row}
               rank={i + 1}
-              reason={withFollowed(formatPickReason(row, now), row.followed)}
+              reason={withFollowed(reasonFor(row, mode, now), row.followed)}
               previewing={previewing === row.matchKey}
               preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
               onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
@@ -37,10 +54,7 @@ export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
         </RowList>
       </div>
       <p className="dh-profile__note">
-        {mode === 'fresh'
-          ? 'What the fans most in step with you lately bought in the last year, weighted by how in step each twin is, how recently they bought it and how rare it is.'
-          : "Releases your closest twins own and you don't, weighted by how alike each twin is and how rare the release is."}{' '}
-        Hidden, owned and wishlisted releases are left out.
+        {NOTES[mode]} Hidden, owned and wishlisted releases are left out.
       </p>
     </>
   );
