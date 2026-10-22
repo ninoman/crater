@@ -551,3 +551,44 @@ The same tags as §8, on the releases in your wishlist, with the same filter (al
 - **Shared with the following tab:** `TagEditor`, `FilterControls`, `BulkBar`, the tag-bar CSS, `tagActions.ts` (`followTagHandlers`, `itemTagHandlers`) and the pure `tagFilter.ts`, which works over any rows through key, tags and text accessors.
 - **Release pages:** when the release is in your wishlist, the sidebar shows "In your wishlist" with its tags and "+ tag", under the artist's tags (§8). Only the exact item: wishlisting an album doesn't tag its track pages.
 - **Gap:** Bandcamp's own wishlist search box (`#wishlist-controls`) is left as it is and searches Bandcamp's list, not ours.
+
+## 15. Page badges
+
+Decided and built 2026-10-22. Roadmap: *Page badges*. Code: `bandcamp/pageLinks.ts` (+ `pageLinksDom.ts`), `db/repo/pageBadges.ts`, `content/badges/`. Tested on the fixtures (jsdom); not yet tried on live pages, and not at all on Discover or the feed, which have no fixtures (both render in JS, and the feed needs a login).
+
+A quiet pill after release links anywhere on bandcamp.com: **owned**, **wishlist**, **3 twins**. Off by default; a toggle under *Pages* in the popup's settings. It's read when a page loads, so turning it on or off applies from the next page.
+
+### Which links
+
+- **A release link** is an `<a href>` whose path is `/album/<slug>` or `/track/<slug>`, on any host: artist subdomains, `bandcamp.com` itself, and custom domains linked from bandcamp.com. A link to a non-Bandcamp site with that path finds nothing in the DB, so it gets no badge.
+- **Normalised URL:** `https://<host lowercased>/<album|track>/<slug>`, without query, hash or trailing slash, with relative links resolved against the page. That's the shape of `items.url`, which comes from collection `item_url` and the release page's `data-tralbum.url`.
+- **Ids from the page when it has them, so no URL guessing there:** a fan page's `li.collection-item-container` (`data-tralbumtype` + `data-tralbumid`), a band page's `li.music-grid-item` (`data-item-id="album-123"`), and a release page's footer `li.recommended-album` (`data-albumid`). Otherwise the URL is the key.
+- **Skipped:** links with no text (cover images: the title link next to them gets the badge), Bandcamp's action links (`?action=buy`, "go to album"), the release's own tracklist (`#track_table`) and any link back to the page you're on. One badge per release per card: a second link to the same release in the same `<li>` is skipped.
+- **Not on your own profile.** Every item in your collection would say "owned".
+- All of this is in `bandcamp/pageLinks.ts`, with selectors in `pageLinksDom.ts`; fixture tests cover fan, band, album and track pages.
+
+### Lookup
+
+- **One message per batch:** `getPageBadges { links: { url, itemKey }[] }` answers one badge (or null) per link, in order. The content script collects links, de-dupes them, and sends them together; there's never a request per link, and **no Bandcamp request at all**: only the local DB is read.
+- **URL → item** is an index read: schema v10 adds an index on `items.url` (no data change, so no upgrade or backup migration). An unknown URL answers null.
+- **owned:** your collection has the exact item or its album, or, for an album link, any track of it (§3.8: a track bought means the album counts as yours).
+- **wishlist:** the exact item or its album is in your wishlist, and you don't own it.
+- **N twins:** how many of your top `topTwinsK` twins (the For you set, §7) own it by matchKey, so a twin owning a track of an album counts for the album, as in For you. Read from their `fanMatches` lists with a binary search, so a batch costs K record reads, not a query per link.
+
+### What it says
+
+- `owned` alone when you own it: the twin count doesn't matter then.
+- Otherwise `wishlist`, `3 twins`, or both: `wishlist · 3 twins`. Nothing at all when there's nothing to say, so most links stay bare.
+- A native `title` gives the long form ("3 of your top 30 twins own this"). It isn't focusable: a page of hundreds of links would get hundreds of tab stops.
+
+### Infinite scroll and rendering
+
+- A `MutationObserver` on `document.body` re-runs the scan 300 ms after the last change. Every anchor seen goes in a `WeakSet`, so nothing is looked up or badged twice, and Bandcamp's own DOM isn't marked.
+- Each badge is a `<dighead-badge>` host inserted right after its link, with a shadow root holding the shared styles, so Bandcamp CSS can't reach in. **One React root** renders every badge through portals into those shadow roots; a page doesn't get a React root per link.
+- Colours come from the tokens, with the page theme (§13) on release pages, so a badge on a dark artist page isn't a light pill.
+- Errors (worker unreachable, a broken page) are `console.warn`ed and the page simply has no badges.
+
+### Gaps
+
+- **Your data changes aren't pushed.** Wishlisting a release on a page doesn't turn its badge to "wishlist" until the next page load.
+- **Links whose stored URL differs** (a release first seen under a custom domain, then linked under its subdomain) aren't found by URL; the id containers above cover the pages that have them.
