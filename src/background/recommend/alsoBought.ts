@@ -33,7 +33,7 @@ import {
   type SupporterList,
   type TwinBoost,
 } from '../../scoring/alsoBought';
-import { exclusions, type Exclusions } from '../../scoring/exclusions';
+import { exclusions } from '../../scoring/exclusions';
 import { supporters } from '../../scoring/weights';
 import type { AlsoBoughtReason, AlsoBoughtResult, AlsoBoughtRow } from '../../shared/alsoBought';
 
@@ -46,13 +46,13 @@ export async function computeAlsoBought(
   meFanId: number | null,
 ): Promise<AlsoBoughtResult> {
   const data = await gatherAlsoBought(db, releaseKey, meFanId);
-  const mine = exclusions(data.mine, data.hidden, data.matchKey);
+  const excluded = exclusions(data.mine, data.hidden, data.matchKey);
   const basis = { supporters: data.supporters.length, population: data.population };
 
   const boosts = twinBoosts(data.twinSupporters, data.bestTwinScore);
   const candidates = coOwnership(
     data.supporters.map((s) => s.matchIds),
-    mine.excluded,
+    excluded,
   );
   const scored = await scoreTop(db, candidates, data.supporters, basis, boosts);
   const wait = warmup(
@@ -61,7 +61,7 @@ export async function computeAlsoBought(
   );
   // While warming up, same-artist and same-label picks fill the panel for any release.
   const fallback =
-    wait !== null || isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, mine) : [];
+    wait !== null || isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, excluded) : [];
   const picks = blendPicks(wait === null ? scored : [], fallback, ALSO_BOUGHT_LIMIT);
 
   const items = await getDisplayItems(
@@ -71,7 +71,7 @@ export async function computeAlsoBought(
   const label = data.album?.label ?? data.release?.label ?? null;
   const rows = picks.flatMap((pick) => {
     const item = items.get(pick.matchKey);
-    return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label), mine)] : [];
+    return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label))] : [];
   });
   return { releaseKey, rows, warmup: wait };
 }
@@ -116,7 +116,7 @@ async function scoreTop(
 async function fallbackFor(
   db: DigheadDb,
   data: AlsoBoughtData,
-  mine: Exclusions,
+  excluded: ReadonlySet<number>,
 ): Promise<FallbackPick[]> {
   const release = data.album ?? data.release;
   if (!release) return [];
@@ -130,7 +130,7 @@ async function fallbackFor(
       ...item,
       supporters: supporters([item.supporterCount], owners.get(ids[i] ?? 0) ?? 0),
     })),
-    mine.excluded,
+    excluded,
     ALSO_BOUGHT_LIMIT,
   );
 }
@@ -146,12 +146,7 @@ function reasonFor(pick: AlsoBoughtPick, label: string | null): AlsoBoughtReason
   }
 }
 
-function toRow(
-  pick: AlsoBoughtPick,
-  item: ItemRecord,
-  reason: AlsoBoughtReason,
-  mine: Exclusions,
-): AlsoBoughtRow {
+function toRow(pick: AlsoBoughtPick, item: ItemRecord, reason: AlsoBoughtReason): AlsoBoughtRow {
   return {
     matchKey: pick.matchKey,
     title: item.title,
@@ -160,6 +155,5 @@ function toRow(
     url: item.url,
     coverUrl: item.artId === null ? null : artUrl(item.artId),
     reason,
-    ownedTracks: mine.ownedTracks.get(keyToNumber(pick.matchKey)) ?? 0,
   };
 }

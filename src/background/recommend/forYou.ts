@@ -1,7 +1,7 @@
 // Runs the For-you scorer: what your top twins own, scored with pruning, diversified, then
 // dressed for display.
 
-import { artUrl, keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
+import { artUrl, keyFromNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherForYou,
   getDisplayItems,
@@ -47,10 +47,10 @@ export async function computeForYou(
     me.fanId,
   );
   const scoreOf = new Map(twins.map((twin) => [twin.fanId, twin.score]));
-  const mine = exclusions(data.mine, data.hidden);
+  const excluded = exclusions(data.mine, data.hidden);
   const candidates = twinOwnership(
     data.twinLists.map((list) => ({ score: scoreOf.get(list.fanId) ?? 0, matches: list.matchIds })),
-    mine.excluded,
+    excluded,
   );
 
   const { ranked, items } = await scoreTop(db, candidates);
@@ -61,7 +61,7 @@ export async function computeForYou(
   }
   const rows = forYouPicks(ranked, artists, FOR_YOU_LIMIT).flatMap((pick) => {
     const item = items.get(pick.matchKey);
-    return item ? [toRow(pick.matchKey, item, pick.twins, mine.ownedTracks)] : [];
+    return item ? [toRow(pick.matchKey, item, pick.twins)] : [];
   });
   return { basis, rows, twinsUsed: data.twinLists.length };
 }
@@ -104,12 +104,7 @@ async function scoreTop(
   return { ranked, items };
 }
 
-function toRow(
-  matchKey: ItemKey,
-  item: ItemRecord,
-  twins: number,
-  ownedTracks: ReadonlyMap<number, number>,
-): ForYouRow {
+function toRow(matchKey: ItemKey, item: ItemRecord, twins: number): ForYouRow {
   return {
     matchKey,
     title: item.title,
@@ -118,6 +113,5 @@ function toRow(
     url: item.url,
     coverUrl: item.artId === null ? null : artUrl(item.artId),
     twins,
-    ownedTracks: ownedTracks.get(keyToNumber(matchKey)) ?? 0,
   };
 }

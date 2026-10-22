@@ -34,9 +34,9 @@ describe('For-you scoring', () => {
   const mine: MyRow[] = [
     { itemKey: 'a10', matchKey: 'a10', source: 'collection' },
     { itemKey: 'a11', matchKey: 'a11', source: 'wishlist' },
-    { itemKey: 't41', matchKey: 'a4', source: 'collection' },
+    { itemKey: 't41', matchKey: 'a4', source: 'wishlist' },
   ];
-  const mineExcluded = exclusions(mine, new Set<ItemKey>(['a20']));
+  const excluded = exclusions(mine, new Set<ItemKey>(['a20']));
   const twins: TwinMatches[] = [
     { score: 3, matches: list('a1', 'a2', 'a10', 't7', 'a20') },
     { score: 2, matches: list('a1', 'a3', 'a10', 'a11') },
@@ -53,7 +53,7 @@ describe('For-you scoring', () => {
     candidates.map((c) => scoreForYou(c, supporterCounts.get(keyFromNumber(c.id)) ?? 0));
 
   it('sums twin scores per release, leaving out owned, wishlisted and hidden ones', () => {
-    const owned = twinOwnership(twins, mineExcluded.excluded);
+    const owned = twinOwnership(twins, excluded);
 
     expect(owned.map((c) => ({ ...c, id: keyFromNumber(c.id) }))).toEqual([
       { id: 'a1', twinScore: 6, twins: 3 },
@@ -64,12 +64,8 @@ describe('For-you scoring', () => {
     ]);
   });
 
-  it('keeps an album you own a track of', () => {
-    expect(mineExcluded.ownedTracks).toEqual(new Map([[keyToNumber('a4'), 1]]));
-  });
-
   it('weighs by rarity, so a niche pick beats the staple every twin owns', () => {
-    const ranked = rankForYou(score(twinOwnership(twins, mineExcluded.excluded)), 10);
+    const ranked = rankForYou(score(twinOwnership(twins, excluded)), 10);
 
     // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3 = 1; t7: 3 × 1/4; a4: 1 × 1/log2(3); a1: 6 × 1/10.
     expect(ranked.map((s) => [keyFromNumber(s.id), s.score])).toEqual([

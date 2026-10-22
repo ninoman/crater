@@ -94,7 +94,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
      - Two people own different tracks from A: a match for co-ownership and recommendations (Also bought, For you), since it's the same release group. **Not a match for twin overlap** (changed 2026-10-21, §7).
      - Rarity weight uses the album's `also_collected_count` when it's known, otherwise the track's.
      - Recommendations are ranked per `matchKey` and point at the album, with a reason such as "2 twins own tracks from this".
-     - If you own one track of A, A stays in your recommendations, tagged "you own 1 track", and is not hidden.
+     - If you own a track of A, A is left out of recommendations, as if you owned A (changed 2026-10-22: buying a track almost always means you've heard the album; before, A stayed in, tagged "you own 1 track"). Wishlisting a track of A keeps A in.
    - Still open for Phase 4: track-only buyers don't appear in the album's supporter list. Pulling them would cost one supporters request per track on the album page. Measure whether it's worth it once the sidebar works.
 
 ## 4. Syncing your own collection (Phase 2)
@@ -189,7 +189,7 @@ Code: `twinBoosts` in `src/scoring/alsoBought.ts`; `gatherAlsoBought` reads the 
 - **Multiplier `1 + 0.5 × twinShare`, so at most ×1.5** (`TWIN_BOOST_MAX`). It's multiplicative so it scales with the evidence: at the same lift, a release your twins own can pass one with up to 1.5 times as many co-owners, never more. Bounded, so twins re-order close calls without drowning out what the supporters as a whole bought. Twins flagged as label clusters already carry ×0.3 in their score, so they barely move anything.
 - **The reason line says so:** "7 supporters have this so far, 2 are your twins". It leaves out how many supporters were scanned: "so far" says the count can grow without the technical detail.
 - **Cost:** none measurable. `pnpm perf` now also seeds a full 200-twin leaderboard with 50 twins among the 300 supporters, and medians were the same with and without it (~70 ms on a loaded machine).
-- **Filters:** the release itself, hidden releases, and releases you own or wishlisted *as a whole*. Owning tracks of an album keeps the album in, tagged "you own N tracks" (§3.8). Wishlisting a single track keeps the album in, untagged.
+- **Filters:** the release itself, hidden releases, releases you own or wishlisted *as a whole*, and albums you own a track of (§3.8). Wishlisting a single track keeps the album in.
 - **Display:** rows point at the album. If no scanned collection holds the album itself, only tracks of it, the row shows one of those tracks (title and link) until the album turns up. The reason line doesn't say whether owners bought the album or only tracks.
 - **`weights.ts`** implements `w(i)` and `supporters(i)` (album count, then track count, then owners we've seen). Phase 4 only uses `supporters(i)`, to order fallback picks. `w(i)` is for twins and For you.
 
@@ -243,7 +243,7 @@ Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.htm
 Code: `src/scoring/forYou.ts` (pure), `src/db/repo/forYou.ts` (gathering), `src/background/recommend/forYou.ts` (running it), `src/content/profile/forYou/` (the `#for-you` tab). Decided 2026-10-20.
 
 - **Twins** are the top `settings.topTwinsK` (default 30) of the stored leaderboard, ties on fanId. Their `fanMatches` lists are what's counted, so tracks fold into albums and wishlists don't count, as everywhere else. Label-cluster twins carry their ×0.3 in their score.
-- **Filters** are `scoring/exclusions.ts`, as for Also bought: hidden releases and releases you own or wishlisted as a whole. Owning tracks of an album keeps it in, tagged "you own N tracks".
+- **Filters** are `scoring/exclusions.ts`, as for Also bought: hidden releases, releases you own or wishlisted as a whole, and albums you own a track of (§3.8).
 - **w(i)** uses the shown record's `supporterCount` (the album's, or a track's when only tracks of the album have turned up), else `matchOwners`. It doesn't look for a track's count when the album record exists without one.
 - **Pruning:** w(i) ≤ 1, so a candidate's summed twin score is its ceiling. Candidates come in falling twin-score order, 200 at a time, and the loop stops once the next ceiling is below the 60th-best score. 60 (twice the 30 shown) leaves room for the diversity rule to move an artist's extras down without leaving rows empty. Candidates with no item record are dropped before ranking, since they can't be shown.
 - **Rows** show their place in the list, cover, artist · label, "owned by N of your top twins", and the same preview / wishlist / open / hide buttons as Also bought (one shared `ReleaseRow` in `src/ui/`). Wishlist still opens the release page (§6, Gaps). Hide drops the row at once and re-fetches, so the next pick moves up.

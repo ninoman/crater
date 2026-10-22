@@ -9,31 +9,23 @@ export interface MyRow {
   source: 'collection' | 'wishlist';
 }
 
-/** Keyed by match id (keyToNumber), like the lists they filter. */
-export interface Exclusions {
-  excluded: Set<number>;
-  /** Albums you own some tracks of. They stay in, tagged with the count (decisions §3.8). */
-  ownedTracks: Map<number, number>;
-}
-
 /**
- * What never gets recommended: hidden releases, releases you own or wishlisted as a whole, and
- * the release being recommended from, if any. Owning or wishlisting a track of an album keeps
- * the album in.
+ * Match ids (keyToNumber) that never get recommended: hidden releases, releases you own or
+ * wishlisted as a whole, albums you own a track of, and the release being recommended from, if
+ * any. Owning a track almost always means you've heard the album; wishlisting one doesn't, so
+ * that album stays in (decisions §3.8).
  */
 export function exclusions(
   mine: readonly MyRow[],
   hidden: ReadonlySet<ItemKey>,
   release?: ItemKey,
-): Exclusions {
+): Set<number> {
   const excluded = new Set([...hidden].map(keyToNumber));
   if (release !== undefined) excluded.add(keyToNumber(release));
-  const ownedTracks = new Map<number, number>();
   for (const row of mine) {
-    const id = keyToNumber(row.matchKey);
-    if (row.itemKey === row.matchKey) excluded.add(id);
-    else if (row.source === 'collection') ownedTracks.set(id, (ownedTracks.get(id) ?? 0) + 1);
+    if (row.itemKey === row.matchKey || row.source === 'collection') {
+      excluded.add(keyToNumber(row.matchKey));
+    }
   }
-  for (const key of excluded) ownedTracks.delete(key);
-  return { excluded, ownedTracks };
+  return excluded;
 }
