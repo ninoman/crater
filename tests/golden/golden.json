@@ -16,7 +16,57 @@
     "followed": false,
     "lately": 0.1349748236211622,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1791504000000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1016",
+      "title": "Release 16",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-16",
+      "coverUrl": "https://f4.bcbits.com/img/a5016_7.jpg",
+      "boughtAt": 1790380800000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1789516800000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "a1041",
+      "title": "Release 41",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-41",
+      "coverUrl": "https://f4.bcbits.com/img/a5041_7.jpg",
+      "boughtAt": 1785801600000
+     }
+    ]
    },
    {
     "fanId": 134,
@@ -32,7 +82,57 @@
     "followed": false,
     "lately": 0.05999879495410515,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790812800000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1789344000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1784073600000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1781049600000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1777852800000
+     }
+    ]
    },
    {
     "fanId": 122,
@@ -48,7 +148,57 @@
     "followed": false,
     "lately": 0.0640804675304488,
     "latelyOverlap": 3,
-    "trend": "steady"
+    "trend": "steady",
+    "recentBuys": [
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1786233600000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1784851200000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1779235200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1779148800000
+     }
+    ]
    },
    {
     "fanId": 127,
@@ -64,7 +214,57 @@
     "followed": false,
     "lately": 0.08466841525969225,
     "latelyOverlap": 10,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1791849600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1790035200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1090",
+      "title": "Song t29000",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29000",
+      "coverUrl": "https://f4.bcbits.com/img/a36000_7.jpg",
+      "boughtAt": 1785024000000
+     }
+    ]
    },
    {
     "fanId": 120,
@@ -80,7 +280,57 @@
     "followed": false,
     "lately": 0.07370690847668604,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1789776000000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1042",
+      "title": "Release 42",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-42",
+      "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+      "boughtAt": 1786752000000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1782432000000
+     }
+    ]
    },
    {
     "fanId": 115,
@@ -96,7 +346,57 @@
     "followed": false,
     "lately": 0.06744056001845908,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1791331200000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1786233600000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1781913600000
+     },
+     {
+      "matchKey": "a1075",
+      "title": "Release 75",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-75",
+      "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+      "boughtAt": 1781049600000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1780963200000
+     }
+    ]
    },
    {
     "fanId": 129,
@@ -112,7 +412,57 @@
     "followed": false,
     "lately": 0.10417873465216851,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1006",
+      "title": "Release 6",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-6",
+      "coverUrl": "https://f4.bcbits.com/img/a5006_7.jpg",
+      "boughtAt": 1791676800000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1789603200000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787011200000
+     }
+    ]
    },
    {
     "fanId": 131,
@@ -128,7 +478,57 @@
     "followed": false,
     "lately": 0.04406070107002445,
     "latelyOverlap": 3,
-    "trend": "new"
+    "trend": "new",
+    "recentBuys": [
+     {
+      "matchKey": "a1024",
+      "title": "Release 24",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-24",
+      "coverUrl": "https://f4.bcbits.com/img/a5024_7.jpg",
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1789776000000
+     },
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1786838400000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1776470400000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1776384000000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1771891200000
+     }
+    ]
    },
    {
     "fanId": 110,
@@ -144,7 +544,57 @@
     "followed": false,
     "lately": 0.055271741860187754,
     "latelyOverlap": 8,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1792454400000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1791590400000
+     },
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1789344000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1784419200000
+     }
+    ]
    },
    {
     "fanId": 102,
@@ -160,7 +610,57 @@
     "followed": false,
     "lately": 0.09137969768478543,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1787961600000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1784505600000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1784246400000
+     },
+     {
+      "matchKey": "a1075",
+      "title": "Release 75",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-75",
+      "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+      "boughtAt": 1783987200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1783296000000
+     }
+    ]
    },
    {
     "fanId": 124,
@@ -176,7 +676,57 @@
     "followed": false,
     "lately": 0.04731369481120308,
     "latelyOverlap": 3,
-    "trend": "drifting"
+    "trend": "drifting",
+    "recentBuys": [
+     {
+      "matchKey": "a1002",
+      "title": "Release 2",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-2",
+      "coverUrl": "https://f4.bcbits.com/img/a5002_7.jpg",
+      "boughtAt": 1790208000000
+     },
+     {
+      "matchKey": "a1026",
+      "title": "Release 26",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-26",
+      "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+      "boughtAt": 1784764800000
+     },
+     {
+      "matchKey": "a1039",
+      "title": "Release 39",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-39",
+      "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+      "boughtAt": 1782777600000
+     },
+     {
+      "matchKey": "a1016",
+      "title": "Release 16",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-16",
+      "coverUrl": "https://f4.bcbits.com/img/a5016_7.jpg",
+      "boughtAt": 1781481600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1778371200000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1778112000000
+     }
+    ]
    },
    {
     "fanId": 113,
@@ -192,7 +742,57 @@
     "followed": false,
     "lately": 0.0986962057972656,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1791072000000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1014",
+      "title": "Release 14",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-14",
+      "coverUrl": "https://f4.bcbits.com/img/a5014_7.jpg",
+      "boughtAt": 1786924800000
+     },
+     {
+      "matchKey": "a1002",
+      "title": "Release 2",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-2",
+      "coverUrl": "https://f4.bcbits.com/img/a5002_7.jpg",
+      "boughtAt": 1786406400000
+     },
+     {
+      "matchKey": "a1064",
+      "title": "Release 64",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-64",
+      "coverUrl": "https://f4.bcbits.com/img/a5064_7.jpg",
+      "boughtAt": 1784937600000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1783900800000
+     }
+    ]
    },
    {
     "fanId": 109,
@@ -208,7 +808,57 @@
     "followed": false,
     "lately": 0.06334606927040262,
     "latelyOverlap": 5,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1014",
+      "title": "Release 14",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-14",
+      "coverUrl": "https://f4.bcbits.com/img/a5014_7.jpg",
+      "boughtAt": 1787184000000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1786320000000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1784332800000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1783900800000
+     }
+    ]
    },
    {
     "fanId": 126,
@@ -224,7 +874,57 @@
     "followed": false,
     "lately": 0.055553545654159986,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1058",
+      "title": "Release 58",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-58",
+      "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1792195200000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1789430400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788393600000
+     },
+     {
+      "matchKey": "a1039",
+      "title": "Release 39",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-39",
+      "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+      "boughtAt": 1786838400000
+     }
+    ]
    },
    {
     "fanId": 101,
@@ -240,7 +940,57 @@
     "followed": true,
     "lately": 0.07092361683200538,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1068",
+      "title": "Release 68",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-68",
+      "coverUrl": "https://f4.bcbits.com/img/a5068_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1782604800000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1780704000000
+     }
+    ]
    },
    {
     "fanId": 136,
@@ -256,7 +1006,57 @@
     "followed": false,
     "lately": 0.0536014563244181,
     "latelyOverlap": 7,
-    "trend": "steady"
+    "trend": "steady",
+    "recentBuys": [
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1054",
+      "title": "Release 54",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-54",
+      "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+      "boughtAt": 1790985600000
+     },
+     {
+      "matchKey": "a1012",
+      "title": "Release 12",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-12",
+      "coverUrl": "https://f4.bcbits.com/img/a5012_7.jpg",
+      "boughtAt": 1789171200000
+     },
+     {
+      "matchKey": "a1060",
+      "title": "Release 60",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-60",
+      "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+      "boughtAt": 1788825600000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "t30003",
+      "title": "Song t30003",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30003",
+      "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+      "boughtAt": 1787356800000
+     }
+    ]
    },
    {
     "fanId": 125,
@@ -272,7 +1072,57 @@
     "followed": false,
     "lately": 0.08225955430438085,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1005",
+      "title": "Release 5",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-5",
+      "coverUrl": "https://f4.bcbits.com/img/a5005_7.jpg",
+      "boughtAt": 1787097600000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1783209600000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1781395200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1780876800000
+     }
+    ]
    },
    {
     "fanId": 130,
@@ -288,7 +1138,57 @@
     "followed": false,
     "lately": 0.07164147963044216,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1791590400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1787788800000
+     },
+     {
+      "matchKey": "a1043",
+      "title": "Release 43",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-43",
+      "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1782777600000
+     }
+    ]
    },
    {
     "fanId": 100,
@@ -304,7 +1204,57 @@
     "followed": false,
     "lately": 0.0653437223403831,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1791936000000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1791676800000
+     },
+     {
+      "matchKey": "a1055",
+      "title": "Release 55",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-55",
+      "coverUrl": null,
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1033",
+      "title": "Release 33",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-33",
+      "coverUrl": null,
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1785801600000
+     }
+    ]
    },
    {
     "fanId": 128,
@@ -320,7 +1270,57 @@
     "followed": false,
     "lately": 0.04668885986392159,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1789516800000
+     },
+     {
+      "matchKey": "t30004",
+      "title": "Song t30004",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30004",
+      "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+      "boughtAt": 1787875200000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1784678400000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1784505600000
+     }
+    ]
    },
    {
     "fanId": 104,
@@ -336,7 +1336,57 @@
     "followed": false,
     "lately": 0.043820875122056624,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1790726400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1062",
+      "title": "Release 62",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-62",
+      "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+      "boughtAt": 1788048000000
+     },
+     {
+      "matchKey": "a1069",
+      "title": "Release 69",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-69",
+      "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+      "boughtAt": 1787702400000
+     }
+    ]
    },
    {
     "fanId": 118,
@@ -352,7 +1402,57 @@
     "followed": false,
     "lately": 0.06140711879141622,
     "latelyOverlap": 8,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1791072000000
+     },
+     {
+      "matchKey": "a1035",
+      "title": "Release 35",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-35",
+      "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1074",
+      "title": "Release 74",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-74",
+      "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+      "boughtAt": 1784332800000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1053",
+      "title": "Release 53",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-53",
+      "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+      "boughtAt": 1781654400000
+     }
+    ]
    },
    {
     "fanId": 119,
@@ -368,7 +1468,57 @@
     "followed": false,
     "lately": 0.09932114248145851,
     "latelyOverlap": 5,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1790121600000
+     },
+     {
+      "matchKey": "a1033",
+      "title": "Release 33",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-33",
+      "coverUrl": null,
+      "boughtAt": 1789171200000
+     },
+     {
+      "matchKey": "a1024",
+      "title": "Release 24",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-24",
+      "coverUrl": "https://f4.bcbits.com/img/a5024_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1784332800000
+     }
+    ]
    },
    {
     "fanId": 135,
@@ -384,7 +1534,57 @@
     "followed": false,
     "lately": 0.08264918832061104,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1792195200000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1792108800000
+     },
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1788480000000
+     }
+    ]
    },
    {
     "fanId": 114,
@@ -400,7 +1600,57 @@
     "followed": false,
     "lately": 0.05872903064614325,
     "latelyOverlap": 3,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1787184000000
+     },
+     {
+      "matchKey": "a1091",
+      "title": "Song t29002",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29002",
+      "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1785283200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1784505600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1783123200000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1778544000000
+     }
+    ]
    },
    {
     "fanId": 123,
@@ -416,7 +1666,57 @@
     "followed": false,
     "lately": 0.05922287818014012,
     "latelyOverlap": 11,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1791417600000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1790121600000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1788825600000
+     },
+     {
+      "matchKey": "a1063",
+      "title": "Release 63",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-63",
+      "coverUrl": "https://f4.bcbits.com/img/a5063_7.jpg",
+      "boughtAt": 1787961600000
+     }
+    ]
    },
    {
     "fanId": 105,
@@ -432,7 +1732,57 @@
     "followed": false,
     "lately": 0.055477780310001445,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1786579200000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1784592000000
+     },
+     {
+      "matchKey": "a1038",
+      "title": "Release 38",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-38",
+      "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+      "boughtAt": 1782950400000
+     }
+    ]
    },
    {
     "fanId": 117,
@@ -448,7 +1798,57 @@
     "followed": false,
     "lately": 0.044768141229353006,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1069",
+      "title": "Release 69",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-69",
+      "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "t30002",
+      "title": "Song t30002",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30002",
+      "coverUrl": "https://f4.bcbits.com/img/a37002_7.jpg",
+      "boughtAt": 1786492800000
+     },
+     {
+      "matchKey": "a1048",
+      "title": "Release 48",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-48",
+      "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+      "boughtAt": 1783209600000
+     },
+     {
+      "matchKey": "a1012",
+      "title": "Release 12",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-12",
+      "coverUrl": "https://f4.bcbits.com/img/a5012_7.jpg",
+      "boughtAt": 1779926400000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1777680000000
+     }
+    ]
    },
    {
     "fanId": 106,
@@ -464,7 +1864,57 @@
     "followed": false,
     "lately": 0.04740151038348149,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1015",
+      "title": "Release 15",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-15",
+      "coverUrl": "https://f4.bcbits.com/img/a5015_7.jpg",
+      "boughtAt": 1790035200000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1789257600000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1041",
+      "title": "Release 41",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-41",
+      "coverUrl": "https://f4.bcbits.com/img/a5041_7.jpg",
+      "boughtAt": 1784851200000
+     }
+    ]
    },
    {
     "fanId": 112,
@@ -480,7 +1930,57 @@
     "followed": false,
     "lately": 0.08218436881243552,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1783900800000
+     },
+     {
+      "matchKey": "a1005",
+      "title": "Release 5",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-5",
+      "coverUrl": "https://f4.bcbits.com/img/a5005_7.jpg",
+      "boughtAt": 1783036800000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1780617600000
+     },
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1780531200000
+     }
+    ]
    },
    {
     "fanId": 111,
@@ -496,7 +1996,57 @@
     "followed": false,
     "lately": 0.03292714076608568,
     "latelyOverlap": 3,
-    "trend": "drifting"
+    "trend": "drifting",
+    "recentBuys": [
+     {
+      "matchKey": "a1051",
+      "title": "Release 51",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-51",
+      "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1054",
+      "title": "Release 54",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-54",
+      "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1781568000000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1778371200000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1778284800000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1775865600000
+     }
+    ]
    },
    {
     "fanId": 107,
@@ -512,7 +2062,57 @@
     "followed": false,
     "lately": 0.06460767026500569,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1792108800000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787097600000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1780444800000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1777161600000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1776556800000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1776384000000
+     }
+    ]
    },
    {
     "fanId": 121,
@@ -528,7 +2128,57 @@
     "followed": false,
     "lately": 0.0533240054723104,
     "latelyOverlap": 11,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1789689600000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1786147200000
+     },
+     {
+      "matchKey": "t30000",
+      "title": "Song t30000",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30000",
+      "coverUrl": "https://f4.bcbits.com/img/a37000_7.jpg",
+      "boughtAt": 1781568000000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1780963200000
+     }
+    ]
    },
    {
     "fanId": 103,
@@ -544,7 +2194,57 @@
     "followed": false,
     "lately": 0.06835248522744539,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1071",
+      "title": "Release 71",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-71",
+      "coverUrl": "https://f4.bcbits.com/img/a5071_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1026",
+      "title": "Release 26",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-26",
+      "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1787529600000
+     }
+    ]
    },
    {
     "fanId": 108,
@@ -560,7 +2260,57 @@
     "followed": false,
     "lately": 0.10066517710765403,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1043",
+      "title": "Release 43",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-43",
+      "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1788912000000
+     },
+     {
+      "matchKey": "a1065",
+      "title": "Release 65",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-65",
+      "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1787011200000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1784764800000
+     }
+    ]
    },
    {
     "fanId": 133,
@@ -576,7 +2326,57 @@
     "followed": false,
     "lately": 0.03557406773891146,
     "latelyOverlap": 4,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1090",
+      "title": "Song t29000",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29000",
+      "coverUrl": "https://f4.bcbits.com/img/a36000_7.jpg",
+      "boughtAt": 1792454400000
+     },
+     {
+      "matchKey": "a1038",
+      "title": "Release 38",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-38",
+      "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+      "boughtAt": 1791331200000
+     },
+     {
+      "matchKey": "a1066",
+      "title": "Release 66",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-66",
+      "coverUrl": null,
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1006",
+      "title": "Release 6",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-6",
+      "coverUrl": "https://f4.bcbits.com/img/a5006_7.jpg",
+      "boughtAt": 1786147200000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1785024000000
+     },
+     {
+      "matchKey": "a1042",
+      "title": "Release 42",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-42",
+      "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+      "boughtAt": 1780444800000
+     }
+    ]
    },
    {
     "fanId": 132,
@@ -592,7 +2392,57 @@
     "followed": false,
     "lately": 0.0436541377219521,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1791158400000
+     },
+     {
+      "matchKey": "a1015",
+      "title": "Release 15",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-15",
+      "coverUrl": "https://f4.bcbits.com/img/a5015_7.jpg",
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1076",
+      "title": "Release 76",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-76",
+      "coverUrl": "https://f4.bcbits.com/img/a5076_7.jpg",
+      "boughtAt": 1785715200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1784246400000
+     }
+    ]
    }
   ],
   "latelyRows": [
@@ -610,7 +2460,57 @@
     "followed": false,
     "lately": 0.1349748236211622,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1791504000000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1016",
+      "title": "Release 16",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-16",
+      "coverUrl": "https://f4.bcbits.com/img/a5016_7.jpg",
+      "boughtAt": 1790380800000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1789516800000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "a1041",
+      "title": "Release 41",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-41",
+      "coverUrl": "https://f4.bcbits.com/img/a5041_7.jpg",
+      "boughtAt": 1785801600000
+     }
+    ]
    },
    {
     "fanId": 129,
@@ -626,7 +2526,57 @@
     "followed": false,
     "lately": 0.10417873465216851,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1006",
+      "title": "Release 6",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-6",
+      "coverUrl": "https://f4.bcbits.com/img/a5006_7.jpg",
+      "boughtAt": 1791676800000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1789603200000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787011200000
+     }
+    ]
    },
    {
     "fanId": 108,
@@ -642,7 +2592,57 @@
     "followed": false,
     "lately": 0.10066517710765403,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1043",
+      "title": "Release 43",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-43",
+      "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1788912000000
+     },
+     {
+      "matchKey": "a1065",
+      "title": "Release 65",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-65",
+      "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1787011200000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1784764800000
+     }
+    ]
    },
    {
     "fanId": 119,
@@ -658,7 +2658,57 @@
     "followed": false,
     "lately": 0.09932114248145851,
     "latelyOverlap": 5,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1790121600000
+     },
+     {
+      "matchKey": "a1033",
+      "title": "Release 33",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-33",
+      "coverUrl": null,
+      "boughtAt": 1789171200000
+     },
+     {
+      "matchKey": "a1024",
+      "title": "Release 24",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-24",
+      "coverUrl": "https://f4.bcbits.com/img/a5024_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1784332800000
+     }
+    ]
    },
    {
     "fanId": 113,
@@ -674,7 +2724,57 @@
     "followed": false,
     "lately": 0.0986962057972656,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1791072000000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1014",
+      "title": "Release 14",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-14",
+      "coverUrl": "https://f4.bcbits.com/img/a5014_7.jpg",
+      "boughtAt": 1786924800000
+     },
+     {
+      "matchKey": "a1002",
+      "title": "Release 2",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-2",
+      "coverUrl": "https://f4.bcbits.com/img/a5002_7.jpg",
+      "boughtAt": 1786406400000
+     },
+     {
+      "matchKey": "a1064",
+      "title": "Release 64",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-64",
+      "coverUrl": "https://f4.bcbits.com/img/a5064_7.jpg",
+      "boughtAt": 1784937600000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1783900800000
+     }
+    ]
    },
    {
     "fanId": 102,
@@ -690,7 +2790,57 @@
     "followed": false,
     "lately": 0.09137969768478543,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1787961600000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1784505600000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1784246400000
+     },
+     {
+      "matchKey": "a1075",
+      "title": "Release 75",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-75",
+      "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+      "boughtAt": 1783987200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1783296000000
+     }
+    ]
    },
    {
     "fanId": 127,
@@ -706,7 +2856,57 @@
     "followed": false,
     "lately": 0.08466841525969225,
     "latelyOverlap": 10,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1791849600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1790035200000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1090",
+      "title": "Song t29000",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29000",
+      "coverUrl": "https://f4.bcbits.com/img/a36000_7.jpg",
+      "boughtAt": 1785024000000
+     }
+    ]
    },
    {
     "fanId": 135,
@@ -722,7 +2922,57 @@
     "followed": false,
     "lately": 0.08264918832061104,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1792195200000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1792108800000
+     },
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1788480000000
+     }
+    ]
    },
    {
     "fanId": 125,
@@ -738,7 +2988,57 @@
     "followed": false,
     "lately": 0.08225955430438085,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1005",
+      "title": "Release 5",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-5",
+      "coverUrl": "https://f4.bcbits.com/img/a5005_7.jpg",
+      "boughtAt": 1787097600000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1783209600000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1781395200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1780876800000
+     }
+    ]
    },
    {
     "fanId": 112,
@@ -754,7 +3054,57 @@
     "followed": false,
     "lately": 0.08218436881243552,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1783900800000
+     },
+     {
+      "matchKey": "a1005",
+      "title": "Release 5",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-5",
+      "coverUrl": "https://f4.bcbits.com/img/a5005_7.jpg",
+      "boughtAt": 1783036800000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1780617600000
+     },
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1780531200000
+     }
+    ]
    },
    {
     "fanId": 120,
@@ -770,7 +3120,57 @@
     "followed": false,
     "lately": 0.07370690847668604,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1789776000000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1042",
+      "title": "Release 42",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-42",
+      "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+      "boughtAt": 1786752000000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1782432000000
+     }
+    ]
    },
    {
     "fanId": 130,
@@ -786,7 +3186,57 @@
     "followed": false,
     "lately": 0.07164147963044216,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1791590400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1787788800000
+     },
+     {
+      "matchKey": "a1043",
+      "title": "Release 43",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-43",
+      "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1782777600000
+     }
+    ]
    },
    {
     "fanId": 101,
@@ -802,7 +3252,57 @@
     "followed": true,
     "lately": 0.07092361683200538,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1068",
+      "title": "Release 68",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-68",
+      "coverUrl": "https://f4.bcbits.com/img/a5068_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1782604800000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1780704000000
+     }
+    ]
    },
    {
     "fanId": 103,
@@ -818,7 +3318,57 @@
     "followed": false,
     "lately": 0.06835248522744539,
     "latelyOverlap": 9,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1792022400000
+     },
+     {
+      "matchKey": "a1071",
+      "title": "Release 71",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-71",
+      "coverUrl": "https://f4.bcbits.com/img/a5071_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1026",
+      "title": "Release 26",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-26",
+      "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+      "boughtAt": 1787616000000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1787529600000
+     }
+    ]
    },
    {
     "fanId": 115,
@@ -834,7 +3384,57 @@
     "followed": false,
     "lately": 0.06744056001845908,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1791331200000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1786233600000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1781913600000
+     },
+     {
+      "matchKey": "a1075",
+      "title": "Release 75",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-75",
+      "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+      "boughtAt": 1781049600000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1780963200000
+     }
+    ]
    },
    {
     "fanId": 100,
@@ -850,7 +3450,57 @@
     "followed": false,
     "lately": 0.0653437223403831,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1791936000000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1791676800000
+     },
+     {
+      "matchKey": "a1055",
+      "title": "Release 55",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-55",
+      "coverUrl": null,
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1033",
+      "title": "Release 33",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-33",
+      "coverUrl": null,
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1785801600000
+     }
+    ]
    },
    {
     "fanId": 107,
@@ -866,7 +3516,57 @@
     "followed": false,
     "lately": 0.06460767026500569,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1792108800000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787097600000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1780444800000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1777161600000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1776556800000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1776384000000
+     }
+    ]
    },
    {
     "fanId": 122,
@@ -882,7 +3582,57 @@
     "followed": false,
     "lately": 0.0640804675304488,
     "latelyOverlap": 3,
-    "trend": "steady"
+    "trend": "steady",
+    "recentBuys": [
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1786233600000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1784851200000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1779235200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1779148800000
+     }
+    ]
    },
    {
     "fanId": 109,
@@ -898,7 +3648,57 @@
     "followed": false,
     "lately": 0.06334606927040262,
     "latelyOverlap": 5,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1014",
+      "title": "Release 14",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-14",
+      "coverUrl": "https://f4.bcbits.com/img/a5014_7.jpg",
+      "boughtAt": 1787184000000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1786320000000
+     },
+     {
+      "matchKey": "a1019",
+      "title": "Release 19",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-19",
+      "coverUrl": "https://f4.bcbits.com/img/a5019_7.jpg",
+      "boughtAt": 1785628800000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1784332800000
+     },
+     {
+      "matchKey": "a1001",
+      "title": "Release 1",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-1",
+      "coverUrl": "https://f4.bcbits.com/img/a5001_7.jpg",
+      "boughtAt": 1783900800000
+     }
+    ]
    },
    {
     "fanId": 118,
@@ -914,7 +3714,57 @@
     "followed": false,
     "lately": 0.06140711879141622,
     "latelyOverlap": 8,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1791072000000
+     },
+     {
+      "matchKey": "a1035",
+      "title": "Release 35",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-35",
+      "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1025",
+      "title": "Release 25",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-25",
+      "coverUrl": "https://f4.bcbits.com/img/a5025_7.jpg",
+      "boughtAt": 1786665600000
+     },
+     {
+      "matchKey": "a1074",
+      "title": "Release 74",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-74",
+      "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+      "boughtAt": 1784332800000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1782518400000
+     },
+     {
+      "matchKey": "a1053",
+      "title": "Release 53",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-53",
+      "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+      "boughtAt": 1781654400000
+     }
+    ]
    },
    {
     "fanId": 134,
@@ -930,7 +3780,57 @@
     "followed": false,
     "lately": 0.05999879495410515,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790812800000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1789344000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1787270400000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1784073600000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1781049600000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1777852800000
+     }
+    ]
    },
    {
     "fanId": 123,
@@ -946,7 +3846,57 @@
     "followed": false,
     "lately": 0.05922287818014012,
     "latelyOverlap": 11,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1791417600000
+     },
+     {
+      "matchKey": "a1044",
+      "title": "Release 44",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-44",
+      "coverUrl": null,
+      "boughtAt": 1790121600000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1023",
+      "title": "Release 23",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-23",
+      "coverUrl": "https://f4.bcbits.com/img/a5023_7.jpg",
+      "boughtAt": 1788825600000
+     },
+     {
+      "matchKey": "a1063",
+      "title": "Release 63",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-63",
+      "coverUrl": "https://f4.bcbits.com/img/a5063_7.jpg",
+      "boughtAt": 1787961600000
+     }
+    ]
    },
    {
     "fanId": 114,
@@ -962,7 +3912,57 @@
     "followed": false,
     "lately": 0.05872903064614325,
     "latelyOverlap": 3,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1787184000000
+     },
+     {
+      "matchKey": "a1091",
+      "title": "Song t29002",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29002",
+      "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1785283200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1784505600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1783123200000
+     },
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1778544000000
+     }
+    ]
    },
    {
     "fanId": 126,
@@ -978,7 +3978,57 @@
     "followed": false,
     "lately": 0.055553545654159986,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1058",
+      "title": "Release 58",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-58",
+      "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1792195200000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1789430400000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1788393600000
+     },
+     {
+      "matchKey": "a1039",
+      "title": "Release 39",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-39",
+      "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+      "boughtAt": 1786838400000
+     }
+    ]
    },
    {
     "fanId": 105,
@@ -994,7 +4044,57 @@
     "followed": false,
     "lately": 0.055477780310001445,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1786579200000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1784592000000
+     },
+     {
+      "matchKey": "a1038",
+      "title": "Release 38",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-38",
+      "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+      "boughtAt": 1782950400000
+     }
+    ]
    },
    {
     "fanId": 110,
@@ -1010,7 +4110,57 @@
     "followed": false,
     "lately": 0.055271741860187754,
     "latelyOverlap": 8,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1792454400000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1791590400000
+     },
+     {
+      "matchKey": "a1032",
+      "title": "Release 32",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-32",
+      "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+      "boughtAt": 1789344000000
+     },
+     {
+      "matchKey": "a1031",
+      "title": "Release 31",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-31",
+      "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+      "boughtAt": 1788566400000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1785888000000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1784419200000
+     }
+    ]
    },
    {
     "fanId": 136,
@@ -1026,7 +4176,57 @@
     "followed": false,
     "lately": 0.0536014563244181,
     "latelyOverlap": 7,
-    "trend": "steady"
+    "trend": "steady",
+    "recentBuys": [
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1792627200000
+     },
+     {
+      "matchKey": "a1054",
+      "title": "Release 54",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-54",
+      "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+      "boughtAt": 1790985600000
+     },
+     {
+      "matchKey": "a1012",
+      "title": "Release 12",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-12",
+      "coverUrl": "https://f4.bcbits.com/img/a5012_7.jpg",
+      "boughtAt": 1789171200000
+     },
+     {
+      "matchKey": "a1060",
+      "title": "Release 60",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-60",
+      "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+      "boughtAt": 1788825600000
+     },
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1787443200000
+     },
+     {
+      "matchKey": "t30003",
+      "title": "Song t30003",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30003",
+      "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+      "boughtAt": 1787356800000
+     }
+    ]
    },
    {
     "fanId": 121,
@@ -1042,7 +4242,57 @@
     "followed": false,
     "lately": 0.0533240054723104,
     "latelyOverlap": 11,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1059",
+      "title": "Release 59",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-59",
+      "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+      "boughtAt": 1792368000000
+     },
+     {
+      "matchKey": "a1027",
+      "title": "Release 27",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-27",
+      "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+      "boughtAt": 1789689600000
+     },
+     {
+      "matchKey": "a1009",
+      "title": "Release 9",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-9",
+      "coverUrl": "https://f4.bcbits.com/img/a5009_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1786147200000
+     },
+     {
+      "matchKey": "t30000",
+      "title": "Song t30000",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30000",
+      "coverUrl": "https://f4.bcbits.com/img/a37000_7.jpg",
+      "boughtAt": 1781568000000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1780963200000
+     }
+    ]
    },
    {
     "fanId": 106,
@@ -1058,7 +4308,57 @@
     "followed": false,
     "lately": 0.04740151038348149,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1029",
+      "title": "Release 29",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-29",
+      "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1015",
+      "title": "Release 15",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-15",
+      "coverUrl": "https://f4.bcbits.com/img/a5015_7.jpg",
+      "boughtAt": 1790035200000
+     },
+     {
+      "matchKey": "a1049",
+      "title": "Release 49",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-49",
+      "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+      "boughtAt": 1789257600000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1785542400000
+     },
+     {
+      "matchKey": "a1041",
+      "title": "Release 41",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-41",
+      "coverUrl": "https://f4.bcbits.com/img/a5041_7.jpg",
+      "boughtAt": 1784851200000
+     }
+    ]
    },
    {
     "fanId": 124,
@@ -1074,7 +4374,57 @@
     "followed": false,
     "lately": 0.04731369481120308,
     "latelyOverlap": 3,
-    "trend": "drifting"
+    "trend": "drifting",
+    "recentBuys": [
+     {
+      "matchKey": "a1002",
+      "title": "Release 2",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-2",
+      "coverUrl": "https://f4.bcbits.com/img/a5002_7.jpg",
+      "boughtAt": 1790208000000
+     },
+     {
+      "matchKey": "a1026",
+      "title": "Release 26",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-26",
+      "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+      "boughtAt": 1784764800000
+     },
+     {
+      "matchKey": "a1039",
+      "title": "Release 39",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-39",
+      "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+      "boughtAt": 1782777600000
+     },
+     {
+      "matchKey": "a1016",
+      "title": "Release 16",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-16",
+      "coverUrl": "https://f4.bcbits.com/img/a5016_7.jpg",
+      "boughtAt": 1781481600000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1778371200000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1778112000000
+     }
+    ]
    },
    {
     "fanId": 128,
@@ -1090,7 +4440,57 @@
     "followed": false,
     "lately": 0.04668885986392159,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1020",
+      "title": "Release 20",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-20",
+      "coverUrl": "https://f4.bcbits.com/img/a5020_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1036",
+      "title": "Release 36",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-36",
+      "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+      "boughtAt": 1789516800000
+     },
+     {
+      "matchKey": "t30004",
+      "title": "Song t30004",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30004",
+      "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+      "boughtAt": 1787875200000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1787356800000
+     },
+     {
+      "matchKey": "a1008",
+      "title": "Release 8",
+      "artist": "Artist 18",
+      "url": "https://band18.bandcamp.com/album/release-8",
+      "coverUrl": "https://f4.bcbits.com/img/a5008_7.jpg",
+      "boughtAt": 1784678400000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1784505600000
+     }
+    ]
    },
    {
     "fanId": 117,
@@ -1106,7 +4506,57 @@
     "followed": false,
     "lately": 0.044768141229353006,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1069",
+      "title": "Release 69",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-69",
+      "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1011",
+      "title": "Release 11",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-11",
+      "coverUrl": null,
+      "boughtAt": 1788652800000
+     },
+     {
+      "matchKey": "t30002",
+      "title": "Song t30002",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/track/song-30002",
+      "coverUrl": "https://f4.bcbits.com/img/a37002_7.jpg",
+      "boughtAt": 1786492800000
+     },
+     {
+      "matchKey": "a1048",
+      "title": "Release 48",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-48",
+      "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+      "boughtAt": 1783209600000
+     },
+     {
+      "matchKey": "a1012",
+      "title": "Release 12",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-12",
+      "coverUrl": "https://f4.bcbits.com/img/a5012_7.jpg",
+      "boughtAt": 1779926400000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1777680000000
+     }
+    ]
    },
    {
     "fanId": 131,
@@ -1122,7 +4572,57 @@
     "followed": false,
     "lately": 0.04406070107002445,
     "latelyOverlap": 3,
-    "trend": "new"
+    "trend": "new",
+    "recentBuys": [
+     {
+      "matchKey": "a1024",
+      "title": "Release 24",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-24",
+      "coverUrl": "https://f4.bcbits.com/img/a5024_7.jpg",
+      "boughtAt": 1790294400000
+     },
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1789776000000
+     },
+     {
+      "matchKey": "a1040",
+      "title": "Release 40",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-40",
+      "coverUrl": "https://f4.bcbits.com/img/a5040_7.jpg",
+      "boughtAt": 1786838400000
+     },
+     {
+      "matchKey": "a1010",
+      "title": "Release 10",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-10",
+      "coverUrl": "https://f4.bcbits.com/img/a5010_7.jpg",
+      "boughtAt": 1776470400000
+     },
+     {
+      "matchKey": "a1037",
+      "title": "Release 37",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-37",
+      "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+      "boughtAt": 1776384000000
+     },
+     {
+      "matchKey": "a1018",
+      "title": "Release 18",
+      "artist": "Artist 16",
+      "url": "https://oldname16.bandcamp.com/album/release-18",
+      "coverUrl": "https://f4.bcbits.com/img/a5018_7.jpg",
+      "boughtAt": 1771891200000
+     }
+    ]
    },
    {
     "fanId": 104,
@@ -1138,7 +4638,57 @@
     "followed": false,
     "lately": 0.043820875122056624,
     "latelyOverlap": 7,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1003",
+      "title": "Release 3",
+      "artist": "Various Artists",
+      "url": "https://band13.bandcamp.com/album/release-3",
+      "coverUrl": "https://f4.bcbits.com/img/a5003_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1028",
+      "title": "Release 28",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-28",
+      "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+      "boughtAt": 1790726400000
+     },
+     {
+      "matchKey": "a1007",
+      "title": "Release 7",
+      "artist": "Artist 17",
+      "url": "https://band17.bandcamp.com/album/release-7",
+      "coverUrl": "https://f4.bcbits.com/img/a5007_7.jpg",
+      "boughtAt": 1789862400000
+     },
+     {
+      "matchKey": "a1004",
+      "title": "Release 4",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-4",
+      "coverUrl": "https://f4.bcbits.com/img/a5004_7.jpg",
+      "boughtAt": 1788998400000
+     },
+     {
+      "matchKey": "a1062",
+      "title": "Release 62",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-62",
+      "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+      "boughtAt": 1788048000000
+     },
+     {
+      "matchKey": "a1069",
+      "title": "Release 69",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-69",
+      "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+      "boughtAt": 1787702400000
+     }
+    ]
    },
    {
     "fanId": 132,
@@ -1154,7 +4704,57 @@
     "followed": false,
     "lately": 0.0436541377219521,
     "latelyOverlap": 6,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1047",
+      "title": "Release 47",
+      "artist": "Artist 21",
+      "url": "https://band21.bandcamp.com/album/release-47",
+      "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+      "boughtAt": 1791158400000
+     },
+     {
+      "matchKey": "a1015",
+      "title": "Release 15",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-15",
+      "coverUrl": "https://f4.bcbits.com/img/a5015_7.jpg",
+      "boughtAt": 1790640000000
+     },
+     {
+      "matchKey": "a1017",
+      "title": "Release 17",
+      "artist": "Artist 15",
+      "url": "https://music.label15.com/album/release-17",
+      "coverUrl": "https://f4.bcbits.com/img/a5017_7.jpg",
+      "boughtAt": 1790553600000
+     },
+     {
+      "matchKey": "a1045",
+      "title": "Release 45",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-45",
+      "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+      "boughtAt": 1788134400000
+     },
+     {
+      "matchKey": "a1076",
+      "title": "Release 76",
+      "artist": "Artist 14",
+      "url": "https://band14.bandcamp.com/album/release-76",
+      "coverUrl": "https://f4.bcbits.com/img/a5076_7.jpg",
+      "boughtAt": 1785715200000
+     },
+     {
+      "matchKey": "a1078",
+      "title": "Release 78",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-78",
+      "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+      "boughtAt": 1784246400000
+     }
+    ]
    },
    {
     "fanId": 133,
@@ -1170,7 +4770,57 @@
     "followed": false,
     "lately": 0.03557406773891146,
     "latelyOverlap": 4,
-    "trend": "converging"
+    "trend": "converging",
+    "recentBuys": [
+     {
+      "matchKey": "a1090",
+      "title": "Song t29000",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/track/song-29000",
+      "coverUrl": "https://f4.bcbits.com/img/a36000_7.jpg",
+      "boughtAt": 1792454400000
+     },
+     {
+      "matchKey": "a1038",
+      "title": "Release 38",
+      "artist": "Artist 12",
+      "url": "https://band12.bandcamp.com/album/release-38",
+      "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+      "boughtAt": 1791331200000
+     },
+     {
+      "matchKey": "a1066",
+      "title": "Release 66",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-66",
+      "coverUrl": null,
+      "boughtAt": 1790467200000
+     },
+     {
+      "matchKey": "a1006",
+      "title": "Release 6",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-6",
+      "coverUrl": "https://f4.bcbits.com/img/a5006_7.jpg",
+      "boughtAt": 1786147200000
+     },
+     {
+      "matchKey": "a1021",
+      "title": "Release 21",
+      "artist": "Artist 19",
+      "url": "https://band19.bandcamp.com/album/release-21",
+      "coverUrl": "https://f4.bcbits.com/img/a5021_7.jpg",
+      "boughtAt": 1785024000000
+     },
+     {
+      "matchKey": "a1042",
+      "title": "Release 42",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-42",
+      "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+      "boughtAt": 1780444800000
+     }
+    ]
    },
    {
     "fanId": 111,
@@ -1186,7 +4836,57 @@
     "followed": false,
     "lately": 0.03292714076608568,
     "latelyOverlap": 3,
-    "trend": "drifting"
+    "trend": "drifting",
+    "recentBuys": [
+     {
+      "matchKey": "a1051",
+      "title": "Release 51",
+      "artist": "Artist 13",
+      "url": "https://band13.bandcamp.com/album/release-51",
+      "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1054",
+      "title": "Release 54",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-54",
+      "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+      "boughtAt": 1792540800000
+     },
+     {
+      "matchKey": "a1030",
+      "title": "Release 30",
+      "artist": "Artist 16",
+      "url": "https://band16.bandcamp.com/album/release-30",
+      "coverUrl": "https://f4.bcbits.com/img/a5030_7.jpg",
+      "boughtAt": 1781568000000
+     },
+     {
+      "matchKey": "a1022",
+      "title": "Release 22",
+      "artist": "Artist 20",
+      "url": "https://band20.bandcamp.com/album/release-22",
+      "coverUrl": null,
+      "boughtAt": 1778371200000
+     },
+     {
+      "matchKey": "a1013",
+      "title": "Release 13",
+      "artist": "Artist 11",
+      "url": "https://band11.bandcamp.com/album/release-13",
+      "coverUrl": "https://f4.bcbits.com/img/a5013_7.jpg",
+      "boughtAt": 1778284800000
+     },
+     {
+      "matchKey": "a1000",
+      "title": "Release 0",
+      "artist": "Artist 10",
+      "url": "https://band10.bandcamp.com/album/release-0",
+      "coverUrl": null,
+      "boughtAt": 1775865600000
+     }
+    ]
    }
   ],
   "latelyHalfLifeMonths": 6,

@@ -182,7 +182,7 @@ describe('readTwinsResult', () => {
       item(`a${i + 1}` as ItemKey, (i + 1) * 100),
     );
     const undated = item('a99' as ItemKey, null);
-    await upsertCollectionItems(db, [...bought, undated], 0);
+    await upsertCollectionItems(db, [...bought, undated]);
     await putOwnership(db, 10, [...bought, undated], 'collection');
     await replaceTwins(db, [twin(10, 0.5), twin(11, 0.2)], [twin(10, 0.5, { lately: 0.1 })]);
 
