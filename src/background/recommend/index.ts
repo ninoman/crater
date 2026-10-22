@@ -7,6 +7,7 @@ import type { AlsoBoughtResult } from '../../shared/alsoBought';
 import type { ForYouResult } from '../../shared/forYou';
 import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
 import type { TwinsResult } from '../../shared/twins';
+import type { TwinsLatestResult } from '../../shared/twinsLatest';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
@@ -16,6 +17,7 @@ import { computeReleaseTwins } from './releaseTwins';
 import { rescoreDue } from './rescore';
 import { readTwinsResult } from './twinRows';
 import { computeTwins } from './twins';
+import { computeTwinsLatest } from './twinsLatest';
 
 export { getTwinStanding, getTwinStandings } from './twinStanding';
 
@@ -38,6 +40,12 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
 export async function getForYou(): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   return computeForYou(db, me, settings.topTwinsK);
+}
+
+/** Twins' latest on your profile: what your top twins bought lately. */
+export async function getTwinsLatest(): Promise<TwinsLatestResult> {
+  const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
+  return computeTwinsLatest(db, me, settings.topTwinsK, Date.now());
 }
 
 /** Both twins leaderboards for the Twins tab on your profile. */

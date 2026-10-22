@@ -1,0 +1,53 @@
+import { useState } from 'react';
+import type { ItemKey } from '../../../bandcamp';
+import type { TwinsLatestResult } from '../../../shared/twinsLatest';
+import { Badge, ReleaseRow, RowList, StatusDot } from '../../../ui';
+import { formatOwnedTracks } from '../../shared/formatOwnedTracks';
+import { ReleasePreview } from '../../shared/ReleasePreview';
+import { formatChecking, formatLatestReason, formatLatestSummary } from './latestText';
+
+export interface LatestListProps {
+  result: TwinsLatestResult;
+  /** For "3 days ago". */
+  now: number;
+  onHide: (matchKey: ItemKey) => void;
+}
+
+/** Your twins' recent buys, newest first, one preview open at a time. */
+export function LatestList({ result, now, onHide }: LatestListProps) {
+  const [previewing, setPreviewing] = useState<ItemKey | null>(null);
+
+  return (
+    <>
+      <div className="dh-profile__toolbar">
+        <p className="dh-profile__summary">
+          {formatLatestSummary(result.rows.length, result.twinsUsed, result.windowDays)}
+        </p>
+        {result.checking > 0 && (
+          <StatusDot tone="neutral">{formatChecking(result.checking)}</StatusDot>
+        )}
+      </div>
+      <div className="dh-profile__list">
+        <RowList label="Twins' latest">
+          {result.rows.map((row) => (
+            <ReleaseRow
+              key={row.matchKey}
+              release={row}
+              reason={formatLatestReason(row, now)}
+              badges={row.ownedTracks > 0 && <Badge>{formatOwnedTracks(row.ownedTracks)}</Badge>}
+              previewing={previewing === row.matchKey}
+              preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
+              onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
+              onHide={() => onHide(row.matchKey)}
+            />
+          ))}
+        </RowList>
+      </div>
+      <p className="dh-profile__note">
+        What your top twins on the Lately board, then the all-time one, bought recently and you
+        don&apos;t own. Dighead re-reads your closest lately twins every week, everyone else
+        monthly. Hidden, owned and wishlisted releases are left out.
+      </p>
+    </>
+  );
+}

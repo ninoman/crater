@@ -11,6 +11,7 @@ import {
   getReleaseTwins,
   getTwinStanding,
   getTwinStandings,
+  getTwinsLatest,
   getTwinsResult,
 } from './recommend';
 import {
@@ -47,6 +48,7 @@ export const handlers: MessageHandlers = {
   getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
   getForYou: () => getForYou(),
+  getTwinsLatest: () => getTwinsLatest(),
   ...followingHandlers(db),
   ...backupHandlers(db),
   pauseScanner: async () => {

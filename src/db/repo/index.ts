@@ -14,3 +14,4 @@ export * from './releaseSupporters';
 export * from './supporterRank';
 export * from './tags';
 export * from './twins';
+export * from './twinsLatest';

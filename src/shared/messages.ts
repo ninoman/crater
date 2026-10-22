@@ -21,6 +21,7 @@ import type { ReleaseTwinsResult } from './releaseTwins';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { TwinsResult, TwinStanding } from './twins';
+import type { TwinsLatestResult } from './twinsLatest';
 
 type NoPayload = Record<string, never>;
 
@@ -55,6 +56,8 @@ export interface MessageMap {
   getTwins: { request: NoPayload; response: TwinsResult };
   /** Releases your top twins own and you don't, for the For you tab on your profile. */
   getForYou: { request: NoPayload; response: ForYouResult };
+  /** What your top twins bought lately that you don't own, for Twins' latest on your profile. */
+  getTwinsLatest: { request: NoPayload; response: TwinsLatestResult };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
   getTwinStanding: { request: { fanId: number }; response: TwinStanding | null };
   /** `getTwinStanding` for many fans in one board read. Fans not on the board are left out. */
