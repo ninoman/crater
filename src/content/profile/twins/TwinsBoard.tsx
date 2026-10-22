@@ -35,7 +35,12 @@ const FAN: Column = {
       avatarUrl={row.avatarUrl}
       name={row.name}
       href={row.url}
-      badges={row.labelCluster && <Badge>label cluster</Badge>}
+      badges={
+        <>
+          {row.followed && <Badge>you follow</Badge>}
+          {row.labelCluster && <Badge>label cluster</Badge>}
+        </>
+      }
     />
   ),
 };

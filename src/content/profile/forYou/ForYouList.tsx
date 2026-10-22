@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ItemKey } from '../../../bandcamp';
 import type { ForYouMode, ForYouRow } from '../../../shared/forYou';
 import { ReleaseRow, RowList } from '../../../ui';
+import { withFollowed } from '../../shared/followedText';
 import { ReleasePreview } from '../../shared/ReleasePreview';
 import { formatPickReason } from './forYouText';
 
@@ -26,7 +27,7 @@ export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
               key={row.matchKey}
               release={row}
               rank={i + 1}
-              reason={formatPickReason(row, now)}
+              reason={withFollowed(formatPickReason(row, now), row.followed)}
               previewing={previewing === row.matchKey}
               preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
               onPreview={(open) => setPreviewing(open ? row.matchKey : null)}

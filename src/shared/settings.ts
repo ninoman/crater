@@ -25,6 +25,8 @@ export interface Settings {
   latelyRescanDays: number;
   /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
   seedFromCollection: boolean;
+  /** Releases from artists and labels you follow score a little higher (decisions §15). */
+  followingBoost: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -43,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   latelyRescanTwins: 25,
   latelyRescanDays: 7,
   seedFromCollection: true,
+  followingBoost: true,
 };
 
 export type NumericSetting = {

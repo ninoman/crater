@@ -1,6 +1,7 @@
 import { useQueueRelease } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
 import { Button, QueueIcon, ReleaseRow, Tooltip } from '../../ui';
+import { withFollowed } from '../shared/followedText';
 import { ReleasePreview } from '../shared/ReleasePreview';
 import { formatQueueOutcome, formatReason } from './formatReason';
 
@@ -17,7 +18,7 @@ export function AlsoBoughtRow({ row, ...actions }: AlsoBoughtRowProps) {
   return (
     <ReleaseRow
       release={row}
-      reason={formatReason(row.reason)}
+      reason={withFollowed(formatReason(row.reason), row.followed)}
       status={formatQueueOutcome(queue)}
       preview={<ReleasePreview url={row.url} name={name} />}
       extraActions={

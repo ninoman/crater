@@ -264,6 +264,25 @@ Design: [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twi
 
 ---
 
+## Following as a signal (not MVP)
+
+**Goal:** what you follow on Bandcamp nudges recommendations and scanning, without drowning out what collections say.
+
+Design: decisions §15. Uses the following sync from *Following tags*; no new requests.
+
+1. [x] `scoring/following.ts`: which releases come from a followed artist or label, a flat ×1.25 boost (below the twin boost's ×1.5), and followed-first ordering, with synthetic tests.
+2. [x] Repo reads: followed bands with their local releases (seller or label), followed fans.
+3. [x] For you (both modes) and Also bought's co-owned rows: the boost, with pruning ceilings scaled so no boosted release is cut early. Setting `followingBoost` (default on) in the popup.
+4. [x] Reason text: "… · you follow Warp" on boosted rows.
+5. [x] Supporters you follow are read first: front of pass 0, and their collection reads ahead in pass 1.
+6. [x] "you follow" badge on both twins boards; scores untouched.
+7. [ ] Later, if followed fans turn out to be good twins: queue their collections at seed priority (≤ 20 requests each, once).
+8. [ ] Try it on real data: do followed releases feel like a nudge, or like noise you already know?
+
+**Done when:** on your real data a release from an artist you follow moves up a few places in For you and says why, and turning the setting off puts it back.
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".
@@ -291,7 +310,6 @@ Also added: full database export and import on the popup's Settings tab (backup,
 
 - Page badges ("6 twins" / "owned") next to release links anywhere on bandcamp.com, behind a setting
 - Export picks as CSV or M3U-style text for DJ library tools
-- Followers / following as an extra signal. The following sync from *Following tags* would provide its data.
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
 - Better scoring: ignoring compilations (recency: see *Lately twins*)
 

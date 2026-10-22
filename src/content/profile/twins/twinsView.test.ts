@@ -14,6 +14,7 @@ function row(rank: number, overrides: Partial<TwinRow> = {}): TwinRow {
     jaccard: 0.1,
     score: 1 / rank,
     labelCluster: false,
+    followed: false,
     lately: null,
     latelyOverlap: 0,
     trend: 'quiet',

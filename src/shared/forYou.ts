@@ -19,6 +19,8 @@ export interface ForYouRow {
   twins: number;
   /** Fresh only: the newest purchase of it among those twins (ms). Null in All time. */
   lastBoughtAt: number | null;
+  /** The artist or label you follow behind it, when that lifted it (decisions §15). */
+  followed: string | null;
 }
 
 export interface ForYouResult {

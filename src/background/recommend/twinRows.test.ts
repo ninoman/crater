@@ -5,6 +5,7 @@ import {
   DigheadDb,
   finishFanScan,
   markSynced,
+  putFollowing,
   replaceTwins,
   saveViewer,
   upsertSupporterFans,
@@ -93,11 +94,43 @@ describe('readTwinsResult', () => {
         jaccard: 0.1,
         score: 0.5,
         labelCluster: true,
+        followed: false,
         lately: null,
         latelyOverlap: 0,
         trend: 'quiet',
       },
       expect.objectContaining({ fanId: 11, rank: 2, name: 'fan11', avatarUrl: null }),
+    ]);
+  });
+
+  it('marks fans you follow on both boards without moving them', async () => {
+    await saveViewer(db, { fanId: 1, username: 'me' });
+    await upsertSupporterFans(db, [supporter(10, 'Ten'), supporter(11, 'Eleven')], 0);
+    const ten = twin(10, 0.5, { lately: 0.1 });
+    const eleven = twin(11, 0.2, { lately: 0.3 });
+    await replaceTwins(db, [ten, eleven], [eleven, ten]);
+    await putFollowing(db, [
+      {
+        kind: 'fan',
+        id: 11,
+        name: 'Eleven',
+        url: '',
+        imageId: null,
+        location: null,
+        followedAt: 0,
+      },
+      { kind: 'band', id: 10, name: 'Band', url: '', imageId: null, location: null, followedAt: 0 },
+    ]);
+
+    const result = await readTwinsResult(db, 6);
+
+    expect(result.rows.map((row) => [row.fanId, row.rank, row.followed])).toEqual([
+      [10, 1, false],
+      [11, 2, true],
+    ]);
+    expect(result.latelyRows.map((row) => [row.fanId, row.followed])).toEqual([
+      [11, true],
+      [10, false],
     ]);
   });
 
