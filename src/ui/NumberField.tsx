@@ -1,9 +1,11 @@
-import { useId } from 'react';
+import { SettingRow } from './SettingRow';
 
 export interface NumberFieldProps {
   label: string;
   value: number;
   onChange: (value: number) => void;
+  /** One plain sentence under the label. */
+  description?: string;
   /** Shown under the input, and marks it invalid. */
   error?: string;
   min?: number;
@@ -16,36 +18,31 @@ export function NumberField({
   label,
   value,
   onChange,
+  description,
   error,
   min,
   max,
   step = 1,
 }: NumberFieldProps) {
-  const id = useId();
-  const errorId = `${id}-error`;
   return (
-    <div className="dh-field">
-      <label className="dh-field__label" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        id={id}
-        className="dh-field__input"
-        type="number"
-        inputMode="numeric"
-        value={Number.isNaN(value) ? '' : value}
-        min={min}
-        max={max}
-        step={step}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
-        onChange={(event) => onChange(event.target.value === '' ? NaN : Number(event.target.value))}
-      />
-      {error && (
-        <span id={errorId} className="dh-field__error">
-          {error}
-        </span>
+    <SettingRow label={label} description={description} error={error}>
+      {({ id, describedBy }) => (
+        <input
+          id={id}
+          className="dh-field__input"
+          type="number"
+          inputMode="numeric"
+          value={Number.isNaN(value) ? '' : value}
+          min={min}
+          max={max}
+          step={step}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
+          onChange={(event) =>
+            onChange(event.target.value === '' ? NaN : Number(event.target.value))
+          }
+        />
       )}
-    </div>
+    </SettingRow>
   );
 }

@@ -9,6 +9,7 @@ import checkbox from './Checkbox.css?inline';
 import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
+import disclosure from './Disclosure.css?inline';
 import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
 import identity from './Identity.css?inline';
@@ -59,6 +60,7 @@ export const uiStyles = [
   tagPicker,
   segmented,
   sectionHeading,
+  disclosure,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

@@ -1,70 +1,35 @@
+import { useState } from 'react';
 import { useSettings } from '../hooks/useSettings';
+import { DEFAULT_SETTINGS, SETTING_LIMITS, type Settings } from '../shared/settings';
+import { applySpeedPreset, type SpeedPreset, speedPresetOf } from '../shared/settingsPresets';
 import {
-  SETTING_LIMITS,
-  type BooleanSetting,
-  type NumericSetting,
-  type Settings,
-} from '../shared/settings';
-import { Button, EmptyState, NumberField, StatusDot, Toggle } from '../ui';
-
-interface Group {
-  title: string;
-  fields: { key: NumericSetting; label: string }[];
-  toggles?: { key: BooleanSetting; label: string }[];
-}
-
-const GROUPS: Group[] = [
-  {
-    title: 'Pace',
-    fields: [
-      { key: 'paceMinMs', label: 'Min gap (ms)' },
-      { key: 'paceMaxMs', label: 'Max gap (ms)' },
-      { key: 'dailyRequestBudget', label: 'Requests per day' },
-    ],
-    toggles: [{ key: 'seedFromCollection', label: 'Scan supporters of releases you own' }],
-  },
-  {
-    title: 'Caps',
-    fields: [
-      { key: 'collectionCap', label: 'Items per fan' },
-      { key: 'collectionBatchSize', label: 'Items per request' },
-      { key: 'supportersPerReleaseCap', label: 'Supporters per release' },
-    ],
-  },
-  {
-    title: 'Taste twins',
-    fields: [
-      { key: 'minCollectionSize', label: 'Min collection' },
-      { key: 'maxCollectionSize', label: 'Max collection' },
-      { key: 'topTwinsK', label: 'Twins used (K)' },
-      { key: 'latelyHalfLifeMonths', label: 'Lately half-life (months)' },
-      { key: 'latelyMinPurchases', label: 'Lately min purchases' },
-    ],
-    toggles: [
-      { key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' },
-      { key: 'followingBoost', label: 'Boost releases from accounts you follow' },
-      { key: 'ignoreCompilations', label: 'Ignore compilations' },
-    ],
-  },
-  {
-    title: 'Deep cuts',
-    fields: [{ key: 'deepCutMaxSupporters', label: 'Deep cut: at most N owners' }],
-  },
-  {
-    title: 'Lately re-reads',
-    fields: [
-      { key: 'latelyRescanTwins', label: 'Top lately twins (0 = off)' },
-      { key: 'latelyRescanDays', label: 'Every (days)' },
-    ],
-  },
-  {
-    title: 'Pages',
-    fields: [],
-    toggles: [{ key: 'pageBadges', label: 'Badges next to release links (owned, twins)' }],
-  },
-];
+  Button,
+  Disclosure,
+  EmptyState,
+  NumberField,
+  Segmented,
+  type SegmentedOption,
+  SettingRow,
+  StatusDot,
+  Toggle,
+} from '../ui';
+import {
+  ADVANCED_KEYS,
+  ADVANCED_SECTIONS,
+  MAIN_SECTIONS,
+  type SettingEntry,
+  type SettingSection,
+} from './settingsSections';
 
 type ReadyView = Extract<ReturnType<typeof useSettings>['view'], { state: 'ready' }>;
+type SpeedChoice = SpeedPreset | 'custom';
+
+const SPEED_OPTIONS: SegmentedOption<SpeedPreset>[] = [
+  { value: 'gentle', label: 'Gentle' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'fast', label: 'Fast' },
+];
+const CUSTOM_OPTION: SegmentedOption<SpeedChoice> = { value: 'custom', label: 'Custom' };
 
 function SaveLine({ view }: { view: ReadyView }) {
   const { saveState, errors, dirty } = view;
@@ -79,9 +44,91 @@ function SaveLine({ view }: { view: ReadyView }) {
   return null;
 }
 
-/** Scanner pace, caps and twins thresholds, validated, with a reset to the defaults. */
+interface EntryProps {
+  entry: SettingEntry;
+  view: ReadyView;
+  setDraft: (next: Settings) => void;
+}
+
+function Entry({ entry, view, setDraft }: EntryProps) {
+  const { draft, errors } = view;
+  const set = <K extends keyof Settings>(key: K, value: Settings[K]) =>
+    setDraft({ ...draft, [key]: value });
+
+  switch (entry.kind) {
+    case 'number':
+      return (
+        <NumberField
+          label={entry.label}
+          description={entry.description}
+          value={draft[entry.key]}
+          onChange={(value) => set(entry.key, value)}
+          error={errors[entry.key]}
+          min={SETTING_LIMITS[entry.key].min}
+          max={SETTING_LIMITS[entry.key].max}
+        />
+      );
+    case 'toggle':
+      return (
+        <Toggle
+          label={entry.label}
+          description={entry.description}
+          checked={draft[entry.key]}
+          onChange={(checked) => set(entry.key, checked)}
+        />
+      );
+    case 'speed': {
+      const current = speedPresetOf(draft);
+      const options = current === 'custom' ? [...SPEED_OPTIONS, CUSTOM_OPTION] : SPEED_OPTIONS;
+      return (
+        <SettingRow
+          label="Scan speed"
+          description="How fast Dighead reads Bandcamp in the background. Slower is kinder to Bandcamp."
+          group
+        >
+          {({ describedBy }) => (
+            <Segmented<SpeedChoice>
+              label="Scan speed"
+              options={options}
+              value={current}
+              describedBy={describedBy}
+              onChange={(choice) =>
+                choice !== 'custom' && setDraft(applySpeedPreset(draft, choice))
+              }
+            />
+          )}
+        </SettingRow>
+      );
+    }
+    case 'lately-rescan':
+      return (
+        <Toggle
+          label="Keep up with your Lately twins"
+          description="Re-check what your closest Lately twins bought more often than everyone else."
+          checked={draft.latelyRescanTwins > 0}
+          onChange={(checked) =>
+            set('latelyRescanTwins', checked ? DEFAULT_SETTINGS.latelyRescanTwins : 0)
+          }
+        />
+      );
+  }
+}
+
+function Section({ section, ...props }: { section: SettingSection } & Omit<EntryProps, 'entry'>) {
+  return (
+    <fieldset className="dh-settings__group">
+      <legend className="dh-settings__legend">{section.title}</legend>
+      {section.entries.map((entry) => (
+        <Entry key={'key' in entry ? entry.key : entry.kind} entry={entry} {...props} />
+      ))}
+    </fieldset>
+  );
+}
+
+/** Plain-language settings up front, the raw scanner and scoring numbers under Advanced. */
 export function SettingsPanel() {
   const { view, setField, save, reset } = useSettings();
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   if (view.state === 'loading') return <EmptyState title="Loading settings…" />;
   if (view.state === 'error') {
@@ -90,8 +137,13 @@ export function SettingsPanel() {
 
   const { draft, errors, dirty, saveState } = view;
   const invalid = Object.keys(errors).length > 0;
-  const setNumber = (key: NumericSetting) => (value: number) =>
-    setField(key, value as Settings[typeof key]);
+  // A marked field must stay visible, or "Fix the marked fields" points at nothing.
+  const advancedHasError = [...ADVANCED_KEYS].some((key) => errors[key]);
+  const setDraft = (next: Settings) => {
+    for (const key of Object.keys(next) as (keyof Settings)[]) {
+      if (!Object.is(next[key], draft[key])) setField(key, next[key]);
+    }
+  };
 
   return (
     <form
@@ -101,32 +153,18 @@ export function SettingsPanel() {
         save();
       }}
     >
-      {GROUPS.map((group) => (
-        <fieldset key={group.title} className="dh-settings__group">
-          <legend className="dh-settings__legend">{group.title}</legend>
-          <div className="dh-settings__fields">
-            {group.fields.map(({ key, label }) => (
-              <NumberField
-                key={key}
-                label={label}
-                value={draft[key]}
-                onChange={setNumber(key)}
-                error={errors[key]}
-                min={SETTING_LIMITS[key].min}
-                max={SETTING_LIMITS[key].max}
-              />
-            ))}
-          </div>
-          {group.toggles?.map(({ key, label }) => (
-            <Toggle
-              key={key}
-              label={label}
-              checked={draft[key]}
-              onChange={(checked) => setField(key, checked)}
-            />
-          ))}
-        </fieldset>
+      {MAIN_SECTIONS.map((section) => (
+        <Section key={section.title} section={section} view={view} setDraft={setDraft} />
       ))}
+      <Disclosure
+        summary="Advanced"
+        open={advancedOpen || advancedHasError}
+        onOpenChange={setAdvancedOpen}
+      >
+        {ADVANCED_SECTIONS.map((section) => (
+          <Section key={section.title} section={section} view={view} setDraft={setDraft} />
+        ))}
+      </Disclosure>
       <div className="dh-settings__footer">
         <span className="dh-settings__status">
           <SaveLine view={view} />
