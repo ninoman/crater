@@ -28,6 +28,7 @@ function item(
     tags: [],
     supporterCount: null,
     fetchedAt: 0,
+    compilation: false,
   };
 }
 

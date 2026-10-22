@@ -205,6 +205,30 @@ describe('older backups', () => {
       }),
     ]);
   });
+
+  it('imports a v9 file, flagging compilations from the artist and title', async () => {
+    const item = { albumKey: null, bandId: 1, label: null, labelId: null, url: 'u', artId: null };
+    const record = { ...item, tags: [], supporterCount: null, compilation: false, fetchedAt: 0 };
+    await db.items.bulkPut([
+      { ...record, itemKey: 'a1', title: 'Benefit', artist: 'Various Artists' },
+      { ...record, itemKey: 'a2', title: 'LP', artist: 'Someone' },
+    ]);
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await file.text());
+    json.data.databaseVersion = 9;
+    for (const table of json.data.data) {
+      if (table.tableName !== 'items') continue;
+      for (const row of table.rows) delete row.compilation;
+    }
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect((await db.items.toArray()).map((i) => [i.itemKey, i.compilation])).toEqual([
+      ['a1', true],
+      ['a2', false],
+    ]);
+  });
 });
 
 describe('refused files', () => {

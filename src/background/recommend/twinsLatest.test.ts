@@ -50,6 +50,7 @@ function item(
     labelId: null,
     otherOwners: null,
     addedAt: daysAgo === null ? null : NOW - daysAgo * DAY,
+    compilation: false,
   };
 }
 

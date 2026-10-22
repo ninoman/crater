@@ -13,6 +13,7 @@ import {
   type ItemRecord,
   type MeRecord,
 } from '../../db';
+import { discountCompilations } from '../../scoring/compilations';
 import { exclusions } from '../../scoring/exclusions';
 import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import {
@@ -46,6 +47,8 @@ export interface ForYouInput {
   latelyHalfLifeMonths: number;
   /** Releases from accounts you follow score a little higher (decisions §16). */
   followingBoost: boolean;
+  /** Down-weight compilations among the picks (decisions §17). */
+  ignoreCompilations: boolean;
   now: number;
 }
 
@@ -68,7 +71,7 @@ export async function computeForYou(
   for (const c of candidates) if ('lastBoughtAt' in c) lastBought.set(c.id, c.lastBoughtAt);
 
   const followed = await loadFollowedReleases(db, input.followingBoost);
-  const { ranked, items } = await scoreTop(db, candidates, followed);
+  const { ranked, items } = await scoreTop(db, candidates, followed, input.ignoreCompilations);
   const artists = new Map<number, string>();
   for (const scored of ranked) {
     const item = items.get(keyFromNumber(scored.id));
@@ -124,11 +127,13 @@ function candidatesFor(
  * Scores candidates in falling twinScore order, a chunk at a time, and stops once none left
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
  * take a place. Ceilings allow for the follow boost, so a followed release is never cut early.
+ * Compilations are down-weighted by their shown record's flag (§17).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly TwinOwned[],
   followed: ReadonlyMap<number, string>,
+  ignoreCompilations: boolean,
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemRecord> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemRecord>();
@@ -149,13 +154,16 @@ async function scoreTop(
         chunk.map((c) => c.id),
       ),
     ]);
+    const compilations = new Set<number>();
     const scored = chunk.flatMap((c) => {
       const item = display.get(keyFromNumber(c.id));
       if (!item) return [];
       items.set(keyFromNumber(c.id), item);
+      if (ignoreCompilations && item.compilation) compilations.add(c.id);
       return [scoreForYou(c, supporters([item.supporterCount], owners.get(c.id) ?? c.twins))];
     });
-    ranked = rankForYou([...ranked, ...boostFollowed(scored, followed)], RANKED);
+    const adjusted = boostFollowed(discountCompilations(scored, compilations), followed);
+    ranked = rankForYou([...ranked, ...adjusted], RANKED);
   }
   return { ranked, items };
 }

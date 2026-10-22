@@ -1,3 +1,4 @@
+import { isCompilation } from './compilation';
 import { ParserError } from './errors';
 import { readBlobById, readDataAttribute, readLdJson } from './html';
 import { itemKey } from './keys';
@@ -40,6 +41,11 @@ export function parseReleasePage(html: string): ReleasePage {
       url: tralbum.url,
       artId: tralbum.art_id ?? null,
       tags: readTags(html),
+      compilation: isCompilation({
+        artist: tralbum.artist,
+        title: tralbum.current.title,
+        trackArtists: (tralbum.trackinfo ?? []).map((track) => track.artist ?? null),
+      }),
     },
     supporters: collectors
       ? [

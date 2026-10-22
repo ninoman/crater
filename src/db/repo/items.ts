@@ -1,10 +1,16 @@
-import type { CollectionItem, ItemKey, ReleasePageItem } from '../../bandcamp';
+import {
+  keyFromNumber,
+  type CollectionItem,
+  type ItemKey,
+  type ReleasePageItem,
+} from '../../bandcamp';
 import { itemFromCollection, itemFromReleasePage } from '../mappers';
 import type { DigheadDb, ItemRecord } from '../schema';
 
 /**
  * Saves release metadata seen in a collection page. Keeps what collection items don't carry
- * (tags from a release page) and a known supporter count when the new one is missing.
+ * (tags from a release page) and a known supporter count when the new one is missing. A
+ * collection page can't see track artists, so it never clears a compilation flag (§17).
  */
 export async function upsertCollectionItems(
   db: DigheadDb,
@@ -17,7 +23,12 @@ export async function upsertCollectionItems(
     const fresh = itemFromCollection(item, now);
     const old = existing[i];
     if (!old) return fresh;
-    return { ...fresh, tags: old.tags, supporterCount: fresh.supporterCount ?? old.supporterCount };
+    return {
+      ...fresh,
+      tags: old.tags,
+      supporterCount: fresh.supporterCount ?? old.supporterCount,
+      compilation: fresh.compilation || old.compilation,
+    };
   });
   await db.items.bulkPut(records);
 }
@@ -52,4 +63,13 @@ export async function getItems(
 ): Promise<Map<ItemKey, ItemRecord>> {
   const items = await db.items.bulkGet(itemKeys);
   return new Map(items.filter((item) => item !== undefined).map((item) => [item.itemKey, item]));
+}
+
+/** Which of these match ids have a record flagged as a compilation (decisions §17). */
+export async function getCompilations(
+  db: DigheadDb,
+  matchIds: readonly number[],
+): Promise<Set<number>> {
+  const items = await db.items.bulkGet(matchIds.map(keyFromNumber));
+  return new Set(matchIds.filter((_, i) => items[i]?.compilation));
 }

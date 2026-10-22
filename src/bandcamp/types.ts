@@ -19,6 +19,8 @@ export interface ReleaseInfo {
 
 export interface ReleasePageItem extends ReleaseInfo {
   tags: string[];
+  /** From the artist, title and track artists (decisions §17). */
+  compilation: boolean;
 }
 
 export interface CollectionItem extends ReleaseInfo {
@@ -33,6 +35,8 @@ export interface CollectionItem extends ReleaseInfo {
   otherOwners: number | null;
   /** ms since epoch; purchase date for collections, added date for wishlists. */
   addedAt: number | null;
+  /** From the artist and title only: collection pages don't list track artists (§17). */
+  compilation: boolean;
 }
 
 export interface Supporter {

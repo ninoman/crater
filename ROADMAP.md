@@ -262,6 +262,22 @@ Design: [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twi
 
 **Done when:** on your real data, Deep cuts finds at least 1.5× as many of your held-out rare releases as For you does, and its rows feel like real finds, not noise from one twin.
 
+## Ignoring compilations (not MVP)
+
+**Goal:** label samplers and Various Artists comps stop making strangers look like twins and stop crowding the picks.
+
+Design: decisions §17.
+
+1. [x] Capture a compilation release page as a fixture (`album-page-compilation.html`).
+2. [x] `bandcamp/compilation.ts`: a high-precision detector (various-artists artist line, VA title prefix, and on release pages 3+ other track artists), set on collection and release-page items, with fixture tests.
+3. [x] Schema v11: `items.compilation`, flagged on existing items by the upgrade and on older backups by `migrateRows`. A collection page never clears a release page's flag.
+4. [x] Twins and lately twins: compilations you own are left out of the shared releases.
+5. [x] Also bought and For you (both modes): compilations down-weighted ×0.5 as picks.
+6. [x] `ignoreCompilations` setting (default on), with a popup toggle.
+7. [ ] Check on real data: how many of your releases get flagged, and spot-check a sample for false positives.
+
+**Done when:** a fan whose only overlap with you is a comp isn't on either twins board, a comp ranks below a normal release with the same evidence in Also bought and For you, and no single-artist album in your collection is flagged.
+
 ---
 
 ## Page badges (not MVP)
@@ -327,7 +343,6 @@ Also added: full database export and import on the popup's Settings tab (backup,
 
 - Export picks as CSV or M3U-style text for DJ library tools
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
-- Better scoring: ignoring compilations (recency: see *Lately twins*)
 
 ---
 

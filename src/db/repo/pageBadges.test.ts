@@ -25,6 +25,7 @@ function item(itemKey: ItemKey, albumKey: ItemKey | null = null): CollectionItem
     labelId: null,
     otherOwners: null,
     addedAt: null,
+    compilation: false,
   };
 }
 

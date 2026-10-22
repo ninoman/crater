@@ -50,6 +50,7 @@ export async function computeTwins(deps: TwinsDeps, meFanId: number): Promise<Tw
     minCollectionSize: settings.minCollectionSize,
     maxCollectionSize: settings.maxCollectionSize,
     labelClusterDownweight: settings.labelClusterDownweight,
+    compilations: settings.ignoreCompilations ? basis.compilations : new Set(),
     lately: {
       halfLifeMs,
       minPurchases: settings.latelyMinPurchases,

@@ -33,7 +33,10 @@ let twinsAgain = false;
 export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResult> {
   fansSinceScore.set(releaseKey, 0);
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
-  return computeAlsoBought(db, releaseKey, me?.fanId ?? null, settings.followingBoost);
+  return computeAlsoBought(db, releaseKey, me?.fanId ?? null, {
+    followingBoost: settings.followingBoost,
+    ignoreCompilations: settings.ignoreCompilations,
+  });
 }
 
 /** For you on your profile, from the stored twins leaderboard, or the lately one for Fresh. */
@@ -44,6 +47,7 @@ export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
     topTwinsK: settings.topTwinsK,
     latelyHalfLifeMonths: settings.latelyHalfLifeMonths,
     followingBoost: settings.followingBoost,
+    ignoreCompilations: settings.ignoreCompilations,
     now: Date.now(),
   });
 }

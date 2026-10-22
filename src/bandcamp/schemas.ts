@@ -67,6 +67,8 @@ export const rawTralbum = z.object({
     band_id: z.number(),
     album_id: z.number().nullish(),
   }),
+  /** A track's own artist line: null on a normal album, set per track on a compilation. */
+  trackinfo: z.array(z.object({ artist: z.string().nullish() })).nullish(),
 });
 
 /** The tracks a release page can stream. `file` is null for tracks Bandcamp won't play. */

@@ -616,3 +616,43 @@ Code: `src/scoring/following.ts` (pure), `src/db/repo/followSignal.ts`, wiring i
 - Rows boosted for a follow say so after the usual reason, with the account's name, as Fresh does with " · ": "7 supporters have this so far · you follow Warp", "owned by 5 of your top twins · you follow Warp". The name is Bandcamp's name for the account you follow. When both the seller and the label are followed, the seller's name shows.
 - **Cost:** one more read per score: the followed bands, then their releases through the `bandId` and `labelId` indexes. Pass 1 reads one `following` row per profile.
 - **Not yet checked on real data:** whether ×1.25 feels like a nudge. Tune it with the other weights (Phase 7.3).
+
+## 17. Ignoring compilations
+
+Decided and built 2026-10-22. Roadmap: *Ignoring compilations*. Code: `src/bandcamp/compilation.ts` (detector, pure), `src/scoring/compilations.ts` (pure), `items.compilation` (schema v11, `db/repo/items.ts`), and its uses in `db/repo/twins.ts` and `background/recommend/` (twins, Also bought, For you). Fixture: `album-page-compilation.html`.
+
+### Why
+
+- **Compilations connect fans who share nothing else.** A label sampler, a Various Artists charity comp or a scene retrospective is bought by fans of every artist on it, and by the label's subscribers. Two fans who both own *Bandcamp Friday Benefit Vol. 3* may have no other release in common.
+- **Twins suffer most.** Twin overlap only counts releases you own (§7), and a comp you own matches everyone who bought it for any of its 20 artists. w(i) only damps the big ones: a niche comp with 60 supporters still weighs about as much as a niche album. The label-cluster flag (§7) catches label subscribers, not a comp's mixed crowd.
+- **Recommendations suffer less.** In Also bought, lift already corrects for a comp's base rate (§6), so a comp that ranks high there is one this release's buyers really do buy more, often because the artist is on it. In For you, a comp several twins own is a fair pick, though it's there partly for the same reason it shouldn't make them twins.
+
+### Detecting one (high precision)
+
+`isCompilation` in `bandcamp/compilation.ts`. Wrongly flagging a normal album would silently drop real overlap, so each rule needs strong evidence, and missing a comp only leaves things as they were before.
+
+1. **Artist is a various-artists placeholder.** After lowercasing, trimming and dropping trailing dots: `various artists`, `various artist`, `various`, `va`, `v.a`, `v/a`, `v-a`, plus the common translations (`varios artistas`, `vários artistas`, `artistes variés`, `artisti vari`, `verschiedene künstler`, `diverse artiesten`, `vv.aa`). The artist must be exactly one of these: "Various Artists" as part of a longer name doesn't count. On collection pages `band_name` is the release's artist line, not the selling account's name: the Jazzman comp in `collection_items-p1.json` has `band_name` "Various Artists", sold from `jazzmanalbums`.
+2. **The title starts with a VA prefix:** `VA - Title`, `V/A: Title`, `Various Artists – Title`, optionally after a catalog number in brackets (`[LBL001] VA - Title`). This is how labels selling from their own account often name comps, with the label as the artist.
+3. **Release pages only: at least 3 distinct track artists other than the album artist, on at least half the tracks.** `data-tralbum.trackinfo[].artist` is null on a normal album (all 9 tracks of `album-page.html`) and set per track on a comp (24 different artists on the 24 tracks of `album-page-compilation.html`). A track artist that contains the album artist or is contained in it doesn't count, which keeps "Artist feat. Guest" and split releases whose artist line names everyone out. Titles that say remix, rework, edits, versions or reimagined skip this rule, since remix albums list the remixers per track but are bought by the original artist's fans.
+
+Collection pages carry only the featured track's artist (`tracklists`), and on a comp it's the album artist again ("Various Artists"), so rule 3 can't run there.
+
+**Not used, on purpose:** title words like "compilation" or "sampler" (single-artist sample packs, of which the collection fixtures hold several, and an artist's own "The Compilation" would trip them), and "sold from a label's account" (most label releases are single-artist albums, §3.3).
+
+**Coverage:** rules 1–2 run on every item from every scan. Rule 3 runs on release pages we fetch: every release you open, and every release in your own collection, since seeding fetches each one's page (§5). Twin overlap only ever touches releases you own (§7), so the rule that sees the most lands where it matters most. Comps whose artist is a label's name and that only turn up in other fans' collections are missed.
+
+### What ignoring means, per scorer
+
+The `ignoreCompilations` setting (default on, a popup toggle next to the label-cluster one) turns all of this off. Changing it takes effect at the next twins recompute and the next score of Also bought or For you.
+
+- **Twins, all-time and lately: dropped.** Shared compilations are removed from the shared releases before anything is counted, so they add nothing to the score, the lately score, the overlap, Jaccard, "this year" or the label-cluster test. A fan whose only overlap is comps isn't a twin at all. The comp still counts in both collection sizes (√(|M|·|F|)), so a collector of comps is a little diluted, as with any release they don't share with you. Dropping rather than down-weighting because overlap on a comp is evidence about the comp's artist list, not about taste.
+- **Also bought: down-weighted ×0.5** (`COMPILATION_FACTOR`) as a candidate. Kept, because a comp with a high lift among this release's buyers is a real association. The release you're looking at being a comp changes nothing: you chose that page. Pruning stays valid, since the factor only lowers scores.
+- **For you and Fresh: down-weighted ×0.5** as a candidate, for the same reason. Twin scores feeding it are already comp-free.
+- **Left alone:** Twins' latest (a feed of what twins bought, not a ranking), twins who own this, same-artist and same-label picks, and pass 0's supporter ranking (§12; it only orders scans).
+
+### Data
+
+- **`items.compilation: boolean`**, set by the parsers (`CollectionItem.compilation` from rules 1–2, `ReleasePageItem.compilation` from all three). Not indexed: scorers look it up for records they already read (your collection for twins, the candidates' records for Also bought and For you).
+- **Merging:** a release page has the whole picture, so its verdict replaces the stored one. A collection page only sees the name, so it can set the flag but never clear it: `compilation = fromCollection || stored`.
+- **A matchKey is a compilation** when a record scoring already reads for it says so. Twins: any of your own records under it, album or track. Also bought: the matchKey's own record (`getCompilations`), so an album known only through tracks isn't checked. For you: the record it shows (`getDisplayItems`), which may be a track of the album.
+- **Schema v11** adds no index. Its upgrade runs rules 1–2 over every stored item's artist and title, so existing data is flagged at once. Rule 3 fills in as release pages are re-fetched (weekly for your own releases, §5). Importing an older backup does the same in `migrateRows`.

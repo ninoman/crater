@@ -81,6 +81,14 @@ export const SPECS: Spec[] = [
     parse: html(parseReleasePage),
   },
   {
+    file: 'album-page-compilation.html',
+    request: () =>
+      releasePageRequest(
+        'https://jazzmanalbums.bandcamp.com/album/follow-me-to-the-popcorn-the-untold-history-of-the-belgium-popcorn-scene',
+      ),
+    parse: html(parseReleasePage),
+  },
+  {
     file: 'album-page-small.html',
     request: () =>
       releasePageRequest('https://doorsdarkmancollective.bandcamp.com/album/summers-fault'),

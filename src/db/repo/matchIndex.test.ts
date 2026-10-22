@@ -22,6 +22,7 @@ function item(itemKey: ItemKey, albumKey: ItemKey | null = null): CollectionItem
     labelId: null,
     otherOwners: 3,
     addedAt: null,
+    compilation: false,
   };
 }
 
@@ -210,7 +211,9 @@ describe('upgrade to v3', () => {
       twins: 'fanId, score',
       queue: '++id, &[kind+target], [priority+nextAttemptAt]',
     });
-    await old.table('items').put({ itemKey: 'a1', bandId: 1, albumKey: null, title: 'T' });
+    await old
+      .table('items')
+      .put({ itemKey: 'a1', bandId: 1, albumKey: null, title: 'T', artist: 'A' });
     await old.table('ownership').bulkPut([
       { fanId: 1, itemKey: 'a1', matchKey: 'a1', source: 'collection', addedAt: null },
       { fanId: 2, itemKey: 't2', matchKey: 'a1', source: 'collection', addedAt: null },

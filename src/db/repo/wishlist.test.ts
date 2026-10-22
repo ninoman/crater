@@ -29,6 +29,7 @@ function item(itemKey: ItemKey, addedAt: number | null): CollectionItem {
     labelId: null,
     otherOwners: null,
     addedAt,
+    compilation: false,
   };
 }
 

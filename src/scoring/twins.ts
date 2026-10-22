@@ -1,6 +1,7 @@
 // Taste twins: fans whose collections overlap most with yours, weighted towards rare releases.
 // Pure: lists are sorted ids (keyToNumber), as stored in `fanMatches` (decisions §6).
 
+import { withoutCompilations } from './compilations';
 import {
   boughtSince,
   latelyScore,
@@ -54,6 +55,8 @@ export interface TwinInput {
   minCollectionSize: number;
   maxCollectionSize: number;
   labelClusterDownweight: boolean;
+  /** Your match ids that are compilations, left out of overlap (decisions §17). Empty when off. */
+  compilations: ReadonlySet<number>;
   lately: LatelyInput;
 }
 
@@ -171,7 +174,11 @@ export function scoreTwin(candidate: Candidate, input: TwinInput): Twin | null {
   }
   if (mine.length === 0 || theirs.length === 0) return null;
 
-  const positions = sharedReleasePositions(input.mine, candidate);
+  const positions = withoutCompilations(
+    sharedReleasePositions(input.mine, candidate),
+    mine,
+    input.compilations,
+  );
   if (positions.length === 0) return null;
   const shared = positions.map((at) => mine[at.mine] as number);
 

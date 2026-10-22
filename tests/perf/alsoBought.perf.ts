@@ -96,6 +96,7 @@ beforeAll(async () => {
     artId: i,
     tags: [],
     supporterCount: 10,
+    compilation: false,
     fetchedAt: 0,
   }));
 

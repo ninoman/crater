@@ -8,6 +8,7 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `track-page.html` | `GET https://floatingpoints.bandcamp.com/track/movement-1` | `parseReleasePage` for tracks: `album_url`, `current.album_id`, track-only supporters |
 | `tralbumcollectors-thumbs-p2.json` | `POST https://bandcamp.com/api/tralbumcollectors/2/thumbs` with `{"tralbum_type":"a","tralbum_id":3149089081,"token":"<last thumb token>","count":100}` | `parseMoreSupporters` |
 | `tralbumcollectors-reviews-p2.json` | `POST .../tralbumcollectors/2/reviews`, same body using the last review token | `parseMoreSupporters` (reviewers are supporters too) |
+| `album-page-compilation.html` | `GET https://jazzmanalbums.bandcamp.com/album/follow-me-to-the-popcorn-the-untold-history-of-the-belgium-popcorn-scene`, logged out (2026-10-22). Artist "Various Artists", sold from Jazzman's account, every `trackinfo[].artist` set (24 artists) | `isCompilation` through `parseReleasePage` (decisions §17) |
 | `album-page-small.html` | `GET https://doorsdarkmancollective.bandcamp.com/album/summers-fault` (3 supporters, `more_thumbs_available: false`) | small-release fallback path |
 | `fan-page.html` | `GET https://bandcamp.com/jiggypol` (10 items, so `small_collection` is true) | `parseFanPage` |
 | `fan-page-medium.html` | `GET https://bandcamp.com/icantthinkofaname` (122 items, 9 wishlisted) | `parseFanPage` with pagination tokens |

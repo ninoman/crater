@@ -13,6 +13,7 @@ import {
 import {
   blankLately,
   type DigheadDb,
+  flagCompilation,
   rebuildFanMatchLists,
   TABLES_ADDED,
   upgradeJobToV8,
@@ -86,6 +87,8 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   }
   // v8 ranked queued jobs and staged fan scans.
   if (fromVersion < 8) await db.queue.toCollection().modify(upgradeJobToV8);
+  // v11 flagged compilations on items.
+  if (fromVersion < 11) await db.items.toCollection().modify(flagCompilation);
 }
 
 /** Where the safety copy of the current data waits while an import runs. */

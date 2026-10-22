@@ -48,6 +48,7 @@ function item(
     labelId: null,
     otherOwners: 3,
     addedAt: null,
+    compilation: false,
     ...patch,
   };
 }
@@ -139,6 +140,20 @@ describe('computeAlsoBought', () => {
     // a900 3 of 10 → 0.13, lift 1.35, ≈ 2.6. The staple's 8 owners now count for more than
     // a400's 4: more evidence, so less shrinkage.
     expect(await ranking('a100')).toEqual(['a300', 'a200', 'a400', 'a900']);
+  });
+
+  it('down-weights a compilation among the picks, unless told not to', async () => {
+    await seedBigRelease();
+    await upsertCollectionItems(
+      db,
+      [item('a300', { artist: 'Various Artists', compilation: true })],
+      0,
+    );
+
+    // a300's ≈ 4.0 halves to ≈ 2.0, below a900's ≈ 2.6.
+    expect(await ranking('a100')).toEqual(['a200', 'a400', 'a900', 'a300']);
+    const unchanged = await computeAlsoBought(db, 'a100', ME, { ignoreCompilations: false });
+    expect(unchanged.rows.map((row) => row.matchKey)).toEqual(['a300', 'a200', 'a400', 'a900']);
   });
 
   it('explains each row and leaves out albums you own a track of', async () => {
@@ -266,7 +281,7 @@ describe('computeAlsoBought', () => {
     expect(rows.map((row) => row.matchKey)).toEqual(['a200', 'a300', 'a400', 'a900']);
     expect(rows.map((row) => row.followed)).toEqual(['Followed Artist', null, null, null]);
 
-    const off = await computeAlsoBought(db, 'a100', ME, false);
+    const off = await computeAlsoBought(db, 'a100', ME, { followingBoost: false });
     expect(off.rows.map((row) => row.matchKey)).toEqual(['a300', 'a200', 'a400', 'a900']);
     expect(off.rows.every((row) => row.followed === null)).toBe(true);
   });

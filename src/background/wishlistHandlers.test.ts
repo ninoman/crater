@@ -20,6 +20,7 @@ const ITEM: CollectionItem = {
   labelId: null,
   otherOwners: null,
   addedAt: 1000,
+  compilation: false,
 };
 
 let db: DigheadDb;

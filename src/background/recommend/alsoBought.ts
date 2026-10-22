@@ -4,6 +4,7 @@
 import { artUrl, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherAlsoBought,
+  getCompilations,
   getDisplayItems,
   getOwnerCounts,
   getSellerItems,
@@ -33,6 +34,7 @@ import {
   type SupporterList,
   type TwinBoost,
 } from '../../scoring/alsoBought';
+import { discountCompilations } from '../../scoring/compilations';
 import { exclusions } from '../../scoring/exclusions';
 import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import { supporters } from '../../scoring/weights';
@@ -42,12 +44,18 @@ import { loadFollowedReleases } from './followSignal';
 /** Owner counts are looked up this many candidates at a time. */
 const CHUNK = 200;
 
-/** `followingBoost`: releases from accounts you follow score a little higher (decisions §16). */
+export interface AlsoBoughtOptions {
+  /** Releases from accounts you follow score a little higher (decisions §16). */
+  followingBoost?: boolean;
+  /** Down-weight compilations among the picks (decisions §17). */
+  ignoreCompilations?: boolean;
+}
+
 export async function computeAlsoBought(
   db: DigheadDb,
   releaseKey: ItemKey,
   meFanId: number | null,
-  followingBoost = true,
+  { followingBoost = true, ignoreCompilations = true }: AlsoBoughtOptions = {},
 ): Promise<AlsoBoughtResult> {
   const [data, followed] = await Promise.all([
     gatherAlsoBought(db, releaseKey, meFanId),
@@ -61,7 +69,10 @@ export async function computeAlsoBought(
     data.supporters.map((s) => s.matchIds),
     excluded,
   );
-  const scored = await scoreTop(db, candidates, data.supporters, basis, boosts, followed);
+  const scored = await scoreTop(db, candidates, data.supporters, basis, boosts, {
+    followed,
+    ignoreCompilations,
+  });
   const wait = warmup(
     { read: data.supporters.length, allScanned: data.allScanned, listed: data.listed },
     scored.filter(isConfident).length,
@@ -89,7 +100,8 @@ export async function computeAlsoBought(
  * Scores candidates in falling co order, fetching owner counts and weighing votes a chunk at a
  * time, and stops once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
  * candidates whose own twin share still lets them in are looked up. Ceilings are linear in co, so
- * scaling co by the follow boost keeps them exact (§16).
+ * scaling co by the follow boost keeps them exact (§16). Compilations are down-weighted (§17),
+ * which only lowers scores, so the ceilings still hold.
  */
 async function scoreTop(
   db: DigheadDb,
@@ -97,7 +109,10 @@ async function scoreTop(
   supporters: readonly SupporterList[],
   basis: Basis,
   boosts: ReadonlyMap<number, TwinBoost>,
-  followed: ReadonlyMap<number, string>,
+  {
+    followed,
+    ignoreCompilations,
+  }: { followed: ReadonlyMap<number, string>; ignoreCompilations: boolean },
 ): Promise<Scored[]> {
   const maxShare = maxTwinShare(boosts);
   const factor = maxFollowFactor(followed);
@@ -110,7 +125,10 @@ async function scoreTop(
       .slice(start, start + CHUNK)
       .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co * factor, boostOf(c.id).share));
     const ids = chunk.map((c) => c.id);
-    const owners = await getOwnerCounts(db, ids);
+    const [owners, compilations] = await Promise.all([
+      getOwnerCounts(db, ids),
+      ignoreCompilations ? getCompilations(db, ids) : new Set<number>(),
+    ]);
     const votes = coOwnerVotes(ids, supporters);
     const scored = chunk.map((c) =>
       scoreCoOwned(
@@ -120,7 +138,8 @@ async function scoreTop(
         boostOf(c.id),
       ),
     );
-    top = rankScored([...top, ...boostFollowed(scored, followed)], ALSO_BOUGHT_LIMIT);
+    const adjusted = boostFollowed(discountCompilations(scored, compilations), followed);
+    top = rankScored([...top, ...adjusted], ALSO_BOUGHT_LIMIT);
   }
   return top;
 }

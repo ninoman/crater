@@ -43,6 +43,7 @@ const GROUPS: Group[] = [
     toggles: [
       { key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' },
       { key: 'followingBoost', label: 'Boost releases from accounts you follow' },
+      { key: 'ignoreCompilations', label: 'Ignore compilations' },
     ],
   },
   {

@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import type { ItemKey } from '../bandcamp';
+import { isCompilation, type ItemKey } from '../bandcamp';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 
 export interface ItemRecord {
@@ -20,6 +20,8 @@ export interface ItemRecord {
   tags: string[];
   /** also_collected_count + 1 (decisions §3.2). */
   supporterCount: number | null;
+  /** A compilation: scorers ignore or down-weight it (decisions §17). */
+  compilation: boolean;
   fetchedAt: number;
 }
 
@@ -225,6 +227,14 @@ export function upgradeJobToV8(job: QueueJob): void {
   if (cursor && !('stage' in cursor)) job.cursor = { stage: 'full', ...cursor };
 }
 
+/**
+ * Flags an item stored before v11 from its artist and title. Track artists aren't stored, so
+ * that rule waits for the release page's next fetch (decisions §17).
+ */
+export function flagCompilation(item: ItemRecord): void {
+  item.compilation ??= isCompilation(item);
+}
+
 /** Tables newer than the oldest restorable backup, by the version that added them. */
 export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 7, itemTags: 9 };
 
@@ -320,6 +330,10 @@ export class DigheadDb extends Dexie {
     this.version(9).stores({ itemTags: 'itemKey, *tagIds' });
     // v10: items by url, so page badges find a release from a link (decisions §15). Index only.
     this.version(10).stores({ items: 'itemKey, bandId, albumKey, labelId, url' });
+    // v11: compilations flagged on items (decisions §17). No index, only the flag to fill in.
+    this.version(11)
+      .stores({})
+      .upgrade((tx) => tx.table<ItemRecord>('items').toCollection().modify(flagCompilation));
   }
 }
 
