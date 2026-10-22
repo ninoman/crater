@@ -1,8 +1,6 @@
 # Dighead privacy policy
 
-*"Dighead" is a placeholder for the final name (ROADMAP 8.1). Replace it, the contact address and the date before publishing. Keep `docs/privacy.html` in step with this file.*
-
-**Last updated:** 2026-10-20
+**Last updated:** 2026-10-22
 
 Dighead is a Chrome extension that builds a database of Bandcamp fans and their collections, then uses it to suggest music (*Also bought*, *Crate mates*, *For you*). This policy says what it reads, where that data goes, and how to delete it.
 
@@ -61,4 +59,4 @@ If this policy changes, the new version will be published at the same address wi
 
 ## Contact
 
-[contact email: to be added]
+[st.nuriar@gmail.com](mailto:st.nuriar@gmail.com)
