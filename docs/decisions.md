@@ -659,7 +659,7 @@ The `ignoreCompilations` setting (default on, a popup toggle next to the label-c
 
 ## 18. Deep cuts
 
-Researched 2026-10-21 ([docs/research/deep-cuts.md](research/deep-cuts.md)); scorer, worker and message built 2026-10-22 (Roadmap *Deep cuts* steps 1–3). Code: `src/scoring/deepCuts.ts` (pure), the constants and `nichePenalty` in `src/scoring/weights.ts`, `src/background/recommend/deepCuts.ts`. No UI yet (step 4).
+Researched 2026-10-21 ([docs/research/deep-cuts.md](research/deep-cuts.md)); scorer, worker and message built 2026-10-22 (Roadmap *Deep cuts* steps 1–3). Code: `src/scoring/deepCuts.ts` (pure), the constants and `nichePenalty` in `src/scoring/weights.ts`, `src/background/recommend/deepCuts.ts`, and the *Deep cuts* option in the For you tab's switch (`src/content/profile/forYou/`), with the cap in the popup's settings.
 
 - **A third mode of For you**, next to *Fresh*: `All / Fresh / Deep cuts`. It reuses For you's twins, exclusions, rows and diversity rule. On the bus it's `getForYou { mode: 'deep' }`, answered with the same `ForYouResult`.
 - **Score** = `T × t/(t + c) × n^−β`, limited to `n ≤ cap`. T is the sum of the all-time scores of the top-K twins who own the release, t is how many own it, and n is Bandcamp's owner count (`supporterCount`), at least t. Defaults: K = 100 (`DEEP_CUT_TWINS_K`), c = 2 (`DEEP_CUT_AGREEMENT`), β = 0.6 (`DEEP_CUT_BETA`: RP³β's default and Zhou et al.'s tuned value on RateYourMusic data), cap = 50 (underground electronic releases run small). The cap is a user setting, `deepCutMaxSupporters` (5–1000), since what counts as rare depends on the genre. `rankDeepCuts` takes the cap and optional β and c, so the eval (step 5) can grid them.
@@ -670,4 +670,17 @@ Researched 2026-10-21 ([docs/research/deep-cuts.md](research/deep-cuts.md)); sco
 - **No follow boost** (§16), unlike All and Fresh: a release from an account you follow is one Bandcamp already tells you about, the opposite of a deep cut. Keeping it out also means the pure scorer is the whole score, so the eval measures what ships. Deep-cut rows have `followed: null`.
 - **Reason line:** "Only 4 owners on Bandcamp · 3 are your twins", "Only 3 owners on Bandcamp, all your twins", or with one twin "Only 12 owners on Bandcamp · one is your #3 twin". `ForYouRow` carries `supporters` and `bestTwinRank` (the rank, on the board the mode draws on, of the most alike twin owning it) in every mode. In All and Fresh, `supporters` falls back to the owners we've seen when Bandcamp gave no count.
 - **Tags, labels and early-adopter signals stay out of v1.** Tags re-rank only (§12). Earliness is a later boost, after a check that early buyers really predict twin overlap.
-- **Tuning** comes from an offline holdout eval (`tests/eval/`, on a local backup) with niche recall@k as the target metric, not plain recall.
+- **Tuning** comes from an offline holdout eval (`pnpm eval <backup.json>`, `tests/eval/`) with niche recall@k as the target metric, not plain recall.
+- **First eval, 2026-10-22: defaults kept (β = 0.6, c = 2, cap 50).** One real backup: 2,144 fans, ~895 owned releases, 179 held out per fold. Recall@30 on held-out releases with n ≤ 50, as % (± is the spread across the 5 random folds):
+
+  | Method | Temporal (newest 20%) | Random (5 folds) | Median n of hits (random) |
+  | --- | --- | --- | --- |
+  | For you | 3.6 | 4.1 ± 1.3 | 91 |
+  | For you filtered to n ≤ 50 | 5.4 | 7.3 ± 3.7 | 25 |
+  | Deep cuts, defaults | 5.4 | 7.3 ± 4.3 | 25 |
+  | Deep cuts, cap 25 (niche n ≤ 25) | 9.1 | 12.6 ± 13.5 | 15 |
+
+  - Deep cuts finds ~1.8× as many held-out rare releases as For you, with hits a quarter as popular. The bar (1.5× and under a fifth of the median n) is met on the temporal split and missed narrowly on the random one, on the median.
+  - **The cap does the work so far.** Every β and c at cap 50 lands within the noise, and the plain filter scores the same. With one or two rare hits per fold the eval can't tell them apart. What the formula changes is the list's shape, which recall doesn't see: c = 2 keeps single-twin picks out of the top 100 (0% against 28% at c = 0), and a higher β puts 5-owner records above 45-owner ones.
+  - Cap 25 is the only setting that clearly clears the bar, but its spread is as wide as its lead, so the default stays 50. Re-run after much more scanning before moving any default.
+  - The eval runs on fake-indexeddb, which scans every index entry on each overwrite or delete. So it loads items into an emptied table and holds out by writing your remaining lists under a fresh fan id per fold, never by deleting rows. A full run takes ~3 minutes.

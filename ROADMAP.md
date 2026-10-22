@@ -256,7 +256,7 @@ Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cut
 3. [x] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
 4. [x] For you tab: a Deep cuts option in the `All time / Fresh` switch, a "Deep cut: at most N owners" field in the popup's settings, the reason line ("Only 4 owners on Bandcamp · 3 are your twins"), and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
 5. [x] Offline eval script (`tests/eval/`, run with `pnpm eval <backup.json>`, out of `pnpm test`): temporal and random holdout on a local backup, twins recomputed without the held-out releases, recall@k, niche recall@k, mean popularity of the list, median owners of the hits, and a grid over β, the shrink constant and the cap.
-6. [ ] Tune the defaults from the eval on real data, and record the numbers in decisions §18.
+6. [x] Tune the defaults from the eval on real data, and record the numbers in decisions §18 (first run: defaults kept, re-run after more scanning).
 7. [ ] Later: an early-adopter boost, tested first ("do early buyers overlap more with your twins?").
 8. [ ] Later: β adapted to how mainstream your own collection is.
 
