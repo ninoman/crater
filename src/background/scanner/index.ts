@@ -29,6 +29,7 @@ import { usedToday } from './budget';
 import type { StepEvent } from './context';
 import { fanIdOf } from './fanJob';
 import { supportersAreFresh } from './freshness';
+import { queueLatelyRescans } from './latelyRescan';
 import { rankSupporters } from './passZero';
 import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
@@ -149,6 +150,11 @@ export async function seedFromSync({ me, mode, added }: SyncResult): Promise<voi
   const only = mode === 'incremental' ? new Set(added) : undefined;
   if (only?.size === 0) return;
   if ((await seedOwnReleases(db, me.fanId, Date.now(), only)) > 0) kickScanner();
+}
+
+/** Queues latest reads of the top lately twins that are due (decisions §11). */
+export async function rescanLatelyTwins(): Promise<void> {
+  if ((await queueLatelyRescans(db, await loadSettings(), Date.now())) > 0) kickScanner();
 }
 
 export async function getScannerStatus(): Promise<ScannerStatus> {

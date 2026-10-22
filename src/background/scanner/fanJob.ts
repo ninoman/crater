@@ -5,6 +5,7 @@ import { finishFanScan, getMe, type FanJob } from '../../db';
 import type { StepContext, StepResult } from './context';
 import { fanIdOf } from './fanId';
 import { fullStep, quickStep } from './fanCollectionStep';
+import { latestStep } from './fanLatestStep';
 import { profileStep } from './fanProfileStep';
 import { SEED } from './priority';
 
@@ -17,6 +18,8 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<StepRes
       return quickStep(ctx, job);
     case 'full':
       return fullStep(ctx, job, job.cursor);
+    case 'latest':
+      return latestStep(ctx, job, job.cursor);
     default:
       return firstStep(ctx, job);
   }
@@ -34,6 +37,8 @@ async function firstStep(ctx: StepContext, job: FanJob): Promise<StepResult> {
 
 /** A fan whose job was dropped after failing. */
 export async function abandonFan(ctx: StepContext, job: FanJob): Promise<void> {
+  // A failed latest read leaves the collection on file as it was; the next round tries again.
+  if (job.cursor?.stage === 'latest') return;
   const scanned = job.cursor?.stage === 'full' ? job.cursor.scanned : 0;
   await finishFanScan(ctx.db, fanIdOf(job), 'error', scanned, ctx.now);
 }
