@@ -13,6 +13,7 @@
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit && tsc --noEmit -p scripts/tsconfig.json",
     "perf": "vitest run --config tests/perf/vitest.config.ts",
+    "eval": "tsx tests/eval/deepCuts.ts",
     "fixtures:refresh": "tsx scripts/refresh-fixtures.ts",
     "release:build": "tsx scripts/release.ts",
     "storage:estimate": "tsx scripts/estimate-storage.ts"
