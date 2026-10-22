@@ -56,8 +56,13 @@ function createTab(doc: Document, { id, label }: ProfileTabSpec<string>): HTMLLI
   link.href = `#${id}`;
   link.textContent = label;
   item.append(link);
-  // Bandcamp's own tab switching must never see clicks on ours.
-  item.addEventListener('click', (event) => event.stopImmediatePropagation());
+  item.addEventListener('click', (event) => {
+    // Bandcamp's own tab switching must never see clicks on ours.
+    event.stopImmediatePropagation();
+    // Bandcamp pads the <li> and gives it a pointer, so the whole tab looks clickable, not
+    // just the link's text.
+    if (event.target instanceof Node && !link.contains(event.target)) link.click();
+  });
   return item;
 }
 
