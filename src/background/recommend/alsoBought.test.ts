@@ -47,6 +47,7 @@ function item(
     labelId: null,
     otherOwners: 3,
     addedAt: null,
+    compilation: false,
     ...patch,
   };
 }
@@ -80,7 +81,7 @@ const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
 async function ranking(releaseKey: ItemKey, me: number | null = ME) {
-  return (await computeAlsoBought(db, releaseKey, me)).rows.map((row) => row.matchKey);
+  return (await computeAlsoBought(db, releaseKey, me, true)).rows.map((row) => row.matchKey);
 }
 
 /**
@@ -140,10 +141,24 @@ describe('computeAlsoBought', () => {
     expect(await ranking('a100')).toEqual(['a300', 'a200', 'a400', 'a900']);
   });
 
+  it('down-weights a compilation among the picks, unless told not to', async () => {
+    await seedBigRelease();
+    await upsertCollectionItems(
+      db,
+      [item('a300', { artist: 'Various Artists', compilation: true })],
+      0,
+    );
+
+    // a300's ≈ 4.0 halves to ≈ 2.0, below a900's ≈ 2.6.
+    expect(await ranking('a100')).toEqual(['a200', 'a400', 'a900', 'a300']);
+    const unchanged = await computeAlsoBought(db, 'a100', ME, false);
+    expect(unchanged.rows.map((row) => row.matchKey)).toEqual(['a300', 'a200', 'a400', 'a900']);
+  });
+
   it('explains each row and leaves out albums you own a track of', async () => {
     await seedBigRelease();
 
-    const { rows } = await computeAlsoBought(db, 'a100', ME);
+    const { rows } = await computeAlsoBought(db, 'a100', ME, true);
 
     expect(rows[0]).toEqual({
       matchKey: 'a300',
@@ -161,7 +176,7 @@ describe('computeAlsoBought', () => {
     await fans(range(10, 12), [item('a100'), track('t401', 'a400')]);
     await listSupporters('a100', range(10, 12));
 
-    const [row] = (await computeAlsoBought(db, 'a100', ME)).rows;
+    const [row] = (await computeAlsoBought(db, 'a100', ME, true)).rows;
 
     expect(row).toMatchObject({ matchKey: 'a400', title: 'Title t401' });
   });
@@ -235,7 +250,7 @@ describe('computeAlsoBought', () => {
 
     // a200 (fan 17, share 0.5): 3.85 × 1.25 ≈ 4.8 passes a300's 4.0.
     // a900 (fans 17 and 18, share 1): 2.57 × 1.5 ≈ 3.85 passes a400's 3.75.
-    const { rows } = await computeAlsoBought(db, 'a100', ME);
+    const { rows } = await computeAlsoBought(db, 'a100', ME, true);
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
       ['a200', { kind: 'co-owned', owners: 8, twins: 1 }],
       ['a300', { kind: 'co-owned', owners: 5, twins: 0 }],
@@ -248,7 +263,7 @@ describe('computeAlsoBought', () => {
     await fans(range(10, 19), [item('a100'), item('a200')], 'queued');
     await listSupporters('a100', range(10, 19));
 
-    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME, true);
     expect(rows.filter((row) => row.reason.kind === 'co-owned')).toEqual([]);
     expect(warmup).toEqual({ read: 0, readTarget: 10, confident: 0, confidentTarget: 5 });
   });
@@ -283,7 +298,7 @@ describe('warm-up', () => {
   it('holds co-owned rows back until 20 supporters are read, showing the same artist meanwhile', async () => {
     await seed(12);
 
-    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME, true);
     expect(warmup).toEqual({ read: 12, readTarget: 20, confident: 5, confidentTarget: 5 });
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
       ['a101', { kind: 'same-artist' }],
@@ -293,7 +308,7 @@ describe('warm-up', () => {
   it('shows co-owned rows once enough supporters are read and enough rows stand out', async () => {
     await seed(20);
 
-    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
+    const { rows, warmup } = await computeAlsoBought(db, 'a100', ME, true);
     expect(warmup).toBeNull();
     expect(rows.every((row) => row.reason.kind === 'co-owned')).toBe(true);
     expect(rows.map((row) => row.matchKey)).toContain('a300');
@@ -327,7 +342,7 @@ describe('small-release fallback', () => {
   it('blends in the same artist and label, labelled as such', async () => {
     await seedSmallRelease();
 
-    const { rows } = await computeAlsoBought(db, 'a1000', ME);
+    const { rows } = await computeAlsoBought(db, 'a1000', ME, true);
 
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
       ['a2000', { kind: 'co-owned', owners: 2, twins: 0 }],

@@ -46,6 +46,7 @@ function item(
     labelId: null,
     otherOwners: null,
     addedAt: null,
+    compilation: false,
     ...patch,
   };
 }
@@ -91,6 +92,7 @@ const allTime = (topTwinsK: number): ForYouInput => ({
   mode: 'all',
   topTwinsK,
   latelyHalfLifeMonths: 6,
+  ignoreCompilations: true,
   now: 0,
 });
 
@@ -144,6 +146,26 @@ describe('computeForYou', () => {
       ['a1', 3],
     ]);
     expect(result).toMatchObject({ basis: 'ready', twinsUsed: 3 });
+  });
+
+  it('down-weights a compilation your twins own, unless told not to', async () => {
+    await seed();
+    await upsertCollectionItems(
+      db,
+      [item('a3', { artist: 'Various Artists', compilation: true })],
+      0,
+    );
+    const keys = async (input: ForYouInput) =>
+      (await computeForYou(db, await me(), input)).rows.map((row) => row.matchKey);
+
+    // a3's 1 halves to 0.5, below a5's ≈ 0.77 and a1's 0.6.
+    expect(await keys(allTime(3))).toEqual(['a2', 'a5', 'a1', 'a3']);
+    expect(await keys({ ...allTime(3), ignoreCompilations: false })).toEqual([
+      'a2',
+      'a3',
+      'a5',
+      'a1',
+    ]);
   });
 
   it('dresses rows for display', async () => {
@@ -209,6 +231,7 @@ describe('computeForYou, Fresh', () => {
     mode: 'fresh',
     topTwinsK,
     latelyHalfLifeMonths: 6,
+    ignoreCompilations: true,
     now: NOW,
   });
   const bought = (key: ItemKey, daysAgo: number | null) =>

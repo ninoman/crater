@@ -96,6 +96,7 @@ beforeAll(async () => {
     artId: i,
     tags: [],
     supporterCount: 10,
+    compilation: false,
     fetchedAt: 0,
   }));
 
@@ -147,14 +148,14 @@ afterAll(async () => {
 
 it(`re-scores a release with ${SUPPORTERS} scanned supporters in under ${BUDGET_MS} ms`, async () => {
   expect(await db.ownership.count()).toBeGreaterThanOrEqual(300_000);
-  await computeAlsoBought(db, RELEASE, ME); // warm-up
+  await computeAlsoBought(db, RELEASE, ME, true); // warm-up
 
   const times: number[] = [];
   let rows = 0;
   let coOwned = 0;
   for (let run = 0; run < 5; run++) {
     const started = performance.now();
-    const result = await computeAlsoBought(db, RELEASE, ME);
+    const result = await computeAlsoBought(db, RELEASE, ME, true);
     rows = result.rows.length;
     coOwned = result.rows.filter((row) => row.reason.kind === 'co-owned').length;
     times.push(performance.now() - started);

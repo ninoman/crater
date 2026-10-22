@@ -32,6 +32,7 @@ function item(itemKey: CollectionItem['itemKey']): CollectionItem {
     labelId: null,
     otherOwners: null,
     addedAt: null,
+    compilation: false,
   };
 }
 

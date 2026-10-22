@@ -19,6 +19,7 @@ const album: CollectionItem = {
   labelId: null,
   otherOwners: 11,
   addedAt: null,
+  compilation: false,
 };
 const trackFromAlbum: CollectionItem = {
   ...album,
@@ -168,6 +169,27 @@ describe('DigheadDb', () => {
       { itemKey: 't2', tagIds: [2] },
     ]);
     expect(await upgraded.itemTags.where('tagIds').equals(2).primaryKeys()).toEqual(['a1', 't2']);
+    await upgraded.delete();
+  });
+
+  it('flags compilations on v9 items from their artist and title in v10', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(9).stores({ items: 'itemKey, bandId, albumKey, labelId' });
+    await old.table('items').bulkAdd([
+      { itemKey: 'a1', artist: 'Various Artists', title: 'Benefit' },
+      { itemKey: 'a2', artist: 'Some Label', title: 'VA - Sampler' },
+      { itemKey: 'a3', artist: 'Someone', title: 'LP' },
+    ]);
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    const items = await upgraded.items.toArray();
+    expect(items.map((item) => [item.itemKey, item.compilation])).toEqual([
+      ['a1', true],
+      ['a2', true],
+      ['a3', false],
+    ]);
     await upgraded.delete();
   });
 

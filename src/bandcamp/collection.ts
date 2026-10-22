@@ -1,3 +1,4 @@
+import { isCompilation } from './compilation';
 import { itemKey, parseBandcampDate } from './keys';
 import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
@@ -27,6 +28,7 @@ export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null 
     labelId: raw.label_id ?? null,
     otherOwners: raw.also_collected_count ?? null,
     addedAt: parseBandcampDate(raw.purchased ?? raw.added),
+    compilation: isCompilation({ artist: raw.band_name, title: raw.item_title }),
   };
 }
 

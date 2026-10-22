@@ -52,6 +52,7 @@ function item(
     labelId: null,
     otherOwners: owners,
     addedAt: null,
+    compilation: false,
   };
 }
 
@@ -138,6 +139,17 @@ describe('computeTwins', () => {
     expect((await run({ minCollectionSize: 2, maxCollectionSize: 5 })).map((t) => t.fanId)).toEqual(
       [13],
     );
+  });
+
+  it('leaves compilations you own out of the overlap, unless told not to', async () => {
+    const comp = { ...item('a1', 1, 1), artist: 'Various Artists', compilation: true };
+    await mine([comp, item('a2', 2, 1)]);
+    // Fan 10 shares only the comp; fan 11 shares a2.
+    await fan(10, [comp, ...filler(100, 3)]);
+    await fan(11, [item('a2', 2, 1), ...filler(200, 3)]);
+
+    expect((await run()).map((twin) => [twin.fanId, twin.overlap])).toEqual([[11, 1]]);
+    expect((await run({ ignoreCompilations: false })).map((twin) => twin.fanId)).toEqual([10, 11]);
   });
 
   it('down-weights a fan who owns most of the label behind the overlap', async () => {

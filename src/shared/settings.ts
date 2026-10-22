@@ -15,6 +15,8 @@ export interface Settings {
   maxCollectionSize: number;
   topTwinsK: number;
   labelClusterDownweight: boolean;
+  /** Leave compilations out of twin overlap and down-weight them as picks (decisions §15). */
+  ignoreCompilations: boolean;
   /** Lately twins: a purchase counts half as much after this many months (decisions §11). */
   latelyHalfLifeMonths: number;
   /** Fans who bought less than this lately (purchases weighed by age) get no lately score. */
@@ -38,6 +40,7 @@ export const DEFAULT_SETTINGS: Settings = {
   maxCollectionSize: 20000,
   topTwinsK: 30,
   labelClusterDownweight: true,
+  ignoreCompilations: true,
   latelyHalfLifeMonths: 6,
   latelyMinPurchases: 5,
   latelyRescanTwins: 25,

@@ -36,6 +36,7 @@ function item(itemKey: ItemKey, album: ItemKey | null = null): CollectionItem {
     labelId: null,
     otherOwners: 3,
     addedAt: null,
+    compilation: false,
   };
 }
 

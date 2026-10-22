@@ -53,6 +53,7 @@ const input: TwinInput = {
   minCollectionSize: 3,
   maxCollectionSize: 1000,
   labelClusterDownweight: true,
+  compilations: new Set(),
 };
 const fan = (fanId: number, ...values: number[]): Candidate => ({
   fanId,
@@ -166,6 +167,38 @@ describe('scoreTwin', () => {
     expect(unweighted.labelCluster).toBe(true);
     expect(twin.score).toBeCloseTo(unweighted.score * LABEL_CLUSTER_FACTOR);
   });
+
+  describe('with compilations ignored', () => {
+    // Releases 1 and 2 of yours are rare compilations.
+    const ignoring: TwinInput = { ...input, compilations: new Set([1, 2]) };
+
+    it('drops a fan whose only overlap is compilations', () => {
+      const compBuyer = fan(1, 1, 2, 30);
+
+      expect(scored(compBuyer).overlap).toBe(2);
+      expect(scoreTwin(compBuyer, ignoring)).toBeNull();
+    });
+
+    it('counts only the other shared releases, so a real match ranks first', () => {
+      const compBuyer = fan(1, 1, 2, 3, 30);
+      const realMatch = fan(2, 3, 4, 30, 31);
+
+      expect(compareTwins(scored(compBuyer), scored(realMatch))).toBeLessThan(0);
+      const comp = scored(compBuyer, ignoring);
+      const real = scored(realMatch, ignoring);
+      expect(comp).toMatchObject({ overlap: 1, jaccard: 1 / 13 });
+      expect(comp.score).toBeCloseTo(1 / Math.sqrt(10 * 4));
+      expect(compareTwins(real, comp)).toBeLessThan(0);
+    });
+
+    it('leaves the label-cluster test to the other shared releases', () => {
+      // 1–3 are label 100's: with 1 and 2 ignored, too few are left to flag a cluster.
+      const subscriber = fan(1, 1, 2, 3, 20, 21, 30);
+
+      expect(scored(subscriber).labelCluster).toBe(true);
+      expect(scored(subscriber, ignoring).labelCluster).toBe(false);
+    });
+  });
 });
 
 describe('isLabelCluster', () => {
@@ -278,6 +311,14 @@ describe('lately in scoreTwin', () => {
 
     expect(twin.labelCluster).toBe(true);
     expect(twin.lately).toBeCloseTo((unweighted?.lately ?? 0) * LABEL_CLUSTER_FACTOR);
+  });
+
+  it('leaves compilations bought together out of the lately score', () => {
+    const together = datedFan(1, [1, 1], [2, 1], [30, 1], [31, 1], [32, 1]);
+    const twin = scoreTwin(together, { ...dated, compilations: new Set([1, 2]) });
+
+    expect(scoredDated(together).latelyOverlap).toBe(2);
+    expect(twin).toBeNull();
   });
 });
 

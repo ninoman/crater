@@ -24,6 +24,7 @@ export function itemFromCollection(item: CollectionItem, now: number): ItemRecor
     labelId: item.labelId,
     tags: [],
     supporterCount: item.otherOwners === null ? null : item.otherOwners + 1,
+    compilation: item.compilation,
     fetchedAt: now,
   };
 }

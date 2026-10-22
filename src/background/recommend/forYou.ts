@@ -13,6 +13,7 @@ import {
   type ItemRecord,
   type MeRecord,
 } from '../../db';
+import { discountCompilations } from '../../scoring/compilations';
 import { exclusions } from '../../scoring/exclusions';
 import {
   couldRank,
@@ -42,6 +43,8 @@ export interface ForYouInput {
   topTwinsK: number;
   /** Fresh fades each twin's purchases with this half-life, as the lately score does. */
   latelyHalfLifeMonths: number;
+  /** Down-weight compilations among the picks (decisions §15). */
+  ignoreCompilations: boolean;
   now: number;
 }
 
@@ -63,7 +66,7 @@ export async function computeForYou(
   const lastBought = new Map<number, number>();
   for (const c of candidates) if ('lastBoughtAt' in c) lastBought.set(c.id, c.lastBoughtAt);
 
-  const { ranked, items } = await scoreTop(db, candidates);
+  const { ranked, items } = await scoreTop(db, candidates, input.ignoreCompilations);
   const artists = new Map<number, string>();
   for (const scored of ranked) {
     const item = items.get(keyFromNumber(scored.id));
@@ -117,11 +120,12 @@ function candidatesFor(
 /**
  * Scores candidates in falling twinScore order, a chunk at a time, and stops once none left
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
- * take a place.
+ * take a place. Compilations are down-weighted by their shown record's flag (§15).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly TwinOwned[],
+  ignoreCompilations: boolean,
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemRecord> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemRecord>();
@@ -141,13 +145,15 @@ async function scoreTop(
         chunk.map((c) => c.id),
       ),
     ]);
+    const compilations = new Set<number>();
     const scored = chunk.flatMap((c) => {
       const item = display.get(keyFromNumber(c.id));
       if (!item) return [];
       items.set(keyFromNumber(c.id), item);
+      if (ignoreCompilations && item.compilation) compilations.add(c.id);
       return [scoreForYou(c, supporters([item.supporterCount], owners.get(c.id) ?? c.twins))];
     });
-    ranked = rankForYou([...ranked, ...scored], RANKED);
+    ranked = rankForYou([...ranked, ...discountCompilations(scored, compilations)], RANKED);
   }
   return { ranked, items };
 }

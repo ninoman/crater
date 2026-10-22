@@ -44,6 +44,7 @@ async function own(rows: OwnershipRecord[]): Promise<void> {
       artId: null,
       tags: [],
       supporterCount: null,
+      compilation: false,
       fetchedAt: 0,
     })),
   );

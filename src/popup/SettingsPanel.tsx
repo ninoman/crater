@@ -40,7 +40,10 @@ const GROUPS: Group[] = [
       { key: 'latelyHalfLifeMonths', label: 'Lately half-life (months)' },
       { key: 'latelyMinPurchases', label: 'Lately min purchases' },
     ],
-    toggles: [{ key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' }],
+    toggles: [
+      { key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' },
+      { key: 'ignoreCompilations', label: 'Ignore compilations' },
+    ],
   },
   {
     title: 'Lately re-reads',

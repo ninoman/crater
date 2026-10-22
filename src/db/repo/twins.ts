@@ -20,6 +20,8 @@ export interface TwinBasis {
   labelOf: Map<number, number>;
   /** Distinct match ids per label, for those same labels. */
   catalogSize: Map<number, number>;
+  /** Your match ids with a record flagged as a compilation (decisions §15). */
+  compilations: Set<number>;
 }
 
 /** A fan whose collection we've read, as the scorer takes it. */
@@ -74,6 +76,7 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
       counts.set(id, { bandcampCounts: [], knownOwners: owners[i]?.owners ?? 0 });
     });
     const labels = new Set<number>();
+    const compilations = new Set<number>();
     // Albums before tracks, so an album's own count comes first.
     const ordered = [...owned].sort(
       (a, b) => Number(a.itemKey !== a.matchKey) - Number(b.itemKey !== b.matchKey),
@@ -83,6 +86,7 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
       if (!item) continue;
       counts.get(keyToNumber(row.matchKey))?.bandcampCounts.push(item.supporterCount);
       labels.add(labelKey(item));
+      if (item.compilation) compilations.add(keyToNumber(row.matchKey));
     }
 
     const { labelOf, catalogSize } = await labelCatalogs(db, labels);
@@ -93,7 +97,7 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
       matchTimes: lists.matchTimes,
       albumOfTrack,
     };
-    return { mine, counts, labelOf, catalogSize };
+    return { mine, counts, labelOf, catalogSize, compilations };
   });
 }
 
