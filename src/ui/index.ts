@@ -28,6 +28,7 @@ export { Table, type TableColumn, type TableProps } from './Table';
 export { type TagOption, tagColor } from './tag';
 export { TagPicker, type TagPickerProps } from './TagPicker';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
+export { type PageColors, type ThemeVariables, themeVariables } from './theme';
 export { Toggle, type ToggleProps } from './Toggle';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export { TruncatedText, type TruncatedTextProps } from './TruncatedText';
