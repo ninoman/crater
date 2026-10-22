@@ -3,6 +3,7 @@ export * from './alsoBought';
 export * from './clear';
 export * from './fans';
 export * from './following';
+export * from './followSignal';
 export * from './forYou';
 export * from './hidden';
 export * from './items';
