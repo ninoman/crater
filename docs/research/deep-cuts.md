@@ -83,8 +83,6 @@ Constants, in `src/scoring/weights.ts` next to `weight()`:
 ```ts
 /** Deep cuts: twins drawn on. More than For you's K, since niche picks are spread thin. */
 export const DEEP_CUT_TWINS_K = 100;
-/** Releases with more Bandcamp owners than this are not deep cuts. 50: underground electronic runs small. */
-export const DEEP_CUT_MAX_SUPPORTERS = 50;
 /** Candidate popularity penalty n^−β. 0.6: RP³β's default, and Zhou et al.'s tuned λ on RYM. */
 export const DEEP_CUT_BETA = 0.6;
 /** Agreement shrink t/(t + c): one twin alone counts 1/3, two 1/2, four 2/3. */
@@ -93,6 +91,16 @@ export const DEEP_CUT_AGREEMENT = 2;
 /** n^−β for a release's Bandcamp owner count. 1 for a release only one fan owns. */
 export function nichePenalty(supporterCount: number, beta = DEEP_CUT_BETA): number
 ```
+
+The cap is a user setting, not a constant: what counts as rare depends on the genre you dig in.
+
+```ts
+// src/shared/settings.ts
+/** Releases with more Bandcamp owners than this are not deep cuts (decisions §13). */
+deepCutMaxSupporters: number; // default 50: underground electronic runs small. Range 5–1000.
+```
+
+It sits in the popup's settings with the other recommendation settings, and the empty state and the reason line read it rather than a hard-coded 50.
 
 ### Reason-line copy
 
@@ -172,7 +180,7 @@ If the full mode is too much for now: an *Edge* toggle on For you that only filt
 > Researched 2026-10-21: `docs/research/deep-cuts.md`.
 >
 > - **A third mode of For you**, next to *Fresh*: `All / Fresh / Deep cuts`. It reuses For you's twins, exclusions, rows and diversity rule.
-> - **Score** = `T × t/(t + c) × n^−β`, limited to `n ≤ cap`. T is the sum of the all-time scores of the top-K twins who own the release, t is how many own it, and n is Bandcamp's owner count (`supporterCount`). Defaults: K = 100, c = 2, β = 0.6 (RP³β's default and Zhou et al.'s tuned value on RateYourMusic data), cap = 50 (underground electronic releases run small). Constants live in `scoring/weights.ts`.
+> - **Score** = `T × t/(t + c) × n^−β`, limited to `n ≤ cap`. T is the sum of the all-time scores of the top-K twins who own the release, t is how many own it, and n is Bandcamp's owner count (`supporterCount`). Defaults: K = 100, c = 2, β = 0.6 (RP³β's default and Zhou et al.'s tuned value on RateYourMusic data), cap = 50 (underground electronic releases run small). K, c and β live in `scoring/weights.ts`; the cap is a user setting, `deepCutMaxSupporters` (5–1000), since what counts as rare depends on the genre.
 > - **Popularity is always Bandcamp's count, never `matchOwners`.** We scan around your twins, so local counts make your own neighbourhood look popular. A release with no Bandcamp count isn't a deep cut.
 > - **No IUF or BM25:** both need the number of Bandcamp fans, which we don't know. A power law doesn't.
 > - **Reason line:** "Only 4 owners on Bandcamp · 3 are your twins". With one twin: "… · one is your #3 twin".
@@ -188,10 +196,10 @@ If the full mode is too much for now: an *Edge* toggle on For you that only filt
 
 Design: decisions §13, research in docs/research/deep-cuts.md.
 
-1. [ ] `scoring/deepCuts.ts` and the constants and `nichePenalty` in `weights.ts`, with the synthetic test set (niche beats staple, cap, shrink, no-count skip, ceiling safety).
+1. [ ] `scoring/deepCuts.ts` (taking the cap as an argument) and the constants and `nichePenalty` in `weights.ts`, plus the `deepCutMaxSupporters` setting (default 50, 5–1000), with the synthetic test set (niche beats staple, cap, shrink, no-count skip, ceiling safety).
 2. [ ] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
 3. [ ] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
-4. [ ] For you tab: an `All / Deep cuts` switch (Fresh joins it when built), the reason-line copy, and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
+4. [ ] For you tab: an `All / Deep cuts` switch (Fresh joins it when built), the cap in the popup's settings, the reason-line copy, and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
 5. [ ] Offline eval script (`tests/eval/`): temporal and random holdout, twins recomputed, recall@k, niche recall@k, ARP, median hit n, and the β / c / cap grid.
 6. [ ] Tune the defaults from the eval on real data and record the numbers in decisions §13.
 7. [ ] Later: early-adopter boost, tested first ("do early buyers overlap more with twins?").
