@@ -1,38 +1,59 @@
-// Where one fan sits on your twins leaderboard, so a profile tab needn't download the board.
+// Where one fan sits on your twins leaderboards, so a profile tab needn't download them.
 
-import { getTwins, type DigheadDb, type TwinRecord } from '../../db';
+import { getLatelyTwins, getTwins, type DigheadDb, type TwinRecord } from '../../db';
 import type { TwinStanding } from '../../shared/twins';
 
-/** `twins` must be best first, as `getTwins` returns them. Null for a fan who isn't on it. */
-export function twinStanding(twins: readonly TwinRecord[], fanId: number): TwinStanding | null {
-  const i = twins.findIndex((twin) => twin.fanId === fanId);
-  const twin = twins[i];
-  if (!twin) return null;
-  return { rank: i + 1, overlap: twin.overlap, matchPct: twin.jaccard * 100 };
+function rankByFan(board: readonly TwinRecord[]): Map<number, number> {
+  return new Map(board.map((twin, i) => [twin.fanId, i + 1]));
 }
 
-/** `twinStanding` for many fans at once, indexing the board a single time. */
+/**
+ * Both boards must be best first, as `getTwins` and `getLatelyTwins` return them. Fans on neither
+ * are left out. Overlap and match are the same pair's numbers on either board.
+ */
 export function twinStandings(
   twins: readonly TwinRecord[],
+  latelyTwins: readonly TwinRecord[],
   fanIds: readonly number[],
 ): Record<number, TwinStanding> {
-  const wanted = new Set(fanIds);
+  const ranks = rankByFan(twins);
+  const latelyRanks = rankByFan(latelyTwins);
+  const records = new Map([...latelyTwins, ...twins].map((twin) => [twin.fanId, twin]));
   const standings: Record<number, TwinStanding> = {};
-  twins.forEach((twin, i) => {
-    if (wanted.has(twin.fanId)) {
-      standings[twin.fanId] = { rank: i + 1, overlap: twin.overlap, matchPct: twin.jaccard * 100 };
-    }
-  });
+  for (const fanId of fanIds) {
+    const twin = records.get(fanId);
+    if (!twin) continue;
+    standings[fanId] = {
+      rank: ranks.get(fanId) ?? null,
+      latelyRank: latelyRanks.get(fanId) ?? null,
+      overlap: twin.overlap,
+      matchPct: twin.jaccard * 100,
+    };
+  }
   return standings;
+}
+
+export function twinStanding(
+  twins: readonly TwinRecord[],
+  latelyTwins: readonly TwinRecord[],
+  fanId: number,
+): TwinStanding | null {
+  return twinStandings(twins, latelyTwins, [fanId])[fanId] ?? null;
+}
+
+async function readBoards(db: DigheadDb): Promise<[TwinRecord[], TwinRecord[]]> {
+  return Promise.all([getTwins(db), getLatelyTwins(db)]);
 }
 
 export async function getTwinStandings(
   db: DigheadDb,
   fanIds: readonly number[],
 ): Promise<Record<number, TwinStanding>> {
-  return twinStandings(await getTwins(db), fanIds);
+  const [twins, latelyTwins] = await readBoards(db);
+  return twinStandings(twins, latelyTwins, fanIds);
 }
 
 export async function getTwinStanding(db: DigheadDb, fanId: number): Promise<TwinStanding | null> {
-  return twinStanding(await getTwins(db), fanId);
+  const [twins, latelyTwins] = await readBoards(db);
+  return twinStanding(twins, latelyTwins, fanId);
 }
