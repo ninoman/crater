@@ -4,3 +4,7 @@ dist/
 .DS_Store
 tests/fixtures/.fresh/
 releases/
+
+# Personal backups for the offline eval (pnpm eval); never commit them
+backups/
+*.backup.json
