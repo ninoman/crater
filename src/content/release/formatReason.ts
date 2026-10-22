@@ -3,15 +3,15 @@ import type { AlsoBoughtReason } from '../../shared/alsoBought';
 
 /**
  * The reason line under a recommendation, e.g. "7 supporters have this so far", plus how many
- * of them are your twins, since that's what lifted it in the ranking. "So far" because the
+ * of them are your crate mates, since that's what lifted it in the ranking. "So far" because the
  * count grows as more supporters are scanned.
  */
 export function formatReason(reason: AlsoBoughtReason): string {
   switch (reason.kind) {
     case 'co-owned': {
       const line = `${reason.owners} supporters have this so far`;
-      if (reason.twins === 0) return line;
-      return `${line}, ${reason.twins === 1 ? '1 is your twin' : `${reason.twins} are your twins`}`;
+      if (reason.crateMates === 0) return line;
+      return `${line}, ${reason.crateMates === 1 ? '1 is your crate mate' : `${reason.crateMates} are your crate mates`}`;
     }
     case 'same-artist':
       return 'More from this artist';

@@ -7,18 +7,18 @@ import {
   forYouPicks,
   rankForYou,
   scoreForYou,
-  topTwins,
-  twinOwnership,
+  topCrateMates,
+  crateMateOwnership,
   type ForYouScored,
-  type TwinMatches,
+  type CrateMateMatches,
 } from './forYou';
 
-// Lists hold matchKeys, as `fanMatches` does: a twin's track of album a2 shows up as a2.
+// Lists hold matchKeys, as `fanMatches` does: a crate mate's track of album a2 shows up as a2.
 const list = (...keys: ItemKey[]) => Float64Array.from(keys.map(keyToNumber)).sort();
 
-describe('topTwins', () => {
+describe('topCrateMates', () => {
   it('keeps the K highest scores, ties on fanId', () => {
-    const twins = [
+    const crateMates = [
       { fanId: 4, score: 0.1 },
       { fanId: 5, score: 0.6 },
       { fanId: 1, score: 0.9 },
@@ -26,7 +26,7 @@ describe('topTwins', () => {
       { fanId: 3, score: 0.3 },
     ];
 
-    expect(topTwins(twins, 3).map((t) => t.fanId)).toEqual([1, 2, 5]);
+    expect(topCrateMates(crateMates, 3).map((t) => t.fanId)).toEqual([1, 2, 5]);
   });
 });
 
@@ -37,7 +37,7 @@ describe('For-you scoring', () => {
     { itemKey: 't41', matchKey: 'a4', source: 'wishlist' },
   ];
   const excluded = exclusions(mine, new Set<ItemKey>(['a20']));
-  const twins: TwinMatches[] = [
+  const crateMates: CrateMateMatches[] = [
     { score: 3, matches: list('a1', 'a2', 'a10', 't7', 'a20') },
     { score: 2, matches: list('a1', 'a3', 'a10', 'a11') },
     { score: 1, matches: list('a1', 'a2', 'a3', 'a4') },
@@ -49,23 +49,23 @@ describe('For-you scoring', () => {
     ['a4', 0],
     ['t7', 14],
   ]);
-  const score = (candidates: ReturnType<typeof twinOwnership>) =>
+  const score = (candidates: ReturnType<typeof crateMateOwnership>) =>
     candidates.map((c) => scoreForYou(c, supporterCounts.get(keyFromNumber(c.id)) ?? 0));
 
-  it('sums twin scores per release, leaving out owned, wishlisted and hidden ones', () => {
-    const owned = twinOwnership(twins, excluded);
+  it('sums crate mate scores per release, leaving out owned, wishlisted and hidden ones', () => {
+    const owned = crateMateOwnership(crateMates, excluded);
 
     expect(owned.map((c) => ({ ...c, id: keyFromNumber(c.id) }))).toEqual([
-      { id: 'a1', twinScore: 6, twins: 3 },
-      { id: 'a2', twinScore: 4, twins: 2 },
-      { id: 'a3', twinScore: 3, twins: 2 },
-      { id: 't7', twinScore: 3, twins: 1 },
-      { id: 'a4', twinScore: 1, twins: 1 },
+      { id: 'a1', crateMateScore: 6, crateMates: 3 },
+      { id: 'a2', crateMateScore: 4, crateMates: 2 },
+      { id: 'a3', crateMateScore: 3, crateMates: 2 },
+      { id: 't7', crateMateScore: 3, crateMates: 1 },
+      { id: 'a4', crateMateScore: 1, crateMates: 1 },
     ]);
   });
 
-  it('weighs by rarity, so a niche pick beats the staple every twin owns', () => {
-    const ranked = rankForYou(score(twinOwnership(twins, excluded)), 10);
+  it('weighs by rarity, so a niche pick beats the staple every crate mate owns', () => {
+    const ranked = rankForYou(score(crateMateOwnership(crateMates, excluded)), 10);
 
     // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3 = 1; t7: 3 × 1/4; a4: 1 × 1/log2(3); a1: 6 × 1/10.
     expect(ranked.map((s) => [keyFromNumber(s.id), s.score])).toEqual([
@@ -77,21 +77,21 @@ describe('For-you scoring', () => {
     ]);
   });
 
-  it('never counts fewer supporters than twins owning it', () => {
-    expect(scoreForYou({ id: 1, twinScore: 2, twins: 2 }, 0)).toEqual({
+  it('never counts fewer supporters than crate mates owning it', () => {
+    expect(scoreForYou({ id: 1, crateMateScore: 2, crateMates: 2 }, 0)).toEqual({
       id: 1,
-      twinScore: 2,
-      twins: 2,
+      crateMateScore: 2,
+      crateMates: 2,
       supporters: 2,
       score: 1,
     });
   });
 
-  it('breaks ties on twins, then id, and stops at the limit', () => {
+  it('breaks ties on crate mates, then id, and stops at the limit', () => {
     const tied = [
-      { id: 3, twinScore: 1, twins: 1, supporters: 0, score: 1 },
-      { id: 2, twinScore: 1, twins: 1, supporters: 0, score: 1 },
-      { id: 1, twinScore: 1, twins: 2, supporters: 0, score: 1 },
+      { id: 3, crateMateScore: 1, crateMates: 1, supporters: 0, score: 1 },
+      { id: 2, crateMateScore: 1, crateMates: 1, supporters: 0, score: 1 },
+      { id: 1, crateMateScore: 1, crateMates: 2, supporters: 0, score: 1 },
     ];
 
     expect(rankForYou(tied, 2).map((s) => s.id)).toEqual([1, 2]);
@@ -130,11 +130,11 @@ describe('diversify', () => {
 });
 
 describe('forYouPicks', () => {
-  it('diversifies, then keeps the limit as matchKeys with their twin counts', () => {
+  it('diversifies, then keeps the limit as matchKeys with their crate mate counts', () => {
     const scored: ForYouScored[] = [1, 2, 3, 4].map((id) => ({
       id,
-      twinScore: 5 - id,
-      twins: id,
+      crateMateScore: 5 - id,
+      crateMates: id,
       supporters: 0,
       score: 5 - id,
     }));
@@ -146,9 +146,9 @@ describe('forYouPicks', () => {
     ]);
 
     expect(forYouPicks(scored, artists, 3)).toEqual([
-      { matchKey: 'a1', twins: 1 },
-      { matchKey: 'a2', twins: 2 },
-      { matchKey: 'a4', twins: 4 },
+      { matchKey: 'a1', crateMates: 1 },
+      { matchKey: 'a2', crateMates: 2 },
+      { matchKey: 'a4', crateMates: 4 },
     ]);
   });
 });
@@ -156,8 +156,8 @@ describe('forYouPicks', () => {
 describe('couldRank', () => {
   const top: ForYouScored[] = [2, 1].map((score, i) => ({
     id: i + 1,
-    twinScore: score * 2,
-    twins: 1,
+    crateMateScore: score * 2,
+    crateMates: 1,
     supporters: 2,
     score,
   }));
@@ -166,7 +166,7 @@ describe('couldRank', () => {
     expect(couldRank(top, 3, 0.1)).toBe(true);
   });
 
-  it('keeps out candidates whose twin score is below the last place', () => {
+  it('keeps out candidates whose crate mate score is below the last place', () => {
     expect(couldRank(top, 2, 1)).toBe(true);
     expect(couldRank(top, 2, 0.9)).toBe(false);
   });

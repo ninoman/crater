@@ -1,4 +1,4 @@
-// Runs Deep cuts (decisions §18): what few own but your top DEEP_CUT_TWINS_K twins do, looked up in
+// Runs Deep cuts (decisions §18): what few own but your top DEEP_CUT_CRATE_MATES_K crate mates do, looked up in
 // ceiling order with pruning, diversified, then dressed as For-you rows.
 
 import { keyFromNumber, type ItemKey } from '../../bandcamp';
@@ -6,7 +6,7 @@ import {
   gatherForYou,
   getDisplayItems,
   getShownFields,
-  getTwins,
+  getCrateMates,
   type DigheadDb,
   type ItemFields,
   type MeRecord,
@@ -21,11 +21,11 @@ import {
   type DeepCutScored,
 } from '../../scoring/deepCuts';
 import { exclusions } from '../../scoring/exclusions';
-import { diversify, FOR_YOU_LIMIT, topTwins, twinOwnership } from '../../scoring/forYou';
-import { DEEP_CUT_TWINS_K } from '../../scoring/weights';
+import { diversify, FOR_YOU_LIMIT, topCrateMates, crateMateOwnership } from '../../scoring/forYou';
+import { DEEP_CUT_CRATE_MATES_K } from '../../scoring/weights';
 import type { ForYouResult } from '../../shared/forYou';
 import { listsInRankOrder, toRow } from './forYouRow';
-import { twinsBasis } from './twinRows';
+import { crateMatesBasis } from './crateMateRows';
 
 /** Ranked before diversifying, so artists' moved-down extras leave room for others. */
 const RANKED = FOR_YOU_LIMIT * 2;
@@ -44,18 +44,21 @@ export async function computeDeepCuts(
   me: MeRecord | undefined,
   input: DeepCutsInput,
 ): Promise<ForYouResult> {
-  const basis = twinsBasis(me);
-  if (!me) return { basis, rows: [], twinsUsed: 0 };
+  const basis = crateMatesBasis(me);
+  if (!me) return { basis, rows: [], crateMatesUsed: 0 };
 
-  const twins = topTwins(await getTwins(db), DEEP_CUT_TWINS_K);
+  const crateMates = topCrateMates(await getCrateMates(db), DEEP_CUT_CRATE_MATES_K);
   const data = await gatherForYou(
     db,
-    twins.map((twin) => twin.fanId),
+    crateMates.map((crateMate) => crateMate.fanId),
     me.fanId,
   );
-  const scoreOf = new Map(twins.map((twin) => [twin.fanId, twin.score]));
-  const owned = twinOwnership(
-    data.twinLists.map((list) => ({ score: scoreOf.get(list.fanId) ?? 0, matches: list.matchIds })),
+  const scoreOf = new Map(crateMates.map((crateMate) => [crateMate.fanId, crateMate.score]));
+  const owned = crateMateOwnership(
+    data.crateMateLists.map((list) => ({
+      score: scoreOf.get(list.fanId) ?? 0,
+      matches: list.matchIds,
+    })),
     exclusions(data.mine, data.hidden),
   );
   const options = { maxSupporters: input.maxSupporters, limit: RANKED };
@@ -66,7 +69,7 @@ export async function computeDeepCuts(
     const item = items.get(keyFromNumber(scored.id));
     if (item) artists.set(scored.id, item.artist);
   }
-  const lists = listsInRankOrder(twins, data);
+  const lists = listsInRankOrder(crateMates, data);
   const picks = diversify(ranked, artists).slice(0, FOR_YOU_LIMIT);
   // Only the rows shown need URLs, so only they look up their bands (decisions §19).
   const display = await getDisplayItems(
@@ -85,7 +88,7 @@ export async function computeDeepCuts(
       }),
     ];
   });
-  return { basis, rows, twinsUsed: data.twinLists.length };
+  return { basis, rows, crateMatesUsed: data.crateMateLists.length };
 }
 
 /**

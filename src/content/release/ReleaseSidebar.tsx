@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ReleasePageItem } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
-import { useReleaseTwins } from '../../hooks/useReleaseTwins';
+import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useScanProgress } from '../../hooks/useScanProgress';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
@@ -9,7 +9,7 @@ import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus'
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
 import { AlsoBoughtList } from './AlsoBoughtList';
-import { ReleaseTwinsList } from './ReleaseTwinsList';
+import { ReleaseCrateMatesList } from './ReleaseCrateMatesList';
 import { ScanHeader } from './ScanHeader';
 import { useCurrentRelease } from './useCurrentRelease';
 import { WishlistItemTags } from './WishlistItemTags';
@@ -43,7 +43,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
   const { view, hide } = useAlsoBought(item.itemKey, releaseSaved);
-  const twins = useReleaseTwins(item.itemKey, releaseSaved);
+  const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
@@ -66,9 +66,9 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
             ),
           },
           {
-            value: 'twins',
-            label: 'Twins who own this',
-            content: <ReleaseTwinsList view={twins} />,
+            value: 'crateMates',
+            label: 'Crate mates who own this',
+            content: <ReleaseCrateMatesList view={crateMates} />,
           },
         ]}
       />

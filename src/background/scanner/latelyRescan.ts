@@ -1,11 +1,11 @@
-// Re-reads your top lately twins' newest purchases more often than the 30-day re-scan, so the
-// Lately board and Twins' latest see what they bought this week (decisions §11).
+// Re-reads your top lately crate mates' newest purchases more often than the 30-day re-scan, so the
+// Lately board and Crate mates' latest see what they bought this week (decisions §11).
 
 import {
   collectionFullyRead,
   enqueueLatestReads,
   getFans,
-  getLatelyTwins,
+  getLatelyCrateMates,
   queuedFans,
   type DigheadDb,
   type FanRecord,
@@ -28,7 +28,7 @@ export interface RescanCandidate {
 }
 
 /**
- * The twins due a latest read, best first: the top `count` of the lately board whose collection
+ * The crate mates due a latest read, best first: the top `count` of the lately board whose collection
  * was fully read at least `days` ago, and who have nothing queued already (a queued scan reads
  * their newest purchases anyway).
  */
@@ -36,9 +36,12 @@ export function pickLatelyRescans(
   board: readonly RescanCandidate[],
   queued: ReadonlySet<number>,
   now: number,
-  { latelyRescanTwins, latelyRescanDays }: Pick<Settings, 'latelyRescanTwins' | 'latelyRescanDays'>,
+  {
+    latelyRescanCrateMates,
+    latelyRescanDays,
+  }: Pick<Settings, 'latelyRescanCrateMates' | 'latelyRescanDays'>,
 ): LatestRead[] {
-  return board.slice(0, latelyRescanTwins).flatMap(({ fanId, fan }): LatestRead[] => {
+  return board.slice(0, latelyRescanCrateMates).flatMap(({ fanId, fan }): LatestRead[] => {
     const at = fan?.collectionFetchedAt ?? null;
     if (queued.has(fanId) || !collectionFullyRead(fan?.status) || at === null) return [];
     if (now - at < latelyRescanDays * DAY_MS) return [];
@@ -52,9 +55,9 @@ export async function queueLatelyRescans(
   settings: Settings,
   now: number,
 ): Promise<number> {
-  if (settings.latelyRescanTwins === 0) return 0;
-  const top = (await getLatelyTwins(db)).slice(0, settings.latelyRescanTwins);
-  const fanIds = top.map((twin) => twin.fanId);
+  if (settings.latelyRescanCrateMates === 0) return 0;
+  const top = (await getLatelyCrateMates(db)).slice(0, settings.latelyRescanCrateMates);
+  const fanIds = top.map((crateMate) => crateMate.fanId);
   const [fans, queued] = await Promise.all([getFans(db, fanIds), queuedFans(db, fanIds)]);
   const board = fanIds.map((fanId, i) => ({ fanId, fan: fans[i] }));
   return enqueueLatestReads(

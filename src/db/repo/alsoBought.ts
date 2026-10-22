@@ -29,10 +29,10 @@ export interface AlsoBoughtData {
   listed: number | null;
   /** Whether every listed supporter's scan has ended, whatever the outcome. */
   allScanned: boolean;
-  /** Those owners who are also your taste twins, with their twin score. */
-  twinSupporters: { score: number; matchIds: Float64Array }[];
-  /** Your best twin's score, which twin scores are scaled by. 0 with no twins. */
-  bestTwinScore: number;
+  /** Those owners who are also your crate mates, with their crate mate score. */
+  crateMateSupporters: { score: number; matchIds: Float64Array }[];
+  /** Your best crate mate's score, which crate mate scores are scaled by. 0 with no crate mates. */
+  bestCrateMateScore: number;
   /** Fans other than you with any known collection: the base rate's population. */
   population: number;
   /** Your own ownership rows, collection and wishlist. Empty when nobody is logged in. */
@@ -47,7 +47,15 @@ export async function gatherAlsoBought(
 ): Promise<AlsoBoughtData> {
   return db.transaction(
     'r',
-    [db.items, db.ownership, db.fans, db.fanMatches, db.hidden, db.twins, db.releaseSupporters],
+    [
+      db.items,
+      db.ownership,
+      db.fans,
+      db.fanMatches,
+      db.hidden,
+      db.crateMates,
+      db.releaseSupporters,
+    ],
     async () => {
       const [release] = await getItemFields(db, [releaseKey]);
       const matchKey = release?.albumKey ?? releaseKey;
@@ -66,10 +74,10 @@ export async function gatherAlsoBought(
       );
       const readIds = readFans.map((fan) => fan.fanId);
 
-      const [lists, twins, best, population, myList, mine, hidden, list] = await Promise.all([
+      const [lists, crateMates, best, population, myList, mine, hidden, list] = await Promise.all([
         db.fanMatches.bulkGet(readIds),
-        db.twins.bulkGet(readIds),
-        db.twins.orderBy('score').last(),
+        db.crateMates.bulkGet(readIds),
+        db.crateMates.orderBy('score').last(),
         db.fanMatches.count(),
         meFanId === null ? undefined : db.fanMatches.get(meFanId),
         meFanId === null ? [] : fanRows(db, meFanId),
@@ -78,9 +86,9 @@ export async function gatherAlsoBought(
       ]);
       const listedFans = list ? await db.fans.bulkGet(list.fanIds) : [];
 
-      const twinSupporters = lists.flatMap((record, i) => {
-        const twin = twins[i];
-        return record && twin ? [{ score: twin.score, matchIds: record.matchIds }] : [];
+      const crateMateSupporters = lists.flatMap((record, i) => {
+        const crateMate = crateMates[i];
+        return record && crateMate ? [{ score: crateMate.score, matchIds: record.matchIds }] : [];
       });
 
       return {
@@ -99,8 +107,8 @@ export async function gatherAlsoBought(
         allScanned:
           list !== undefined &&
           listedFans.every((fan) => fan !== undefined && fan.status !== 'queued'),
-        twinSupporters,
-        bestTwinScore: best?.score ?? 0,
+        crateMateSupporters,
+        bestCrateMateScore: best?.score ?? 0,
         population: population - (myList ? 1 : 0),
         mine,
         hidden,

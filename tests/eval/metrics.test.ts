@@ -10,10 +10,10 @@ const pops = new Map<number, Popularity>([
   [5, { supporters: 10, owners: 5 }],
 ]);
 const lookup = (id: number) => pops.get(id) as Popularity;
-const cand = (id: number, twins: number): Candidate => ({
+const cand = (id: number, crateMates: number): Candidate => ({
   id,
-  twinScore: 1,
-  twins,
+  crateMateScore: 1,
+  crateMates,
   ...lookup(id),
 });
 
@@ -43,7 +43,7 @@ describe('listMetrics', () => {
     expect(m.recall).toBe(2 / 4);
     expect(m.nicheRecall).toBe(1 / 2);
     expect(m.medianHitN).toBe((3 + 2000) / 2);
-    expect(m.singleTwinShare).toBe(1 / 2);
+    expect(m.singleCrateMateShare).toBe(1 / 2);
     expect(m.arp).toBeCloseTo((Math.log2(2001) + 2) / 2);
   });
 
@@ -59,6 +59,6 @@ describe('listMetrics', () => {
 
   it('gives null averages for an empty list', () => {
     const m = listMetrics([], heldOut, lookup, 50, 30);
-    expect(m).toMatchObject({ recall: 0, arp: null, medianHitN: null, singleTwinShare: null });
+    expect(m).toMatchObject({ recall: 0, arp: null, medianHitN: null, singleCrateMateShare: null });
   });
 });

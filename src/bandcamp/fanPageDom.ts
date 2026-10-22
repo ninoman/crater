@@ -3,7 +3,7 @@
 // the markup.
 
 export const FAN_PAGE_DOM = {
-  /** The name block of the profile header; the twin badge goes at its end, under the `<h1>`. */
+  /** The name block of the profile header; the crate mate badge goes at its end, under the `<h1>`. */
   name: '.fan-bio:not(.edit) .fan-bio-inner .name',
   /** Wraps the tab bar and every grid. */
   grids: '#grids',

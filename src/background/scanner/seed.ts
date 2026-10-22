@@ -1,4 +1,4 @@
-// Seeds the queue with your own releases, so taste twins fill in without opening any page.
+// Seeds the queue with your own releases, so crate mates fill in without opening any page.
 
 import type { ItemKey } from '../../bandcamp';
 import {

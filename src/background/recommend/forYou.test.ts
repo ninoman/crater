@@ -8,10 +8,10 @@ import {
   markSynced,
   putFollowing,
   putOwnership,
-  replaceTwins,
+  replaceCrateMates,
   saveViewer,
   upsertCollectionItems,
-  type TwinRecord,
+  type CrateMateRecord,
 } from '../../db';
 import { computeForYou, type ForYouInput } from './forYou';
 
@@ -57,8 +57,11 @@ async function own(fanId: number, items: CollectionItem[], source: 'collection' 
   await putOwnership(db, fanId, items, source);
 }
 
-async function twins(scores: [fanId: number, score: number][], lately: TwinRecord[] = []) {
-  await replaceTwins(
+async function crateMates(
+  scores: [fanId: number, score: number][],
+  lately: CrateMateRecord[] = [],
+) {
+  await replaceCrateMates(
     db,
     scores.map(([fanId, score]) => ({
       fanId,
@@ -75,7 +78,7 @@ async function twins(scores: [fanId: number, score: number][], lately: TwinRecor
   );
 }
 
-function latelyTwin(fanId: number, lately: number | null): TwinRecord {
+function latelyCrateMate(fanId: number, lately: number | null): CrateMateRecord {
   return {
     fanId,
     overlap: 3,
@@ -89,9 +92,9 @@ function latelyTwin(fanId: number, lately: number | null): TwinRecord {
   };
 }
 
-const allTime = (topTwinsK: number): ForYouInput => ({
+const allTime = (topCrateMatesK: number): ForYouInput => ({
   mode: 'all',
-  topTwinsK,
+  topCrateMatesK,
   latelyHalfLifeMonths: 6,
   followingBoost: true,
   ignoreCompilations: true,
@@ -105,7 +108,7 @@ async function me() {
 }
 
 /**
- * Twins 10, 11 and 12 (scores 3, 2, 1) and twin 13 (0.5), who falls outside a top 3. Everything
+ * Crate mates 10, 11 and 12 (scores 3, 2, 1) and crate mate 13 (0.5), who falls outside a top 3. Everything
  * in a10, a11 and a20 is something you own, wishlisted or hid.
  */
 async function seed() {
@@ -125,7 +128,7 @@ async function seed() {
   await own(ME, [a10, item('t42', {}, 'a4')], 'collection');
   await own(ME, [a11], 'wishlist');
   await hideRelease(db, 'a20', 0);
-  await twins([
+  await crateMates([
     [10, 3],
     [11, 2],
     [12, 1],
@@ -134,23 +137,23 @@ async function seed() {
 }
 
 describe('computeForYou', () => {
-  it('ranks what your top twins own by twin score and rarity', async () => {
+  it('ranks what your top crate mates own by crate mate score and rarity', async () => {
     await seed();
 
     const result = await computeForYou(db, await me(), allTime(3));
 
     // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3; a5: 2 × 1/log2(6) ≈ 0.77; a1: 6 × 1/10. a4 is out:
     // you own a track of it.
-    expect(result.rows.map((row) => [row.matchKey, row.twins])).toEqual([
+    expect(result.rows.map((row) => [row.matchKey, row.crateMates])).toEqual([
       ['a2', 2],
       ['a3', 2],
       ['a5', 1],
       ['a1', 3],
     ]);
-    expect(result).toMatchObject({ basis: 'ready', twinsUsed: 3 });
+    expect(result).toMatchObject({ basis: 'ready', crateMatesUsed: 3 });
   });
 
-  it('down-weights a compilation your twins own, unless told not to', async () => {
+  it('down-weights a compilation your crate mates own, unless told not to', async () => {
     await seed();
     await upsertCollectionItems(db, [item('a3', { artist: 'Various Artists', compilation: true })]);
     const keys = async (input: ForYouInput) =>
@@ -178,9 +181,9 @@ describe('computeForYou', () => {
       label: null,
       url: 'https://artist.bandcamp.com/album/a2',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
-      twins: 2,
+      crateMates: 2,
       supporters: 2,
-      bestTwinRank: 1,
+      bestCrateMateRank: 1,
       lastBoughtAt: null,
       followed: null,
     });
@@ -207,21 +210,21 @@ describe('computeForYou', () => {
     expect(off.rows.every((row) => row.followed === null)).toBe(true);
   });
 
-  it('reads only the top K twins', async () => {
+  it('reads only the top K crate mates', async () => {
     await seed();
 
     const result = await computeForYou(db, await me(), allTime(4));
 
-    expect(result.twinsUsed).toBe(4);
+    expect(result.crateMatesUsed).toBe(4);
     expect(result.rows.map((row) => row.matchKey)).toContain('a30');
   });
 
   it('holds back a third release by the same artist', async () => {
     const releases = [1, 2, 3, 4].map((n) => item(`a${n}`, { artist: n === 4 ? 'Other' : 'Same' }));
-    // Without the rule: a1, a2, a3 (two twins each), then a4.
+    // Without the rule: a1, a2, a3 (two crate mates each), then a4.
     await own(10, releases, 'collection');
     await own(11, releases.slice(0, 3), 'collection');
-    await twins([
+    await crateMates([
       [10, 1],
       [11, 1],
     ]);
@@ -235,12 +238,12 @@ describe('computeForYou', () => {
     expect(await computeForYou(db, undefined, allTime(30))).toEqual({
       basis: 'no-viewer',
       rows: [],
-      twinsUsed: 0,
+      crateMatesUsed: 0,
     });
     expect(await computeForYou(db, await me(), allTime(30))).toEqual({
       basis: 'ready',
       rows: [],
-      twinsUsed: 0,
+      crateMatesUsed: 0,
     });
   });
 });
@@ -248,9 +251,9 @@ describe('computeForYou', () => {
 describe('computeForYou, Fresh', () => {
   const DAY = 86_400_000;
   const NOW = 1000 * DAY;
-  const fresh = (topTwinsK = 30): ForYouInput => ({
+  const fresh = (topCrateMatesK = 30): ForYouInput => ({
     mode: 'fresh',
-    topTwinsK,
+    topCrateMatesK,
     latelyHalfLifeMonths: 6,
     followingBoost: true,
     ignoreCompilations: true,
@@ -259,8 +262,8 @@ describe('computeForYou, Fresh', () => {
   const bought = (key: ItemKey, daysAgo: number | null) =>
     item(key, { addedAt: daysAgo === null ? null : NOW - daysAgo * DAY });
 
-  it('draws on lately twins and ranks recent buys above old ones', async () => {
-    // Twin 10 is a top all-time twin with nothing lately; twins 20 and 21 are lately twins.
+  it('draws on lately crate mates and ranks recent buys above old ones', async () => {
+    // Crate mate 10 is a top all-time crate mate with nothing lately; crate mates 20 and 21 are lately crate mates.
     await own(10, [bought('a9', 5)], 'collection');
     await own(
       20,
@@ -269,27 +272,30 @@ describe('computeForYou, Fresh', () => {
     );
     await own(21, [bought('a2', 200), bought('a5', 3)], 'collection');
     await own(ME, [bought('a5', 50)], 'collection');
-    await twins([[10, 5]], [latelyTwin(20, 2), latelyTwin(21, 1), latelyTwin(22, null)]);
+    await crateMates(
+      [[10, 5]],
+      [latelyCrateMate(20, 2), latelyCrateMate(21, 1), latelyCrateMate(22, null)],
+    );
 
     const result = await computeForYou(db, await me(), fresh());
 
     // a1: 2 × fade(10 days) ≈ 1.92; a2: 2 × fade(300) + 1 × fade(200) ≈ 0.64. a3 is over a year
-    // old, a4 undated, a5 yours, a9 from an all-time twin only.
-    expect(result.rows.map((row) => [row.matchKey, row.twins, row.lastBoughtAt])).toEqual([
+    // old, a4 undated, a5 yours, a9 from an all-time crate mate only.
+    expect(result.rows.map((row) => [row.matchKey, row.crateMates, row.lastBoughtAt])).toEqual([
       ['a1', 1, NOW - 10 * DAY],
       ['a2', 2, NOW - 200 * DAY],
     ]);
-    expect(result.twinsUsed).toBe(2);
+    expect(result.crateMatesUsed).toBe(2);
   });
 
-  it('says there are no lately twins yet', async () => {
+  it('says there are no lately crate mates yet', async () => {
     await own(10, [bought('a1', 5)], 'collection');
-    await twins([[10, 5]]);
+    await crateMates([[10, 5]]);
 
     expect(await computeForYou(db, await me(), fresh())).toEqual({
       basis: 'ready',
       rows: [],
-      twinsUsed: 0,
+      crateMatesUsed: 0,
     });
   });
 });

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { injectProfileTabs } from './profileTabs';
 
 const SPECS = [
-  { id: 'twins', label: 'twins' },
+  { id: 'crate-mates', label: 'crate mates' },
   { id: 'for-you', label: 'for you' },
 ] as const;
 
@@ -58,7 +58,7 @@ describe('injectProfileTabs', () => {
   it('switches between our tabs and back to Bandcamp’s', async () => {
     const tabs = injectProfileTabs(document, SPECS);
     let changed = hashChanged();
-    ourTab('twins').click();
+    ourTab('crate-mates').click();
     await changed;
     changed = hashChanged();
     ourTab('for-you').click();

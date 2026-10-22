@@ -45,7 +45,7 @@ export function listMetrics(
         ? null
         : mean(list.map((c) => Math.log2(1 + popularityOf(popularity(c.id))))),
     medianHitN: median(hits.map((c) => popularityOf(popularity(c.id)))),
-    singleTwinShare:
-      list.length === 0 ? null : list.filter((c) => c.twins === 1).length / list.length,
+    singleCrateMateShare:
+      list.length === 0 ? null : list.filter((c) => c.crateMates === 1).length / list.length,
   };
 }

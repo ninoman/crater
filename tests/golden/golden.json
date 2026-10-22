@@ -1,5 +1,5 @@
 {
- "twins": {
+ "crateMates": {
   "basis": "ready",
   "rows": [
    {
@@ -4906,7 +4906,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 26,
-     "twins": 26
+     "crateMates": 26
     },
     "followed": "Artist 12"
    },
@@ -4920,7 +4920,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 26,
-     "twins": 26
+     "crateMates": 26
     },
     "followed": null
    },
@@ -4934,7 +4934,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 20,
-     "twins": 20
+     "crateMates": 20
     },
     "followed": null
    },
@@ -4948,7 +4948,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 18,
-     "twins": 18
+     "crateMates": 18
     },
     "followed": null
    },
@@ -4962,7 +4962,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 18,
-     "twins": 18
+     "crateMates": 18
     },
     "followed": null
    },
@@ -4976,7 +4976,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 16,
-     "twins": 16
+     "crateMates": 16
     },
     "followed": null
    },
@@ -4990,7 +4990,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 16,
-     "twins": 16
+     "crateMates": 16
     },
     "followed": null
    },
@@ -5004,7 +5004,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 15,
-     "twins": 15
+     "crateMates": 15
     },
     "followed": null
    },
@@ -5018,7 +5018,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -5032,7 +5032,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -5046,7 +5046,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -5060,7 +5060,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -5074,7 +5074,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": "Artist 12"
    },
@@ -5088,7 +5088,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -5102,7 +5102,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -5116,7 +5116,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -5130,7 +5130,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -5144,7 +5144,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -5158,7 +5158,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -5172,7 +5172,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -5186,7 +5186,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -5200,7 +5200,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -5214,7 +5214,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 9,
-     "twins": 9
+     "crateMates": 9
     },
     "followed": "Artist 12"
    },
@@ -5228,7 +5228,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -5242,7 +5242,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 9,
-     "twins": 9
+     "crateMates": 9
     },
     "followed": "Artist 12"
    },
@@ -5256,7 +5256,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -5270,7 +5270,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -5284,7 +5284,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -5298,7 +5298,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -5312,14 +5312,14 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    }
   ],
   "warmup": null
  },
- "releaseTwins a1000": {
+ "releaseCrateMates a1000": {
   "releaseKey": "a1000",
   "rows": [
    {
@@ -5595,7 +5595,7 @@
     "labelCluster": false
    }
   ],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "alsoBought a1005": {
   "releaseKey": "a1005",
@@ -5759,7 +5759,7 @@
    "confidentTarget": 5
   }
  },
- "releaseTwins a1005": {
+ "releaseCrateMates a1005": {
   "releaseKey": "a1005",
   "rows": [
    {
@@ -5907,7 +5907,7 @@
     "labelCluster": false
    }
   ],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "alsoBought t20001": {
   "releaseKey": "t20001",
@@ -5922,7 +5922,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 26,
-     "twins": 26
+     "crateMates": 26
     },
     "followed": "Artist 12"
    },
@@ -5936,7 +5936,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 26,
-     "twins": 26
+     "crateMates": 26
     },
     "followed": null
    },
@@ -5950,7 +5950,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 20,
-     "twins": 20
+     "crateMates": 20
     },
     "followed": null
    },
@@ -5964,7 +5964,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 18,
-     "twins": 18
+     "crateMates": 18
     },
     "followed": null
    },
@@ -5978,7 +5978,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 18,
-     "twins": 18
+     "crateMates": 18
     },
     "followed": null
    },
@@ -5992,7 +5992,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 16,
-     "twins": 16
+     "crateMates": 16
     },
     "followed": null
    },
@@ -6006,7 +6006,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 16,
-     "twins": 16
+     "crateMates": 16
     },
     "followed": null
    },
@@ -6020,7 +6020,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 15,
-     "twins": 15
+     "crateMates": 15
     },
     "followed": null
    },
@@ -6034,7 +6034,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -6048,7 +6048,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -6062,7 +6062,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -6076,7 +6076,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 14,
-     "twins": 14
+     "crateMates": 14
     },
     "followed": null
    },
@@ -6090,7 +6090,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": "Artist 12"
    },
@@ -6104,7 +6104,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -6118,7 +6118,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -6132,7 +6132,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -6146,7 +6146,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 13,
-     "twins": 13
+     "crateMates": 13
     },
     "followed": null
    },
@@ -6160,7 +6160,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -6174,7 +6174,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -6188,7 +6188,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 12,
-     "twins": 12
+     "crateMates": 12
     },
     "followed": null
    },
@@ -6202,7 +6202,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -6216,7 +6216,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -6230,7 +6230,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 9,
-     "twins": 9
+     "crateMates": 9
     },
     "followed": "Artist 12"
    },
@@ -6244,7 +6244,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 11,
-     "twins": 11
+     "crateMates": 11
     },
     "followed": null
    },
@@ -6258,7 +6258,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 9,
-     "twins": 9
+     "crateMates": 9
     },
     "followed": "Artist 12"
    },
@@ -6272,7 +6272,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -6286,7 +6286,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -6300,7 +6300,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -6314,7 +6314,7 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    },
@@ -6328,14 +6328,14 @@
     "reason": {
      "kind": "co-owned",
      "owners": 10,
-     "twins": 10
+     "crateMates": 10
     },
     "followed": null
    }
   ],
   "warmup": null
  },
- "releaseTwins t20001": {
+ "releaseCrateMates t20001": {
   "releaseKey": "t20001",
   "rows": [
    {
@@ -6611,7 +6611,7 @@
     "labelCluster": false
    }
   ],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "alsoBought a1090": {
   "releaseKey": "a1090",
@@ -6623,7 +6623,7 @@
    "confidentTarget": 5
   }
  },
- "releaseTwins a1090": {
+ "releaseCrateMates a1090": {
   "releaseKey": "a1090",
   "rows": [
    {
@@ -6739,7 +6739,7 @@
     "labelCluster": false
    }
   ],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "alsoBought a1085": {
   "releaseKey": "a1085",
@@ -6800,10 +6800,10 @@
    "confidentTarget": 5
   }
  },
- "releaseTwins a1085": {
+ "releaseCrateMates a1085": {
   "releaseKey": "a1085",
   "rows": [],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "alsoBought a1050": {
   "releaseKey": "a1050",
@@ -6955,7 +6955,7 @@
    "confidentTarget": 5
   }
  },
- "releaseTwins a1050": {
+ "releaseCrateMates a1050": {
   "releaseKey": "a1050",
   "rows": [
    {
@@ -7015,7 +7015,7 @@
     "labelCluster": false
    }
   ],
-  "twinCount": 37
+  "crateMateCount": 37
  },
  "forYou all": {
   "basis": "ready",
@@ -7027,9 +7027,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-26",
     "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
-    "twins": 22,
+    "crateMates": 22,
     "supporters": 26,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": "Artist 12"
    },
@@ -7040,9 +7040,9 @@
     "label": "Label Fifty-One",
     "url": "https://band14.bandcamp.com/album/release-28",
     "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
-    "twins": 21,
+    "crateMates": 21,
     "supporters": 21,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7053,9 +7053,9 @@
     "label": null,
     "url": "https://music.label15.com/album/release-29",
     "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
-    "twins": 18,
+    "crateMates": 18,
     "supporters": 18,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7066,9 +7066,9 @@
     "label": null,
     "url": "https://band18.bandcamp.com/album/release-32",
     "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
-    "twins": 14,
+    "crateMates": 14,
     "supporters": 14,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7079,9 +7079,9 @@
     "label": "Label Fifty",
     "url": "https://band10.bandcamp.com/album/release-60",
     "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
-    "twins": 12,
+    "crateMates": 12,
     "supporters": 12,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7092,9 +7092,9 @@
     "label": null,
     "url": "https://band11.bandcamp.com/album/release-37",
     "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
-    "twins": 12,
+    "crateMates": 12,
     "supporters": 12,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7105,9 +7105,9 @@
     "label": null,
     "url": "https://band19.bandcamp.com/album/release-33",
     "coverUrl": null,
-    "twins": 12,
+    "crateMates": 12,
     "supporters": 12,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7118,9 +7118,9 @@
     "label": null,
     "url": "https://band20.bandcamp.com/track/song-29002",
     "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
-    "twins": 13,
+    "crateMates": 13,
     "supporters": 17,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7131,9 +7131,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/album/release-47",
     "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
-    "twins": 13,
+    "crateMates": 13,
     "supporters": 18,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7144,9 +7144,9 @@
     "label": "Label Fifty",
     "url": "https://band21.bandcamp.com/album/release-35",
     "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
-    "twins": 11,
+    "crateMates": 11,
     "supporters": 11,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7157,9 +7157,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-51",
     "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
-    "twins": 11,
+    "crateMates": 11,
     "supporters": 11,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7170,9 +7170,9 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-78",
     "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 9,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7183,9 +7183,9 @@
     "label": "Label Fifty-One",
     "url": "https://band16.bandcamp.com/album/release-42",
     "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
-    "twins": 16,
+    "crateMates": 16,
     "supporters": 63,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7196,9 +7196,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-39",
     "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 9,
-    "bestTwinRank": 7,
+    "bestCrateMateRank": 7,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7209,9 +7209,9 @@
     "label": "Label Fifty-One",
     "url": "https://band11.bandcamp.com/album/release-49",
     "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 9,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7222,9 +7222,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-38",
     "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 15,
-    "bestTwinRank": 12,
+    "bestCrateMateRank": 12,
     "lastBoughtAt": null,
     "followed": "Artist 12"
    },
@@ -7235,9 +7235,9 @@
     "label": null,
     "url": "https://band17.bandcamp.com/album/release-43",
     "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
-    "twins": 14,
+    "crateMates": 14,
     "supporters": 41,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7248,9 +7248,9 @@
     "label": "Label Fifty",
     "url": "https://band19.bandcamp.com/album/release-45",
     "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 13,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7261,9 +7261,9 @@
     "label": null,
     "url": "https://music.label15.com/album/release-53",
     "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 7,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7274,9 +7274,9 @@
     "label": null,
     "url": "https://band10.bandcamp.com/album/release-36",
     "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 14,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7287,9 +7287,9 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-66",
     "coverUrl": null,
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 9,
-    "bestTwinRank": 4,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7300,9 +7300,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-27",
     "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
-    "twins": 11,
+    "crateMates": 11,
     "supporters": 18,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7313,9 +7313,9 @@
     "label": "Label Fifty",
     "url": "https://band13.bandcamp.com/album/release-75",
     "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
-    "twins": 8,
+    "crateMates": 8,
     "supporters": 8,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7326,9 +7326,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/track/song-30003",
     "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 7,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7339,9 +7339,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-74",
     "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
-    "twins": 8,
+    "crateMates": 8,
     "supporters": 23,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": "Artist 12"
    },
@@ -7352,9 +7352,9 @@
     "label": "Label Fifty",
     "url": "https://band12.bandcamp.com/album/release-50",
     "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
-    "twins": 5,
+    "crateMates": 5,
     "supporters": 6,
-    "bestTwinRank": 9,
+    "bestCrateMateRank": 9,
     "lastBoughtAt": null,
     "followed": "Artist 12"
    },
@@ -7365,9 +7365,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/track/song-30002",
     "coverUrl": "https://f4.bcbits.com/img/a37002_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 8,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7378,9 +7378,9 @@
     "label": null,
     "url": "https://band17.bandcamp.com/album/release-31",
     "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
-    "twins": 12,
+    "crateMates": 12,
     "supporters": 80,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7391,9 +7391,9 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-54",
     "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 12,
-    "bestTwinRank": 5,
+    "bestCrateMateRank": 5,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7404,14 +7404,14 @@
     "label": "Label Fifty-One",
     "url": "https://band13.bandcamp.com/album/release-63",
     "coverUrl": "https://f4.bcbits.com/img/a5063_7.jpg",
-    "twins": 6,
+    "crateMates": 6,
     "supporters": 7,
-    "bestTwinRank": 8,
+    "bestCrateMateRank": 8,
     "lastBoughtAt": null,
     "followed": null
    }
   ],
-  "twinsUsed": 30
+  "crateMatesUsed": 30
  },
  "forYou fresh": {
   "basis": "ready",
@@ -7423,9 +7423,9 @@
     "label": null,
     "url": "https://music.label15.com/album/release-29",
     "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
-    "twins": 13,
+    "crateMates": 13,
     "supporters": 13,
-    "bestTwinRank": 4,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": 1791417600000,
     "followed": null
    },
@@ -7436,9 +7436,9 @@
     "label": null,
     "url": "https://band18.bandcamp.com/album/release-32",
     "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 9,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": 1789344000000,
     "followed": null
    },
@@ -7449,9 +7449,9 @@
     "label": "Label Fifty-One",
     "url": "https://band14.bandcamp.com/album/release-28",
     "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
-    "twins": 10,
+    "crateMates": 10,
     "supporters": 13,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1792627200000,
     "followed": null
    },
@@ -7462,9 +7462,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/album/release-47",
     "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 18,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1788998400000,
     "followed": null
    },
@@ -7475,9 +7475,9 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-78",
     "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
-    "twins": 8,
+    "crateMates": 8,
     "supporters": 8,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1784505600000,
     "followed": null
    },
@@ -7488,9 +7488,9 @@
     "label": "Label Fifty-One",
     "url": "https://band11.bandcamp.com/album/release-49",
     "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
-    "twins": 5,
+    "crateMates": 5,
     "supporters": 7,
-    "bestTwinRank": 4,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": 1792627200000,
     "followed": null
    },
@@ -7501,9 +7501,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-26",
     "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 26,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1787616000000,
     "followed": "Artist 12"
    },
@@ -7514,9 +7514,9 @@
     "label": null,
     "url": "https://band19.bandcamp.com/album/release-33",
     "coverUrl": null,
-    "twins": 2,
+    "crateMates": 2,
     "supporters": 2,
-    "bestTwinRank": 4,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": 1789171200000,
     "followed": null
    },
@@ -7527,9 +7527,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-51",
     "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
-    "twins": 4,
+    "crateMates": 4,
     "supporters": 4,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1779926400000,
     "followed": null
    },
@@ -7540,9 +7540,9 @@
     "label": "Label Fifty",
     "url": "https://band10.bandcamp.com/album/release-60",
     "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
-    "twins": 4,
+    "crateMates": 4,
     "supporters": 4,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1788825600000,
     "followed": null
    },
@@ -7553,9 +7553,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-39",
     "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 7,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1786838400000,
     "followed": null
    },
@@ -7566,9 +7566,9 @@
     "label": null,
     "url": "https://band17.bandcamp.com/album/release-31",
     "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
-    "twins": 9,
+    "crateMates": 9,
     "supporters": 80,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1792195200000,
     "followed": null
    },
@@ -7579,9 +7579,9 @@
     "label": "Label Fifty-One",
     "url": "https://band16.bandcamp.com/album/release-42",
     "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
-    "twins": 10,
+    "crateMates": 10,
     "supporters": 63,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1786752000000,
     "followed": null
    },
@@ -7592,9 +7592,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-74",
     "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
-    "twins": 6,
+    "crateMates": 6,
     "supporters": 23,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": 1784332800000,
     "followed": "Artist 12"
    },
@@ -7605,9 +7605,9 @@
     "label": null,
     "url": "https://band17.bandcamp.com/album/release-43",
     "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
-    "twins": 8,
+    "crateMates": 8,
     "supporters": 41,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": 1789862400000,
     "followed": null
    },
@@ -7618,9 +7618,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/album/release-59",
     "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
-    "twins": 7,
+    "crateMates": 7,
     "supporters": 93,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1792368000000,
     "followed": null
    },
@@ -7631,9 +7631,9 @@
     "label": null,
     "url": "https://band20.bandcamp.com/track/song-29002",
     "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
-    "twins": 6,
+    "crateMates": 6,
     "supporters": 17,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1785542400000,
     "followed": null
    },
@@ -7644,9 +7644,9 @@
     "label": null,
     "url": "https://band10.bandcamp.com/album/release-36",
     "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
-    "twins": 4,
+    "crateMates": 4,
     "supporters": 14,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": 1788480000000,
     "followed": null
    },
@@ -7657,9 +7657,9 @@
     "label": "Label Fifty",
     "url": "https://band19.bandcamp.com/album/release-45",
     "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
-    "twins": 3,
+    "crateMates": 3,
     "supporters": 13,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1791590400000,
     "followed": null
    },
@@ -7670,9 +7670,9 @@
     "label": null,
     "url": "https://band11.bandcamp.com/album/release-37",
     "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
-    "twins": 4,
+    "crateMates": 4,
     "supporters": 4,
-    "bestTwinRank": 4,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": 1777852800000,
     "followed": null
    },
@@ -7683,9 +7683,9 @@
     "label": "Label Fifty",
     "url": "https://band13.bandcamp.com/album/release-75",
     "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
-    "twins": 3,
+    "crateMates": 3,
     "supporters": 3,
-    "bestTwinRank": 6,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": 1783987200000,
     "followed": null
    },
@@ -7696,9 +7696,9 @@
     "label": "Label Fifty",
     "url": "https://band21.bandcamp.com/album/release-35",
     "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
-    "twins": 6,
+    "crateMates": 6,
     "supporters": 6,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1788566400000,
     "followed": null
    },
@@ -7709,9 +7709,9 @@
     "label": null,
     "url": "https://band13.bandcamp.com/album/release-27",
     "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
-    "twins": 5,
+    "crateMates": 5,
     "supporters": 18,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1792368000000,
     "followed": null
    },
@@ -7722,9 +7722,9 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-66",
     "coverUrl": null,
-    "twins": 3,
+    "crateMates": 3,
     "supporters": 3,
-    "bestTwinRank": 5,
+    "bestCrateMateRank": 5,
     "lastBoughtAt": 1785888000000,
     "followed": null
    },
@@ -7735,9 +7735,9 @@
     "label": null,
     "url": "https://band18.bandcamp.com/album/release-44",
     "coverUrl": null,
-    "twins": 6,
+    "crateMates": 6,
     "supporters": 69,
-    "bestTwinRank": 1,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": 1790121600000,
     "followed": null
    },
@@ -7748,9 +7748,9 @@
     "label": null,
     "url": "https://band12.bandcamp.com/album/release-38",
     "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
-    "twins": 4,
+    "crateMates": 4,
     "supporters": 15,
-    "bestTwinRank": 5,
+    "bestCrateMateRank": 5,
     "lastBoughtAt": 1785542400000,
     "followed": "Artist 12"
    },
@@ -7761,9 +7761,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/track/song-30003",
     "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
-    "twins": 3,
+    "crateMates": 3,
     "supporters": 6,
-    "bestTwinRank": 5,
+    "bestCrateMateRank": 5,
     "lastBoughtAt": 1787356800000,
     "followed": null
    },
@@ -7774,9 +7774,9 @@
     "label": null,
     "url": "https://band21.bandcamp.com/track/song-30005",
     "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
-    "twins": 5,
+    "crateMates": 5,
     "supporters": 40,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1778198400000,
     "followed": null
    },
@@ -7787,9 +7787,9 @@
     "label": null,
     "url": "https://music.label15.com/album/release-53",
     "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
-    "twins": 2,
+    "crateMates": 2,
     "supporters": 2,
-    "bestTwinRank": 3,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": 1781654400000,
     "followed": null
    },
@@ -7800,14 +7800,14 @@
     "label": null,
     "url": "https://band16.bandcamp.com/album/release-54",
     "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
-    "twins": 3,
+    "crateMates": 3,
     "supporters": 12,
-    "bestTwinRank": 2,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": 1790985600000,
     "followed": null
    }
   ],
-  "twinsUsed": 30
+  "crateMatesUsed": 30
  },
  "deepCuts": {
   "basis": "ready",
@@ -7820,8 +7820,8 @@
     "url": "https://band12.bandcamp.com/album/release-26",
     "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
     "supporters": 28,
-    "twins": 28,
-    "bestTwinRank": 1,
+    "crateMates": 28,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7833,8 +7833,8 @@
     "url": "https://band14.bandcamp.com/album/release-28",
     "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
     "supporters": 28,
-    "twins": 28,
-    "bestTwinRank": 3,
+    "crateMates": 28,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7846,8 +7846,8 @@
     "url": "https://music.label15.com/album/release-29",
     "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
     "supporters": 21,
-    "twins": 21,
-    "bestTwinRank": 2,
+    "crateMates": 21,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7859,8 +7859,8 @@
     "url": "https://band18.bandcamp.com/album/release-32",
     "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
     "supporters": 16,
-    "twins": 16,
-    "bestTwinRank": 2,
+    "crateMates": 16,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7872,8 +7872,8 @@
     "url": "https://band11.bandcamp.com/album/release-37",
     "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
     "supporters": 14,
-    "twins": 14,
-    "bestTwinRank": 2,
+    "crateMates": 14,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7885,8 +7885,8 @@
     "url": "https://band21.bandcamp.com/album/release-35",
     "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
     "supporters": 14,
-    "twins": 14,
-    "bestTwinRank": 1,
+    "crateMates": 14,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7898,8 +7898,8 @@
     "url": "https://band10.bandcamp.com/album/release-60",
     "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
     "supporters": 13,
-    "twins": 13,
-    "bestTwinRank": 1,
+    "crateMates": 13,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7911,8 +7911,8 @@
     "url": "https://band19.bandcamp.com/album/release-33",
     "coverUrl": null,
     "supporters": 13,
-    "twins": 13,
-    "bestTwinRank": 2,
+    "crateMates": 13,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7924,8 +7924,8 @@
     "url": "https://band21.bandcamp.com/album/release-47",
     "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
     "supporters": 18,
-    "twins": 15,
-    "bestTwinRank": 1,
+    "crateMates": 15,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7937,8 +7937,8 @@
     "url": "https://band13.bandcamp.com/album/release-51",
     "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
     "supporters": 12,
-    "twins": 12,
-    "bestTwinRank": 1,
+    "crateMates": 12,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7950,8 +7950,8 @@
     "url": "https://band16.bandcamp.com/album/release-78",
     "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
     "supporters": 11,
-    "twins": 11,
-    "bestTwinRank": 1,
+    "crateMates": 11,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7963,8 +7963,8 @@
     "url": "https://band16.bandcamp.com/album/release-66",
     "coverUrl": null,
     "supporters": 12,
-    "twins": 12,
-    "bestTwinRank": 4,
+    "crateMates": 12,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7976,8 +7976,8 @@
     "url": "https://band11.bandcamp.com/album/release-49",
     "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
     "supporters": 11,
-    "twins": 11,
-    "bestTwinRank": 3,
+    "crateMates": 11,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -7989,8 +7989,8 @@
     "url": "https://band13.bandcamp.com/album/release-39",
     "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
     "supporters": 10,
-    "twins": 10,
-    "bestTwinRank": 7,
+    "crateMates": 10,
+    "bestCrateMateRank": 7,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8002,8 +8002,8 @@
     "url": "https://music.label15.com/album/release-53",
     "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
     "supporters": 9,
-    "twins": 9,
-    "bestTwinRank": 2,
+    "crateMates": 9,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8015,8 +8015,8 @@
     "url": "https://band12.bandcamp.com/album/release-38",
     "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
     "supporters": 15,
-    "twins": 12,
-    "bestTwinRank": 12,
+    "crateMates": 12,
+    "bestCrateMateRank": 12,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8028,8 +8028,8 @@
     "url": "https://band17.bandcamp.com/album/release-43",
     "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
     "supporters": 41,
-    "twins": 19,
-    "bestTwinRank": 3,
+    "crateMates": 19,
+    "bestCrateMateRank": 3,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8041,8 +8041,8 @@
     "url": "https://band14.bandcamp.com/album/release-76",
     "coverUrl": "https://f4.bcbits.com/img/a5076_7.jpg",
     "supporters": 7,
-    "twins": 7,
-    "bestTwinRank": 2,
+    "crateMates": 7,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8054,8 +8054,8 @@
     "url": "https://band17.bandcamp.com/album/release-55",
     "coverUrl": null,
     "supporters": 39,
-    "twins": 12,
-    "bestTwinRank": 5,
+    "crateMates": 12,
+    "bestCrateMateRank": 5,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8067,8 +8067,8 @@
     "url": "https://band20.bandcamp.com/album/release-58",
     "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
     "supporters": 33,
-    "twins": 9,
-    "bestTwinRank": 7,
+    "crateMates": 9,
+    "bestCrateMateRank": 7,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8080,8 +8080,8 @@
     "url": "https://band21.bandcamp.com/track/song-30003",
     "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
     "supporters": 9,
-    "twins": 9,
-    "bestTwinRank": 2,
+    "crateMates": 9,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8093,8 +8093,8 @@
     "url": "https://band13.bandcamp.com/album/release-75",
     "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
     "supporters": 8,
-    "twins": 8,
-    "bestTwinRank": 6,
+    "crateMates": 8,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8106,8 +8106,8 @@
     "url": "https://music.label15.com/album/release-77",
     "coverUrl": null,
     "supporters": 7,
-    "twins": 7,
-    "bestTwinRank": 9,
+    "crateMates": 7,
+    "bestCrateMateRank": 9,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8119,8 +8119,8 @@
     "url": "https://band12.bandcamp.com/album/release-50",
     "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
     "supporters": 7,
-    "twins": 7,
-    "bestTwinRank": 9,
+    "crateMates": 7,
+    "bestCrateMateRank": 9,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8132,8 +8132,8 @@
     "url": "https://band21.bandcamp.com/track/song-30004",
     "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
     "supporters": 24,
-    "twins": 11,
-    "bestTwinRank": 6,
+    "crateMates": 11,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8145,8 +8145,8 @@
     "url": "https://band21.bandcamp.com/track/song-30005",
     "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
     "supporters": 40,
-    "twins": 13,
-    "bestTwinRank": 6,
+    "crateMates": 13,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8158,8 +8158,8 @@
     "url": "https://band12.bandcamp.com/album/release-74",
     "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
     "supporters": 23,
-    "twins": 9,
-    "bestTwinRank": 6,
+    "crateMates": 9,
+    "bestCrateMateRank": 6,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8171,8 +8171,8 @@
     "url": "https://band14.bandcamp.com/album/release-52",
     "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
     "supporters": 47,
-    "twins": 12,
-    "bestTwinRank": 1,
+    "crateMates": 12,
+    "bestCrateMateRank": 1,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8184,8 +8184,8 @@
     "url": "https://band14.bandcamp.com/album/release-64",
     "coverUrl": "https://f4.bcbits.com/img/a5064_7.jpg",
     "supporters": 8,
-    "twins": 4,
-    "bestTwinRank": 2,
+    "crateMates": 4,
+    "bestCrateMateRank": 2,
     "lastBoughtAt": null,
     "followed": null
    },
@@ -8197,15 +8197,15 @@
     "url": "https://band18.bandcamp.com/album/release-68",
     "coverUrl": "https://f4.bcbits.com/img/a5068_7.jpg",
     "supporters": 27,
-    "twins": 6,
-    "bestTwinRank": 4,
+    "crateMates": 6,
+    "bestCrateMateRank": 4,
     "lastBoughtAt": null,
     "followed": null
    }
   ],
-  "twinsUsed": 37
+  "crateMatesUsed": 37
  },
- "twinsLatest": {
+ "crateMatesLatest": {
   "basis": "ready",
   "rows": [
    {
@@ -8719,7 +8719,7 @@
     ]
    }
   ],
-  "twinsUsed": 34,
+  "crateMatesUsed": 34,
   "windowDays": 60,
   "checking": 8
  },
@@ -8727,64 +8727,64 @@
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 17,
-   "topTwins": 30
+   "crateMates": 17,
+   "topCrateMates": 30
   },
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 15,
-   "topTwins": 30
+   "crateMates": 15,
+   "topCrateMates": 30
   },
   {
    "owned": false,
    "wishlisted": false,
-   "twins": 0,
-   "topTwins": 30
+   "crateMates": 0,
+   "topCrateMates": 30
   },
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 18,
-   "topTwins": 30
+   "crateMates": 18,
+   "topCrateMates": 30
   },
   null,
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 29,
-   "topTwins": 30
+   "crateMates": 29,
+   "topCrateMates": 30
   },
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 11,
-   "topTwins": 30
+   "crateMates": 11,
+   "topCrateMates": 30
   },
   {
    "owned": false,
    "wishlisted": true,
-   "twins": 7,
-   "topTwins": 30
+   "crateMates": 7,
+   "topCrateMates": 30
   },
   null,
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 13,
-   "topTwins": 30
+   "crateMates": 13,
+   "topCrateMates": 30
   },
   {
    "owned": true,
    "wishlisted": false,
-   "twins": 11,
-   "topTwins": 30
+   "crateMates": 11,
+   "topCrateMates": 30
   },
   {
    "owned": false,
    "wishlisted": false,
-   "twins": 0,
-   "topTwins": 30
+   "crateMates": 0,
+   "topCrateMates": 30
   }
  ],
  "wishlist": [

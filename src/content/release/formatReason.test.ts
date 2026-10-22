@@ -3,14 +3,14 @@ import { formatOverlap, formatReason } from './formatReason';
 
 describe('formatReason', () => {
   it.each([
-    [{ kind: 'co-owned', owners: 7, twins: 0 } as const, '7 supporters have this so far'],
+    [{ kind: 'co-owned', owners: 7, crateMates: 0 } as const, '7 supporters have this so far'],
     [
-      { kind: 'co-owned', owners: 7, twins: 1 } as const,
-      '7 supporters have this so far, 1 is your twin',
+      { kind: 'co-owned', owners: 7, crateMates: 1 } as const,
+      '7 supporters have this so far, 1 is your crate mate',
     ],
     [
-      { kind: 'co-owned', owners: 7, twins: 2 } as const,
-      '7 supporters have this so far, 2 are your twins',
+      { kind: 'co-owned', owners: 7, crateMates: 2 } as const,
+      '7 supporters have this so far, 2 are your crate mates',
     ],
     [{ kind: 'same-artist' } as const, 'More from this artist'],
     [{ kind: 'same-label', label: 'Luaka Bop' } as const, 'Also on Luaka Bop'],

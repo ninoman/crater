@@ -1,5 +1,5 @@
-// "For you": what your top taste twins own, weighted by how alike each twin is and by rarity.
-// score(i) = Σ over top-K twins F owning i of score(F) × w(i). Pure: src/db gathers the data
+// "For you": what your top crate mates own, weighted by how alike each crate mate is and by rarity.
+// score(i) = Σ over top-K crate mates F owning i of score(F) × w(i). Pure: src/db gathers the data
 // and src/background runs the steps.
 
 import { keyFromNumber, type ItemKey } from '../bandcamp';
@@ -10,76 +10,76 @@ export const FOR_YOU_LIMIT = 30;
 export const MAX_PER_ARTIST = 2;
 export const DIVERSE_ROWS = 20;
 
-export interface Twin {
+export interface CrateMate {
   fanId: number;
   score: number;
 }
 
-/** A top twin with their distinct collection match ids (a `fanMatches` list). */
-export interface TwinMatches {
+/** A top crate mate with their distinct collection match ids (a `fanMatches` list). */
+export interface CrateMateMatches {
   score: number;
   matches: Float64Array;
 }
 
-/** The K most alike twins. Ties break on fanId, so the same data always picks the same twins. */
-export function topTwins<T extends Twin>(twins: readonly T[], k: number): T[] {
-  return [...twins].sort((a, b) => b.score - a.score || a.fanId - b.fanId).slice(0, k);
+/** The K most alike crate mates. Ties break on fanId, so the same data always picks the same crate mates. */
+export function topCrateMates<T extends CrateMate>(crateMates: readonly T[], k: number): T[] {
+  return [...crateMates].sort((a, b) => b.score - a.score || a.fanId - b.fanId).slice(0, k);
 }
 
-export interface TwinOwned {
+export interface CrateMateOwned {
   /** The release, as keyToNumber(matchKey). */
   id: number;
-  /** Σ score(F) over the twins owning it. w(i) ≤ 1, so this is also the score's ceiling. */
-  twinScore: number;
-  /** How many of the twins own it, for "owned by N of your top twins". */
-  twins: number;
+  /** Σ score(F) over the crate mates owning it. w(i) ≤ 1, so this is also the score's ceiling. */
+  crateMateScore: number;
+  /** How many of the crate mates own it, for "owned by N of your top crate mates". */
+  crateMates: number;
 }
 
 /**
- * Sums twin scores per match id across the twins' lists (each holds distinct ids, so tracks of
- * an album already count once per twin) and drops excluded ids. Highest twinScore first.
+ * Sums crate mate scores per match id across the crate mates' lists (each holds distinct ids, so tracks of
+ * an album already count once per crate mate) and drops excluded ids. Highest crateMateScore first.
  */
-export function twinOwnership(
-  twins: readonly TwinMatches[],
+export function crateMateOwnership(
+  crateMates: readonly CrateMateMatches[],
   excluded: ReadonlySet<number>,
-): TwinOwned[] {
-  const byId = new Map<number, TwinOwned>();
-  for (const twin of twins) {
-    for (const id of twin.matches) {
+): CrateMateOwned[] {
+  const byId = new Map<number, CrateMateOwned>();
+  for (const crateMate of crateMates) {
+    for (const id of crateMate.matches) {
       if (excluded.has(id)) continue;
       const entry = byId.get(id);
       if (entry) {
-        entry.twinScore += twin.score;
-        entry.twins++;
-      } else byId.set(id, { id, twinScore: twin.score, twins: 1 });
+        entry.crateMateScore += crateMate.score;
+        entry.crateMates++;
+      } else byId.set(id, { id, crateMateScore: crateMate.score, crateMates: 1 });
     }
   }
-  return [...byId.values()].sort(byTwinScore);
+  return [...byId.values()].sort(byCrateMateScore);
 }
 
-/** Candidate order for pruning: highest twinScore first, then most twins, then id. */
-export function byTwinScore(a: TwinOwned, b: TwinOwned): number {
-  return b.twinScore - a.twinScore || b.twins - a.twins || a.id - b.id;
+/** Candidate order for pruning: highest crateMateScore first, then most crate mates, then id. */
+export function byCrateMateScore(a: CrateMateOwned, b: CrateMateOwned): number {
+  return b.crateMateScore - a.crateMateScore || b.crateMates - a.crateMates || a.id - b.id;
 }
 
-export interface ForYouScored extends TwinOwned {
+export interface ForYouScored extends CrateMateOwned {
   supporters: number;
   score: number;
 }
 
 /**
- * score = twinScore × w(supporters). A release has at least as many supporters as twins owning
+ * score = crateMateScore × w(supporters). A release has at least as many supporters as crate mates owning
  * it; the clamp guards a stale Bandcamp count.
  */
-export function scoreForYou(candidate: TwinOwned, supporterCount: number): ForYouScored {
-  const count = Math.max(supporterCount, candidate.twins);
-  return { ...candidate, supporters: count, score: candidate.twinScore * weight(count) };
+export function scoreForYou(candidate: CrateMateOwned, supporterCount: number): ForYouScored {
+  const count = Math.max(supporterCount, candidate.crateMates);
+  return { ...candidate, supporters: count, score: candidate.crateMateScore * weight(count) };
 }
 
-/** Best first. Ties break on twins, then id. */
+/** Best first. Ties break on crate mates, then id. */
 export function rankForYou(scored: readonly ForYouScored[], limit: number): ForYouScored[] {
   return [...scored]
-    .sort((a, b) => b.score - a.score || b.twins - a.twins || a.id - b.id)
+    .sort((a, b) => b.score - a.score || b.crateMates - a.crateMates || a.id - b.id)
     .slice(0, limit);
 }
 
@@ -108,8 +108,8 @@ export function diversify<T extends { id: number }>(
 
 export interface ForYouPick {
   matchKey: ItemKey;
-  /** Twins owning it, for the reason line. */
-  twins: number;
+  /** Crate mates owning it, for the reason line. */
+  crateMates: number;
 }
 
 /**
@@ -123,23 +123,27 @@ export function forYouPicks(
 ): ForYouPick[] {
   return diversify(ranked, artists)
     .slice(0, limit)
-    .map(({ id, twins }) => ({ matchKey: keyFromNumber(id), twins }));
+    .map(({ id, crateMates }) => ({ matchKey: keyFromNumber(id), crateMates }));
 }
 
 /**
  * Whether a candidate can still make the top `limit` of `top` (ranked). w(i) ≤ 1, so a
- * candidate's twinScore is the most it can score.
+ * candidate's crateMateScore is the most it can score.
  */
-export function couldRank(top: readonly ForYouScored[], limit: number, twinScore: number): boolean {
+export function couldRank(
+  top: readonly ForYouScored[],
+  limit: number,
+  crateMateScore: number,
+): boolean {
   const last = top[limit - 1];
-  return top.length < limit || last === undefined || twinScore >= last.score;
+  return top.length < limit || last === undefined || crateMateScore >= last.score;
 }
 
 /**
- * The rank of the first twin, in `ranked` order (best first), whose sorted match list holds `id`.
- * Twins without a list (never scanned) keep their place, so ranks match the leaderboard.
+ * The rank of the first crate mate, in `ranked` order (best first), whose sorted match list holds `id`.
+ * Crate mates without a list (never scanned) keep their place, so ranks match the leaderboard.
  */
-export function bestTwinRank(
+export function bestCrateMateRank(
   id: number,
   ranked: readonly (Float64Array | undefined)[],
 ): number | null {

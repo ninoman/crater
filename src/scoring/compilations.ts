@@ -7,7 +7,7 @@ import type { SharedPosition } from './lately';
 export const COMPILATION_FACTOR = 0.5;
 
 /**
- * Twin overlap without compilations: they connect fans through their artist lists, not taste,
+ * Crate mate overlap without compilations: they connect fans through their artist lists, not taste,
  * so they're dropped before anything is counted.
  */
 export function withoutCompilations(

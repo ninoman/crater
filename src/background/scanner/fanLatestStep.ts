@@ -1,4 +1,4 @@
-// A top lately twin's newest purchases, read from the top until the page reaches what the last
+// A top lately crate mate's newest purchases, read from the top until the page reaches what the last
 // read already saw (decisions §11). Usually one request, against up to 20 for a full re-scan.
 
 import {

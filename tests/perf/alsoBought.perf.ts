@@ -1,5 +1,5 @@
 // ROADMAP Phase 4 step 8: a re-score stays under ~200 ms with ~300k ownership rows, with a full
-// twins leaderboard so the twin boost (Phase 5) is part of the measurement.
+// crate mates leaderboard so the crate mate boost (Phase 5) is part of the measurement.
 // fake-indexeddb is slower than Chrome's IndexedDB, so passing here leaves headroom.
 
 import 'fake-indexeddb/auto';
@@ -13,7 +13,7 @@ import {
   type FanRecord,
   type ItemRecord,
   type OwnershipRecord,
-  type TwinRecord,
+  type CrateMateRecord,
 } from '../../src/db';
 import { storedRows } from './stored';
 
@@ -21,9 +21,9 @@ const SUPPORTERS = 300;
 const ITEMS_PER_FAN = 1000;
 const CATALOG = 60_000;
 const OTHER_FANS = 2_000;
-/** The leaderboard keeps 200 twins; this many of them are the release's supporters. */
-const TWINS = 200;
-const TWIN_SUPPORTERS = 50;
+/** The leaderboard keeps 200 crate mates; this many of them are the release's supporters. */
+const CRATE_MATES = 200;
+const CRATE_MATE_SUPPORTERS = 50;
 const ME = 1;
 const RELEASE: ItemKey = 'a1';
 const BUDGET_MS = 200;
@@ -100,12 +100,12 @@ beforeAll(async () => {
     compilation: false,
   }));
 
-  const twinIds = [
-    ...Array.from({ length: TWIN_SUPPORTERS }, (_, i) => 100 + i * 6),
-    ...Array.from({ length: TWINS - TWIN_SUPPORTERS }, (_, i) => 10_000 + i),
+  const crateMateIds = [
+    ...Array.from({ length: CRATE_MATE_SUPPORTERS }, (_, i) => 100 + i * 6),
+    ...Array.from({ length: CRATE_MATES - CRATE_MATE_SUPPORTERS }, (_, i) => 10_000 + i),
   ];
-  const twins = twinIds.map(
-    (fanId, i): TwinRecord => ({
+  const crateMates = crateMateIds.map(
+    (fanId, i): CrateMateRecord => ({
       fanId,
       overlap: 50,
       jaccard: 0.05,
@@ -128,7 +128,7 @@ beforeAll(async () => {
     [db.fans, fans],
     [db.items, stored.items],
     [db.bands, stored.bands],
-    [db.twins, twins],
+    [db.crateMates, crateMates],
     // Every supporter listed and scanned, so the warm-up is over and co-owned rows show.
     [
       db.releaseSupporters,

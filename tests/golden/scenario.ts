@@ -3,7 +3,7 @@
 // every recommender's output can be compared before and after a storage change (decisions §19).
 
 import type { CollectionItem, ItemKey, ReleasePageItem, Supporter } from '../../src/bandcamp';
-import { computeTwins } from '../../src/background/recommend/twins';
+import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   addSupporterOwnership,
   type DigheadDb,
@@ -230,7 +230,7 @@ export async function buildScenario(db: DigheadDb): Promise<void> {
       .map((fanId, i) => ({ spec: fanJob(fanId, albumKey(0)), at: NOW, rank: i + 1 })),
     2,
   );
-  await computeTwins(
+  await computeCrateMates(
     { db, settings: DEFAULT_SETTINGS, now: NOW, yieldNow: async () => undefined },
     ME,
   );

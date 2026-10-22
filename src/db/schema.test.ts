@@ -220,4 +220,24 @@ describe('DigheadDb', () => {
     expect(jobs[2]).toMatchObject({ via: null, cursor: null });
     await upgraded.delete();
   });
+
+  it('moves the v12 twins leaderboards into the crate mates tables in v13', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(12).stores({ twins: 'fanId, score', latelyTwins: 'fanId, lately' });
+    await old.table('twins').bulkAdd([
+      { fanId: 1, score: 3 },
+      { fanId: 2, score: 1 },
+    ]);
+    await old.table('latelyTwins').add({ fanId: 2, lately: 0.5 });
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+    expect(await upgraded.crateMates.orderBy('score').primaryKeys()).toEqual([2, 1]);
+    expect(await upgraded.latelyCrateMates.toArray()).toEqual([{ fanId: 2, lately: 0.5 }]);
+    expect(upgraded.tables.map((table) => table.name)).not.toContain('twins');
+    expect([...upgraded.backendDB().objectStoreNames]).not.toContain('latelyTwins');
+    await upgraded.delete();
+  });
 });

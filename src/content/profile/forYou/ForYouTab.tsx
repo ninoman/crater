@@ -19,7 +19,7 @@ const LOADING_TITLES: Record<ForYouMode, string> = {
 };
 
 /**
- * The For you tab on your profile: picks from your top twins, or from what your lately twins
+ * The For you tab on your profile: picks from your top crate mates, or from what your lately crate mates
  * bought recently, or why there aren't any yet. The switch stays put in every state, so an
  * empty Fresh list can be switched back from.
  */
@@ -34,7 +34,7 @@ export function ForYouTab() {
         <p className="dh-profile__summary">
           {picks > 0 &&
             view.state === 'ready' &&
-            formatForYouSummary(picks, view.result.twinsUsed, mode)}
+            formatForYouSummary(picks, view.result.crateMatesUsed, mode)}
         </p>
         <div className="dh-profile__controls">
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
@@ -87,64 +87,64 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
     return (
       <EmptyState
         title="Your collection is still syncing"
-        description="For you is built from your taste twins, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
+        description="For you is built from your crate mates, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
       />
     );
   }
-  if (mode === 'deep') return <NoDeepCuts twinsUsed={result.twinsUsed} />;
-  if (mode === 'fresh') return <NoFreshPicks twinsUsed={result.twinsUsed} />;
-  if (result.twinsUsed === 0) {
+  if (mode === 'deep') return <NoDeepCuts crateMatesUsed={result.crateMatesUsed} />;
+  if (mode === 'fresh') return <NoFreshPicks crateMatesUsed={result.crateMatesUsed} />;
+  if (result.crateMatesUsed === 0) {
     return (
       <EmptyState
-        title="No taste twins yet"
-        description="For you is built from what your closest twins own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time, or open the pages of releases you love to scan their supporters first."
-        action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
-      />
-    );
-  }
-  return (
-    <EmptyState
-      title="Nothing new from your twins yet"
-      description={`Your ${result.twinsUsed} closest twins own nothing you haven't already got, wishlisted or hidden. More turns up as Dighead scans more fans.`}
-      action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
-    />
-  );
-}
-
-function NoFreshPicks({ twinsUsed }: { twinsUsed: number }) {
-  if (twinsUsed === 0) {
-    return (
-      <EmptyState
-        title="No lately twins yet"
-        description="Fresh is built from the fans whose recent buying is most in step with yours. Either you haven't bought much lately, or none of the fans read so far bought the same releases around the same time. All time still has picks from your closest twins overall."
-        action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+        title="No crate mates yet"
+        description="For you is built from what your closest crate mates own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time, or open the pages of releases you love to scan their supporters first."
+        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
   }
   return (
     <EmptyState
-      title="Nothing fresh from your lately twins"
-      description={`Your ${twinsUsed} lately ${twinsUsed === 1 ? 'twin has' : 'twins have'} bought nothing in the last year that you haven't already got, wishlisted or hidden. Try All time, or check back after Dighead scans more fans.`}
-      action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+      title="Nothing new from your crate mates yet"
+      description={`Your ${result.crateMatesUsed} closest crate mates own nothing you haven't already got, wishlisted or hidden. More turns up as Dighead scans more fans.`}
+      action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
 }
 
-function NoDeepCuts({ twinsUsed }: { twinsUsed: number }) {
-  if (twinsUsed === 0) {
+function NoFreshPicks({ crateMatesUsed }: { crateMatesUsed: number }) {
+  if (crateMatesUsed === 0) {
     return (
       <EmptyState
-        title="No taste twins yet"
-        description="Deep cuts are built from what your closest twins own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
-        action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+        title="No lately crate mates yet"
+        description="Fresh is built from the fans whose recent buying is most in step with yours. Either you haven't bought much lately, or none of the fans read so far bought the same releases around the same time. All time still has picks from your closest crate mates overall."
+        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
+      />
+    );
+  }
+  return (
+    <EmptyState
+      title="Nothing fresh from your lately crate mates"
+      description={`Your ${crateMatesUsed} lately ${crateMatesUsed === 1 ? 'crate mate has' : 'crate mates have'} bought nothing in the last year that you haven't already got, wishlisted or hidden. Try All time, or check back after Dighead scans more fans.`}
+      action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
+    />
+  );
+}
+
+function NoDeepCuts({ crateMatesUsed }: { crateMatesUsed: number }) {
+  if (crateMatesUsed === 0) {
+    return (
+      <EmptyState
+        title="No crate mates yet"
+        description="Deep cuts are built from what your closest crate mates own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
+        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
   }
   return (
     <EmptyState
       title="No deep cuts yet"
-      description="Your twins' rare records show up as more of them are scanned. You can raise the owner limit in Dighead's settings."
-      action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+      description="Your crate mates' rare records show up as more of them are scanned. You can raise the owner limit in Dighead's settings."
+      action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
 }

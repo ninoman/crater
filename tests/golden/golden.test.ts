@@ -90,7 +90,7 @@ it('answers the same after Dexie upgrades a v11 database', async () => {
   old.close();
 
   await db.open();
-  expect(db.verno).toBe(12);
+  expect(db.verno).toBe(13);
   await expectSlim(db);
   expect(await collectionRows(db)).toBeGreaterThan(0);
   expect(await outputsOf(db)).toEqual(golden());

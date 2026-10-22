@@ -6,7 +6,7 @@ import type { DigheadDb, ItemFields, ItemRecord, OwnershipRecord } from '../sche
 import { releaseUrlHost } from '../storage';
 import { fanRows } from './fanRows';
 import { getItemFields, itemsWhere } from './items';
-import { getTwins } from './twins';
+import { getCrateMates } from './crateMates';
 
 interface Release {
   itemKey: ItemKey;
@@ -67,29 +67,29 @@ function ownsRelease(rows: OwnershipRecord[], release: Release): boolean {
 
 /**
  * One badge per ref, in order; null for a release we know nothing about. Your ownership comes
- * from your own rows; twins are the top `topTwinsK` of the leaderboard, counted by matchKey.
+ * from your own rows; crate mates are the top `topCrateMatesK` of the leaderboard, counted by matchKey.
  */
 export async function pageBadges(
   db: DigheadDb,
   refs: ReleaseRef[],
-  topTwinsK: number,
+  topCrateMatesK: number,
 ): Promise<(PageBadge | null)[]> {
   if (refs.length === 0) return [];
   return db.transaction(
     'r',
-    [db.items, db.bands, db.me, db.ownership, db.twins, db.fanMatches],
+    [db.items, db.bands, db.me, db.ownership, db.crateMates, db.fanMatches],
     async () => {
       const [releases, me, board] = await Promise.all([
         resolve(db, refs),
         db.me.get('self'),
-        getTwins(db),
+        getCrateMates(db),
       ]);
       const mine = me ? await fanRows(db, me.fanId) : [];
       const collection = mine.filter((row) => row.source === 'collection');
       const wishlist = mine.filter((row) => row.source === 'wishlist');
-      const top = board.slice(0, topTwinsK);
-      const lists = (await db.fanMatches.bulkGet(top.map((twin) => twin.fanId))).flatMap((list) =>
-        list ? [list.matchIds] : [],
+      const top = board.slice(0, topCrateMatesK);
+      const lists = (await db.fanMatches.bulkGet(top.map((crateMate) => crateMate.fanId))).flatMap(
+        (list) => (list ? [list.matchIds] : []),
       );
 
       return releases.map((release) => {
@@ -101,8 +101,8 @@ export async function pageBadges(
             (row) => row.itemKey === release.itemKey || row.itemKey === release.albumKey,
           );
         const id = keyToNumber(release.albumKey ?? release.itemKey);
-        const twins = lists.filter((matchIds) => contains(matchIds, id)).length;
-        return { owned, wishlisted, twins, topTwins: top.length };
+        const crateMates = lists.filter((matchIds) => contains(matchIds, id)).length;
+        return { owned, wishlisted, crateMates, topCrateMates: top.length };
       });
     },
   );

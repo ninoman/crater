@@ -10,7 +10,7 @@ import {
 import type { MessageHandlers } from '../shared/messages';
 import { chromeImportStateStore } from './importState';
 import { keepAliveWhile } from './keepAlive';
-import { refreshTwins } from './recommend';
+import { refreshCrateMates } from './recommend';
 import { resetScanDataAfterImport, whileScannerPausedForImport } from './scanner';
 
 export type BackupHandlers = Pick<
@@ -45,7 +45,7 @@ export function backupHandlers(db: DigheadDb): BackupHandlers {
         });
       } finally {
         await discardStagedFile('import');
-        refreshTwins();
+        refreshCrateMates();
       }
     },
     getImportNotice: async () => (await chromeImportStateStore.load()).notice,

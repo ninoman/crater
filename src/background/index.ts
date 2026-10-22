@@ -9,7 +9,7 @@ import { keepAliveWhile } from './keepAlive';
 import { chromeImportStateStore } from './importState';
 import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
 import { onSynced, startSync } from './meSync';
-import { refreshTwins } from './recommend';
+import { refreshCrateMates } from './recommend';
 import { handlers } from './router';
 import { ensureScannerAlarm, kickScanner, SCANNER_ALARM, seedFromSync } from './scanner';
 import { chromeScannerStore } from './scanner/state';
@@ -27,9 +27,9 @@ chrome.runtime.onStartup.addListener(() => {
   void startSync('incremental');
 });
 
-// An update may change how twins are scored, so don't wait for the next sync to see it.
+// An update may change how crate mates are scored, so don't wait for the next sync to see it.
 chrome.runtime.onInstalled.addListener(() => {
-  refreshTwins();
+  refreshCrateMates();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {

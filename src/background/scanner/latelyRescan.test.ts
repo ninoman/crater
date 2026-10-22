@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, enqueue, fanJob, type FanRecord, type TwinRecord } from '../../db';
+import { DigheadDb, enqueue, fanJob, type FanRecord, type CrateMateRecord } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import {
   LATEST_READ_OVERLAP_MS,
@@ -12,7 +12,7 @@ import { LATELY_RESCAN } from './priority';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1000 * DAY;
-const WEEKLY = { latelyRescanTwins: 3, latelyRescanDays: 7 };
+const WEEKLY = { latelyRescanCrateMates: 3, latelyRescanDays: 7 };
 
 function read(
   fanId: number,
@@ -23,7 +23,7 @@ function read(
 }
 
 describe('pickLatelyRescans', () => {
-  it('picks the top twins read at least the interval ago, best first, from just before that read', () => {
+  it('picks the top crate mates read at least the interval ago, best first, from just before that read', () => {
     const board = [read(1, 8), read(2, 7), read(3, 6), read(4, 30)];
     expect(pickLatelyRescans(board, new Set(), NOW, WEEKLY)).toEqual([
       { fanId: 1, since: NOW - 8 * DAY - LATEST_READ_OVERLAP_MS },
@@ -31,7 +31,7 @@ describe('pickLatelyRescans', () => {
     ]);
   });
 
-  it('skips twins with a scan already queued, or no full read on file', () => {
+  it('skips crate mates with a scan already queued, or no full read on file', () => {
     const board = [
       read(1, 10),
       read(2, 10, 'quick'),
@@ -39,13 +39,16 @@ describe('pickLatelyRescans', () => {
       { fanId: 4, fan: undefined },
       read(5, 10, 'partial'),
     ];
-    const picked = pickLatelyRescans(board, new Set([1]), NOW, { ...WEEKLY, latelyRescanTwins: 5 });
+    const picked = pickLatelyRescans(board, new Set([1]), NOW, {
+      ...WEEKLY,
+      latelyRescanCrateMates: 5,
+    });
     expect(picked.map((r) => r.fanId)).toEqual([5]);
   });
 
   it('picks nobody when turned off', () => {
     expect(
-      pickLatelyRescans([read(1, 30)], new Set(), NOW, { ...WEEKLY, latelyRescanTwins: 0 }),
+      pickLatelyRescans([read(1, 30)], new Set(), NOW, { ...WEEKLY, latelyRescanCrateMates: 0 }),
     ).toEqual([]);
   });
 });
@@ -62,7 +65,7 @@ describe('queueLatelyRescans', () => {
     await db.delete();
   });
 
-  function twin(fanId: number, lately: number): TwinRecord {
+  function crateMate(fanId: number, lately: number): CrateMateRecord {
     return {
       fanId,
       overlap: 1,
@@ -91,7 +94,12 @@ describe('queueLatelyRescans', () => {
   }
 
   it('queues latest reads at their own priority, in lately order, leaving queued fans alone', async () => {
-    await db.latelyTwins.bulkPut([twin(1, 0.2), twin(2, 0.9), twin(3, 0.5), twin(4, 0.1)]);
+    await db.latelyCrateMates.bulkPut([
+      crateMate(1, 0.2),
+      crateMate(2, 0.9),
+      crateMate(3, 0.5),
+      crateMate(4, 0.1),
+    ]);
     await db.fans.bulkPut([fan(1, 10), fan(2, 10), fan(3, 10), fan(4, 10)]);
     await enqueue(db, [fanJob(3)], 2, NOW);
 

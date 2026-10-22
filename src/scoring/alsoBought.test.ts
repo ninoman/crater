@@ -11,12 +11,12 @@ import {
   isSmallRelease,
   LIFT_CAP,
   lift,
-  maxTwinShare,
+  maxCrateMateShare,
   rankScored,
   scoreCeiling,
   scoreCoOwned,
-  TWIN_BOOST_MAX,
-  twinBoosts,
+  CRATE_MATE_BOOST_MAX,
+  crateMateBoosts,
   voteWeight,
   warmup,
   WARMUP_ROWS,
@@ -144,7 +144,7 @@ describe('warm-up', () => {
     votes: 3,
     owners: 3,
     lift,
-    twins: 0,
+    crateMates: 0,
     score: 1,
   });
 
@@ -213,7 +213,7 @@ describe('lift and score', () => {
       votes: 4,
       owners: 20,
       lift: expect.closeTo(value) as number,
-      twins: 0,
+      crateMates: 0,
       score: expect.closeTo(4 * Math.log1p(value)) as number,
     });
   });
@@ -227,21 +227,21 @@ describe('lift and score', () => {
 
   it('breaks ties on co, then id', () => {
     const scored = [
-      { id: 3, co: 2, votes: 2, owners: 2, lift: 1, twins: 0, score: 1 },
-      { id: 2, co: 2, votes: 2, owners: 2, lift: 1, twins: 0, score: 1 },
-      { id: 1, co: 1, votes: 1, owners: 1, lift: 1, twins: 0, score: 1 },
+      { id: 3, co: 2, votes: 2, owners: 2, lift: 1, crateMates: 0, score: 1 },
+      { id: 2, co: 2, votes: 2, owners: 2, lift: 1, crateMates: 0, score: 1 },
+      { id: 1, co: 1, votes: 1, owners: 1, lift: 1, crateMates: 0, score: 1 },
     ];
 
     expect(rankScored(scored, 2).map((s) => s.id)).toEqual([2, 3]);
   });
 });
 
-describe('twin boost', () => {
+describe('crate mate boost', () => {
   const list = (...ids: number[]) => Float64Array.from(ids);
   const basis = { supporters: 10, population: 100 };
 
-  it('scales twin scores by your best twin and caps the share at 1', () => {
-    const boosts = twinBoosts(
+  it('scales crate mate scores by your best crate mate and caps the share at 1', () => {
+    const boosts = crateMateBoosts(
       [
         { score: 0.2, matchIds: list(1, 2) },
         { score: 0.1, matchIds: list(2, 3) },
@@ -250,35 +250,38 @@ describe('twin boost', () => {
       0.4,
     );
 
-    expect(boosts.get(1)).toEqual({ share: 0.5, twins: 1 });
-    expect(boosts.get(2)).toEqual({ share: expect.closeTo(0.75) as number, twins: 2 });
-    expect(boosts.get(3)).toEqual({ share: 1, twins: 2 });
+    expect(boosts.get(1)).toEqual({ share: 0.5, crateMates: 1 });
+    expect(boosts.get(2)).toEqual({ share: expect.closeTo(0.75) as number, crateMates: 2 });
+    expect(boosts.get(3)).toEqual({ share: 1, crateMates: 2 });
     expect(boosts.has(4)).toBe(false);
-    expect(maxTwinShare(boosts)).toBe(1);
+    expect(maxCrateMateShare(boosts)).toBe(1);
   });
 
-  it('does nothing without twins', () => {
-    expect(twinBoosts([{ score: 0.2, matchIds: list(1) }], 0).size).toBe(0);
-    expect(maxTwinShare(new Map())).toBe(0);
+  it('does nothing without crate mates', () => {
+    expect(crateMateBoosts([{ score: 0.2, matchIds: list(1) }], 0).size).toBe(0);
+    expect(maxCrateMateShare(new Map())).toBe(0);
   });
 
-  it('multiplies the score by at most 1 + TWIN_BOOST_MAX', () => {
+  it('multiplies the score by at most 1 + CRATE_MATE_BOOST_MAX', () => {
     const plain = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 20, basis);
-    const full = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 20, basis, { share: 1, twins: 2 });
-    const half = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 20, basis, { share: 0.5, twins: 1 });
+    const full = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 20, basis, { share: 1, crateMates: 2 });
+    const half = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 20, basis, { share: 0.5, crateMates: 1 });
 
-    expect(full.score).toBeCloseTo(plain.score * (1 + TWIN_BOOST_MAX));
-    expect(half.score).toBeCloseTo(plain.score * (1 + TWIN_BOOST_MAX / 2));
-    expect(full.twins).toBe(2);
+    expect(full.score).toBeCloseTo(plain.score * (1 + CRATE_MATE_BOOST_MAX));
+    expect(half.score).toBeCloseTo(plain.score * (1 + CRATE_MATE_BOOST_MAX / 2));
+    expect(full.crateMates).toBe(2);
   });
 
-  it('lets a release your closest twin owns pass one with an extra co-owner', () => {
+  it('lets a release your closest crate mate owns pass one with an extra co-owner', () => {
     // Same lift for all three: 5 × 1.5 = 7.5 co-owners' worth beats 6, but not 8.
-    const twinOwned = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 10, basis, { share: 1, twins: 1 });
+    const crateMateOwned = scoreCoOwned({ id: 1, co: 5, votes: 5 }, 10, basis, {
+      share: 1,
+      crateMates: 1,
+    });
     const more = scoreCoOwned({ id: 2, co: 6, votes: 6 }, 12, basis);
     const most = scoreCoOwned({ id: 3, co: 8, votes: 8 }, 16, basis);
 
-    expect(rankScored([more, twinOwned, most], 10).map((s) => s.id)).toEqual([3, 1, 2]);
+    expect(rankScored([more, crateMateOwned, most], 10).map((s) => s.id)).toEqual([3, 1, 2]);
   });
 });
 
@@ -295,8 +298,8 @@ describe('couldEnter', () => {
     expect(couldEnter(top, 1, 3, 0)).toBe(scoreCeiling(3, 0) >= (top[0]?.score ?? 0));
   });
 
-  it('leaves room for the twin boost', () => {
-    // With a full twin share, 2 co-owners reach 2 × ln 11 × 1.5 ≈ 7.2, past the leader's 6.9.
+  it('leaves room for the crate mate boost', () => {
+    // With a full crate mate share, 2 co-owners reach 2 × ln 11 × 1.5 ≈ 7.2, past the leader's 6.9.
     expect(couldEnter(top, 1, 2, 0)).toBe(false);
     expect(couldEnter(top, 1, 2, 1)).toBe(true);
   });
@@ -346,7 +349,7 @@ describe('small-release fallback', () => {
     ];
 
     expect(blendPicks(scored, fallback, 10)).toEqual([
-      { matchKey: 'a2', kind: 'co-owned', co: 2, twins: 0 },
+      { matchKey: 'a2', kind: 'co-owned', co: 2, crateMates: 0 },
       { matchKey: 'a1', kind: 'same-artist' },
     ]);
   });

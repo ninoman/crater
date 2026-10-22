@@ -163,9 +163,11 @@ describe('older backups', () => {
     const { file } = await exportDatabase(db);
     const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 6;
-    json.data.tables = json.data.tables.filter((t: { name: string }) => t.name !== 'latelyTwins');
+    json.data.tables = json.data.tables.filter(
+      (t: { name: string }) => t.name !== 'latelyCrateMates',
+    );
     json.data.data = json.data.data.filter(
-      (t: { tableName: string }) => t.tableName !== 'latelyTwins',
+      (t: { tableName: string }) => t.tableName !== 'latelyCrateMates',
     );
     for (const table of json.data.data) {
       if (table.tableName !== 'fanMatches') continue;

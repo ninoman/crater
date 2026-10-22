@@ -6,7 +6,7 @@ export interface BadgeText {
   hint: string;
 }
 
-/** "owned", "wishlist", "3 twins" or "wishlist · 3 twins"; null when there's nothing to say. */
+/** "owned", "wishlist", "3 crate mates" or "wishlist · 3 crate mates"; null when there's nothing to say. */
 export function badgeText(badge: PageBadge): BadgeText | null {
   if (badge.owned) return { label: 'owned', hint: 'In your collection' };
   const labels: string[] = [];
@@ -15,9 +15,9 @@ export function badgeText(badge: PageBadge): BadgeText | null {
     labels.push('wishlist');
     hints.push('In your wishlist');
   }
-  if (badge.twins > 0) {
-    labels.push(badge.twins === 1 ? '1 twin' : `${badge.twins} twins`);
-    hints.push(`${badge.twins} of your top ${badge.topTwins} twins own this`);
+  if (badge.crateMates > 0) {
+    labels.push(badge.crateMates === 1 ? '1 crate mate' : `${badge.crateMates} crate mates`);
+    hints.push(`${badge.crateMates} of your top ${badge.topCrateMates} crate mates own this`);
   }
   return labels.length > 0 ? { label: labels.join(' · '), hint: hints.join('. ') } : null;
 }

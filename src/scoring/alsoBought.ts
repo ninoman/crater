@@ -8,8 +8,8 @@ import type { AlsoBoughtWarmup } from '../shared/alsoBought';
 export const MIN_CO_OWNERS = 2;
 /** Past this, a higher lift is mostly a tiny base rate, not a stronger link. */
 export const LIFT_CAP = 10;
-/** Releases your taste twins own score up to this much more: ×(1 + TWIN_BOOST_MAX) at most. */
-export const TWIN_BOOST_MAX = 0.5;
+/** Releases your crate mates own score up to this much more: ×(1 + CRATE_MATE_BOOST_MAX) at most. */
+export const CRATE_MATE_BOOST_MAX = 0.5;
 /** Releases with fewer known owners than this get same-artist and same-label picks blended in. */
 export const SMALL_RELEASE_OWNERS = 8;
 export const ALSO_BOUGHT_LIMIT = 30;
@@ -73,7 +73,7 @@ export interface SupporterList {
 /**
  * How much one co-owner's vote counts. The chance of owning any given release by accident grows
  * with collection size, so a 2,000-item omnivore's purchases say less about this release's
- * buyers than a 100-item collector's. √ rather than 1/size: it's the damping the twin score and
+ * buyers than a 100-item collector's. √ rather than 1/size: it's the damping the crate mate score and
  * the planned fan-page ranking use (√ of both sizes), and 1/size would throw away most of what
  * big collectors tell us. Flat at 1 up to FULL_VOTE_ITEMS so no vote exceeds 1, which keeps
  * `co` an upper bound for the pruning.
@@ -146,49 +146,49 @@ export function lift(votes: number, owners: number, basis: Basis): number {
   return Math.min(LIFT_CAP, wilsonLower(votes, n) / base);
 }
 
-/** One of the release's scanned supporters who is also one of your taste twins. */
-export interface TwinSupporter {
-  /** Their twin score (scoring/twins.ts). */
+/** One of the release's scanned supporters who is also one of your crate mates. */
+export interface CrateMateSupporter {
+  /** Their crate mate score (scoring/crate mates.ts). */
   score: number;
   /** Their distinct collection match ids. */
   matchIds: Float64Array;
 }
 
-export interface TwinBoost {
-  /** min(1, Σ score(F) / your best twin's score) over the twin supporters owning it. */
+export interface CrateMateBoost {
+  /** min(1, Σ score(F) / your best crate mate's score) over the crate mate supporters owning it. */
   share: number;
   /** How many of them own it, for the reason line. */
-  twins: number;
+  crateMates: number;
 }
 
-const NO_TWINS: TwinBoost = { share: 0, twins: 0 };
+const NO_CRATE_MATES: CrateMateBoost = { share: 0, crateMates: 0 };
 
 /**
- * Per match id, how strongly your twins among the release's supporters own it. Scores are
- * scaled by your best twin's, so your closest twin alone, or two half as close, gives the full
+ * Per match id, how strongly your crate mates among the release's supporters own it. Scores are
+ * scaled by your best crate mate's, so your closest crate mate alone, or two half as close, gives the full
  * boost. Only supporters count: they're the fans whose collections the co-counts come from.
  */
-export function twinBoosts(
-  twins: readonly TwinSupporter[],
-  bestTwinScore: number,
-): Map<number, TwinBoost> {
-  const boosts = new Map<number, TwinBoost>();
-  if (bestTwinScore <= 0) return boosts;
-  for (const twin of twins) {
-    const part = twin.score / bestTwinScore;
-    for (const id of twin.matchIds) {
+export function crateMateBoosts(
+  crateMates: readonly CrateMateSupporter[],
+  bestCrateMateScore: number,
+): Map<number, CrateMateBoost> {
+  const boosts = new Map<number, CrateMateBoost>();
+  if (bestCrateMateScore <= 0) return boosts;
+  for (const crateMate of crateMates) {
+    const part = crateMate.score / bestCrateMateScore;
+    for (const id of crateMate.matchIds) {
       const boost = boosts.get(id);
       if (boost) {
         boost.share = Math.min(1, boost.share + part);
-        boost.twins++;
-      } else boosts.set(id, { share: Math.min(1, part), twins: 1 });
+        boost.crateMates++;
+      } else boosts.set(id, { share: Math.min(1, part), crateMates: 1 });
     }
   }
   return boosts;
 }
 
 /** The highest share any release reaches, which bounds what the rest can score. */
-export function maxTwinShare(boosts: ReadonlyMap<number, TwinBoost>): number {
+export function maxCrateMateShare(boosts: ReadonlyMap<number, CrateMateBoost>): number {
   let max = 0;
   for (const { share } of boosts.values()) if (share > max) max = share;
   return max;
@@ -202,34 +202,34 @@ export interface Voted extends CoOwned {
 export interface Scored extends Voted {
   owners: number;
   lift: number;
-  /** Twin supporters owning it, for the reason line. */
-  twins: number;
+  /** Crate mate supporters owning it, for the reason line. */
+  crateMates: number;
   score: number;
 }
 
-/** score = votes × ln(1 + lift) × (1 + TWIN_BOOST_MAX × twin share), decisions §6 and §12. */
+/** score = votes × ln(1 + lift) × (1 + CRATE_MATE_BOOST_MAX × crate mate share), decisions §6 and §12. */
 export function scoreCoOwned(
   candidate: Voted,
   owners: number,
   basis: Basis,
-  twin: TwinBoost = NO_TWINS,
+  crateMate: CrateMateBoost = NO_CRATE_MATES,
 ): Scored {
   const value = lift(candidate.votes, owners, basis);
   return {
     ...candidate,
     owners,
     lift: value,
-    twins: twin.twins,
-    score: candidate.votes * Math.log1p(value) * (1 + TWIN_BOOST_MAX * twin.share),
+    crateMates: crateMate.crateMates,
+    score: candidate.votes * Math.log1p(value) * (1 + CRATE_MATE_BOOST_MAX * crateMate.share),
   };
 }
 
 /**
  * The best score `co` co-owners can reach, whatever the base rate and their collection sizes,
- * at a given twin share. Votes never exceed co.
+ * at a given crate mate share. Votes never exceed co.
  */
-export function scoreCeiling(co: number, twinShare: number): number {
-  return co * Math.log1p(LIFT_CAP) * (1 + TWIN_BOOST_MAX * twinShare);
+export function scoreCeiling(co: number, crateMateShare: number): number {
+  return co * Math.log1p(LIFT_CAP) * (1 + CRATE_MATE_BOOST_MAX * crateMateShare);
 }
 
 /** Best first. Ties break on co, then id, so the same data always ranks the same way. */
@@ -240,7 +240,7 @@ export function rankScored(scored: readonly Scored[], limit: number): Scored[] {
 }
 
 /**
- * Whether a candidate with `co` co-owners and up to `twinShare` could still enter a full `top`
+ * Whether a candidate with `co` co-owners and up to `crateMateShare` could still enter a full `top`
  * list. Candidates come in falling co order, so with the highest share any of them has, the
  * first one that can't means none of the rest can either.
  */
@@ -248,10 +248,10 @@ export function couldEnter(
   top: readonly Scored[],
   limit: number,
   co: number,
-  twinShare: number,
+  crateMateShare: number,
 ): boolean {
   const last = top[limit - 1];
-  return top.length < limit || last === undefined || scoreCeiling(co, twinShare) >= last.score;
+  return top.length < limit || last === undefined || scoreCeiling(co, crateMateShare) >= last.score;
 }
 
 /** Even at the cautious end of its share, clearly more common among buyers than everyone. */
@@ -345,7 +345,7 @@ export function fallbackPicks(
 }
 
 export type AlsoBoughtPick =
-  | { matchKey: ItemKey; kind: 'co-owned'; co: number; twins: number }
+  | { matchKey: ItemKey; kind: 'co-owned'; co: number; crateMates: number }
   | FallbackPick;
 
 /** Co-owned picks first, then fallback picks they don't already cover. */
@@ -354,11 +354,11 @@ export function blendPicks(
   fallback: readonly FallbackPick[],
   limit: number,
 ): AlsoBoughtPick[] {
-  const picks: AlsoBoughtPick[] = scored.map(({ id, co, twins }) => ({
+  const picks: AlsoBoughtPick[] = scored.map(({ id, co, crateMates }) => ({
     matchKey: keyFromNumber(id),
     kind: 'co-owned',
     co,
-    twins,
+    crateMates,
   }));
   const taken = new Set(picks.map((pick) => pick.matchKey));
   return [...picks, ...fallback.filter((pick) => !taken.has(pick.matchKey))].slice(0, limit);

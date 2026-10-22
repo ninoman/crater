@@ -1,11 +1,11 @@
 // Shapes of For-you results, shared by the worker and the profile page.
 
 import type { ItemKey } from '../bandcamp';
-import type { TwinsBasis } from './twins';
+import type { CrateMatesBasis } from './crateMates';
 
 /**
- * All time draws on the twins leaderboard; Fresh on lately twins' buys of the last year (§11);
- * Deep cuts on releases few own but your top twins do (§18).
+ * All time draws on the crate mates leaderboard; Fresh on lately crate mates' buys of the last year (§11);
+ * Deep cuts on releases few own but your top crate mates do (§18).
  */
 export type ForYouMode = 'all' | 'fresh' | 'deep';
 
@@ -18,26 +18,26 @@ export interface ForYouRow {
   /** The album's page, or one of its tracks' when only tracks of it have turned up. */
   url: string;
   coverUrl: string | null;
-  /** How many of your top twins own it: "owned by 5 of your top twins". */
-  twins: number;
+  /** How many of your top crate mates own it: "owned by 5 of your top crate mates". */
+  crateMates: number;
   /**
-   * Its owners: Bandcamp's count, at least `twins`. Deep cuts always has Bandcamp's count
+   * Its owners: Bandcamp's count, at least `crateMates`. Deep cuts always has Bandcamp's count
    * ("Only 4 owners on Bandcamp"); the other modes fall back to the owners we've seen.
    */
   supporters: number;
-  /** Rank of the most alike twin owning it, on the board the mode draws on ("your #3 twin"). */
-  bestTwinRank: number | null;
-  /** Fresh only: the newest purchase of it among those twins (ms). Null in All time. */
+  /** Rank of the most alike crate mate owning it, on the board the mode draws on ("your #3 crate mate"). */
+  bestCrateMateRank: number | null;
+  /** Fresh only: the newest purchase of it among those crate mates (ms). Null in All time. */
   lastBoughtAt: number | null;
   /** The artist or label you follow behind it, when that lifted it (decisions §16). */
   followed: string | null;
 }
 
 export interface ForYouResult {
-  /** Same as the twins leaderboard's: why there may be no twins to draw on. */
-  basis: TwinsBasis;
+  /** Same as the crate mates leaderboard's: why there may be no crate mates to draw on. */
+  basis: CrateMatesBasis;
   /** Best first, at most FOR_YOU_LIMIT. */
   rows: ForYouRow[];
-  /** Top twins the picks came from: up to settings.topTwinsK. 0 means no twins yet (on that board). */
-  twinsUsed: number;
+  /** Top crate mates the picks came from: up to settings.topCrateMatesK. 0 means no crate mates yet (on that board). */
+  crateMatesUsed: number;
 }

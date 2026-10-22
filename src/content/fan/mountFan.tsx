@@ -3,9 +3,9 @@ import { FollowedAccountTags } from '../shared/FollowedAccountTags';
 import { pageTagsStyles } from '../shared/tagStyles';
 import { mountShadow } from '../shared/mountShadow';
 import fanCss from './Fan.css?inline';
-import { TwinStandingBadge } from './TwinStandingBadge';
+import { CrateMateStandingBadge } from './CrateMateStandingBadge';
 
-/** Adds the "your #N twin" badge and, for fans you follow, your tags under the name. */
+/** Adds the "your #N crate mate" badge and, for fans you follow, your tags under the name. */
 export function mountFan(doc: Document): void {
   const pagedata = doc.getElementById('pagedata');
   const name = doc.querySelector(FAN_PAGE_DOM.name);
@@ -26,7 +26,7 @@ export function mountFan(doc: Document): void {
   mountShadow(
     name,
     <>
-      <TwinStandingBadge fanId={fanId} />
+      <CrateMateStandingBadge fanId={fanId} />
       <FollowedAccountTags kind="fan" id={fanId} name={fanName} />
     </>,
     fanCss + pageTagsStyles,

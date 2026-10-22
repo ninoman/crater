@@ -1,4 +1,4 @@
-// Which of our profile tabs is open lives in the URL hash (#twins), so reloads and direct links
+// Which of our profile tabs is open lives in the URL hash (#crate mates), so reloads and direct links
 // land on it.
 
 /** The tab named by `hash` (with or without its "#"), or null if it isn't one of `ids`. */

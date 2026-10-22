@@ -21,10 +21,10 @@ import {
   fallbackPicks,
   isConfident,
   isSmallRelease,
-  maxTwinShare,
+  maxCrateMateShare,
   rankScored,
   scoreCoOwned,
-  twinBoosts,
+  crateMateBoosts,
   warmup,
   type AlsoBoughtPick,
   type Basis,
@@ -32,7 +32,7 @@ import {
   type FallbackPick,
   type Scored,
   type SupporterList,
-  type TwinBoost,
+  type CrateMateBoost,
 } from '../../scoring/alsoBought';
 import { discountCompilations } from '../../scoring/compilations';
 import { exclusions } from '../../scoring/exclusions';
@@ -64,7 +64,7 @@ export async function computeAlsoBought(
   const excluded = exclusions(data.mine, data.hidden, data.matchKey);
   const basis = { supporters: data.supporters.length, population: data.population };
 
-  const boosts = twinBoosts(data.twinSupporters, data.bestTwinScore);
+  const boosts = crateMateBoosts(data.crateMateSupporters, data.bestCrateMateScore);
   const candidates = coOwnership(
     data.supporters.map((s) => s.matchIds),
     excluded,
@@ -99,7 +99,7 @@ export async function computeAlsoBought(
 /**
  * Scores candidates in falling co order, fetching owner counts and weighing votes a chunk at a
  * time, and stops once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
- * candidates whose own twin share still lets them in are looked up. Ceilings are linear in co, so
+ * candidates whose own crate mate share still lets them in are looked up. Ceilings are linear in co, so
  * scaling co by the follow boost keeps them exact (§16). Compilations are down-weighted (§17),
  * which only lowers scores, so the ceilings still hold.
  */
@@ -108,15 +108,15 @@ async function scoreTop(
   candidates: CoOwned[],
   supporters: readonly SupporterList[],
   basis: Basis,
-  boosts: ReadonlyMap<number, TwinBoost>,
+  boosts: ReadonlyMap<number, CrateMateBoost>,
   {
     followed,
     ignoreCompilations,
   }: { followed: ReadonlyMap<number, string>; ignoreCompilations: boolean },
 ): Promise<Scored[]> {
-  const maxShare = maxTwinShare(boosts);
+  const maxShare = maxCrateMateShare(boosts);
   const factor = maxFollowFactor(followed);
-  const boostOf = (id: number) => boosts.get(id) ?? { share: 0, twins: 0 };
+  const boostOf = (id: number) => boosts.get(id) ?? { share: 0, crateMates: 0 };
   let top: Scored[] = [];
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
@@ -169,7 +169,7 @@ async function fallbackFor(
 function reasonFor(pick: AlsoBoughtPick, label: string | null): AlsoBoughtReason {
   switch (pick.kind) {
     case 'co-owned':
-      return { kind: 'co-owned', owners: pick.co, twins: pick.twins };
+      return { kind: 'co-owned', owners: pick.co, crateMates: pick.crateMates };
     case 'same-artist':
       return { kind: 'same-artist' };
     case 'same-label':

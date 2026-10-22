@@ -4,13 +4,18 @@ import { rankDeepCuts } from './deepCutsAdapter';
 import { buildMethods } from './methods';
 import type { Candidate } from './types';
 
-// The research doc's synthetic set: five twins A..E (0.6 .. 0.2).
-const cand = (id: number, twinScore: number, twins: number, supporters: number): Candidate => ({
+// The research doc's synthetic set: five crate mates A..E (0.6 .. 0.2).
+const cand = (
+  id: number,
+  crateMateScore: number,
+  crateMates: number,
+  supporters: number,
+): Candidate => ({
   id,
-  twinScore,
-  twins,
+  crateMateScore,
+  crateMates,
   supporters,
-  owners: twins,
+  owners: crateMates,
 });
 const STAPLE = cand(1, 2.0, 5, 40);
 const NICHE = cand(2, 0.7, 2, 3);
@@ -32,7 +37,7 @@ describe('rankDeepCuts adapter', () => {
     expect(ids(rankDeepCuts([noCount], { cap: 50, beta: 0.6, agreement: 2 }, 10))).toEqual([]);
   });
 
-  it('shrinks a single twin below agreement', () => {
+  it('shrinks a single crate mate below agreement', () => {
     const ranked = rankDeepCuts([LONE, MID], { cap: 50, beta: 0.6, agreement: 2 }, 10);
     expect(ids(ranked)).toEqual([MID.id, LONE.id]);
   });
@@ -49,7 +54,7 @@ describe('buildMethods', () => {
     expect(count('deepCuts')).toBe(4 * 4 * 3);
   });
 
-  it('ranks popularity by twin score and For you by its own penalty', () => {
+  it('ranks popularity by crate mate score and For you by its own penalty', () => {
     const find = (kind: string) => methods.find((m) => m.kind === kind);
     expect(ids(find('popularity')?.rank(all, 5) ?? [])).toEqual(ids(all));
     // For you's mild log penalty: the hit (2000 owners) falls behind the staple, still above lone.
@@ -72,7 +77,7 @@ describe('barVerdict', () => {
       nicheRecall: stat(nicheRecall),
       arp: stat(5),
       medianHitN: stat(medianHitN),
-      singleTwinShare: stat(0.2),
+      singleCrateMateShare: stat(0.2),
     };
     return { kind: 'deepCuts', label: 'x', nicheCap: 50, at: { 30: metrics, 100: metrics } };
   };

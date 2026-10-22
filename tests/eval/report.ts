@@ -12,7 +12,7 @@ export interface SplitResult {
 }
 
 export const CAVEATS = [
-  'Leakage: held-out releases are removed from your lists and the twin board is recomputed, but',
+  'Leakage: held-out releases are removed from your lists and the crate mate board is recomputed, but',
   'some fans are in the database only because they bought a held-out release (the scanner found',
   'them through its supporters). That residual leakage favours every method; the temporal split',
   'limits it.',
@@ -37,7 +37,7 @@ function line(row: AggRow, note: string): string {
     pct(row.at[k].nicheRecall),
     num(row.at[k].arp),
     num(row.at[k].medianHitN),
-    pct(row.at[k].singleTwinShare),
+    pct(row.at[k].singleCrateMateShare),
   ]);
   return [
     `${row.label} [niche n≤${row.nicheCap}]`.padEnd(34),

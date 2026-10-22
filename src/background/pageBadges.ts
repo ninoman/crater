@@ -8,6 +8,6 @@ export async function getPageBadges(
   db: DigheadDb,
   links: ReleaseRef[],
 ): Promise<(PageBadge | null)[]> {
-  const { topTwinsK } = await loadSettings();
-  return pageBadges(db, links, topTwinsK);
+  const { topCrateMatesK } = await loadSettings();
+  return pageBadges(db, links, topCrateMatesK);
 }

@@ -4,8 +4,8 @@ import type { ItemKey } from '../bandcamp';
 
 /** Why a release is recommended. The UI turns this into the reason line. */
 export type AlsoBoughtReason =
-  /** `owners` of the scanned supporters own it, `twins` of them your taste twins. */
-  | { kind: 'co-owned'; owners: number; twins: number }
+  /** `owners` of the scanned supporters own it, `crateMates` of them your crate mates. */
+  | { kind: 'co-owned'; owners: number; crateMates: number }
   | { kind: 'same-artist' }
   /** `label` is null when the selling account is the label, since its name isn't known. */
   | { kind: 'same-label'; label: string | null };

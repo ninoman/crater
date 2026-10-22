@@ -1,10 +1,10 @@
 // The eval's I/O edge: loads a backup, then for each split holds releases out of the database,
-// recomputes the twin board with the real worker code, and scores every method. Everything it
+// recomputes the crate mate board with the real worker code, and scores every method. Everything it
 // returns is aggregate numbers.
 
 import { peakImportFile } from 'dexie-export-import';
 import { keyFromNumber, keyToNumber } from '../../src/bandcamp';
-import { computeTwins } from '../../src/background/recommend/twins';
+import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   type DigheadDb,
   fanRows,
@@ -22,7 +22,7 @@ import {
 } from '../../src/db';
 import { flagCompilation } from '../../src/db/schema';
 import { exclusions } from '../../src/scoring/exclusions';
-import { topTwins, twinOwnership } from '../../src/scoring/forYou';
+import { topCrateMates, crateMateOwnership } from '../../src/scoring/forYou';
 import { parseBackupMeta } from '../../src/shared/backupFile';
 import { DEFAULT_SETTINGS } from '../../src/shared/settings';
 import { aggregate } from './aggregate';
@@ -125,7 +125,7 @@ export async function runEval(
   });
 
   const methods = buildMethods();
-  const twinKs = [...new Set(methods.map((m) => m.twinsK))];
+  const crateMateKs = [...new Set(methods.map((m) => m.crateMatesK))];
   const popularity = new Map<number, Popularity>();
   const lookup = (id: number): Popularity => popularity.get(id) ?? { supporters: null, owners: 0 };
   const splits: SplitResult[] = [];
@@ -139,7 +139,7 @@ export async function runEval(
       foldFan -= 1;
       const fanId = foldFan;
       const rows = await withHoldout(db, fanId, mine, new Set(heldOut), async () => {
-        const byK = await candidatesByK(db, fanId, twinKs);
+        const byK = await candidatesByK(db, fanId, crateMateKs);
         const ids = [...byK.values()].flatMap((list) => list.map((c) => c.id)).concat(heldOut);
         await resolvePopularity(db, popularity, ids);
         return evaluateFold(methods, withPopularity(byK, lookup), new Set(heldOut), lookup);
@@ -214,29 +214,29 @@ async function dropFanMatches(db: DigheadDb, fanId: number): Promise<void> {
 }
 
 /**
- * Recomputes the twin board from what's left of your collection (the real worker code), then
- * builds each K's candidates as For you does: the top-K twins' lists minus your exclusions.
+ * Recomputes the crate mate board from what's left of your collection (the real worker code), then
+ * builds each K's candidates as For you does: the top-K crate mates' lists minus your exclusions.
  */
 async function candidatesByK(
   db: DigheadDb,
   fanId: number,
-  twinKs: readonly number[],
+  crateMateKs: readonly number[],
 ): Promise<Map<number, Candidate[]>> {
-  const board = await computeTwins(
+  const board = await computeCrateMates(
     { db, settings: DEFAULT_SETTINGS, now: Date.now(), yieldNow: async () => undefined },
     fanId,
   );
   const result = new Map<number, Candidate[]>();
-  for (const k of twinKs) {
-    const twins = topTwins(board, k);
+  for (const k of crateMateKs) {
+    const crateMates = topCrateMates(board, k);
     const data = await gatherForYou(
       db,
-      twins.map((t) => t.fanId),
+      crateMates.map((t) => t.fanId),
       fanId,
     );
-    const scoreOf = new Map(twins.map((t) => [t.fanId, t.score]));
-    const owned = twinOwnership(
-      data.twinLists.map((list) => ({
+    const scoreOf = new Map(crateMates.map((t) => [t.fanId, t.score]));
+    const owned = crateMateOwnership(
+      data.crateMateLists.map((list) => ({
         score: scoreOf.get(list.fanId) ?? 0,
         matches: list.matchIds,
       })),
@@ -244,7 +244,7 @@ async function candidatesByK(
     );
     result.set(
       k,
-      owned.map((o) => ({ ...o, supporters: null, owners: o.twins })),
+      owned.map((o) => ({ ...o, supporters: null, owners: o.crateMates })),
     );
   }
   return result;

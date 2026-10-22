@@ -12,7 +12,7 @@ import {
 import { getOwnerCounts } from './matchIndex';
 import { putOwnership } from './ownership';
 import { enqueue, fanJob, countJobs } from './queue';
-import { replaceTwins } from './twins';
+import { replaceCrateMates } from './crateMates';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 400 * DAY;
@@ -75,10 +75,10 @@ describe('forgetFansNotSeenSince', () => {
     // Seen again recently, by a scan rather than a supporter list.
     await seedFan(5, NOW - 300 * DAY, ['a2']);
     await finishFanScan(db, 5, 'done', 1, NOW - DAY);
-    await replaceTwins(
+    await replaceCrateMates(
       db,
-      [2, 3].map((fanId) => twin(fanId)),
-      [2, 3].map((fanId) => twin(fanId)),
+      [2, 3].map((fanId) => crateMate(fanId)),
+      [2, 3].map((fanId) => crateMate(fanId)),
     );
     await enqueue(db, [fanJob(4), fanJob(3)], 2, 0);
 
@@ -94,7 +94,7 @@ describe('forgetFansNotSeenSince', () => {
         [keyToNumber('a2'), 1],
       ]),
     );
-    expect(await db.twins.toCollection().primaryKeys()).toEqual([3]);
+    expect(await db.crateMates.toCollection().primaryKeys()).toEqual([3]);
     expect(await countJobs(db)).toEqual({ release: 0, fan: 1 });
   });
 
@@ -128,7 +128,7 @@ describe('clearAllData', () => {
   });
 });
 
-function twin(fanId: number) {
+function crateMate(fanId: number) {
   return {
     fanId,
     overlap: 1,

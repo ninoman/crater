@@ -1,7 +1,7 @@
-// ROADMAP Deep cuts step 2: a Deep cuts score over a 100-twin board stays under ~200 ms. The same
-// board also times a For you score and a twins recompute (decisions §19).
-// Twins hold full 2,000-item collections, and Bandcamp counts follow popularity, so the releases
-// most twins share (highest ceilings) are mostly over the cap: the worst case for pruning.
+// ROADMAP Deep cuts step 2: a Deep cuts score over a 100-crate-mate board stays under ~200 ms. The same
+// board also times a For you score and a crate mates recompute (decisions §19).
+// Crate mates hold full 2,000-item collections, and Bandcamp counts follow popularity, so the releases
+// most crate mates share (highest ceilings) are mostly over the cap: the worst case for pruning.
 // fake-indexeddb is slower than Chrome's IndexedDB, so passing here leaves headroom.
 
 import 'fake-indexeddb/auto';
@@ -10,33 +10,33 @@ import { afterAll, beforeAll, expect, it } from 'vitest';
 import { keyToNumber, type ItemKey } from '../../src/bandcamp';
 import { computeDeepCuts } from '../../src/background/recommend/deepCuts';
 import { computeForYou } from '../../src/background/recommend/forYou';
-import { computeTwins } from '../../src/background/recommend/twins';
+import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   buildMatchIndex,
   DigheadDb,
   gatherForYou,
-  getTwins,
+  getCrateMates,
   type ItemRecord,
   type MeRecord,
   type OwnershipRecord,
-  type TwinRecord,
+  type CrateMateRecord,
 } from '../../src/db';
 import { storedRows } from './stored';
 import { rankDeepCuts } from '../../src/scoring/deepCuts';
 import { exclusions } from '../../src/scoring/exclusions';
-import { topTwins, twinOwnership } from '../../src/scoring/forYou';
-import { DEEP_CUT_TWINS_K } from '../../src/scoring/weights';
+import { topCrateMates, crateMateOwnership } from '../../src/scoring/forYou';
+import { DEEP_CUT_CRATE_MATES_K } from '../../src/scoring/weights';
 import { DEFAULT_SETTINGS } from '../../src/shared/settings';
 
-const TWINS = 200;
-const ITEMS_PER_TWIN = 2000;
+const CRATE_MATES = 200;
+const ITEMS_PER_CRATE_MATE = 2000;
 const CATALOG = 100_000;
 const ME = 1;
 const MY_ITEMS = 1000;
 const CAP = 50;
 const BUDGET_MS = 200;
 /** A recompute runs in the background after scans, not while you wait, so it gets more room. */
-const TWINS_BUDGET_MS = 2000;
+const CRATE_MATES_BUDGET_MS = 2000;
 const SEED_CHUNK = 5_000;
 
 /** Deterministic PRNG (mulberry32), so every run seeds the same data. */
@@ -69,8 +69,8 @@ beforeAll(async () => {
   const next = random(7);
 
   const rows: OwnershipRecord[] = [];
-  for (let fanId = 100; fanId < 100 + TWINS; fanId++) {
-    for (const key of collection(next, ITEMS_PER_TWIN)) rows.push(row(fanId, key));
+  for (let fanId = 100; fanId < 100 + CRATE_MATES; fanId++) {
+    for (const key of collection(next, ITEMS_PER_CRATE_MATE)) rows.push(row(fanId, key));
   }
   for (const key of collection(next, MY_ITEMS)) rows.push(row(ME, key));
 
@@ -91,9 +91,9 @@ beforeAll(async () => {
     compilation: false,
   }));
 
-  const twins = Array.from(
-    { length: TWINS },
-    (_, i): TwinRecord => ({
+  const crateMates = Array.from(
+    { length: CRATE_MATES },
+    (_, i): CrateMateRecord => ({
       fanId: 100 + i,
       overlap: 50,
       jaccard: 0.05,
@@ -115,7 +115,7 @@ beforeAll(async () => {
     [db.matchOwners, index.matchOwners],
     [db.items, stored.items],
     [db.bands, stored.bands],
-    [db.twins, twins],
+    [db.crateMates, crateMates],
   ] as const) {
     for (let start = 0; start < records.length; start += SEED_CHUNK) {
       await (table as Table).bulkPut(records.slice(start, start + SEED_CHUNK));
@@ -130,7 +130,7 @@ afterAll(async () => {
   await db.delete();
 });
 
-it(`scores Deep cuts over a ${DEEP_CUT_TWINS_K}-twin board in under ${BUDGET_MS} ms`, async () => {
+it(`scores Deep cuts over a ${DEEP_CUT_CRATE_MATES_K}-crate-mate board in under ${BUDGET_MS} ms`, async () => {
   const input = { maxSupporters: CAP, ignoreCompilations: true };
   await computeDeepCuts(db, me, input); // warm-up
 
@@ -145,19 +145,19 @@ it(`scores Deep cuts over a ${DEEP_CUT_TWINS_K}-twin board in under ${BUDGET_MS}
   const owners = result.rows.map((r) => r.supporters).sort((a, b) => a - b);
   console.log(
     `deep cuts: median ${median.toFixed(1)} ms, runs ${times.map(Math.round).join(', ')}; ` +
-      `${result.rows.length} rows from ${result.twinsUsed} twins, owners ${owners[0]}–${owners.at(-1)}`,
+      `${result.rows.length} rows from ${result.crateMatesUsed} crate mates, owners ${owners[0]}–${owners.at(-1)}`,
   );
 
   // How much pruning saves: candidates against item records actually looked up.
-  const board = topTwins(await getTwins(db), DEEP_CUT_TWINS_K);
+  const board = topCrateMates(await getCrateMates(db), DEEP_CUT_CRATE_MATES_K);
   const data = await gatherForYou(
     db,
     board.map((t) => t.fanId),
     ME,
   );
   const scoreOf = new Map(board.map((t) => [t.fanId, t.score]));
-  const owned = twinOwnership(
-    data.twinLists.map((l) => ({ score: scoreOf.get(l.fanId) ?? 0, matches: l.matchIds })),
+  const owned = crateMateOwnership(
+    data.crateMateLists.map((l) => ({ score: scoreOf.get(l.fanId) ?? 0, matches: l.matchIds })),
     exclusions(data.mine, data.hidden),
   );
   const counts = new Map(
@@ -174,7 +174,7 @@ it(`scores Deep cuts over a ${DEEP_CUT_TWINS_K}-twin board in under ${BUDGET_MS}
   );
   console.log(`deep cuts: ${owned.length} candidates, ${looked} looked up`);
 
-  expect(result.twinsUsed).toBe(DEEP_CUT_TWINS_K);
+  expect(result.crateMatesUsed).toBe(DEEP_CUT_CRATE_MATES_K);
   expect(result.rows).toHaveLength(30);
   expect(result.rows.every((r) => r.supporters <= CAP)).toBe(true);
   expect(median).toBeLessThan(BUDGET_MS);
@@ -192,10 +192,10 @@ async function median(run: () => Promise<unknown>): Promise<number> {
   return times.sort((a, b) => a - b)[2] ?? Infinity;
 }
 
-it(`scores For you over the top ${DEFAULT_SETTINGS.topTwinsK} twins in under ${BUDGET_MS} ms`, async () => {
+it(`scores For you over the top ${DEFAULT_SETTINGS.topCrateMatesK} crate mates in under ${BUDGET_MS} ms`, async () => {
   const input = {
     mode: 'all' as const,
-    topTwinsK: DEFAULT_SETTINGS.topTwinsK,
+    topCrateMatesK: DEFAULT_SETTINGS.topCrateMatesK,
     latelyHalfLifeMonths: DEFAULT_SETTINGS.latelyHalfLifeMonths,
     followingBoost: true,
     ignoreCompilations: true,
@@ -208,23 +208,23 @@ it(`scores For you over the top ${DEFAULT_SETTINGS.topTwinsK} twins in under ${B
 });
 
 // Last: it replaces the board the other checks read.
-it(`recomputes twins over ${TWINS} full collections in under ${TWINS_BUDGET_MS} ms`, async () => {
+it(`recomputes crate mates over ${CRATE_MATES} full collections in under ${CRATE_MATES_BUDGET_MS} ms`, async () => {
   await db.fans.bulkPut(
-    Array.from({ length: TWINS }, (_, i) => ({
+    Array.from({ length: CRATE_MATES }, (_, i) => ({
       fanId: 100 + i,
       username: `fan${i}`,
       name: `Fan ${i}`,
       imageId: null,
-      collectionSize: ITEMS_PER_TWIN,
-      scannedItems: ITEMS_PER_TWIN,
+      collectionSize: ITEMS_PER_CRATE_MATE,
+      scannedItems: ITEMS_PER_CRATE_MATE,
       collectionFetchedAt: 0,
       status: 'done' as const,
       lastSeenAt: 0,
     })),
   );
   const deps = { db, settings: DEFAULT_SETTINGS, now: 0, yieldNow: async () => undefined };
-  const ms = await median(() => computeTwins(deps, ME));
-  console.log(`twins: median ${ms.toFixed(1)} ms`);
-  expect(await db.twins.count()).toBe(TWINS);
-  expect(ms).toBeLessThan(TWINS_BUDGET_MS);
+  const ms = await median(() => computeCrateMates(deps, ME));
+  console.log(`crate mates: median ${ms.toFixed(1)} ms`);
+  expect(await db.crateMates.count()).toBe(CRATE_MATES);
+  expect(ms).toBeLessThan(CRATE_MATES_BUDGET_MS);
 });

@@ -5,7 +5,7 @@ export const FOREGROUND = 1;
 /** Releases opened earlier, and their supporters. */
 export const BACKGROUND = 2;
 /**
- * Latest reads of your top lately twins (decisions §11): after anything you opened, before the
+ * Latest reads of your top lately crate mates (decisions §11): after anything you opened, before the
  * seed backlog, which can take days and would hold them up. A fraction, so SEED's stored value
  * stays as it is.
  */

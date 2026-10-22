@@ -158,7 +158,7 @@ describe('hidden', () => {
 });
 
 describe('upgrade to v7', () => {
-  it('adds purchase times to the match index and blanks lately on stored twins', async () => {
+  it('adds purchase times to the match index and blanks lately on stored crate mates', async () => {
     const name = `test-${crypto.randomUUID()}`;
     const old = new Dexie(name);
     old.version(6).stores({
@@ -189,12 +189,12 @@ describe('upgrade to v7', () => {
       partialIds: Float64Array.from([]),
       matchTimes: Float64Array.from([500, 0]),
     });
-    expect(await upgraded.twins.get(2)).toMatchObject({
+    expect(await upgraded.crateMates.get(2)).toMatchObject({
       lately: null,
       yearAgo: null,
       latelyOverlap: 0,
     });
-    expect(await upgraded.latelyTwins.count()).toBe(0);
+    expect(await upgraded.latelyCrateMates.count()).toBe(0);
     await upgraded.delete();
   });
 });

@@ -57,7 +57,7 @@ describe('followedReleases', () => {
 });
 
 describe('followFactor', () => {
-  it('nudges rather than dominates: below the ×1.5 twin boost', () => {
+  it('nudges rather than dominates: below the ×1.5 crate mate boost', () => {
     expect(followFactor(true)).toBe(1 + FOLLOW_BOOST);
     expect(followFactor(true)).toBeLessThan(1.5);
     expect(followFactor(false)).toBe(1);
@@ -73,8 +73,8 @@ describe('boostFollowed', () => {
   it('lifts a followed release past a close call in For you', () => {
     const followed = new Map([[2, 'Warp']]);
     const scored = [
-      scoreForYou({ id: 1, twinScore: 1.1, twins: 3 }, 10),
-      scoreForYou({ id: 2, twinScore: 1.0, twins: 3 }, 10),
+      scoreForYou({ id: 1, crateMateScore: 1.1, crateMates: 3 }, 10),
+      scoreForYou({ id: 2, crateMateScore: 1.0, crateMates: 3 }, 10),
     ];
 
     expect(rankForYou(scored, 10).map((s) => s.id)).toEqual([1, 2]);
@@ -84,8 +84,8 @@ describe('boostFollowed', () => {
   it('does not lift it past clearly stronger evidence', () => {
     const followed = new Map([[2, 'Warp']]);
     const scored = [
-      scoreForYou({ id: 1, twinScore: 2, twins: 6 }, 10),
-      scoreForYou({ id: 2, twinScore: 1, twins: 3 }, 10),
+      scoreForYou({ id: 1, crateMateScore: 2, crateMates: 6 }, 10),
+      scoreForYou({ id: 2, crateMateScore: 1, crateMates: 3 }, 10),
     ];
 
     expect(rankForYou(boostFollowed(scored, followed), 10).map((s) => s.id)).toEqual([1, 2]);

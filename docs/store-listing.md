@@ -15,8 +15,8 @@ Purchase-based discovery for Bandcamp. Everything stays in your browser.
 Dighead adds recommendations to Bandcamp, based on what people actually bought:
 
 - **Also bought:** on an album or track page, the releases that other buyers of it also own.
-- **Taste twins:** the fans whose collections overlap yours most, on a tab on your profile and as a rank on other fans' profiles.
-- **For you:** releases your twins own that you don't.
+- **Crate mates:** the fans whose collections overlap yours most, on a tab on your profile and as a rank on other fans' profiles.
+- **For you:** releases your crate mates own that you don't.
 
 Dighead reads public Bandcamp pages and your own collection, and keeps everything in your browser. There is no account, no server and no tracking. The popup shows scan progress, lets you pause, tune or reset the scanner, and has a **Clear all data** button.
 

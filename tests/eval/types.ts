@@ -1,9 +1,9 @@
 // Shapes shared by the eval's pure modules.
 
-import type { TwinOwned } from '../../src/scoring/forYou';
+import type { CrateMateOwned } from '../../src/scoring/forYou';
 
-/** A release owned by at least one of the top twins, with what the methods need to rank it. */
-export interface Candidate extends TwinOwned {
+/** A release owned by at least one of the top crate mates, with what the methods need to rank it. */
+export interface Candidate extends CrateMateOwned {
   /** Bandcamp's owner count, null when no item record has one. */
   supporters: number | null;
   /** Owners seen locally: For you's fallback when Bandcamp gave no count. */
@@ -27,8 +27,8 @@ export interface DeepCutParams {
 export interface MethodSpec {
   kind: MethodKind;
   label: string;
-  /** How many top twins the method draws on. */
-  twinsK: number;
+  /** How many top crate mates the method draws on. */
+  crateMatesK: number;
   /** The cap the method itself applies, null when it has none. */
   cap: number | null;
   /** Best first, at most `limit` long. */
@@ -46,8 +46,8 @@ export interface ListMetrics {
   arp: number | null;
   /** Median n of the hits, null when nothing was hit. */
   medianHitN: number | null;
-  /** Share of the list backed by a single twin, null for an empty list. */
-  singleTwinShare: number | null;
+  /** Share of the list backed by a single crate mate, null for an empty list. */
+  singleCrateMateShare: number | null;
 }
 
 /** One method on one fold, at one definition of "niche". */

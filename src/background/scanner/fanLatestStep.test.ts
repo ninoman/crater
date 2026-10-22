@@ -79,8 +79,8 @@ async function drain(collectionBatchSize: number) {
 async function fanReadDaysAgo(days: number, owned: number) {
   const fan: FanRecord = {
     fanId: FAN,
-    username: 'twin',
-    name: 'Twin',
+    username: 'crateMate',
+    name: 'CrateMate',
     imageId: null,
     collectionSize: owned,
     scannedItems: owned,

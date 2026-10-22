@@ -11,6 +11,7 @@ import {
   type BackupSummary,
 } from '../shared/backupFile';
 import { gzip, readBackup } from './gzip';
+import { renameTables } from './renameTables';
 import {
   blankLately,
   type DigheadDb,
@@ -18,6 +19,7 @@ import {
   rebuildFanMatchLists,
   slimToV12,
   TABLES_ADDED,
+  TABLES_RENAMED,
   upgradeJobToV8,
 } from './schema';
 
@@ -86,7 +88,7 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
     await db.transaction('rw', [db.fanMatches, db.ownership], () =>
       rebuildFanMatchLists(db.fanMatches, db.ownership),
     );
-    await db.twins.toCollection().modify(blankLately);
+    await db.crateMates.toCollection().modify(blankLately);
   }
   // v8 ranked queued jobs and staged fan scans.
   if (fromVersion < 8) await db.queue.toCollection().modify(upgradeJobToV8);
@@ -96,6 +98,15 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   if (fromVersion < 12) {
     await db.transaction('rw', [db.items, db.bands], () => slimToV12(db.items, db.bands));
   }
+}
+
+/** A backup's JSON, with tables renamed since it was made under their current names. */
+async function readJson(file: Blob): Promise<Blob> {
+  const json = await readBackup(file);
+  const version = (await peakImportFile(json).catch(() => null))?.data?.databaseVersion;
+  if (typeof version !== 'number') return json;
+  const renames = Object.entries(TABLES_RENAMED).filter(([, renamed]) => version < renamed.version);
+  return renameTables(json, Object.fromEntries(renames.map(([from, { to }]) => [from, to])));
 }
 
 /** Where the safety copy of the current data waits while an import runs. */
@@ -109,7 +120,7 @@ export interface SnapshotStore {
 /** Clears every table and writes the file's rows. Also how a snapshot is put back. */
 export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
   ensureFileReader();
-  const json = await readBackup(file);
+  const json = await readJson(file);
   await Promise.all(db.tables.map((table) => table.clear()));
   await importInto(db, json, READ_ONLY);
 }
@@ -132,7 +143,7 @@ export async function importDatabase(
   onPhase: (phase: ImportPhase | null) => Promise<void>,
 ): Promise<BackupSummary> {
   ensureFileReader();
-  const file = await readBackup(backup);
+  const file = await readJson(backup);
   const meta = parseBackupMeta(await peakImportFile(file).catch(() => null));
   const fileVersion = meta.data.databaseVersion;
   assertRestorableVersion(fileVersion, db.verno);

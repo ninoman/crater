@@ -54,7 +54,7 @@ export function DatabaseBackup() {
         open={confirming}
         onOpenChange={setConfirming}
         title="Import a backup?"
-        description="This deletes every scanned fan and collection, your synced collection, taste twins, tags, hidden releases and the scan queue, and replaces them with the file's contents. Settings are kept."
+        description="This deletes every scanned fan and collection, your synced collection, crate mates, tags, hidden releases and the scan queue, and replaces them with the file's contents. Settings are kept."
         confirmLabel="Choose file…"
         onConfirm={() => {
           setConfirming(false);

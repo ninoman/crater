@@ -16,6 +16,6 @@ export * from './queue';
 export * from './releaseSupporters';
 export * from './supporterRank';
 export * from './tags';
-export * from './twins';
-export * from './twinsLatest';
+export * from './crateMates';
+export * from './crateMatesLatest';
 export * from './wishlist';

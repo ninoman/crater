@@ -1,7 +1,7 @@
 // Your followings as a nudge (decisions §16): releases from accounts you follow score a little
 // higher, and supporters you follow are read first. Pure: src/db gathers, src/background applies.
 
-/** Releases from an account you follow score up to ×(1 + FOLLOW_BOOST). Below the twin boost. */
+/** Releases from an account you follow score up to ×(1 + FOLLOW_BOOST). Below the crate mate boost. */
 export const FOLLOW_BOOST = 0.25;
 
 /** A release's selling account and label, as `items` stores them. */

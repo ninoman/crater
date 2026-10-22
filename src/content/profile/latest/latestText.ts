@@ -1,5 +1,5 @@
 import { timeAgo } from '../../../shared/timeAgo';
-import type { LatestBuyer } from '../../../shared/twinsLatest';
+import type { LatestBuyer } from '../../../shared/crateMatesLatest';
 
 /** Names shown before the rest are counted. */
 const NAMED_BUYERS = 2;
@@ -12,16 +12,16 @@ export function formatBuyers(buyers: readonly Pick<LatestBuyer, 'name'>[]): stri
   return `bought by ${names.slice(0, NAMED_BUYERS).join(', ')} and ${rest} more`;
 }
 
-/** The line above the list, e.g. "12 releases your 40 top twins bought in the last 60 days". */
-export function formatLatestSummary(rows: number, twins: number, windowDays: number): string {
+/** The line above the list, e.g. "12 releases your 40 top crate mates bought in the last 60 days". */
+export function formatLatestSummary(rows: number, crateMates: number, windowDays: number): string {
   const releases = `${rows} ${rows === 1 ? 'release' : 'releases'}`;
-  const who = twins === 1 ? 'your top twin' : `your ${twins} top twins`;
+  const who = crateMates === 1 ? 'your top crate mate' : `your ${crateMates} top crate mates`;
   return `${releases} ${who} bought in the last ${windowDays} days`;
 }
 
-/** While some of those twins have a scan waiting. */
-export function formatChecking(twins: number): string {
-  return `Checking ${twins} ${twins === 1 ? 'twin' : 'twins'} for new purchases`;
+/** While some of those crate mates have a scan waiting. */
+export function formatChecking(crateMates: number): string {
+  return `Checking ${crateMates} ${crateMates === 1 ? 'crate mate' : 'crate mates'} for new purchases`;
 }
 
 /** The reason line under a row: "bought by Ana and Ben · 3 days ago". */

@@ -1,9 +1,9 @@
-// "Deep cuts": releases few people own but your closest twins do (decisions §18).
-// score(α) = T × t/(t + c) × n^−β, only for n ≤ cap, where T is Σ score(F) over the top-K twins
+// "Deep cuts": releases few people own but your closest crate mates do (decisions §18).
+// score(α) = T × t/(t + c) × n^−β, only for n ≤ cap, where T is Σ score(F) over the top-K crate mates
 // owning α, t how many own it and n Bandcamp's owner count. Pure: the eval grids β, c and the cap.
 
 import { COMPILATION_FACTOR } from './compilations';
-import { bestTwinRank, type TwinOwned } from './forYou';
+import { bestCrateMateRank, type CrateMateOwned } from './forYou';
 import { DEEP_CUT_AGREEMENT, nichePenalty } from './weights';
 
 export interface DeepCutOptions {
@@ -23,33 +23,33 @@ export interface DeepCutFacts {
   compilation: boolean;
 }
 
-export interface DeepCutCandidate extends TwinOwned {
+export interface DeepCutCandidate extends CrateMateOwned {
   /** T × t/(t + c): the most it can score, known before any item lookup. */
   ceiling: number;
 }
 
-export interface DeepCutScored extends TwinOwned {
-  /** Bandcamp's owner count, at least the twins owning it. */
+export interface DeepCutScored extends CrateMateOwned {
+  /** Bandcamp's owner count, at least the crate mates owning it. */
   supporters: number;
   score: number;
 }
 
 /** The evidence term T × t/(t + c). n^−β ≤ 1, so it's also the score's ceiling. */
-export function deepCutCeiling(candidate: TwinOwned, agreement = DEEP_CUT_AGREEMENT): number {
-  return (candidate.twinScore * candidate.twins) / (candidate.twins + agreement);
+export function deepCutCeiling(candidate: CrateMateOwned, agreement = DEEP_CUT_AGREEMENT): number {
+  return (candidate.crateMateScore * candidate.crateMates) / (candidate.crateMates + agreement);
 }
 
 /**
  * Scores a candidate, or null when it has no Bandcamp count or more owners than the cap. A
- * release has at least as many owners as twins owning it; the clamp guards a stale count.
+ * release has at least as many owners as crate mates owning it; the clamp guards a stale count.
  */
 export function scoreDeepCut(
-  candidate: TwinOwned,
+  candidate: CrateMateOwned,
   supporterCount: number | null,
   options: DeepCutOptions,
 ): DeepCutScored | null {
   if (supporterCount === null) return null;
-  const supporters = Math.max(supporterCount, candidate.twins);
+  const supporters = Math.max(supporterCount, candidate.crateMates);
   if (supporters > options.maxSupporters) return null;
   const score =
     deepCutCeiling(candidate, options.agreement) * nichePenalty(supporters, options.beta);
@@ -58,12 +58,12 @@ export function scoreDeepCut(
 
 /** Candidates with their ceilings, highest first, so pruning can stop at the first that can't rank. */
 export function deepCutCandidates(
-  owned: readonly TwinOwned[],
+  owned: readonly CrateMateOwned[],
   agreement = DEEP_CUT_AGREEMENT,
 ): DeepCutCandidate[] {
   return owned
     .map((candidate) => ({ ...candidate, ceiling: deepCutCeiling(candidate, agreement) }))
-    .sort((a, b) => b.ceiling - a.ceiling || b.twins - a.twins || a.id - b.id);
+    .sort((a, b) => b.ceiling - a.ceiling || b.crateMates - a.crateMates || a.id - b.id);
 }
 
 /** Whether a ceiling can still make the top `limit` of `top` (ranked). */
@@ -77,7 +77,7 @@ export function couldRankDeepCut(
 }
 
 function byScore(a: DeepCutScored, b: DeepCutScored): number {
-  return b.score - a.score || b.twins - a.twins || a.id - b.id;
+  return b.score - a.score || b.crateMates - a.crateMates || a.id - b.id;
 }
 
 /**
@@ -115,32 +115,32 @@ export function extendDeepCuts(
 }
 
 /**
- * The best `limit` deep cuts among `owned` (twinOwnership's output), best first. `lookup` is
+ * The best `limit` deep cuts among `owned` (crateMateOwnership's output), best first. `lookup` is
  * called only for candidates whose ceiling can still rank.
  */
 export function rankDeepCuts(
-  owned: readonly TwinOwned[],
+  owned: readonly CrateMateOwned[],
   lookup: (id: number) => DeepCutFacts | undefined,
   options: DeepCutOptions & { limit: number },
 ): DeepCutScored[] {
   return extendDeepCuts([], deepCutCandidates(owned, options.agreement), lookup, options).top;
 }
 
-/** What the reason line needs: "Only 12 owners on Bandcamp · one is your #3 twin". */
+/** What the reason line needs: "Only 12 owners on Bandcamp · one is your #3 crate mate". */
 export interface DeepCutReason {
   supporters: number;
-  twins: number;
-  /** 1-based rank of the most alike twin owning it, or null if none of `lists` holds it. */
-  bestTwinRank: number | null;
+  crateMates: number;
+  /** 1-based rank of the most alike crate mate owning it, or null if none of `lists` holds it. */
+  bestCrateMateRank: number | null;
 }
 
 export function deepCutReason(
-  scored: Pick<DeepCutScored, 'id' | 'supporters' | 'twins'>,
+  scored: Pick<DeepCutScored, 'id' | 'supporters' | 'crateMates'>,
   ranked: readonly (Float64Array | undefined)[],
 ): DeepCutReason {
   return {
     supporters: scored.supporters,
-    twins: scored.twins,
-    bestTwinRank: bestTwinRank(scored.id, ranked),
+    crateMates: scored.crateMates,
+    bestCrateMateRank: bestCrateMateRank(scored.id, ranked),
   };
 }

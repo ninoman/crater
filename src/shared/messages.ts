@@ -18,12 +18,12 @@ import type {
   TagResult,
 } from './following';
 import type { PageBadge, ReleaseRef } from './pageBadges';
-import type { ReleaseTwinsResult } from './releaseTwins';
+import type { ReleaseCrateMatesResult } from './releaseCrateMates';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
-import type { TwinsResult, TwinStanding } from './twins';
+import type { CrateMatesResult, CrateMateStanding } from './crateMates';
 import type { WishlistItem } from './wishlist';
-import type { TwinsLatestResult } from './twinsLatest';
+import type { CrateMatesLatestResult } from './crateMatesLatest';
 
 type NoPayload = Record<string, never>;
 
@@ -54,23 +54,23 @@ export interface MessageMap {
   getPreview: { request: { url: string }; response: ReleasePreview };
   /** Never recommend this release again, in any list. */
   hideRelease: { request: { matchKey: ItemKey }; response: null };
-  /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */
-  getTwins: { request: NoPayload; response: TwinsResult };
-  /** Releases your top twins own and you don't, for the For you tab on your profile. */
+  /** The crate-mates leaderboard as last computed, with the fans' names and avatars. */
+  getCrateMates: { request: NoPayload; response: CrateMatesResult };
+  /** Releases your top crate mates own and you don't, for the For you tab on your profile. */
   getForYou: { request: { mode: ForYouMode }; response: ForYouResult };
-  /** What your top twins bought lately that you don't own, for Twins' latest on your profile. */
-  getTwinsLatest: { request: NoPayload; response: TwinsLatestResult };
+  /** What your top crate mates bought lately that you don't own, for Crate mates' latest on your profile. */
+  getCrateMatesLatest: { request: NoPayload; response: CrateMatesLatestResult };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
-  getTwinStanding: { request: { fanId: number }; response: TwinStanding | null };
-  /** `getTwinStanding` for many fans in one board read. Fans not on the board are left out. */
-  getTwinStandings: {
+  getCrateMateStanding: { request: { fanId: number }; response: CrateMateStanding | null };
+  /** `getCrateMateStanding` for many fans in one board read. Fans not on the board are left out. */
+  getCrateMateStandings: {
     request: { fanIds: number[] };
-    response: Record<number, TwinStanding>;
+    response: Record<number, CrateMateStanding>;
   };
   /** Badges for a page's release links, one per link in order; null for an unknown release. */
   getPageBadges: { request: { links: ReleaseRef[] }; response: (PageBadge | null)[] };
-  /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
-  getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
+  /** Your crate mates who own a release, for the sidebar's "Crate mates who own this" tab. */
+  getReleaseCrateMates: { request: { itemKey: ItemKey }; response: ReleaseCrateMatesResult };
   /** Your tags, by name. */
   listTags: { request: NoPayload; response: Tag[] };
   /** A name that already exists answers with that tag. */
@@ -173,8 +173,8 @@ export interface EventMap {
   scanProgress: ScanProgress;
   /** A watched release was re-scored. */
   alsoBought: AlsoBoughtResult;
-  /** Sent with `alsoBought`: the twins owning that release, after the same scans. */
-  releaseTwins: ReleaseTwinsResult;
+  /** Sent with `alsoBought`: the crate mates owning that release, after the same scans. */
+  releaseCrateMates: ReleaseCrateMatesResult;
 }
 
 export type EventType = keyof EventMap;

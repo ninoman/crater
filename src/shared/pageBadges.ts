@@ -12,8 +12,8 @@ export interface ReleaseRef {
 export interface PageBadge {
   owned: boolean;
   wishlisted: boolean;
-  /** How many of your top twins own it. */
-  twins: number;
-  /** How many top twins were looked at (settings.topTwinsK, or fewer on a short board). */
-  topTwins: number;
+  /** How many of your top crate mates own it. */
+  crateMates: number;
+  /** How many top crate mates were looked at (settings.topCrateMatesK, or fewer on a short board). */
+  topCrateMates: number;
 }

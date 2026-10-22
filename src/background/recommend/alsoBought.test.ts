@@ -8,7 +8,7 @@ import {
   hideRelease,
   putFollowing,
   putOwnership,
-  replaceTwins,
+  replaceCrateMates,
   saveReleaseSupporters,
   upsertCollectionItems,
   upsertSupporterFans,
@@ -166,7 +166,7 @@ describe('computeAlsoBought', () => {
       label: null,
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
-      reason: { kind: 'co-owned', owners: 5, twins: 0 },
+      reason: { kind: 'co-owned', owners: 5, crateMates: 0 },
       followed: null,
     });
     expect(rows.map((row) => row.matchKey)).not.toContain('a950');
@@ -205,10 +205,10 @@ describe('computeAlsoBought', () => {
     ]);
   });
 
-  it('boosts releases your twins among the supporters own', async () => {
+  it('boosts releases your crate mates among the supporters own', async () => {
     await seedBigRelease();
-    // Fan 30 is your best twin but doesn't own a100, so their a200 copy doesn't count.
-    await replaceTwins(
+    // Fan 30 is your best crate mate but doesn't own a100, so their a200 copy doesn't count.
+    await replaceCrateMates(
       db,
       [
         {
@@ -252,10 +252,10 @@ describe('computeAlsoBought', () => {
     // a900 (fans 17 and 18, share 1): 2.57 × 1.5 ≈ 3.85 passes a400's 3.75.
     const { rows } = await computeAlsoBought(db, 'a100', ME);
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a200', { kind: 'co-owned', owners: 8, twins: 1 }],
-      ['a300', { kind: 'co-owned', owners: 5, twins: 0 }],
-      ['a900', { kind: 'co-owned', owners: 3, twins: 2 }],
-      ['a400', { kind: 'co-owned', owners: 4, twins: 0 }],
+      ['a200', { kind: 'co-owned', owners: 8, crateMates: 1 }],
+      ['a300', { kind: 'co-owned', owners: 5, crateMates: 0 }],
+      ['a900', { kind: 'co-owned', owners: 3, crateMates: 2 }],
+      ['a400', { kind: 'co-owned', owners: 4, crateMates: 0 }],
     ]);
   });
 
@@ -366,7 +366,7 @@ describe('small-release fallback', () => {
     const { rows } = await computeAlsoBought(db, 'a1000', ME);
 
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a2000', { kind: 'co-owned', owners: 2, twins: 0 }],
+      ['a2000', { kind: 'co-owned', owners: 2, crateMates: 0 }],
       ['a1001', { kind: 'same-artist' }],
       ['a1002', { kind: 'same-label', label: 'Tiny Label' }],
       ['a1003', { kind: 'same-label', label: 'Tiny Label' }],

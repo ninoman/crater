@@ -12,7 +12,7 @@ import {
   trendOf,
   TREND_RATIO,
 } from './lately';
-import { sharedPositions } from './twins';
+import { sharedPositions } from './crateMates';
 
 const HALF_LIFE = 6 * MONTH_MS;
 const NOW = 1000 * MONTH_MS;

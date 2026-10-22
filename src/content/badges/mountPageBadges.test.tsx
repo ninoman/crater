@@ -16,11 +16,11 @@ beforeEach(() => {
         if (message.type !== 'getPageBadges') return { ok: false, error: message.type };
         const { links } = message.payload;
         batches.push(links);
-        // Promises is owned; everything else has 2 twins, except unknown urls.
+        // Promises is owned; everything else has 2 crate mates, except unknown urls.
         const data = links.map((link) => {
           if (link.url.endsWith('/unknown')) return null;
           const owned = link.itemKey === 'a3149089081';
-          return { owned, wishlisted: false, twins: owned ? 0 : 2, topTwins: 30 };
+          return { owned, wishlisted: false, crateMates: owned ? 0 : 2, topCrateMates: 30 };
         });
         return { ok: true, data };
       },
@@ -59,7 +59,7 @@ describe('startPageBadges', () => {
     expect(promises?.after?.classList.contains('item-link')).toBe(true);
     const cards = document.querySelectorAll('li.collection-item-container');
     for (const card of cards) expect(card.querySelectorAll('dighead-badge')).toHaveLength(1);
-    expect(placed.filter(({ text }) => text === '2 twins').length).toBeGreaterThanOrEqual(9);
+    expect(placed.filter(({ text }) => text === '2 crate mates').length).toBeGreaterThanOrEqual(9);
 
     // Infinite scroll: a new card and a link we can't identify. Only they are asked about.
     document.body.insertAdjacentHTML(
@@ -74,7 +74,7 @@ describe('startPageBadges', () => {
       'https://new.bandcamp.com/album/unknown',
     ]);
     const fresh = badges().filter(({ after }) => after?.textContent === 'Fresh');
-    expect(fresh.map(({ text }) => text)).toEqual(['2 twins']);
+    expect(fresh.map(({ text }) => text)).toEqual(['2 crate mates']);
     expect(badges().some(({ after }) => after?.textContent === 'Unknown')).toBe(false);
     expect(badges()).toHaveLength(placed.length + 1);
     stop();

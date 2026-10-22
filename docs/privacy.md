@@ -4,7 +4,7 @@
 
 **Last updated:** 2026-10-20
 
-Dighead is a Chrome extension that builds a database of Bandcamp fans and their collections, then uses it to suggest music (*Also bought*, *Taste twins*, *For you*). This policy says what it reads, where that data goes, and how to delete it.
+Dighead is a Chrome extension that builds a database of Bandcamp fans and their collections, then uses it to suggest music (*Also bought*, *Crate mates*, *For you*). This policy says what it reads, where that data goes, and how to delete it.
 
 ## The short version
 
@@ -30,7 +30,7 @@ Dighead does not read your payment details, email address, messages or anything 
 
 Everything below is stored locally on your device:
 
-- Scanned fans and their collections, release and supporter lists, the recommendation index and the taste-twin leaderboard.
+- Scanned fans and their collections, release and supporter lists, the recommendation index and the crate-mate leaderboard.
 - Your own synced collection and wishlist, your Bandcamp fan id and username, and the time of your last sync.
 - Releases you hid, and the scan queue.
 - Your settings, plus the scanner's pacing state (back-off, daily request count) and small interface preferences, in `chrome.storage.local`.
@@ -46,7 +46,7 @@ We do not sell, share or use your data for advertising or credit decisions, and 
 
 ## Deleting your data
 
-- **Clear all data:** open the Dighead popup and use **Clear all data**. It deletes scanned fans and collections, your synced collection, taste twins, hidden releases and the scan queue. Your settings are kept.
+- **Clear all data:** open the Dighead popup and use **Clear all data**. It deletes scanned fans and collections, your synced collection, crate mates, hidden releases and the scan queue. Your settings are kept.
 - **Uninstall:** removing the extension from `chrome://extensions` deletes all of its stored data, including settings.
 
 Because the data never leaves your device, we can't see it and have nothing to delete on our side.

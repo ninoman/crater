@@ -1,21 +1,21 @@
-import { useTwinsLatest } from '../../../hooks/useTwinsLatest';
-import type { TwinsLatestResult } from '../../../shared/twinsLatest';
+import { useCrateMatesLatest } from '../../../hooks/useCrateMatesLatest';
+import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
 import { Button, EmptyState, LinkButton } from '../../../ui';
 import { formatChecking } from './latestText';
 import { LatestList } from './LatestList';
 
-/** Twins' latest on your profile: what your top twins just bought, or why there's nothing yet. */
+/** Crate mates' latest on your profile: what your top crate mates just bought, or why there's nothing yet. */
 export function LatestTab() {
-  const { view, reload, hide } = useTwinsLatest();
+  const { view, reload, hide } = useCrateMatesLatest();
 
   switch (view.state) {
     case 'loading':
-      return <EmptyState title="Looking at what your twins bought lately…" />;
+      return <EmptyState title="Looking at what your crate mates bought lately…" />;
     case 'unreachable':
       return (
         <EmptyState
           tone="error"
-          title="Couldn't load Twins' latest"
+          title="Couldn't load Crate mates' latest"
           description="Dighead's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
           action={<Button onClick={reload}>Try again</Button>}
         />
@@ -29,7 +29,7 @@ export function LatestTab() {
   }
 }
 
-function NoPurchases({ result }: { result: TwinsLatestResult }) {
+function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
@@ -42,28 +42,28 @@ function NoPurchases({ result }: { result: TwinsLatestResult }) {
     return (
       <EmptyState
         title="Your collection is still syncing"
-        description="Twins' latest follows your taste twins, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
+        description="Crate mates' latest follows your crate mates, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
       />
     );
   }
-  if (result.twinsUsed === 0) {
+  if (result.crateMatesUsed === 0) {
     return (
       <EmptyState
-        title="No taste twins yet"
-        description="Twins' latest shows what your closest twins just bought. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
-        action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+        title="No crate mates yet"
+        description="Crate mates' latest shows what your closest crate mates just bought. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
+        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
   }
   return (
     <EmptyState
-      title="Nothing new from your twins lately"
+      title="Nothing new from your crate mates lately"
       description={
         result.checking > 0
           ? `${formatChecking(result.checking)}. Come back in a little while.`
-          : `Your ${result.twinsUsed} top twins bought nothing you don't already have in the last ${result.windowDays} days.`
+          : `Your ${result.crateMatesUsed} top crate mates bought nothing you don't already have in the last ${result.windowDays} days.`
       }
-      action={<LinkButton href="#twins">See the Twins tab</LinkButton>}
+      action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
 }

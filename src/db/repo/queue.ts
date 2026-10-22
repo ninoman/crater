@@ -170,7 +170,7 @@ export async function queuedFans(db: DigheadDb, fanIds: readonly number[]): Prom
   return new Set(jobs.map((job) => Number(job.target)));
 }
 
-/** A twin to re-read from their newest purchase back to `since` (decisions §11). */
+/** A crate mate to re-read from their newest purchase back to `since` (decisions §11). */
 export interface LatestRead {
   fanId: number;
   since: number;

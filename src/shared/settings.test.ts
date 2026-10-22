@@ -29,13 +29,28 @@ describe('validateSettings', () => {
 describe('sanitizeSettings', () => {
   it('fills in defaults for anything missing', () => {
     expect(sanitizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
-    expect(sanitizeSettings({ topTwinsK: 50 })).toEqual({ ...DEFAULT_SETTINGS, topTwinsK: 50 });
+    expect(sanitizeSettings({ topCrateMatesK: 50 })).toEqual({
+      ...DEFAULT_SETTINGS,
+      topCrateMatesK: 50,
+    });
   });
 
   it('drops values of the wrong type or out of range', () => {
     expect(
-      sanitizeSettings({ topTwinsK: '50', dailyRequestBudget: -1, labelClusterDownweight: false }),
+      sanitizeSettings({
+        topCrateMatesK: '50',
+        dailyRequestBudget: -1,
+        labelClusterDownweight: false,
+      }),
     ).toEqual({ ...DEFAULT_SETTINGS, labelClusterDownweight: false });
+  });
+
+  it('keeps values saved under their names from before the crate mates rename', () => {
+    expect(sanitizeSettings({ topTwinsK: 50, latelyRescanTwins: 10 })).toEqual({
+      ...DEFAULT_SETTINGS,
+      topCrateMatesK: 50,
+      latelyRescanCrateMates: 10,
+    });
   });
 
   it('falls back to all defaults when a kept value clashes with a reset one', () => {

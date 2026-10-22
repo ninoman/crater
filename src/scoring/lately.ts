@@ -1,9 +1,9 @@
-// Lately: how in step a fan's recent buying is with yours (decisions §11). Twins' weighted overlap,
+// Lately: how in step a fan's recent buying is with yours (decisions §11). Crate mates' weighted overlap,
 // except every purchase fades with age, a release you both bought around the same time counts
 // extra, and the same score taken a year ago gives the trend. Pure: times are ms since epoch,
 // 0 when unknown.
 
-import type { Trend } from '../shared/twins';
+import type { Trend } from '../shared/crateMates';
 
 const DAY_MS = 86_400_000;
 export const MONTH_MS = (365.25 / 12) * DAY_MS;
@@ -61,7 +61,7 @@ export function coTiming(a: number, b: number): number {
 
 /**
  * Σ w(i) × fade(yours) × fade(theirs) × coTiming over shared releases, divided by
- * √(your faded size × theirs). Twins' score with every purchase weighed by age, so old overlap
+ * √(your faded size × theirs). Crate mates' score with every purchase weighed by age, so old overlap
  * and old bulk both fade out. Null when either side bought too little by `when`.
  */
 export function latelyScore(
@@ -101,7 +101,7 @@ export function boughtSince(
   return count;
 }
 
-/** Which way a twin is heading, from their lately score now and a year ago. */
+/** Which way a crate mate is heading, from their lately score now and a year ago. */
 export function trendOf(now: number | null, yearAgo: number | null): Trend {
   if (now === null) return 'quiet';
   if (yearAgo === null) return 'new';

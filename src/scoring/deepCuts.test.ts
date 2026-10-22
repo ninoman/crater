@@ -8,10 +8,10 @@ import {
   scoreDeepCut,
   type DeepCutFacts,
 } from './deepCuts';
-import { rankForYou, scoreForYou, twinOwnership, type TwinMatches } from './forYou';
+import { rankForYou, scoreForYou, crateMateOwnership, type CrateMateMatches } from './forYou';
 import { nichePenalty } from './weights';
 
-// The research doc's dataset: five twins, none of these releases yours.
+// The research doc's dataset: five crate mates, none of these releases yours.
 const list = (...keys: ItemKey[]) => Float64Array.from(keys.map(keyToNumber)).sort();
 const STAPLE: ItemKey = 'a1';
 const NICHE: ItemKey = 'a2';
@@ -27,7 +27,7 @@ const lists = [
   list(STAPLE, NICHE, HIT, NO_COUNT), // D
   list(STAPLE, HIT, LONE), // E
 ];
-const twins: TwinMatches[] = [0.6, 0.5, 0.4, 0.3, 0.2].map((score, i) => ({
+const crateMates: CrateMateMatches[] = [0.6, 0.5, 0.4, 0.3, 0.2].map((score, i) => ({
   score,
   matches: lists[i] as Float64Array,
 }));
@@ -45,7 +45,7 @@ const facts = (id: number): DeepCutFacts | undefined => {
     ? undefined
     : { supporterCount: owners.get(key) ?? null, compilation: false };
 };
-const owned = twinOwnership(twins, new Set());
+const owned = crateMateOwnership(crateMates, new Set());
 const CAP = { maxSupporters: 50, limit: 60 };
 const ids = (rows: readonly { id: number }[]) => rows.map((row) => row.id);
 
@@ -86,12 +86,12 @@ describe('Deep cuts on the synthetic set', () => {
     expect(uncapped.at(-1)?.score).toBeCloseTo(0.015, 3);
   });
 
-  it('keeps one weak twin on a 1-owner record below staple and below two twins (mid)', () => {
+  it('keeps one weak crate mate on a 1-owner record below staple and below two crate mates (mid)', () => {
     const order = ids(rankDeepCuts(owned, facts, CAP));
     const at = (key: ItemKey) => order.indexOf(keyToNumber(key));
     expect(at(LONE)).toBeGreaterThan(at(STAPLE));
     expect(at(LONE)).toBeGreaterThan(at(MID));
-    // c is the knob: with no shrink, the lone twin's oddity jumps above mid.
+    // c is the knob: with no shrink, the lone crate mate's oddity jumps above mid.
     const unshrunk = ids(rankDeepCuts(owned, facts, { ...CAP, agreement: 0 }));
     expect(unshrunk.indexOf(keyToNumber(LONE))).toBeLessThan(unshrunk.indexOf(keyToNumber(MID)));
   });
@@ -144,10 +144,10 @@ describe('Deep-cut pruning', () => {
   });
 
   it('never looks up a candidate whose ceiling is below the last ranked score', () => {
-    // 60 releases one strong twin and many fans own, then one whose ceiling can't reach them.
+    // 60 releases one strong crate mate and many fans own, then one whose ceiling can't reach them.
     const strong = Float64Array.from({ length: 60 }, (_, i) => i + 100);
     const weak = new Float64Array([1]);
-    const candidates = twinOwnership(
+    const candidates = crateMateOwnership(
       [
         { score: 1, matches: strong },
         { score: 1, matches: strong },
@@ -170,15 +170,19 @@ describe('Deep-cut pruning', () => {
 });
 
 describe('deepCutReason', () => {
-  it('gives supporters, twins and the best twin rank', () => {
+  it('gives supporters, crate mates and the best crate mate rank', () => {
     const niche = rankDeepCuts(owned, facts, CAP).find((row) => row.id === keyToNumber(NICHE));
     if (!niche) throw new Error('niche missing');
-    expect(deepCutReason(niche, lists)).toEqual({ supporters: 3, twins: 2, bestTwinRank: 3 });
+    expect(deepCutReason(niche, lists)).toEqual({
+      supporters: 3,
+      crateMates: 2,
+      bestCrateMateRank: 3,
+    });
   });
 
-  it('keeps leaderboard ranks when a twin has no list', () => {
-    const niche = { id: keyToNumber(NICHE), supporters: 3, twins: 2 };
-    expect(deepCutReason(niche, [undefined, ...lists.slice(1)]).bestTwinRank).toBe(3);
-    expect(deepCutReason(niche, []).bestTwinRank).toBeNull();
+  it('keeps leaderboard ranks when a crate mate has no list', () => {
+    const niche = { id: keyToNumber(NICHE), supporters: 3, crateMates: 2 };
+    expect(deepCutReason(niche, [undefined, ...lists.slice(1)]).bestCrateMateRank).toBe(3);
+    expect(deepCutReason(niche, []).bestCrateMateRank).toBeNull();
   });
 });

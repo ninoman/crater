@@ -2,12 +2,12 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import type { ReleaseRef } from '../../shared/pageBadges';
-import { DigheadDb, type TwinRecord } from '../schema';
+import { DigheadDb, type CrateMateRecord } from '../schema';
 import { upsertCollectionItems } from './items';
 import { saveViewer } from './me';
 import { putOwnership } from './ownership';
 import { pageBadges } from './pageBadges';
-import { replaceTwins } from './twins';
+import { replaceCrateMates } from './crateMates';
 
 const ME = 1;
 
@@ -29,7 +29,7 @@ function item(itemKey: ItemKey, albumKey: ItemKey | null = null): CollectionItem
   };
 }
 
-function twin(fanId: number, score: number): TwinRecord {
+function crateMate(fanId: number, score: number): CrateMateRecord {
   return {
     fanId,
     overlap: 1,
@@ -50,7 +50,7 @@ function byUrl(key: ItemKey): ReleaseRef {
 let db: DigheadDb;
 
 // a1 has tracks t11 and t12. You own a1 and t21 (a track of a2), and wishlisted a3 and t41.
-// Twins by score: 10 owns a2 and t11, 11 owns a3, 12 owns a3 but ranks past the top 2.
+// Crate mates by score: 10 owns a2 and t11, 11 owns a3, 12 owns a3 but ranks past the top 2.
 beforeEach(async () => {
   db = new DigheadDb(`test-${crypto.randomUUID()}`);
   await db.open();
@@ -72,7 +72,7 @@ beforeEach(async () => {
   await putOwnership(db, 10, [item('a2'), item('t11', 'a1')], 'collection');
   await putOwnership(db, 11, [item('a3')], 'collection');
   await putOwnership(db, 12, [item('a3'), item('a5')], 'collection');
-  await replaceTwins(db, [twin(10, 3), twin(11, 2), twin(12, 1)], []);
+  await replaceCrateMates(db, [crateMate(10, 3), crateMate(11, 2), crateMate(12, 1)], []);
 });
 
 afterEach(async () => {
@@ -83,15 +83,15 @@ describe('pageBadges', () => {
   it('answers one badge per link, in order, from one batch', async () => {
     const refs = [byUrl('a1'), byUrl('t12'), byUrl('a2'), byUrl('a3'), byUrl('t41'), byUrl('a4')];
     const badges = await pageBadges(db, refs, 2);
-    expect(badges.map((b) => b && [b.owned, b.wishlisted, b.twins])).toEqual([
-      [true, false, 1], // a1: yours; twin 10 owns a track of it
+    expect(badges.map((b) => b && [b.owned, b.wishlisted, b.crateMates])).toEqual([
+      [true, false, 1], // a1: yours; crate mate 10 owns a track of it
       [true, false, 1], // t12: its album is yours
       [true, false, 1], // a2: you own a track of it
-      [false, true, 1], // a3: wishlisted; twin 12 is past the top 2
+      [false, true, 1], // a3: wishlisted; crate mate 12 is past the top 2
       [false, true, 0], // t41: wishlisted itself
       [false, false, 0], // a4: only a track of it is wishlisted
     ]);
-    expect(badges[0]?.topTwins).toBe(2);
+    expect(badges[0]?.topCrateMates).toBe(2);
   });
 
   it("doesn't count a track you own for its sibling tracks", async () => {
@@ -102,7 +102,7 @@ describe('pageBadges', () => {
     expect(album?.owned).toBe(true);
   });
 
-  it('counts top twins and takes ids from the page over urls', async () => {
+  it('counts top crate mates and takes ids from the page over urls', async () => {
     const [a3, a5] = await pageBadges(
       db,
       [
@@ -111,8 +111,8 @@ describe('pageBadges', () => {
       ],
       30,
     );
-    expect(a3).toMatchObject({ twins: 2, topTwins: 3 });
-    expect(a5).toMatchObject({ owned: false, wishlisted: false, twins: 1 });
+    expect(a3).toMatchObject({ crateMates: 2, topCrateMates: 3 });
+    expect(a5).toMatchObject({ owned: false, wishlisted: false, crateMates: 1 });
   });
 
   it('is null for a url it has never seen, and empty for no links', async () => {
@@ -125,6 +125,6 @@ describe('pageBadges', () => {
   it('knows nothing of your own items before you are detected', async () => {
     await db.me.clear();
     const [a1] = await pageBadges(db, [byUrl('a1')], 30);
-    expect(a1).toMatchObject({ owned: false, wishlisted: false, twins: 1 });
+    expect(a1).toMatchObject({ owned: false, wishlisted: false, crateMates: 1 });
   });
 });

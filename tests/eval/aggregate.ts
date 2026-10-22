@@ -16,7 +16,7 @@ export const METRICS: readonly MetricName[] = [
   'nicheRecall',
   'arp',
   'medianHitN',
-  'singleTwinShare',
+  'singleCrateMateShare',
 ];
 
 export interface AggRow {

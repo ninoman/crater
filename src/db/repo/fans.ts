@@ -16,7 +16,7 @@ export function collectionRead(status: FanStatus | undefined): boolean {
 }
 
 /**
- * Fans read from the newest item on: what twins compare. A quick read is 100 items from one
+ * Fans read from the newest item on: what crate mates compare. A quick read is 100 items from one
  * moment, too narrow a sample of their taste.
  */
 export function collectionFullyRead(status: FanStatus | undefined): boolean {
@@ -52,7 +52,7 @@ export async function upsertSupporterFans(
   });
 }
 
-/** How many fans' collections we've fully read: the pool twins draw from. */
+/** How many fans' collections we've fully read: the pool crate mates draw from. */
 export function countReadFans(db: DigheadDb): Promise<number> {
   return db.fans.where('status').anyOf(FULLY_READ).count();
 }
@@ -144,7 +144,7 @@ const FORGET_BATCH = 100;
 
 /**
  * Forgets fans last seen before `before`, with their ownership rows, match-index entries,
- * twin rows and queued scans. `keepFanId` (you) is never forgotten. Returns how many went.
+ * crate mate rows and queued scans. `keepFanId` (you) is never forgotten. Returns how many went.
  */
 export async function forgetFansNotSeenSince(
   db: DigheadDb,
@@ -165,13 +165,21 @@ export async function forgetFansNotSeenSince(
     if (ids.length === 0) return forgotten;
     await db.transaction(
       'rw',
-      [db.fans, db.ownership, db.fanMatches, db.matchOwners, db.twins, db.latelyTwins, db.queue],
+      [
+        db.fans,
+        db.ownership,
+        db.fanMatches,
+        db.matchOwners,
+        db.crateMates,
+        db.latelyCrateMates,
+        db.queue,
+      ],
       async () => {
         await deleteFanRows(db, ids);
         // Their rows are gone, so this drops their lists and lowers the owner counts.
         await refreshFanMatches(db, ids);
-        await db.twins.bulkDelete(ids);
-        await db.latelyTwins.bulkDelete(ids);
+        await db.crateMates.bulkDelete(ids);
+        await db.latelyCrateMates.bulkDelete(ids);
         await db.queue
           .where('[kind+target]')
           .anyOf(ids.map((fanId) => ['fan', `${fanId}`]))

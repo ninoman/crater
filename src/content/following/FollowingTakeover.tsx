@@ -4,7 +4,7 @@ import { notifyFollowingChanged } from '../../hooks/followingChanges';
 import { useFollowing } from '../../hooks/useFollowing';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useTags } from '../../hooks/useTags';
-import { useTwinStandings } from '../../hooks/useTwinStandings';
+import { useCrateMateStandings } from '../../hooks/useCrateMateStandings';
 import type { Following, FollowingKey, Tag } from '../../shared/following';
 import { Button, EmptyState, Notice, NoticeStack, PortalContainerProvider } from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
@@ -50,7 +50,7 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
     () => (kind === 'fan' ? allRows.map((row) => row.id) : NO_TAG_IDS),
     [kind, allRows],
   );
-  const standings = useTwinStandings(fanIds);
+  const standings = useCrateMateStandings(fanIds);
 
   const [rawFilter, setFilter] = useState(NO_FILTER);
   const filter = useMemo(

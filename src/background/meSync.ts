@@ -5,7 +5,7 @@ import { countFollowing, countOwnership, db, getMe, saveViewer, type MeRecord } 
 import { loadSettings } from '../shared/settings';
 import type { SyncActivity, SyncMode, SyncStatus } from '../shared/sync';
 import { fetchJson } from './http';
-import { refreshTwins } from './recommend';
+import { refreshCrateMates } from './recommend';
 import { paceDelayMs } from './scanner/pace';
 import { chromeScannerStore } from './scanner/state';
 import { syncMe } from './syncMe';
@@ -72,7 +72,7 @@ async function runSync(requested: SyncMode): Promise<void> {
       mode,
     );
     activity = { state: 'idle' };
-    refreshTwins();
+    refreshCrateMates();
     await afterSync({ me, mode, added }).catch((error: unknown) =>
       console.error('dighead: after-sync step failed', error),
     );

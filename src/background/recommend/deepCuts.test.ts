@@ -6,7 +6,7 @@ import {
   getMe,
   markSynced,
   putOwnership,
-  replaceTwins,
+  replaceCrateMates,
   saveViewer,
   upsertCollectionItems,
 } from '../../db';
@@ -56,7 +56,7 @@ async function me() {
   return getMe(db);
 }
 
-/** The research doc's set: twins A–E (10–14) scoring 0.6 down to 0.2. You own a7. */
+/** The research doc's set: crate mates A–E (10–14) scoring 0.6 down to 0.2. You own a7. */
 async function seed() {
   const staple = item('a1', 40);
   const niche = item('a2', 3);
@@ -71,7 +71,7 @@ async function seed() {
   await own(13, [staple, niche, hit, noCount]);
   await own(14, [staple, hit, lone]);
   await own(ME, [mine]);
-  await replaceTwins(
+  await replaceCrateMates(
     db,
     [0.6, 0.5, 0.4, 0.3, 0.2].map((score, i) => ({
       fanId: 10 + i,
@@ -89,13 +89,13 @@ async function seed() {
 }
 
 describe('computeDeepCuts', () => {
-  it('ranks rare releases your twins own, leaving out hits, uncounted and owned ones', async () => {
+  it('ranks rare releases your crate mates own, leaving out hits, uncounted and owned ones', async () => {
     await seed();
 
     const result = await computeDeepCuts(db, await me(), INPUT);
 
     expect(result.rows.map((row) => row.matchKey)).toEqual(['a2', 'a1', 'a3', 'a5']);
-    expect(result).toMatchObject({ basis: 'ready', twinsUsed: 5 });
+    expect(result).toMatchObject({ basis: 'ready', crateMatesUsed: 5 });
   });
 
   it('gives the reason-line facts', async () => {
@@ -106,8 +106,8 @@ describe('computeDeepCuts', () => {
     expect(rows[0]).toMatchObject({
       matchKey: 'a2',
       supporters: 3,
-      twins: 2,
-      bestTwinRank: 3,
+      crateMates: 2,
+      bestCrateMateRank: 3,
       lastBoughtAt: null,
       followed: null,
     });
@@ -125,7 +125,7 @@ describe('computeDeepCuts', () => {
     expect(await computeDeepCuts(db, undefined, INPUT)).toEqual({
       basis: 'no-viewer',
       rows: [],
-      twinsUsed: 0,
+      crateMatesUsed: 0,
     });
   });
 });

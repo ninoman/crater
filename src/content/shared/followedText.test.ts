@@ -9,6 +9,8 @@ describe('withFollowed', () => {
   });
 
   it('leaves the reason alone otherwise', () => {
-    expect(withFollowed('owned by 5 of your top twins', null)).toBe('owned by 5 of your top twins');
+    expect(withFollowed('owned by 5 of your top crate mates', null)).toBe(
+      'owned by 5 of your top crate mates',
+    );
   });
 });

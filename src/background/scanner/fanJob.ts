@@ -26,7 +26,7 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<StepRes
 }
 
 /**
- * Seed scans fill twins, not a page you're looking at, so they go straight to the full scan.
+ * Seed scans fill crate mates, not a page you're looking at, so they go straight to the full scan.
  * Logged out, the profile has no count, so the quick read comes first.
  */
 async function firstStep(ctx: StepContext, job: FanJob): Promise<StepResult> {

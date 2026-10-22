@@ -152,8 +152,8 @@ export async function seedFromSync({ me, mode, added }: SyncResult): Promise<voi
   if ((await seedOwnReleases(db, me.fanId, Date.now(), only)) > 0) kickScanner();
 }
 
-/** Queues latest reads of the top lately twins that are due (decisions §11). */
-export async function rescanLatelyTwins(): Promise<void> {
+/** Queues latest reads of the top lately crate mates that are due (decisions §11). */
+export async function rescanLatelyCrateMates(): Promise<void> {
   if ((await queueLatelyRescans(db, await loadSettings(), Date.now())) > 0) kickScanner();
 }
 

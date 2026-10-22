@@ -4,7 +4,7 @@ import { NoticeStack } from '../../ui';
 import { ForYouTab } from './forYou/ForYouTab';
 import { LatestTab } from './latest/LatestTab';
 import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
-import { TwinsTab } from './twins/TwinsTab';
+import { CrateMatesTab } from './crateMates/CrateMatesTab';
 
 interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
   View: ComponentType;
@@ -12,9 +12,9 @@ interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
 
 /** Our tabs on your profile, in order after Bandcamp's own. A new tab is one more entry here. */
 export const PROFILE_TABS = [
-  { id: 'twins', label: 'twins', View: TwinsTab },
+  { id: 'crate-mates', label: 'crate mates', View: CrateMatesTab },
   { id: 'for-you', label: 'for you', View: ForYouTab },
-  { id: 'latest', label: "twins' latest", View: LatestTab },
+  { id: 'latest', label: "crate mates' latest", View: LatestTab },
 ] as const satisfies readonly ProfileTab<string>[];
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];

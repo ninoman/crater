@@ -15,14 +15,14 @@ describe('latest text', () => {
     expect(formatBuyers(named('Ana', 'Ben', 'Cy', 'Di'))).toBe('bought by Ana, Ben and 2 more');
   });
 
-  it('summarises the feed and the twins still being checked', () => {
+  it('summarises the feed and the crate mates still being checked', () => {
     expect(formatLatestSummary(1, 1, 60)).toBe(
-      '1 release your top twin bought in the last 60 days',
+      '1 release your top crate mate bought in the last 60 days',
     );
     expect(formatLatestSummary(12, 40, 60)).toBe(
-      '12 releases your 40 top twins bought in the last 60 days',
+      '12 releases your 40 top crate mates bought in the last 60 days',
     );
-    expect(formatChecking(1)).toBe('Checking 1 twin for new purchases');
+    expect(formatChecking(1)).toBe('Checking 1 crate mate for new purchases');
   });
 
   it('says who bought it and when', () => {

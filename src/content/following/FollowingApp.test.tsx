@@ -23,7 +23,7 @@ function answer(message: { type: string; payload: Record<string, unknown> }): un
       return rows.filter((row) => row.kind === message.payload.kind);
     case 'listTags':
       return TAGS;
-    case 'getTwinStandings':
+    case 'getCrateMateStandings':
       return {};
     case 'setUnfollowed': {
       const { key, unfollowed } = message.payload as { key: FollowingKey; unfollowed: boolean };

@@ -9,11 +9,11 @@ import { getPageBadges } from './pageBadges';
 import {
   getAlsoBought,
   getForYou,
-  getReleaseTwins,
-  getTwinStanding,
-  getTwinStandings,
-  getTwinsLatest,
-  getTwinsResult,
+  getReleaseCrateMates,
+  getCrateMateStanding,
+  getCrateMateStandings,
+  getCrateMatesLatest,
+  getCrateMatesResult,
 } from './recommend';
 import {
   clearScanData,
@@ -45,13 +45,13 @@ export const handlers: MessageHandlers = {
     await hideRelease(db, matchKey, Date.now());
     return null;
   },
-  getTwins: () => getTwinsResult(),
-  getTwinStanding: ({ fanId }) => getTwinStanding(db, fanId),
-  getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
-  getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
+  getCrateMates: () => getCrateMatesResult(),
+  getCrateMateStanding: ({ fanId }) => getCrateMateStanding(db, fanId),
+  getCrateMateStandings: ({ fanIds }) => getCrateMateStandings(db, fanIds),
+  getReleaseCrateMates: ({ itemKey }) => getReleaseCrateMates(itemKey),
   getPageBadges: ({ links }) => getPageBadges(db, links),
   getForYou: ({ mode }) => getForYou(mode),
-  getTwinsLatest: () => getTwinsLatest(),
+  getCrateMatesLatest: () => getCrateMatesLatest(),
   ...followingHandlers(db),
   ...wishlistHandlers(db),
   ...backupHandlers(db),

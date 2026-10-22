@@ -5,7 +5,7 @@ import { sendMessage } from '../shared/messages';
 
 export type ForYouView =
   | { state: 'loading' }
-  /** `loadedAt` stands in for now when saying how long ago a twin bought a pick. */
+  /** `loadedAt` stands in for now when saying how long ago a crate mate bought a pick. */
   | { state: 'ready'; result: ForYouResult; loadedAt: number }
   | { state: 'unreachable'; error: string };
 

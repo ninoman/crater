@@ -5,9 +5,9 @@ import type { ItemKey } from '../../src/bandcamp';
 import { computeAlsoBought } from '../../src/background/recommend/alsoBought';
 import { computeDeepCuts } from '../../src/background/recommend/deepCuts';
 import { computeForYou } from '../../src/background/recommend/forYou';
-import { computeReleaseTwins } from '../../src/background/recommend/releaseTwins';
-import { readTwinsResult } from '../../src/background/recommend/twinRows';
-import { computeTwinsLatest } from '../../src/background/recommend/twinsLatest';
+import { computeReleaseCrateMates } from '../../src/background/recommend/releaseCrateMates';
+import { readCrateMatesResult } from '../../src/background/recommend/crateMateRows';
+import { computeCrateMatesLatest } from '../../src/background/recommend/crateMatesLatest';
 import { rankSupporters } from '../../src/background/scanner/passZero';
 import {
   collectionRows,
@@ -54,15 +54,15 @@ export async function collectOutputs(db: DigheadDb): Promise<unknown> {
   const me = await getMe(db);
   const out: Record<string, unknown> = {};
 
-  out.twins = await readTwinsResult(db, DEFAULT_SETTINGS.latelyHalfLifeMonths);
+  out.crateMates = await readCrateMatesResult(db, DEFAULT_SETTINGS.latelyHalfLifeMonths);
   for (const key of RELEASES) {
     out[`alsoBought ${key}`] = await computeAlsoBought(db, key, ME);
-    out[`releaseTwins ${key}`] = await computeReleaseTwins(db, key);
+    out[`releaseCrateMates ${key}`] = await computeReleaseCrateMates(db, key);
   }
   for (const mode of ['all', 'fresh'] as const) {
     out[`forYou ${mode}`] = await computeForYou(db, me, {
       mode,
-      topTwinsK: DEFAULT_SETTINGS.topTwinsK,
+      topCrateMatesK: DEFAULT_SETTINGS.topCrateMatesK,
       latelyHalfLifeMonths: DEFAULT_SETTINGS.latelyHalfLifeMonths,
       followingBoost: true,
       ignoreCompilations: true,
@@ -73,7 +73,12 @@ export async function collectOutputs(db: DigheadDb): Promise<unknown> {
     maxSupporters: DEFAULT_SETTINGS.deepCutMaxSupporters,
     ignoreCompilations: true,
   });
-  out.twinsLatest = await computeTwinsLatest(db, me, DEFAULT_SETTINGS.topTwinsK, NOW);
+  out.crateMatesLatest = await computeCrateMatesLatest(
+    db,
+    me,
+    DEFAULT_SETTINGS.topCrateMatesK,
+    NOW,
+  );
   out.pageBadges = await pageBadges(
     db,
     [
@@ -90,7 +95,7 @@ export async function collectOutputs(db: DigheadDb): Promise<unknown> {
       { url: 'https://band12.bandcamp.com/album/whatever', itemKey: 'a1090' },
       { url: 'https://band12.bandcamp.com/album/whatever', itemKey: 'a1999' },
     ],
-    DEFAULT_SETTINGS.topTwinsK,
+    DEFAULT_SETTINGS.topCrateMatesK,
   );
   out.wishlist = await listWishlist(db, ME);
 

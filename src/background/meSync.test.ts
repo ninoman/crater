@@ -11,7 +11,7 @@ vi.mock('../db', () => ({
   saveViewer: vi.fn(),
 }));
 vi.mock('./scanner/state', () => ({ chromeScannerStore: { load } }));
-vi.mock('./recommend', () => ({ refreshTwins: vi.fn() }));
+vi.mock('./recommend', () => ({ refreshCrateMates: vi.fn() }));
 
 import { startSync } from './meSync';
 

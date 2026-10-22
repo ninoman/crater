@@ -32,16 +32,16 @@ const GROUPS: Group[] = [
     ],
   },
   {
-    title: 'Taste twins',
+    title: 'Crate mates',
     fields: [
       { key: 'minCollectionSize', label: 'Min collection' },
       { key: 'maxCollectionSize', label: 'Max collection' },
-      { key: 'topTwinsK', label: 'Twins used (K)' },
+      { key: 'topCrateMatesK', label: 'Crate mates used (K)' },
       { key: 'latelyHalfLifeMonths', label: 'Lately half-life (months)' },
       { key: 'latelyMinPurchases', label: 'Lately min purchases' },
     ],
     toggles: [
-      { key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' },
+      { key: 'labelClusterDownweight', label: 'Down-weight label-cluster crate mates' },
       { key: 'followingBoost', label: 'Boost releases from accounts you follow' },
       { key: 'ignoreCompilations', label: 'Ignore compilations' },
     ],
@@ -53,14 +53,14 @@ const GROUPS: Group[] = [
   {
     title: 'Lately re-reads',
     fields: [
-      { key: 'latelyRescanTwins', label: 'Top lately twins (0 = off)' },
+      { key: 'latelyRescanCrateMates', label: 'Top lately crate mates (0 = off)' },
       { key: 'latelyRescanDays', label: 'Every (days)' },
     ],
   },
   {
     title: 'Pages',
     fields: [],
-    toggles: [{ key: 'pageBadges', label: 'Badges next to release links (owned, twins)' }],
+    toggles: [{ key: 'pageBadges', label: 'Badges next to release links (owned, crate mates)' }],
   },
 ];
 
@@ -79,7 +79,7 @@ function SaveLine({ view }: { view: ReadyView }) {
   return null;
 }
 
-/** Scanner pace, caps and twins thresholds, validated, with a reset to the defaults. */
+/** Scanner pace, caps and crate mates thresholds, validated, with a reset to the defaults. */
 export function SettingsPanel() {
   const { view, setField, save, reset } = useSettings();
 

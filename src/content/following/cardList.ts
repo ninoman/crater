@@ -12,7 +12,7 @@ import { FOLLOWING_CLASSES } from './takeOverList';
 export interface Card {
   id: number;
   item: HTMLLIElement;
-  /** Inside the card's shadow root: where its tags and twin rank render. */
+  /** Inside the card's shadow root: where its tags and crate mate rank render. */
   slot: HTMLElement;
   /** Inside a second shadow root over the avatar: where the select box renders. */
   selectSlot: HTMLElement;

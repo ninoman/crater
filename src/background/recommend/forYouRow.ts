@@ -2,12 +2,12 @@
 
 import { artUrl, type ItemKey } from '../../bandcamp';
 import type { ForYouData, ItemRecord } from '../../db';
-import type { Twin } from '../../scoring/forYou';
+import type { CrateMate } from '../../scoring/forYou';
 import type { ForYouRow } from '../../shared/forYou';
 
 export type PickFacts = Pick<
   ForYouRow,
-  'twins' | 'supporters' | 'bestTwinRank' | 'lastBoughtAt' | 'followed'
+  'crateMates' | 'supporters' | 'bestCrateMateRank' | 'lastBoughtAt' | 'followed'
 >;
 
 export function toRow(matchKey: ItemKey, item: ItemRecord, facts: PickFacts): ForYouRow {
@@ -22,11 +22,11 @@ export function toRow(matchKey: ItemKey, item: ItemRecord, facts: PickFacts): Fo
   };
 }
 
-/** The twins' match lists in board order, with a gap for twins never scanned, for bestTwinRank. */
+/** The crate mates' match lists in board order, with a gap for crate mates never scanned, for bestCrateMateRank. */
 export function listsInRankOrder(
-  twins: readonly Twin[],
+  crateMates: readonly CrateMate[],
   data: ForYouData,
 ): (Float64Array | undefined)[] {
-  const byFan = new Map(data.twinLists.map((list) => [list.fanId, list.matchIds]));
-  return twins.map((twin) => byFan.get(twin.fanId));
+  const byFan = new Map(data.crateMateLists.map((list) => [list.fanId, list.matchIds]));
+  return crateMates.map((crateMate) => byFan.get(crateMate.fanId));
 }

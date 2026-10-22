@@ -10,24 +10,24 @@ export interface Settings {
   collectionBatchSize: number;
   /** Max supporters paged per release (most recent first). */
   supportersPerReleaseCap: number;
-  /** Fans outside this collection-size range are ignored by twins scoring. */
+  /** Fans outside this collection-size range are ignored by crate mates scoring. */
   minCollectionSize: number;
   maxCollectionSize: number;
-  topTwinsK: number;
+  topCrateMatesK: number;
   labelClusterDownweight: boolean;
-  /** Leave compilations out of twin overlap and down-weight them as picks (decisions §17). */
+  /** Leave compilations out of crate mate overlap and down-weight them as picks (decisions §17). */
   ignoreCompilations: boolean;
-  /** Lately twins: a purchase counts half as much after this many months (decisions §11). */
+  /** Lately crate mates: a purchase counts half as much after this many months (decisions §11). */
   latelyHalfLifeMonths: number;
   /** Fans who bought less than this lately (purchases weighed by age) get no lately score. */
   latelyMinPurchases: number;
-  /** How many of the top lately twins get their newest purchases re-read more often. 0 turns it off. */
-  latelyRescanTwins: number;
+  /** How many of the top lately crate mates get their newest purchases re-read more often. 0 turns it off. */
+  latelyRescanCrateMates: number;
   /** Days between those re-reads (decisions §11). Everyone else waits the usual 30. */
   latelyRescanDays: number;
   /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
   seedFromCollection: boolean;
-  /** "owned" / "wishlist" / "3 twins" next to release links on Bandcamp pages (decisions §15). */
+  /** "owned" / "wishlist" / "3 crate mates" next to release links on Bandcamp pages (decisions §15). */
   pageBadges: boolean;
   /** Releases from artists and labels you follow score a little higher (decisions §16). */
   followingBoost: boolean;
@@ -44,12 +44,12 @@ export const DEFAULT_SETTINGS: Settings = {
   supportersPerReleaseCap: 500,
   minCollectionSize: 10,
   maxCollectionSize: 20000,
-  topTwinsK: 30,
+  topCrateMatesK: 30,
   labelClusterDownweight: true,
   ignoreCompilations: true,
   latelyHalfLifeMonths: 6,
   latelyMinPurchases: 5,
-  latelyRescanTwins: 25,
+  latelyRescanCrateMates: 25,
   latelyRescanDays: 7,
   seedFromCollection: true,
   pageBadges: false,
@@ -79,10 +79,10 @@ export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }
   supportersPerReleaseCap: { min: 80, max: 5000 },
   minCollectionSize: { min: 1, max: 1000 },
   maxCollectionSize: { min: 100, max: 1_000_000 },
-  topTwinsK: { min: 5, max: 200 },
+  topCrateMatesK: { min: 5, max: 200 },
   latelyHalfLifeMonths: { min: 1, max: 36 },
   latelyMinPurchases: { min: 1, max: 100 },
-  latelyRescanTwins: { min: 0, max: 200 },
+  latelyRescanCrateMates: { min: 0, max: 200 },
   latelyRescanDays: { min: 1, max: 30 },
   deepCutMaxSupporters: { min: 5, max: 1000 },
 };
@@ -109,10 +109,25 @@ export function validateSettings(settings: Settings): SettingsErrors {
   return errors;
 }
 
+/** Settings saved before a rename, by their old name (decisions §20). */
+const RENAMED_SETTINGS: Readonly<Record<string, keyof Settings>> = {
+  topTwinsK: 'topCrateMatesK',
+  latelyRescanTwins: 'latelyRescanCrateMates',
+};
+
+function withCurrentNames(stored: Record<string, unknown>): Record<string, unknown> {
+  const renamed = { ...stored };
+  for (const [old, current] of Object.entries(RENAMED_SETTINGS)) {
+    if (!(current in renamed) && old in renamed) renamed[current] = renamed[old];
+  }
+  return renamed;
+}
+
 /** Stored values that are missing, of the wrong type or out of range fall back to the default. */
 export function sanitizeSettings(stored: unknown): Settings {
-  const raw =
-    typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {};
+  const raw = withCurrentNames(
+    typeof stored === 'object' && stored !== null ? (stored as Record<string, unknown>) : {},
+  );
   const merged = { ...DEFAULT_SETTINGS };
   for (const key of Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]) {
     const value = raw[key];

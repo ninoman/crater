@@ -1,35 +1,35 @@
-// Keeps Also-bought and twins-who-own-this lists fresh for releases open in a tab, answers the
-// sidebar's requests, and keeps the taste-twins leaderboard up to date.
+// Keeps Also-bought and crate-mates-who-own-this lists fresh for releases open in a tab, answers the
+// sidebar's requests, and keeps the crate-mates leaderboard up to date.
 
 import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
-import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
-import type { TwinsResult } from '../../shared/twins';
-import type { TwinsLatestResult } from '../../shared/twinsLatest';
+import type { ReleaseCrateMatesResult } from '../../shared/releaseCrateMates';
+import type { CrateMatesResult } from '../../shared/crateMates';
+import type { CrateMatesLatestResult } from '../../shared/crateMatesLatest';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { computeAlsoBought } from './alsoBought';
 import { computeDeepCuts } from './deepCuts';
 import { computeForYou } from './forYou';
-import { computeReleaseTwins } from './releaseTwins';
+import { computeReleaseCrateMates } from './releaseCrateMates';
 import { rescoreDue } from './rescore';
-import { readTwinsResult } from './twinRows';
-import { computeTwins } from './twins';
-import { computeTwinsLatest } from './twinsLatest';
+import { readCrateMatesResult } from './crateMateRows';
+import { computeCrateMates } from './crateMates';
+import { computeCrateMatesLatest } from './crateMatesLatest';
 
-export { getTwinStanding, getTwinStandings } from './twinStanding';
+export { getCrateMateStanding, getCrateMateStandings } from './crateMateStanding';
 
-/** Twins are recomputed after this many fans finish scanning. */
-export const TWINS_EVERY_FANS = 25;
+/** Crate mates are recomputed after this many fans finish scanning. */
+export const CRATE_MATES_EVERY_FANS = 25;
 
 /** Supporters scanned since each release was last scored. Lost with the worker, which is fine. */
 const fansSinceScore = new Map<ItemKey, number>();
-let fansSinceTwins = 0;
-let twinsRun: Promise<void> | null = null;
-let twinsAgain = false;
+let fansSinceCrateMates = 0;
+let crateMatesRun: Promise<void> | null = null;
+let crateMatesAgain = false;
 
 export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResult> {
   fansSinceScore.set(releaseKey, 0);
@@ -40,7 +40,7 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
   });
 }
 
-/** For you on your profile, from the stored twins leaderboard, or the lately one for Fresh. */
+/** For you on your profile, from the stored crate mates leaderboard, or the lately one for Fresh. */
 export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   if (mode === 'deep') {
@@ -51,7 +51,7 @@ export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
   }
   return computeForYou(db, me, {
     mode,
-    topTwinsK: settings.topTwinsK,
+    topCrateMatesK: settings.topCrateMatesK,
     latelyHalfLifeMonths: settings.latelyHalfLifeMonths,
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
@@ -59,19 +59,19 @@ export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
   });
 }
 
-/** Twins' latest on your profile: what your top twins bought lately. */
-export async function getTwinsLatest(): Promise<TwinsLatestResult> {
+/** Crate mates' latest on your profile: what your top crate mates bought lately. */
+export async function getCrateMatesLatest(): Promise<CrateMatesLatestResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
-  return computeTwinsLatest(db, me, settings.topTwinsK, Date.now());
+  return computeCrateMatesLatest(db, me, settings.topCrateMatesK, Date.now());
 }
 
-/** Both twins leaderboards for the Twins tab on your profile. */
-export async function getTwinsResult(): Promise<TwinsResult> {
-  return readTwinsResult(db, (await loadSettings()).latelyHalfLifeMonths);
+/** Both crate mates leaderboards for the Crate mates tab on your profile. */
+export async function getCrateMatesResult(): Promise<CrateMatesResult> {
+  return readCrateMatesResult(db, (await loadSettings()).latelyHalfLifeMonths);
 }
 
-export function getReleaseTwins(releaseKey: ItemKey): Promise<ReleaseTwinsResult> {
-  return computeReleaseTwins(db, releaseKey);
+export function getReleaseCrateMates(releaseKey: ItemKey): Promise<ReleaseCrateMatesResult> {
+  return computeReleaseCrateMates(db, releaseKey);
 }
 
 /** A job finished for a watched release. Re-scores and pushes the list to tabs when due. */
@@ -86,37 +86,41 @@ export async function onScanStep(
     return;
   }
   await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'alsoBought', await getAlsoBought(releaseKey));
-  await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'releaseTwins', await getReleaseTwins(releaseKey));
+  await broadcastToTabs(
+    RELEASE_PAGE_PATTERNS,
+    'releaseCrateMates',
+    await getReleaseCrateMates(releaseKey),
+  );
 }
 
-/** Recomputes twins now, or once more after the running pass if one is under way. */
-export function refreshTwins(): void {
-  fansSinceTwins = 0;
-  if (twinsRun) {
-    twinsAgain = true;
+/** Recomputes crate mates now, or once more after the running pass if one is under way. */
+export function refreshCrateMates(): void {
+  fansSinceCrateMates = 0;
+  if (crateMatesRun) {
+    crateMatesAgain = true;
     return;
   }
-  twinsRun = (async () => {
+  crateMatesRun = (async () => {
     do {
-      twinsAgain = false;
+      crateMatesAgain = false;
       const me = await getMe(db);
       if (!me) return;
-      await computeTwins(
+      await computeCrateMates(
         { db, settings: await loadSettings(), now: Date.now(), yieldNow: yieldToEvents },
         me.fanId,
       );
-    } while (twinsAgain);
+    } while (crateMatesAgain);
   })()
-    .catch((error: unknown) => console.error('dighead: twins recompute failed', error))
+    .catch((error: unknown) => console.error('dighead: crate mates recompute failed', error))
     .finally(() => {
-      twinsRun = null;
+      crateMatesRun = null;
     });
 }
 
 /** A fan's collection scan ended. Every few fans, the leaderboard catches up. */
 export function onFanScanned(): void {
-  fansSinceTwins++;
-  if (fansSinceTwins >= TWINS_EVERY_FANS) refreshTwins();
+  fansSinceCrateMates++;
+  if (fansSinceCrateMates >= CRATE_MATES_EVERY_FANS) refreshCrateMates();
 }
 
 function yieldToEvents(): Promise<void> {

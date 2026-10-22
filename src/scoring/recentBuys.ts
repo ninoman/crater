@@ -1,6 +1,6 @@
 // A fan's newest purchases, from their match lists. Pure.
 
-import type { TwinPurchases } from './twinsLatest';
+import type { CrateMatePurchases } from './crateMatesLatest';
 
 export interface RecentBuy {
   /** Match id (keyToNumber of the matchKey). */
@@ -10,7 +10,7 @@ export interface RecentBuy {
 
 /** Up to `limit` releases, newest first. Releases with no known purchase time are left out. */
 export function recentBuys(
-  { matchIds, matchTimes }: Omit<TwinPurchases, 'fanId'>,
+  { matchIds, matchTimes }: Omit<CrateMatePurchases, 'fanId'>,
   limit: number,
 ): RecentBuy[] {
   const buys: RecentBuy[] = [];

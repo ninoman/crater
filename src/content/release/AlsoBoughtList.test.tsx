@@ -90,7 +90,7 @@ describe('AlsoBoughtList', () => {
     render({
       releaseKey: 'a1',
       warmup: null,
-      rows: [row('a3', { kind: 'co-owned', owners: 6, twins: 0 })],
+      rows: [row('a3', { kind: 'co-owned', owners: 6, crateMates: 0 })],
     });
 
     expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Also bought');

@@ -5,7 +5,7 @@ Step-by-step build plan for the Bandcamp digging extension (MV3, no backend), ba
 Each phase ends with something you can load unpacked in Chrome and use. Phases 0–6 are the MVP. Phases 7–8 take it to the Web Store. After that comes the backlog.
 
 ```
-P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also bought ─► P5 Twins ─► P6 For you ─► P7 Harden ─► P8 Ship
+P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also bought ─► P5 Crate mates ─► P6 For you ─► P7 Harden ─► P8 Ship
                                   └────────────── (P2 and P3 can overlap once P1 is done) ──┘
                                                                          └─► Following tags (after P6, modifies Bandcamp's following tab; not MVP)
                                                                                └─► Wishlist tags (same tags, on Bandcamp's wishlist tab)
@@ -47,13 +47,13 @@ P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also b
      background/   index.ts, queue.ts, scheduler.ts, router.ts (message handlers)
      bandcamp/     pagedata.ts, fan.ts, collection.ts, release.ts, types.ts   ← all parsing lives here
      db/           schema.ts (Dexie), repo/*.ts (typed read/write helpers)
-     scoring/      weights.ts, twins.ts, alsoBought.ts, forYou.ts
+     scoring/      weights.ts, crate mates.ts, alsoBought.ts, forYou.ts
      content/      shared/shadowRoot.tsx, release/, profile/
      popup/
      shared/       messages.ts (typed request/response), settings.ts
    tests/fixtures/
    ```
-4. [x] Dexie schema for all 7 stores, plus `items.albumKey` and an indexed `ownership.matchKey` (decisions §3.8), (`items`, `fans`, `ownership`, `releaseSupporters`, `me`, `twins`, `queue`) with the indexes from the spec. Version it from day one so later migrations stay clean.
+4. [x] Dexie schema for all 7 stores, plus `items.albumKey` and an indexed `ownership.matchKey` (decisions §3.8), (`items`, `fans`, `ownership`, `releaseSupporters`, `me`, `crateMates`, `queue`) with the indexes from the spec. Version it from day one so later migrations stay clean.
 5. [x] Parsers in `bandcamp/`, each returning typed objects and throwing a typed `ParserError` on unexpected shape:
    - `parseFanPage(html)` → fan_id, username, collection count, first items, first token
    - `parseCollectionPage(json)` → items and next token
@@ -116,7 +116,7 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
 2. [x] `scoring/alsoBought.ts`, implementing the spec's steps 1–5 (lift uses the local base rate, decisions §6):
    - co-ownership counts read from the `ownership.matchKey` index (no full scans), so a track and its album count as the same release
    - lift with a cap, then `score = co × log(1 + lift)`
-   - twin boost (stubbed as 0 until Phase 5)
+   - crate mate boost (stubbed as 0 until Phase 5)
    - drop owned, wishlisted, the release itself, and anything with `co < 2`
    - reason line: "7 of 48 supporters own this"
 3. [x] Small-release fallback (fewer than 8 supporters): blend in the same label's and the same artist's other releases, labeled as such.
@@ -136,35 +136,35 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 
 ---
 
-## Phase 5: Twins leaderboard (Milestone 5)
+## Phase 5: Crate mates leaderboard (Milestone 5)
 
 **Goal:** a ranked list of the fans whose collections overlap most with yours, shown on your profile page.
 
-1. [x] `scoring/twins.ts`: weighted overlap on `matchKey` divided by `√(|M|·|F|)`, plus raw overlap and Jaccard. Apply the min and max collection-size filters from settings.
+1. [x] `scoring/crateMates.ts`: weighted overlap on `matchKey` divided by `√(|M|·|F|)`, plus raw overlap and Jaccard. Apply the min and max collection-size filters from settings.
 2. [x] Label-cluster flag: more than 50% of the overlap comes from one label and F owns more than 60% of that label's catalog. Apply ×0.3 (toggleable). For the MVP, "label" is the selling account (`band_id`), and catalog size is that seller's item count in the local DB (see decisions §3).
-3. [x] Recompute twins after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
-4. [x] Wire the twin boost into Also bought, and add a *Twins who own this* tab to the sidebar. Boost ×(1 + 0.5 × twin share), at most ×1.5 (decisions §6).
+3. [x] Recompute crate mates after a sync and after every N new fans scanned, in chunks so the service worker never blocks for long.
+4. [x] Wire the crate mate boost into Also bought, and add a *Crate mates who own this* tab to the sidebar. Boost ×(1 + 0.5 × crate mate share), at most ×1.5 (decisions §6).
 5. [x] Profile page integration on `bandcamp.com/<you>`:
-   - inject a **Twins** tab next to Bandcamp's own tabs, styled to match
-   - put tab state in the URL hash (`#twins`), and hide Bandcamp's grid while the tab is active
+   - inject a **Crate mates** tab next to Bandcamp's own tabs, styled to match
+   - put tab state in the URL hash (`#crate-mates`), and hide Bandcamp's grid while the tab is active
    - leaderboard with avatar, name, overlap, % match, score and flag, plus sort (score / overlap / Jaccard) and filter
    - one tab injector (`src/content/profile/`) that For you (6.3) and Following reuse by adding an entry to `PROFILE_TABS`
-6. [x] On other fans' profiles, show a badge such as "your #4 twin · 37 in common".
+6. [x] On other fans' profiles, show a badge such as "your #4 crate mate · 37 in common".
 7. [x] "Add release to queue" button, so you can deliberately grow the dataset.
 
 Also added: the scanner seeds itself from your own collection. After each sync, your owned releases' supporters are queued at a third, lowest priority, newest purchase first, with a setting to turn it off and "N / M your releases scanned" in the popup (decisions §5).
 
-**Done when:** the leaderboard loads on reload or a direct `#twins` link, and the top 10 feel like real taste matches, not label subscribers.
+**Done when:** the leaderboard loads on reload or a direct `#crate-mates` link, and the top 10 feel like real taste matches, not label subscribers.
 
 ---
 
 ## Phase 6: For you (Milestone 6) → MVP complete
 
-**Goal:** recommendations built from what your top twins own.
+**Goal:** recommendations built from what your top crate mates own.
 
-1. [x] `scoring/forYou.ts`: take the top K twins (default 30), with `score(i) = Σ score(F) × w(i)`. Apply the same filters as Also bought.
+1. [x] `scoring/forYou.ts`: take the top K crate mates (default 30), with `score(i) = Σ score(F) × w(i)`. Apply the same filters as Also bought.
 2. [x] Optional diversity rule: at most 2 items per artist in the first 20.
-3. [x] **For you** tab on your profile (`#for-you`), with ranked rows, the reason line ("owned by 5 of your top twins"), and preview, wishlist and hide buttons.
+3. [x] **For you** tab on your profile (`#for-you`), with ranked rows, the reason line ("owned by 5 of your top crate mates"), and preview, wishlist and hide buttons.
 4. [x] Tests on synthetic data.
 
 **Done when:** all three features work together on your real data.
@@ -184,9 +184,9 @@ It isn't part of the MVP. Design and data source: decisions §8.
 5. [x] Schema v5 migration.
 6. [x] Following sync inside your own sync (always full, 500 per request).
 7. [x] Tags repo, with tests for merge-on-sync, delete-cascade and bulk assign.
-8. [x] Message bus and hooks, including batched `getTwinStandings`.
+8. [x] Message bus and hooks, including batched `getCrateMateStandings`.
 9. [x] `Chip`, `Checkbox` and `TagPicker` components, and `--dh-tag-1…8` colour tokens.
-10. [x] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and twin rank inside each card. Bulk tagging, unfollow tracking and all view states.
+10. [x] Render the full list as Bandcamp cards (`followCard.ts`, selectors in `FAN_PAGE_DOM`), with our filter bar, and tag chips, checkbox and crate mate rank inside each card. Bulk tagging, unfollow tracking and all view states.
 11. [x] Tags on the account's own page: fan pages, release pages and the band's home page.
 12. [x] Tag export/import.
 
@@ -212,21 +212,21 @@ Design: decisions §14.
 
 ---
 
-## Lately twins (not MVP)
+## Lately crate mates (not MVP)
 
-**Goal:** find the fans whose *recent* buying is in step with yours, not just the ones you overlapped with years ago, and see which twins are drifting apart or getting closer.
+**Goal:** find the fans whose *recent* buying is in step with yours, not just the ones you overlapped with years ago, and see which crate mates are drifting apart or getting closer.
 
 Design: decisions §11.
 
 1. [x] Purchase times in the match index (schema v7), and restoring v5 and v6 backups.
 2. [x] `scoring/lately.ts`: time-faded overlap, a co-timing bonus, and the trend against a year ago.
-3. [x] A second leaderboard (`latelyTwins`) from the same recompute pass.
-4. [x] Twins tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.
-5. [x] For you *Fresh* mode, built from lately twins and their recent buys.
-6. [x] Lately rank in the profile badge ("your #2 twin lately").
-7. [x] Re-scan top lately twins more often than every 30 days, and a "Twins' latest" feed of what they just bought.
+3. [x] A second leaderboard (`latelyCrateMates`) from the same recompute pass.
+4. [x] Crate mates tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.
+5. [x] For you *Fresh* mode, built from lately crate mates and their recent buys.
+6. [x] Lately rank in the profile badge ("your #2 crate mate lately").
+7. [x] Re-scan top lately crate mates more often than every 30 days, and a "Crate mates' latest" feed of what they just bought.
 
-**Done when:** on your real data the Lately board puts fans you're buying alongside now at the top, and long-standing twins you've drifted from show "apart".
+**Done when:** on your real data the Lately board puts fans you're buying alongside now at the top, and long-standing crate mates you've drifted from show "apart".
 
 ---
 
@@ -239,7 +239,7 @@ Design: decisions §12. The scoring half (confidence bound, omnivore damping, wa
 1. [x] Fan-profile parser for Bandcamp's "N items in common", with a signed-in fixture.
 2. [x] Pass 0: rank a release's supporters by what they're known to own of yours, with a `rank` tie-break in the queue (schema v8).
 3. [x] Pass 1: one signed-in profile page per supporter, ranked by in-common count over both collection sizes.
-4. [x] Pass 2: a quick 100-item read around each fan's purchase, best match first, then full scans in the background. Quick-read fans stay out of twins until then.
+4. [x] Pass 2: a quick 100-item read around each fan's purchase, best match first, then full scans in the background. Quick-read fans stay out of crate mates until then.
 
 **Done when:** opening a large release reads high-overlap supporters first, and their full scans still complete in the background.
 
@@ -247,53 +247,53 @@ Design: decisions §12. The scoring half (confidence bound, omnivore damping, wa
 
 ## Deep cuts (not MVP)
 
-**Goal:** a For you mode that surfaces releases few people own but your closest twins do, with an honest "only N owners" reason.
+**Goal:** a For you mode that surfaces releases few people own but your closest crate mates do, with an honest "only N owners" reason.
 
-Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twin scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 50).
+Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ crate mate scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 50).
 
 1. [x] `scoring/deepCuts.ts` (the cap passed in), plus the constants and `nichePenalty` in `weights.ts`, and the `deepCutMaxSupporters` setting (default 50, 5–1000) in `shared/settings.ts`, with the synthetic test set (niche beats staple, cap, agreement shrink, no-count skip, ceiling safety).
-2. [x] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
-3. [x] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
-4. [x] For you tab: a Deep cuts option in the `All time / Fresh` switch, a "Deep cut: at most N owners" field in the popup's settings, the reason line ("Only 4 owners on Bandcamp · 3 are your twins"), and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
-5. [x] Offline eval script (`tests/eval/`, run with `pnpm eval <backup.json>`, out of `pnpm test`): temporal and random holdout on a local backup, twins recomputed without the held-out releases, recall@k, niche recall@k, mean popularity of the list, median owners of the hits, and a grid over β, the shrink constant and the cap.
+2. [x] `computeDeepCuts` in `background/recommend/`, with K = 100 crate mates and ceiling pruning; `pnpm perf` with a 100-crate-mate board. Add the `items.supporterCount` index only if it's over budget.
+3. [x] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best crate mate's rank.
+4. [x] For you tab: a Deep cuts option in the `All time / Fresh` switch, a "Deep cut: at most N owners" field in the popup's settings, the reason line ("Only 4 owners on Bandcamp · 3 are your crate mates"), and the empty state "No deep cuts yet: your crate mates' rare records show up as more of them are scanned".
+5. [x] Offline eval script (`tests/eval/`, run with `pnpm eval <backup.json>`, out of `pnpm test`): temporal and random holdout on a local backup, crate mates recomputed without the held-out releases, recall@k, niche recall@k, mean popularity of the list, median owners of the hits, and a grid over β, the shrink constant and the cap.
 6. [x] Tune the defaults from the eval on real data, and record the numbers in decisions §18 (first run: defaults kept, re-run after more scanning).
-7. [ ] Later: an early-adopter boost, tested first ("do early buyers overlap more with your twins?").
+7. [ ] Later: an early-adopter boost, tested first ("do early buyers overlap more with your crate mates?").
 8. [ ] Later: β adapted to how mainstream your own collection is.
 
-**Done when:** on your real data, Deep cuts finds at least 1.5× as many of your held-out rare releases as For you does, and its rows feel like real finds, not noise from one twin.
+**Done when:** on your real data, Deep cuts finds at least 1.5× as many of your held-out rare releases as For you does, and its rows feel like real finds, not noise from one crate mate.
 
 ## Ignoring compilations (not MVP)
 
-**Goal:** label samplers and Various Artists comps stop making strangers look like twins and stop crowding the picks.
+**Goal:** label samplers and Various Artists comps stop making strangers look like crate mates and stop crowding the picks.
 
 Design: decisions §17.
 
 1. [x] Capture a compilation release page as a fixture (`album-page-compilation.html`).
 2. [x] `bandcamp/compilation.ts`: a high-precision detector (various-artists artist line, VA title prefix, and on release pages 3+ other track artists), set on collection and release-page items, with fixture tests.
 3. [x] Schema v11: `items.compilation`, flagged on existing items by the upgrade and on older backups by `migrateRows`. A collection page never clears a release page's flag.
-4. [x] Twins and lately twins: compilations you own are left out of the shared releases.
+4. [x] Crate mates and lately crate mates: compilations you own are left out of the shared releases.
 5. [x] Also bought and For you (both modes): compilations down-weighted ×0.5 as picks.
 6. [x] `ignoreCompilations` setting (default on), with a popup toggle.
 7. [ ] Check on real data: how many of your releases get flagged, and spot-check a sample for false positives.
 
-**Done when:** a fan whose only overlap with you is a comp isn't on either twins board, a comp ranks below a normal release with the same evidence in Also bought and For you, and no single-artist album in your collection is flagged.
+**Done when:** a fan whose only overlap with you is a comp isn't on either crate mates board, a comp ranks below a normal release with the same evidence in Also bought and For you, and no single-artist album in your collection is flagged.
 
 ---
 
 ## Page badges (not MVP)
 
-**Goal:** see at a glance, anywhere on bandcamp.com, which linked releases you own, have wishlisted, or your top twins own ("owned", "wishlist", "6 twins"), without any extra Bandcamp requests.
+**Goal:** see at a glance, anywhere on bandcamp.com, which linked releases you own, have wishlisted, or your top crate mates own ("owned", "wishlist", "6 crate mates"), without any extra Bandcamp requests.
 
 Design: decisions §15.
 
 1. [x] `bandcamp/pageLinks.ts`: release links and their ids from fan, band and release pages, else a normalised URL, with fixture tests.
-2. [x] Schema v10: an index on `items.url`, and `pageBadges` in `db/repo/`: owned, wishlisted and top-twin counts for a whole batch of links in one read.
+2. [x] Schema v10: an index on `items.url`, and `pageBadges` in `db/repo/`: owned, wishlisted and top-crate-mate counts for a whole batch of links in one read.
 3. [x] `getPageBadges` on the message bus.
 4. [x] Content script: one batched lookup per page, a debounced `MutationObserver` for pages that grow, one badge per release per card, rendered through one React root into small shadow roots.
 5. [x] Setting, off by default: *Pages* → "Badges next to release links" in the popup.
 6. [ ] Try it on live pages: Discover, the feed, a fan's collection, a band page and a release page's recommendations.
 
-**Done when:** with the setting on, a fan page and Discover show "owned" on your releases and "N twins" on releases your twins own, with one worker message per batch of links and no Bandcamp requests.
+**Done when:** with the setting on, a fan page and Discover show "owned" on your releases and "N crate mates" on releases your crate mates own, with one worker message per batch of links and no Bandcamp requests.
 
 ---
 
@@ -303,13 +303,13 @@ Design: decisions §15.
 
 Design: decisions §16. Uses the following sync from *Following tags*; no new requests.
 
-1. [x] `scoring/following.ts`: which releases come from a followed artist or label, a flat ×1.25 boost (below the twin boost's ×1.5), and followed-first ordering, with synthetic tests.
+1. [x] `scoring/following.ts`: which releases come from a followed artist or label, a flat ×1.25 boost (below the crate mate boost's ×1.5), and followed-first ordering, with synthetic tests.
 2. [x] Repo reads: followed bands with their local releases (seller or label), followed fans.
 3. [x] For you (both modes) and Also bought's co-owned rows: the boost, with pruning ceilings scaled so no boosted release is cut early. Setting `followingBoost` (default on) in the popup.
 4. [x] Reason text: "… · you follow Warp" on boosted rows.
 5. [x] Supporters you follow are read first: front of pass 0, and their collection reads ahead in pass 1.
-6. [x] "you follow" badge on both twins boards; scores untouched.
-7. [ ] Later, if followed fans turn out to be good twins: queue their collections at seed priority (≤ 20 requests each, once).
+6. [x] "you follow" badge on both crate mates boards; scores untouched.
+7. [ ] Later, if followed fans turn out to be good crate mates: queue their collections at seed priority (≤ 20 requests each, once).
 8. [ ] Try it on real data: do followed releases feel like a nudge, or like noise you already know?
 
 **Done when:** on your real data a release from an artist you follow moves up a few places in For you and says why, and turning the setting off puts it back.
@@ -354,4 +354,4 @@ Also added: full database export and import on the popup's Settings tab (backup,
 | End of P0 | Service-worker fetch carries cookies | Move your own collection and wishlist fetches into the content script |
 | End of P3 | No 429s at the default pace over an hour of scanning | Lower the defaults and the daily budget |
 | End of P4 | Re-score under ~200 ms at 300k rows | Precompute per-item owner counts and move scoring to an offscreen document. **Precomputing was enough: 39 ms (decisions §6).** |
-| End of P5 | Top twins aren't dominated by label subscribers | Tighten the label-cluster thresholds or the down-weight |
+| End of P5 | Top crate mates aren't dominated by label subscribers | Tighten the label-cluster thresholds or the down-weight |

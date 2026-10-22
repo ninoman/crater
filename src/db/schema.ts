@@ -64,7 +64,7 @@ export interface BandRecord {
 
 /**
  * `quick`: only the 100 items around their purchase of a release were read (decisions §12). Also
- * bought uses them; twins wait for the full scan, which is still queued.
+ * bought uses them; crate mates wait for the full scan, which is still queued.
  */
 export type FanStatus = 'queued' | 'quick' | 'partial' | 'done' | 'private' | 'error';
 
@@ -112,7 +112,7 @@ export interface FanMatchesRecord {
   fanId: number;
   matchIds: Float64Array;
   /**
-   * Tracks they own that belong to an album. Twin overlap needs them: two fans holding only
+   * Tracks they own that belong to an album. Crate mate overlap needs them: two fans holding only
    * different tracks of one album don't match (decisions §7).
    */
   trackIds: Float64Array;
@@ -150,7 +150,7 @@ export interface MeRecord {
   syncedAt: number | null;
 }
 
-export interface TwinRecord {
+export interface CrateMateRecord {
   fanId: number;
   overlap: number;
   jaccard: number;
@@ -176,7 +176,7 @@ export interface ReleaseCursor {
 /**
  * Where a fan job carries on (decisions §12). No cursor yet: the profile page (pass 1) is next.
  * `quick`: one collection page around when they bought the release. `full`: paging the whole
- * collection. `latest`: a top lately twin's purchases since `since`, newest first (decisions
+ * collection. `latest`: a top lately crate mate's purchases since `since`, newest first (decisions
  * §11); a null token starts from the top.
  */
 export type FanCursor =
@@ -253,11 +253,11 @@ export interface TagRecord {
   nameKey: string;
 }
 
-/** Blanks the v7 fields on a twin stored before them, until the next recompute fills them. */
-export function blankLately(twin: TwinRecord): void {
-  twin.lately ??= null;
-  twin.yearAgo ??= null;
-  twin.latelyOverlap ??= 0;
+/** Blanks the v7 fields on a crate mate stored before them, until the next recompute fills them. */
+export function blankLately(crateMate: CrateMateRecord): void {
+  crateMate.lately ??= null;
+  crateMate.yearAgo ??= null;
+  crateMate.latelyOverlap ??= 0;
 }
 
 /** Gives a job from before v8 its rank, and a fan job its `via` and a staged cursor. */
@@ -279,9 +279,15 @@ export function flagCompilation(item: StoredItem): void {
 
 /** Tables newer than the oldest restorable backup, by the version that added them. */
 export const TABLES_ADDED: Readonly<Record<string, number>> = {
-  latelyTwins: 7,
+  latelyCrateMates: 7,
   itemTags: 9,
   bands: 12,
+};
+
+/** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
+export const TABLES_RENAMED: Readonly<Record<string, { to: string; version: number }>> = {
+  twins: { to: 'crateMates', version: 13 },
+  latelyTwins: { to: 'latelyCrateMates', version: 13 },
 };
 
 export class DigheadDb extends Dexie {
@@ -291,9 +297,9 @@ export class DigheadDb extends Dexie {
   ownership!: Table<StoredOwnership, [number, ItemKey]>;
   releaseSupporters!: EntityTable<ReleaseSupportersRecord, 'itemKey'>;
   me!: EntityTable<MeRecord, 'id'>;
-  twins!: EntityTable<TwinRecord, 'fanId'>;
+  crateMates!: EntityTable<CrateMateRecord, 'fanId'>;
   /** The leaderboard by `lately` rather than `score`: the fans most in step with you now. */
-  latelyTwins!: EntityTable<TwinRecord, 'fanId'>;
+  latelyCrateMates!: EntityTable<CrateMateRecord, 'fanId'>;
   queue!: EntityTable<QueueJob, 'id'>;
   fanMatches!: EntityTable<FanMatchesRecord, 'fanId'>;
   matchOwners!: EntityTable<MatchOwnersRecord, 'matchId'>;
@@ -356,7 +362,7 @@ export class DigheadDb extends Dexie {
       following: '[kind+id], kind, *tagIds',
       tags: '++id, &nameKey',
     });
-    // v6: track lists on fanMatches, so twin overlap can tell tracks of one album apart (§7).
+    // v6: track lists on fanMatches, so crate mate overlap can tell tracks of one album apart (§7).
     this.version(6)
       .stores({})
       .upgrade((tx) => rebuildFanMatchLists(tx.table('fanMatches'), tx.table('ownership')));
@@ -366,7 +372,7 @@ export class DigheadDb extends Dexie {
       .stores({ latelyTwins: 'fanId, lately' })
       .upgrade(async (tx) => {
         await rebuildFanMatchLists(tx.table('fanMatches'), tx.table('ownership'));
-        await tx.table<TwinRecord>('twins').toCollection().modify(blankLately);
+        await tx.table<CrateMateRecord>('twins').toCollection().modify(blankLately);
       });
     // v8: a rank tie-break in the queue and staged fan jobs (decisions §12). Every old job
     // gets rank 0, so the order stays as it was.
@@ -390,6 +396,20 @@ export class DigheadDb extends Dexie {
         ownership: '[fanId+itemKey], matchKey',
       })
       .upgrade((tx) => slimToV12(tx.table('items'), tx.table('bands')));
+    // v13: the twins leaderboards renamed to crate mates (decisions §20). Dexie drops the old
+    // tables only after the upgrade has copied their rows.
+    this.version(13)
+      .stores({
+        crateMates: 'fanId, score',
+        latelyCrateMates: 'fanId, lately',
+        twins: null,
+        latelyTwins: null,
+      })
+      .upgrade(async (tx) => {
+        for (const [from, { to }] of Object.entries(TABLES_RENAMED)) {
+          await tx.table(to).bulkPut(await tx.table(from).toArray());
+        }
+      });
   }
 }
 
