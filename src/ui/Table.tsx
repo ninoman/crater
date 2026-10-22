@@ -14,6 +14,8 @@ export interface TableColumn<Row, SortKey extends string = string> {
   hint?: { label: string; content: ReactNode };
   /** Takes the table's spare width; the other columns shrink to fit their content. */
   grow?: boolean;
+  /** Keeps a short multi-word cell, like "↑ closer", on one line. Numeric cells never wrap. */
+  nowrap?: boolean;
 }
 
 export interface TableProps<Row, SortKey extends string = string> {
@@ -84,7 +86,11 @@ export function Table<Row, SortKey extends string = string>({
             {columns.map((column) => (
               <td
                 key={column.key}
-                className={cx('dh-table__cell', column.numeric && 'dh-table__cell--numeric')}
+                className={cx(
+                  'dh-table__cell',
+                  column.numeric && 'dh-table__cell--numeric',
+                  column.nowrap && 'dh-table__cell--nowrap',
+                )}
               >
                 {column.cell(row)}
               </td>

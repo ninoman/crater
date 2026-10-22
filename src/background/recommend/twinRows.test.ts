@@ -1,16 +1,19 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { Supporter } from '../../bandcamp';
+import type { CollectionItem, ItemKey, Supporter } from '../../bandcamp';
 import {
   DigheadDb,
   finishFanScan,
   markSynced,
   putFollowing,
+  putOwnership,
   replaceTwins,
   saveViewer,
+  upsertCollectionItems,
   upsertSupporterFans,
   type TwinRecord,
 } from '../../db';
+import { TWIN_BUYS } from './twinBuys';
 import { readTwinsResult } from './twinRows';
 
 let db: DigheadDb;
@@ -33,6 +36,24 @@ function supporter(fanId: number, name: string, imageId: number | null = null): 
     token: `1:1:${fanId}:0:1:0`,
     purchasedAt: null,
     isReviewer: false,
+  };
+}
+
+function item(itemKey: ItemKey, addedAt: number | null): CollectionItem {
+  return {
+    itemKey,
+    albumKey: null,
+    title: `Title ${itemKey}`,
+    artist: `Artist ${itemKey}`,
+    bandId: 1,
+    url: `https://artist.bandcamp.com/album/${itemKey}`,
+    artId: null,
+    purchaseKind: 'album',
+    label: null,
+    labelId: null,
+    otherOwners: null,
+    addedAt,
+    compilation: false,
   };
 }
 
@@ -98,6 +119,7 @@ describe('readTwinsResult', () => {
         lately: null,
         latelyOverlap: 0,
         trend: 'quiet',
+        recentBuys: [],
       },
       expect.objectContaining({ fanId: 11, rank: 2, name: 'fan11', avatarUrl: null }),
     ]);
@@ -151,5 +173,35 @@ describe('readTwinsResult', () => {
       expect.objectContaining({ fanId: 11, rank: 1, lately: 0.3, latelyOverlap: 6, trend: 'new' }),
       expect.objectContaining({ fanId: 10, rank: 2, lately: 0.1, trend: 'drifting' }),
     ]);
+  });
+
+  it('shows what each twin bought last, newest first, on both boards', async () => {
+    await saveViewer(db, { fanId: 1, username: 'me' });
+    await upsertSupporterFans(db, [supporter(10, 'Ten'), supporter(11, 'Eleven')], 0);
+    const bought = Array.from({ length: TWIN_BUYS + 2 }, (_, i) =>
+      item(`a${i + 1}` as ItemKey, (i + 1) * 100),
+    );
+    const undated = item('a99' as ItemKey, null);
+    await upsertCollectionItems(db, [...bought, undated], 0);
+    await putOwnership(db, 10, [...bought, undated], 'collection');
+    await replaceTwins(db, [twin(10, 0.5), twin(11, 0.2)], [twin(10, 0.5, { lately: 0.1 })]);
+
+    const result = await readTwinsResult(db, 6);
+
+    const buys = result.rows[0]?.recentBuys ?? [];
+    expect(buys).toHaveLength(TWIN_BUYS);
+    expect(buys[0]).toEqual({
+      matchKey: `a${TWIN_BUYS + 2}`,
+      title: `Title a${TWIN_BUYS + 2}`,
+      artist: `Artist a${TWIN_BUYS + 2}`,
+      url: `https://artist.bandcamp.com/album/a${TWIN_BUYS + 2}`,
+      coverUrl: null,
+      boughtAt: (TWIN_BUYS + 2) * 100,
+    });
+    expect(buys.map((buy) => buy.boughtAt)).toEqual(
+      [...buys.map((buy) => buy.boughtAt)].sort((a, b) => b - a),
+    );
+    expect(result.rows[1]?.recentBuys).toEqual([]);
+    expect(result.latelyRows[0]?.recentBuys).toEqual(buys);
   });
 });

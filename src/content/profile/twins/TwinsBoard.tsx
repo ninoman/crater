@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { timeAgo } from '../../../shared/timeAgo';
-import type { TwinRow, TwinsResult } from '../../../shared/twins';
+import type { TwinBuy, TwinRow, TwinsResult } from '../../../shared/twins';
 import {
   Badge,
   Button,
@@ -22,6 +22,8 @@ import {
   type TwinBoard,
   type TwinSort,
 } from './twinsView';
+import { NowPlaying } from './NowPlaying';
+import { TwinBuys } from './TwinBuys';
 
 type Column = TableColumn<TwinRow, TwinSort>;
 
@@ -29,7 +31,6 @@ const RANK: Column = { key: 'rank', header: '#', numeric: true, cell: (row) => r
 const FAN: Column = {
   key: 'fan',
   header: 'fan',
-  grow: true,
   cell: (row) => (
     <Identity
       avatarUrl={row.avatarUrl}
@@ -59,6 +60,7 @@ const OVERLAP: Column = {
 const TREND: Column = {
   key: 'trend',
   header: 'trend',
+  nowrap: true,
   cell: (row) => {
     const { arrow, word } = TREND_LABELS[row.trend];
     return (
@@ -110,10 +112,38 @@ function scoreColumn(key: ScoreKey, top: number): Column {
   };
 }
 
-function columnsFor(board: TwinBoard, top: number): Column[] {
+/** A twin's purchase that is previewing. */
+interface Playing {
+  fanId: number;
+  twinName: string;
+  buy: TwinBuy;
+}
+
+/** The covers column; it takes the spare width, so the fan column stays as wide as its names. */
+function buysColumn(
+  playing: Playing | null,
+  onToggle: (row: TwinRow, buy: TwinBuy) => void,
+  now: number,
+): Column {
+  return {
+    key: 'buys',
+    header: 'latest buys',
+    grow: true,
+    cell: (row) => (
+      <TwinBuys
+        buys={row.recentBuys}
+        playing={playing?.fanId === row.fanId ? playing.buy.matchKey : null}
+        onToggle={(buy) => onToggle(row, buy)}
+        now={now}
+      />
+    ),
+  };
+}
+
+function columnsFor(board: TwinBoard, top: number, buys: Column): Column[] {
   return board === 'all'
-    ? [RANK, FAN, OVERLAP, MATCH, scoreColumn('score', top), TREND]
-    : [RANK, FAN, THIS_YEAR, OVERLAP, scoreColumn('lately', top), TREND];
+    ? [RANK, FAN, buys, OVERLAP, MATCH, scoreColumn('score', top), TREND]
+    : [RANK, FAN, buys, THIS_YEAR, OVERLAP, scoreColumn('lately', top), TREND];
 }
 
 const SCORE_KEY: Record<TwinBoard, ScoreKey> = { all: 'score', lately: 'lately' };
@@ -130,16 +160,23 @@ export function TwinsBoard({ result, now }: { result: TwinsResult; now: number }
   const [board, setBoard] = useState<TwinBoard>('all');
   const [query, setQuery] = useState('');
   const [sortedBy, setSortedBy] = useState<TwinSort>(DEFAULT_SORT.all);
+  const [playing, setPlaying] = useState<Playing | null>(null);
   const boardRows = board === 'all' ? result.rows : result.latelyRows;
   const rows = useMemo(
     () => sortTwins(filterTwins(boardRows, query), sortedBy),
     [boardRows, query, sortedBy],
   );
   // Against the whole board, not the filtered rows, so a score doesn't change as you type.
-  const columns = useMemo(
-    () => columnsFor(board, topScore(boardRows, SCORE_KEY[board])),
-    [board, boardRows],
-  );
+  const columns = useMemo(() => {
+    const toggle = (row: TwinRow, buy: TwinBuy) =>
+      setPlaying((current) =>
+        current?.fanId === row.fanId && current.buy.matchKey === buy.matchKey
+          ? null
+          : { fanId: row.fanId, twinName: row.name, buy },
+      );
+    const buys = buysColumn(playing, toggle, now);
+    return columnsFor(board, topScore(boardRows, SCORE_KEY[board]), buys);
+  }, [board, boardRows, playing, now]);
   const flagged = boardRows.some((row) => row.labelCluster);
 
   const switchBoard = (next: TwinBoard) => {
@@ -185,6 +222,9 @@ export function TwinsBoard({ result, now }: { result: TwinsResult; now: number }
           action={<Button onClick={() => setQuery('')}>Clear filter</Button>}
         />
       )}
+      {playing && (
+        <NowPlaying buy={playing.buy} twinName={playing.twinName} onStop={() => setPlaying(null)} />
+      )}
       <p className="dh-profile__note">
         {board === 'all' ? (
           <>
@@ -199,8 +239,9 @@ export function TwinsBoard({ result, now }: { result: TwinsResult; now: number }
             This year: releases you both bought in the last 12 months.
           </>
         )}{' '}
-        Trend compares how in step your recent buying is now with a year ago; new means they bought
-        little back then, quiet that they've bought little lately.
+        Latest buys: their newest purchases; click a cover to preview it. Trend compares how in step
+        your recent buying is now with a year ago; new means they bought little back then, quiet
+        that they've bought little lately.
         {flagged &&
           ' A label cluster is a fan who collects most of one label you share; their score counts less.'}
       </p>

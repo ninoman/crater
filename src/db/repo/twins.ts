@@ -174,3 +174,16 @@ export function getTwins(db: DigheadDb): Promise<TwinRecord[]> {
 export function getLatelyTwins(db: DigheadDb): Promise<TwinRecord[]> {
   return db.latelyTwins.orderBy('lately').reverse().toArray();
 }
+
+/** Fans' match lists with purchase times, for showing what they bought last. Missing fans are left out. */
+export async function getPurchaseLists(
+  db: DigheadDb,
+  fanIds: readonly number[],
+): Promise<Pick<FanMatchesRecord, 'fanId' | 'matchIds' | 'matchTimes'>[]> {
+  const records = await db.fanMatches.bulkGet([...fanIds]);
+  return records.flatMap((record) =>
+    record
+      ? [{ fanId: record.fanId, matchIds: record.matchIds, matchTimes: record.matchTimes }]
+      : [],
+  );
+}

@@ -237,6 +237,7 @@ Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.htm
 - **% match is Jaccard**, shown as a percentage. The roadmap's columns (overlap, % match, score) and sorts (overlap, Jaccard, score) are the same three numbers. Sorting is one-way, best first; ties keep leaderboard order.
 - **A new tab** (For you) is one entry in `PROFILE_TABS` in `ProfileApp.tsx`: an id, a lowercase label and a view component. Views mount when their tab opens, so each opening fetches fresh data.
 - **Gap:** the leaderboard doesn't update live while open. Reopen the tab or reload after a recompute.
+- **Latest buys (added 2026-10-22):** each twin row shows their 6 newest purchases as covers, from `fanMatches.matchTimes` (releases with no known time are skipped, as are ones with no item record). They ride along in `getTwins` rather than a separate message: about 400 rows × 6 items, read in one `bulkGet`. Clicking a cover opens one shared player pinned to the bottom of the board (`NowPlaying`); a second click on the same cover, or its stop button, closes it.
 
 ### For you (Phase 6)
 
