@@ -34,18 +34,25 @@ import {
   type TwinBoost,
 } from '../../scoring/alsoBought';
 import { exclusions } from '../../scoring/exclusions';
+import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import { supporters } from '../../scoring/weights';
 import type { AlsoBoughtReason, AlsoBoughtResult, AlsoBoughtRow } from '../../shared/alsoBought';
+import { loadFollowedReleases } from './followSignal';
 
 /** Owner counts are looked up this many candidates at a time. */
 const CHUNK = 200;
 
+/** `followingBoost`: releases from accounts you follow score a little higher (decisions §16). */
 export async function computeAlsoBought(
   db: DigheadDb,
   releaseKey: ItemKey,
   meFanId: number | null,
+  followingBoost = true,
 ): Promise<AlsoBoughtResult> {
-  const data = await gatherAlsoBought(db, releaseKey, meFanId);
+  const [data, followed] = await Promise.all([
+    gatherAlsoBought(db, releaseKey, meFanId),
+    loadFollowedReleases(db, followingBoost),
+  ]);
   const excluded = exclusions(data.mine, data.hidden, data.matchKey);
   const basis = { supporters: data.supporters.length, population: data.population };
 
@@ -54,7 +61,7 @@ export async function computeAlsoBought(
     data.supporters.map((s) => s.matchIds),
     excluded,
   );
-  const scored = await scoreTop(db, candidates, data.supporters, basis, boosts);
+  const scored = await scoreTop(db, candidates, data.supporters, basis, boosts, followed);
   const wait = warmup(
     { read: data.supporters.length, allScanned: data.allScanned, listed: data.listed },
     scored.filter(isConfident).length,
@@ -71,7 +78,9 @@ export async function computeAlsoBought(
   const label = data.album?.label ?? data.release?.label ?? null;
   const rows = picks.flatMap((pick) => {
     const item = items.get(pick.matchKey);
-    return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label))] : [];
+    // Only co-owned rows were boosted; fallback picks are about the release's own seller.
+    const follow = pick.kind === 'co-owned' ? followed.get(keyToNumber(pick.matchKey)) : undefined;
+    return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label), follow ?? null)] : [];
   });
   return { releaseKey, rows, warmup: wait };
 }
@@ -79,7 +88,8 @@ export async function computeAlsoBought(
 /**
  * Scores candidates in falling co order, fetching owner counts and weighing votes a chunk at a
  * time, and stops once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
- * candidates whose own twin share still lets them in are looked up.
+ * candidates whose own twin share still lets them in are looked up. Ceilings are linear in co, so
+ * scaling co by the follow boost keeps them exact (§16).
  */
 async function scoreTop(
   db: DigheadDb,
@@ -87,16 +97,18 @@ async function scoreTop(
   supporters: readonly SupporterList[],
   basis: Basis,
   boosts: ReadonlyMap<number, TwinBoost>,
+  followed: ReadonlyMap<number, string>,
 ): Promise<Scored[]> {
   const maxShare = maxTwinShare(boosts);
+  const factor = maxFollowFactor(followed);
   const boostOf = (id: number) => boosts.get(id) ?? { share: 0, twins: 0 };
   let top: Scored[] = [];
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
-    if (!first || !couldEnter(top, ALSO_BOUGHT_LIMIT, first.co, maxShare)) break;
+    if (!first || !couldEnter(top, ALSO_BOUGHT_LIMIT, first.co * factor, maxShare)) break;
     const chunk = candidates
       .slice(start, start + CHUNK)
-      .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co, boostOf(c.id).share));
+      .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co * factor, boostOf(c.id).share));
     const ids = chunk.map((c) => c.id);
     const owners = await getOwnerCounts(db, ids);
     const votes = coOwnerVotes(ids, supporters);
@@ -108,7 +120,7 @@ async function scoreTop(
         boostOf(c.id),
       ),
     );
-    top = rankScored([...top, ...scored], ALSO_BOUGHT_LIMIT);
+    top = rankScored([...top, ...boostFollowed(scored, followed)], ALSO_BOUGHT_LIMIT);
   }
   return top;
 }
@@ -146,7 +158,12 @@ function reasonFor(pick: AlsoBoughtPick, label: string | null): AlsoBoughtReason
   }
 }
 
-function toRow(pick: AlsoBoughtPick, item: ItemRecord, reason: AlsoBoughtReason): AlsoBoughtRow {
+function toRow(
+  pick: AlsoBoughtPick,
+  item: ItemRecord,
+  reason: AlsoBoughtReason,
+  followed: string | null,
+): AlsoBoughtRow {
   return {
     matchKey: pick.matchKey,
     title: item.title,
@@ -155,5 +172,6 @@ function toRow(pick: AlsoBoughtPick, item: ItemRecord, reason: AlsoBoughtReason)
     url: item.url,
     coverUrl: item.artId === null ? null : artUrl(item.artId),
     reason,
+    followed,
   };
 }

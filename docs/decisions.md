@@ -592,3 +592,27 @@ A quiet pill after release links anywhere on bandcamp.com: **owned**, **wishlist
 
 - **Your data changes aren't pushed.** Wishlisting a release on a page doesn't turn its badge to "wishlist" until the next page load.
 - **Links whose stored URL differs** (a release first seen under a custom domain, then linked under its subdomain) aren't found by URL; the id containers above cover the pages that have them.
+
+## 16. Following as a signal
+
+Code: `src/scoring/following.ts` (pure), `src/db/repo/followSignal.ts`, wiring in `src/background/recommend/` (`followSignal.ts`) and `src/background/scanner/` (`passZero.ts`, `fanProfileStep.ts`), reason text in `src/content/shared/followedText.ts`. Decided 2026-10-22.
+
+### What the following sync gives us, and what it doesn't
+
+- **Ours only.** The sync (§8) stores *your* followings: band accounts (artists and labels, not told apart) by `band_id`, and fans by `fan_id`, with names. Unfollowed-on-the-tab rows (`unfollowed`) don't count as follows here.
+- **Other fans' followings aren't stored.** The same endpoints work for any `fan_id` logged out (§8), at one request per 500 follows per list, so two requests per fan. Not built: "follows the same artists as you" mostly restates collection overlap (you follow what you buy), and twins already measure that with purchases, which are the stronger signal. Two requests for each of the 200 twins would be ~400 requests a recompute for a small, redundant nudge.
+- **Followed fans aren't crawled either** (yet). Fans you follow are scanned only when a supporter list brings them in, as everyone else. Queueing them at seed priority would cost ≤ 20 requests each once (the 2,000-item cap at batch 100), then the 30-day re-read, and is the cheapest next step if followed fans turn out to be good twins. Left for later so this change touches no queue or sync code.
+
+### Signals, and how strong
+
+- **Releases from accounts you follow** (For you, both modes, and Also bought's co-owned rows): a release counts as followed when its selling account (`items.bandId`) or its label (`items.labelId`) is a band you follow. Its score is multiplied by `1 + FOLLOW_BOOST` = **×1.25**, flat. Smaller than the twin boost's ×1.5 (§6) on purpose: following an artist says you like them, but you'll also hear about their releases from Bandcamp itself, so these picks carry less discovery. ×1.25 re-orders close calls; it never lifts a release past one with clearly more evidence. Pruning stays exact: every candidate's ceiling is multiplied by the same factor (when you follow anyone), since both ceilings are linear.
+  - Same-artist and same-label fallback picks aren't re-ordered; they're already about the release's own seller.
+  - Setting `followingBoost` (default on, "Boost releases from accounts you follow"). Off, the boost and its reason text are both gone.
+- **Supporters you follow are read first** (§12): pass 0 moves followed fans to the front of a release's supporter order (page order among them), and in pass 1 a followed fan's collection always reads ahead of the profiles still waiting, ranked by similarity like the rest. Costs nothing: it only re-orders requests already planned. No setting: it changes when fans are read, not what's recommended.
+- **Fans you follow on the twins boards** get a "you follow" badge on their row (both boards). Their score isn't touched: the board is a measurement of overlap, and "your #4 twin" is read in badges, sidebars and For you weights. Nudging the score would make every rank partly about who you happen to follow.
+
+### Reason text
+
+- Rows boosted for a follow say so after the usual reason, with the account's name, as Fresh does with " · ": "7 supporters have this so far · you follow Warp", "owned by 5 of your top twins · you follow Warp". The name is Bandcamp's name for the account you follow. When both the seller and the label are followed, the seller's name shows.
+- **Cost:** one more read per score: the followed bands, then their releases through the `bandId` and `labelId` indexes. Pass 1 reads one `following` row per profile.
+- **Not yet checked on real data:** whether ×1.25 feels like a nudge. Tune it with the other weights (Phase 7.3).

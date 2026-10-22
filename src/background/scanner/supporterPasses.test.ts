@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
-import { DigheadDb, enqueueAt, fanJob, refreshFanMatches } from '../../db';
+import { DigheadDb, enqueueAt, fanJob, putFollowing, refreshFanMatches } from '../../db';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import type { StepEvent } from './context';
@@ -198,6 +198,38 @@ describe('pass 1: profile pages', () => {
       'fan 11',
     ]);
     expect(await db.fans.get(12)).toMatchObject({ itemCount: 50, inCommon: 30, status: 'done' });
+  });
+
+  it('reads a fan you follow right after their profile, whatever the overlap', async () => {
+    await signIn();
+    const requests = fakeBandcamp({
+      11: { inCommon: 0, items: 50 },
+      12: { inCommon: 30, items: 50 },
+      13: { inCommon: 5, items: 50 },
+    });
+    await putFollowing(db, [
+      {
+        kind: 'fan',
+        id: 11,
+        name: 'Fan 11',
+        url: '',
+        imageId: null,
+        location: null,
+        followedAt: 0,
+      },
+    ]);
+    await listSupporters([11, 12, 13]);
+
+    await drainQueue(deps());
+
+    expect(requests.map((r) => r.split(' ').slice(0, 2).join(' '))).toEqual([
+      'profile 11',
+      'fan 11',
+      'profile 12',
+      'fan 12',
+      'profile 13',
+      'fan 13',
+    ]);
   });
 
   it('keeps pass-0 order when the profile comes back logged out', async () => {

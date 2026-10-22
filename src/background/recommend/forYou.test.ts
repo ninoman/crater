@@ -6,6 +6,7 @@ import {
   getMe,
   hideRelease,
   markSynced,
+  putFollowing,
   putOwnership,
   replaceTwins,
   saveViewer,
@@ -91,6 +92,7 @@ const allTime = (topTwinsK: number): ForYouInput => ({
   mode: 'all',
   topTwinsK,
   latelyHalfLifeMonths: 6,
+  followingBoost: true,
   now: 0,
 });
 
@@ -160,8 +162,29 @@ describe('computeForYou', () => {
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       twins: 2,
       lastBoughtAt: null,
+      followed: null,
     });
     expect(rows.find((row) => row.matchKey === 'a5')?.title).toBe('Title t51');
+  });
+
+  it('names a followed label behind a track-only release, nudging without reordering', async () => {
+    await seed();
+    await upsertCollectionItems(db, [item('t51', { otherOwners: 3, labelId: 9 }, 'a5')], 0);
+    await putFollowing(db, [
+      { kind: 'band', id: 9, name: 'Label', url: '', imageId: null, location: null, followedAt: 0 },
+    ]);
+
+    // a5 ≈ 0.77 × 1.25 ≈ 0.96 stays just behind a3's 1.
+    const { rows } = await computeForYou(db, await me(), allTime(3));
+    expect(rows.map((row) => [row.matchKey, row.followed])).toEqual([
+      ['a2', null],
+      ['a3', null],
+      ['a5', 'Label'],
+      ['a1', null],
+    ]);
+
+    const off = await computeForYou(db, await me(), { ...allTime(3), followingBoost: false });
+    expect(off.rows.every((row) => row.followed === null)).toBe(true);
   });
 
   it('reads only the top K twins', async () => {
@@ -209,6 +232,7 @@ describe('computeForYou, Fresh', () => {
     mode: 'fresh',
     topTwinsK,
     latelyHalfLifeMonths: 6,
+    followingBoost: true,
     now: NOW,
   });
   const bought = (key: ItemKey, daysAgo: number | null) =>

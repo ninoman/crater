@@ -20,6 +20,8 @@ export interface AlsoBoughtRow {
   url: string;
   coverUrl: string | null;
   reason: AlsoBoughtReason;
+  /** The artist or label you follow behind it, when that lifted it (decisions §16). */
+  followed: string | null;
 }
 
 /** How far the wait for trustworthy co-owned rows has got (decisions §12). */

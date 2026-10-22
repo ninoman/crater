@@ -14,6 +14,7 @@ import {
   type MeRecord,
 } from '../../db';
 import { exclusions } from '../../scoring/exclusions';
+import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import {
   couldRank,
   FOR_YOU_LIMIT,
@@ -30,6 +31,7 @@ import { freshOwnership, type FreshOwned } from '../../scoring/fresh';
 import { MONTH_MS } from '../../scoring/lately';
 import { supporters } from '../../scoring/weights';
 import type { ForYouMode, ForYouResult, ForYouRow } from '../../shared/forYou';
+import { loadFollowedReleases } from './followSignal';
 import { twinsBasis } from './twinRows';
 
 /** Ranked before diversifying, so artists' moved-down extras leave room for others. */
@@ -42,6 +44,8 @@ export interface ForYouInput {
   topTwinsK: number;
   /** Fresh fades each twin's purchases with this half-life, as the lately score does. */
   latelyHalfLifeMonths: number;
+  /** Releases from accounts you follow score a little higher (decisions §16). */
+  followingBoost: boolean;
   now: number;
 }
 
@@ -63,7 +67,8 @@ export async function computeForYou(
   const lastBought = new Map<number, number>();
   for (const c of candidates) if ('lastBoughtAt' in c) lastBought.set(c.id, c.lastBoughtAt);
 
-  const { ranked, items } = await scoreTop(db, candidates);
+  const followed = await loadFollowedReleases(db, input.followingBoost);
+  const { ranked, items } = await scoreTop(db, candidates, followed);
   const artists = new Map<number, string>();
   for (const scored of ranked) {
     const item = items.get(keyFromNumber(scored.id));
@@ -72,8 +77,9 @@ export async function computeForYou(
   const rows = forYouPicks(ranked, artists, FOR_YOU_LIMIT).flatMap((pick) => {
     const item = items.get(pick.matchKey);
     if (!item) return [];
-    const boughtAt = lastBought.get(keyToNumber(pick.matchKey)) ?? null;
-    return [toRow(pick.matchKey, item, pick.twins, boughtAt)];
+    const id = keyToNumber(pick.matchKey);
+    const boughtAt = lastBought.get(id) ?? null;
+    return [toRow(pick.matchKey, item, pick.twins, boughtAt, followed.get(id) ?? null)];
   });
   return { basis, rows, twinsUsed: data.twinLists.length };
 }
@@ -117,20 +123,22 @@ function candidatesFor(
 /**
  * Scores candidates in falling twinScore order, a chunk at a time, and stops once none left
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
- * take a place.
+ * take a place. Ceilings allow for the follow boost, so a followed release is never cut early.
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly TwinOwned[],
+  followed: ReadonlyMap<number, string>,
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemRecord> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemRecord>();
+  const factor = maxFollowFactor(followed);
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
-    if (!first || !couldRank(ranked, RANKED, first.twinScore)) break;
+    if (!first || !couldRank(ranked, RANKED, first.twinScore * factor)) break;
     const chunk = candidates
       .slice(start, start + CHUNK)
-      .filter((c) => couldRank(ranked, RANKED, c.twinScore));
+      .filter((c) => couldRank(ranked, RANKED, c.twinScore * factor));
     const [display, owners] = await Promise.all([
       getDisplayItems(
         db,
@@ -147,7 +155,7 @@ async function scoreTop(
       items.set(keyFromNumber(c.id), item);
       return [scoreForYou(c, supporters([item.supporterCount], owners.get(c.id) ?? c.twins))];
     });
-    ranked = rankForYou([...ranked, ...scored], RANKED);
+    ranked = rankForYou([...ranked, ...boostFollowed(scored, followed)], RANKED);
   }
   return { ranked, items };
 }
@@ -157,6 +165,7 @@ function toRow(
   item: ItemRecord,
   twins: number,
   lastBoughtAt: number | null,
+  followed: string | null,
 ): ForYouRow {
   return {
     matchKey,
@@ -167,5 +176,6 @@ function toRow(
     coverUrl: item.artId === null ? null : artUrl(item.artId),
     twins,
     lastBoughtAt,
+    followed,
   };
 }

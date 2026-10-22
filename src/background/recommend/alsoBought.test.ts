@@ -6,6 +6,7 @@ import {
   finishFanScan,
   markQuickRead,
   hideRelease,
+  putFollowing,
   putOwnership,
   replaceTwins,
   saveReleaseSupporters,
@@ -153,6 +154,7 @@ describe('computeAlsoBought', () => {
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       reason: { kind: 'co-owned', owners: 5, twins: 0 },
+      followed: null,
     });
     expect(rows.map((row) => row.matchKey)).not.toContain('a950');
   });
@@ -242,6 +244,31 @@ describe('computeAlsoBought', () => {
       ['a900', { kind: 'co-owned', owners: 3, twins: 2 }],
       ['a400', { kind: 'co-owned', owners: 4, twins: 0 }],
     ]);
+  });
+
+  it('nudges releases from an account you follow past a close call, and says so', async () => {
+    await seedBigRelease();
+    // a200 (≈ 3.85) sits just behind a300 (≈ 4.0); ×1.25 lifts it to ≈ 4.8.
+    await upsertCollectionItems(db, [item('a200', { bandId: 2 })], 0);
+    await putFollowing(db, [
+      {
+        kind: 'band',
+        id: 2,
+        name: 'Followed Artist',
+        url: '',
+        imageId: null,
+        location: null,
+        followedAt: 0,
+      },
+    ]);
+
+    const { rows } = await computeAlsoBought(db, 'a100', ME);
+    expect(rows.map((row) => row.matchKey)).toEqual(['a200', 'a300', 'a400', 'a900']);
+    expect(rows.map((row) => row.followed)).toEqual(['Followed Artist', null, null, null]);
+
+    const off = await computeAlsoBought(db, 'a100', ME, false);
+    expect(off.rows.map((row) => row.matchKey)).toEqual(['a300', 'a200', 'a400', 'a900']);
+    expect(off.rows.every((row) => row.followed === null)).toBe(true);
   });
 
   it('has no co-owned rows before any supporter is scanned', async () => {

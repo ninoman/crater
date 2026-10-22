@@ -22,6 +22,8 @@ export interface TwinRow {
   score: number;
   /** Most of the overlap is one label they collect wholesale (decisions §7). */
   labelCluster: boolean;
+  /** A fan you follow on Bandcamp. Shown, never scored (decisions §16). */
+  followed: boolean;
   /** In step with your recent buying, null when either of you bought too little lately. */
   lately: number | null;
   /** Releases you both bought within the last year. */

@@ -27,6 +27,8 @@ export interface Settings {
   seedFromCollection: boolean;
   /** "owned" / "wishlist" / "3 twins" next to release links on Bandcamp pages (decisions §15). */
   pageBadges: boolean;
+  /** Releases from artists and labels you follow score a little higher (decisions §16). */
+  followingBoost: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -46,6 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
   latelyRescanDays: 7,
   seedFromCollection: true,
   pageBadges: false,
+  followingBoost: true,
 };
 
 export type NumericSetting = {

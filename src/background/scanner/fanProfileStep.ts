@@ -5,6 +5,7 @@ import { ParserError, fetchFanProfile, type FanProfile } from '../../bandcamp';
 import {
   collectionMatchCount,
   getFan,
+  isFollowedFan,
   getMe,
   profiledSupporters,
   saveFanProfile,
@@ -46,7 +47,8 @@ export async function profileStep(ctx: StepContext, job: FanJob): Promise<StepRe
 
 /**
  * Ahead of the profiles still waiting when it's at least half as close as the best of this
- * release's supporters so far. Logged out there's no count, so the fan keeps their pass-0 place.
+ * release's supporters so far, or when you follow them (§16). Logged out there's no count, so
+ * the fan keeps their pass-0 place.
  */
 async function rankAfterProfile(
   ctx: StepContext,
@@ -62,5 +64,6 @@ async function rankAfterProfile(
     similarity,
     ...others.map((fan) => inCommonSimilarity(fan.inCommon, yours, fan.itemCount)),
   );
-  return profiledRank(similarity, readsAhead(similarity, best));
+  const followed = await isFollowedFan(ctx.db, fanIdOf(job));
+  return profiledRank(similarity, followed || readsAhead(similarity, best));
 }
