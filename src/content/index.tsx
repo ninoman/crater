@@ -10,12 +10,18 @@ import sidebarCss from './release/ReleaseSidebar.css?inline';
 import { reportPage } from './reportPage';
 import { pageTagsStyles } from './shared/tagStyles';
 import { mountShadow } from './shared/mountShadow';
+import { pageTheme } from './shared/pageTheme';
 
 reportPage();
 
 switch (detectPageKind(document)) {
   case 'release':
-    mountShadow(document.body, <ReleaseSidebar />, sidebarCss + pageTagsStyles);
+    mountShadow(
+      document.body,
+      <ReleaseSidebar />,
+      sidebarCss + pageTagsStyles,
+      pageTheme(document),
+    );
     break;
   case 'band':
     mountBand(document);

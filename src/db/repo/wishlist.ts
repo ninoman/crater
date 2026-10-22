@@ -1,4 +1,4 @@
-// Your wishlist and your own tags on its items (decisions §13). Tag ids live in `itemTags`,
+// Your wishlist and your own tags on its items (decisions §14). Tag ids live in `itemTags`,
 // keyed by item, so a scan rewriting `items` or a sync rewriting `ownership` keeps them.
 
 import type { ItemKey } from '../../bandcamp';

@@ -1,4 +1,4 @@
-// A tag filter and selection over a list of tagged rows (decisions §8, §13), as pure functions.
+// A tag filter and selection over a list of tagged rows (decisions §8, §14), as pure functions.
 // Lists hide rows that don't pass rather than re-rendering, so these answer with keys.
 
 import { foldText } from '../../shared/fold';

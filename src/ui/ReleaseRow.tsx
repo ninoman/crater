@@ -20,7 +20,6 @@ export interface ReleaseRowProps {
   reason: string;
   /** Place in a ranked list, shown before the cover. */
   rank?: number;
-  badges?: ReactNode;
   /** A line under the reason, such as the outcome of an extra action. */
   status?: string | null;
   /** More action buttons, shown before Hide. */
@@ -37,7 +36,6 @@ export function ReleaseRow({
   release,
   reason,
   rank,
-  badges,
   status,
   extraActions,
   previewing,
@@ -69,7 +67,6 @@ export function ReleaseRow({
         reason,
         ...(status ? [status] : []),
       ]}
-      badges={badges}
       actions={
         <>
           <Tooltip content="Open in a new tab">

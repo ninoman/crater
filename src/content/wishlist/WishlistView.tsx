@@ -25,7 +25,7 @@ export interface WishlistViewProps {
 
 /**
  * Your whole wishlist in place of Bandcamp's paged one: a filter bar, then every release with
- * its tags, one preview open at a time, and bulk tagging of the checked ones (decisions §13).
+ * its tags, one preview open at a time, and bulk tagging of the checked ones (decisions §14).
  */
 export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
   const view = useWishlist();

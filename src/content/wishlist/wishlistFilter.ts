@@ -1,4 +1,4 @@
-// The wishlist tab's filter and selection over its items (decisions §13).
+// The wishlist tab's filter and selection over its items (decisions §14).
 
 import type { ItemKey } from '../../bandcamp';
 import type { WishlistItem } from '../../shared/wishlist';

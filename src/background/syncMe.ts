@@ -85,7 +85,7 @@ async function syncList(
 
   if (mode === 'full') {
     await removeOwnershipExcept(db, fanId, list, seen);
-    // Items that left the wishlist, bought or removed, take their tags with them (decisions §13).
+    // Items that left the wishlist, bought or removed, take their tags with them (decisions §14).
     if (list === 'wishlist') await removeItemTagsExcept(db, seen);
   }
   return fetched;

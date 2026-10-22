@@ -14,6 +14,12 @@
   white-space: nowrap;
 }
 
+/* Without a growing column, auto layout spreads spare width over every column, so a narrow
+   one like a rank gets a wide empty gutter. */
+.dh-table__head--grow {
+  width: 100%;
+}
+
 .dh-table__cell {
   padding: var(--dh-space-2) var(--dh-space-3);
   border-bottom: 1px solid var(--dh-color-border);

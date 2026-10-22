@@ -57,6 +57,14 @@ export const QueueIcon = () => (
   </Icon>
 );
 
+export const InfoIcon = () => (
+  <Icon>
+    <circle cx="8" cy="8" r="6" />
+    <path d="M8 7.5v3.5" />
+    <circle cx="8" cy="5" r="0.5" fill="currentColor" />
+  </Icon>
+);
+
 export const CheckIcon = () => (
   <Icon>
     <path d="M3.5 8.5l3 3 6-7" />

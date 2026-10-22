@@ -198,7 +198,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 
 **Goal:** tag the releases in your wishlist with the same tags as your follows, then filter your wishlist by tag, on Bandcamp's own wishlist tab.
 
-Design: decisions §13.
+Design: decisions §14.
 
 1. [x] Schema v9: `itemTags`, keyed by item, so scans and syncs never wipe them. A full wishlist sync drops the tags of items that left it.
 2. [x] Repo, messages and hooks: `listWishlist`, `getItemTags`, `assignItemTag`; deleting a tag takes it off items too.
@@ -242,6 +242,25 @@ Design: decisions §12. The scoring half (confidence bound, omnivore damping, wa
 4. [x] Pass 2: a quick 100-item read around each fan's purchase, best match first, then full scans in the background. Quick-read fans stay out of twins until then.
 
 **Done when:** opening a large release reads high-overlap supporters first, and their full scans still complete in the background.
+
+---
+
+## Deep cuts (not MVP)
+
+**Goal:** a For you mode that surfaces releases few people own but your closest twins do, with an honest "only N owners" reason.
+
+Design: [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twin scores × t/(t + 2) × n^−0.6, limited to releases with at most 50 Bandcamp owners.
+
+1. [ ] `scoring/deepCuts.ts`, plus the constants and `nichePenalty` in `weights.ts`, with the synthetic test set (niche beats staple, cap, agreement shrink, no-count skip, ceiling safety).
+2. [ ] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
+3. [ ] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
+4. [ ] For you tab: an `All / Deep cuts` switch (Fresh joins it when built), the reason line ("Only 4 owners on Bandcamp · 3 are your twins"), and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
+5. [ ] Offline eval script (`tests/eval/`, out of `pnpm test`): temporal and random holdout on a local backup, twins recomputed without the held-out releases, recall@k, niche recall@k, mean popularity of the list, median owners of the hits, and a grid over β, the shrink constant and the cap.
+6. [ ] Tune the defaults from the eval on real data, and record the decision and numbers in `docs/decisions.md`.
+7. [ ] Later: an early-adopter boost, tested first ("do early buyers overlap more with your twins?").
+8. [ ] Later: β adapted to how mainstream your own collection is.
+
+**Done when:** on your real data, Deep cuts finds at least 1.5× as many of your held-out rare releases as For you does, and its rows feel like real finds, not noise from one twin.
 
 ---
 

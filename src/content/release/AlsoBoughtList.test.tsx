@@ -23,7 +23,6 @@ function row(matchKey: `a${number}`, reason: AlsoBoughtRow['reason']): AlsoBough
     url: `https://artist.bandcamp.com/album/${matchKey}`,
     coverUrl: null,
     reason,
-    ownedTracks: 0,
   };
 }
 

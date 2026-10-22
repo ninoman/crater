@@ -113,19 +113,18 @@ describe('computeForYou', () => {
 
     const result = await computeForYou(db, await me(), 3);
 
-    // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3; a5: 2 × 1/log2(6) ≈ 0.77; a1: 6 × 1/10; a4: you and
-    // twin 12 own it, so 1 × 1/log2(4) = 0.5.
+    // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3; a5: 2 × 1/log2(6) ≈ 0.77; a1: 6 × 1/10. a4 is out:
+    // you own a track of it.
     expect(result.rows.map((row) => [row.matchKey, row.twins])).toEqual([
       ['a2', 2],
       ['a3', 2],
       ['a5', 1],
       ['a1', 3],
-      ['a4', 1],
     ]);
     expect(result).toMatchObject({ basis: 'ready', twinsUsed: 3 });
   });
 
-  it('dresses rows for display and tags albums you own tracks of', async () => {
+  it('dresses rows for display', async () => {
     await seed();
 
     const { rows } = await computeForYou(db, await me(), 3);
@@ -138,10 +137,8 @@ describe('computeForYou', () => {
       url: 'https://artist.bandcamp.com/album/a2',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       twins: 2,
-      ownedTracks: 0,
     });
     expect(rows.find((row) => row.matchKey === 'a5')?.title).toBe('Title t51');
-    expect(rows.find((row) => row.matchKey === 'a4')?.ownedTracks).toBe(1);
   });
 
   it('reads only the top K twins', async () => {

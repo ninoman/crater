@@ -103,10 +103,10 @@ async function seedBigRelease() {
   // Filtered: you own it, you wishlisted it, you hid it, only one co-owner.
   await fans(range(15, 17), [item('a500'), item('a600'), item('a700')]);
   await fans([18], [item('a800')]);
-  // You own one track of it: stays in.
-  await fans(range(17, 19), [item('a900')]);
+  // a900 stays in. You own a track of a950, so it's left out like an album you own.
+  await fans(range(17, 19), [item('a900'), item('a950')]);
 
-  await putOwnership(db, ME, [item('a500'), track('t901', 'a900')], 'collection');
+  await putOwnership(db, ME, [item('a500'), track('t951', 'a950')], 'collection');
   await putOwnership(db, ME, [item('a600')], 'wishlist');
   await hideRelease(db, 'a700', 0);
 
@@ -135,12 +135,12 @@ describe('computeAlsoBought', () => {
     // Population: fans 10–41 = 32, you left out. N = 10, so shares are Wilson lower bounds:
     // a300 5 of 10 → 0.27, lift 1.23 (fans 40 and 41 own it too), score 5·ln(2.23) ≈ 4.0;
     // a200 8 of 10 → 0.54, lift 0.62, ≈ 3.85; a400 4 of 10 → 0.19, lift 1.55, ≈ 3.75;
-    // a900 3 of 10 → 0.13, lift 1.0, ≈ 2.1. The staple's 8 owners now count for more than
+    // a900 3 of 10 → 0.13, lift 1.35, ≈ 2.6. The staple's 8 owners now count for more than
     // a400's 4: more evidence, so less shrinkage.
     expect(await ranking('a100')).toEqual(['a300', 'a200', 'a400', 'a900']);
   });
 
-  it('explains each row and tags albums you own tracks of', async () => {
+  it('explains each row and leaves out albums you own a track of', async () => {
     await seedBigRelease();
 
     const { rows } = await computeAlsoBought(db, 'a100', ME);
@@ -153,9 +153,8 @@ describe('computeAlsoBought', () => {
       url: 'https://artist.bandcamp.com/album/a300',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       reason: { kind: 'co-owned', owners: 5, twins: 0 },
-      ownedTracks: 0,
     });
-    expect(rows.find((row) => row.matchKey === 'a900')?.ownedTracks).toBe(1);
+    expect(rows.map((row) => row.matchKey)).not.toContain('a950');
   });
 
   it('shows a track when only tracks of the album are known', async () => {
@@ -178,8 +177,17 @@ describe('computeAlsoBought', () => {
   it('only filters what it can when nobody is logged in', async () => {
     await seedBigRelease();
 
-    // Hidden still applies. a500 ranks below a600: your copy makes it one owner more common.
-    expect(await ranking('a100', null)).toEqual(['a300', 'a200', 'a400', 'a600', 'a500', 'a900']);
+    // Hidden still applies. a500 and a950 rank below their peers a600 and a900: your copy makes
+    // each one owner more common.
+    expect(await ranking('a100', null)).toEqual([
+      'a300',
+      'a200',
+      'a400',
+      'a600',
+      'a900',
+      'a500',
+      'a950',
+    ]);
   });
 
   it('boosts releases your twins among the supporters own', async () => {
@@ -226,13 +234,13 @@ describe('computeAlsoBought', () => {
     );
 
     // a200 (fan 17, share 0.5): 3.85 × 1.25 ≈ 4.8 passes a300's 4.0.
-    // a900 (fans 17 and 18, share 1): 2.1 × 1.5 ≈ 3.15, still short of a400's 3.75.
+    // a900 (fans 17 and 18, share 1): 2.57 × 1.5 ≈ 3.85 passes a400's 3.75.
     const { rows } = await computeAlsoBought(db, 'a100', ME);
     expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
       ['a200', { kind: 'co-owned', owners: 8, twins: 1 }],
       ['a300', { kind: 'co-owned', owners: 5, twins: 0 }],
-      ['a400', { kind: 'co-owned', owners: 4, twins: 0 }],
       ['a900', { kind: 'co-owned', owners: 3, twins: 2 }],
+      ['a400', { kind: 'co-owned', owners: 4, twins: 0 }],
     ]);
   });
 

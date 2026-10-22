@@ -175,7 +175,7 @@ export type JobKind = QueueJob['kind'];
 export type FollowKind = 'fan' | 'band';
 export type FollowingKey = [kind: FollowKind, id: number];
 
-/** An account you follow, from your own sync. Taggable, like wishlist items (decisions §8, §13). */
+/** An account you follow, from your own sync. Taggable, like wishlist items (decisions §8, §14). */
 export interface FollowingRecord {
   kind: FollowKind;
   /** fan_id or band_id. */
@@ -191,7 +191,7 @@ export interface FollowingRecord {
   unfollowed: boolean;
 }
 
-/** Your tags on an item in your wishlist, keyed apart from `items`, which scans rewrite (§13). */
+/** Your tags on an item in your wishlist, keyed apart from `items`, which scans rewrite (§14). */
 export interface ItemTagsRecord {
   itemKey: ItemKey;
   tagIds: number[];
@@ -312,7 +312,7 @@ export class DigheadDb extends Dexie {
     this.version(8)
       .stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt+rank]' })
       .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(upgradeJobToV8));
-    // v9: your tags on wishlist items (decisions §13). A new table, so nothing to migrate.
+    // v9: your tags on wishlist items (decisions §14). A new table, so nothing to migrate.
     this.version(9).stores({ itemTags: 'itemKey, *tagIds' });
   }
 }

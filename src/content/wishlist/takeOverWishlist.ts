@@ -1,6 +1,6 @@
 // Puts our wishlist in place of Bandcamp's paged one, inside the wishlist tab. Bandcamp's list
 // renders 20 items at a time behind "view all", so a tag filter over it would be wrong
-// (decisions §13). Ours sits before Bandcamp's, all in one shadow root.
+// (decisions §14). Ours sits before Bandcamp's, all in one shadow root.
 
 import { FAN_PAGE_DOM } from '../../bandcamp';
 import { createShadowSlot, type ShadowSlot } from '../shared/shadowSlot';

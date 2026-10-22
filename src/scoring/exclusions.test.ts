@@ -13,21 +13,19 @@ describe('exclusions', () => {
     { itemKey: 'a5', matchKey: 'a5', source: 'collection' },
   ];
 
-  it('leaves out the release, hidden ones, and whole releases you own or wishlisted', () => {
-    const { excluded } = exclusions(mine, new Set(['a9']), 'a8');
+  it('leaves out the release, hidden ones, whole releases you own or wishlisted, and albums you own a track of', () => {
+    const excluded = exclusions(mine, new Set(['a9']), 'a8');
 
-    expect([...excluded].map(keyFromNumber).sort()).toEqual(['a1', 'a3', 'a5', 'a8', 'a9']);
+    expect([...excluded].map(keyFromNumber).sort()).toEqual(['a1', 'a2', 'a3', 'a5', 'a8', 'a9']);
   });
 
   it('needs no release, for recommenders that start from you', () => {
-    const { excluded } = exclusions(mine, new Set(['a9']));
+    const excluded = exclusions(mine, new Set(['a9']));
 
-    expect([...excluded].map(keyFromNumber).sort()).toEqual(['a1', 'a3', 'a5', 'a9']);
+    expect([...excluded].map(keyFromNumber).sort()).toEqual(['a1', 'a2', 'a3', 'a5', 'a9']);
   });
 
-  it('keeps albums you own some tracks of, with the count', () => {
-    const { ownedTracks } = exclusions(mine, new Set(), 'a8');
-
-    expect(ownedTracks).toEqual(new Map([[keyToNumber('a2'), 2]]));
+  it('keeps an album you only wishlisted a track of', () => {
+    expect(exclusions(mine, new Set()).has(keyToNumber('a4'))).toBe(false);
   });
 });

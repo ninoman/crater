@@ -1,4 +1,4 @@
-// The tags backup file (decisions §8 "Backup", §13). Tags are hand-made, so a re-sync can't
+// The tags backup file (decisions §8 "Backup", §14). Tags are hand-made, so a re-sync can't
 // rebuild them. Version 1 files (followings only) still import.
 
 import { z } from 'zod';

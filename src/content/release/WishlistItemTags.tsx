@@ -13,7 +13,7 @@ export interface WishlistItemTagsProps {
 
 /**
  * Your tags on this release, when it's in your wishlist. Renders nothing while loading, on
- * error and when it isn't wishlisted, like `FollowedAccountTags` (decisions §13).
+ * error and when it isn't wishlisted, like `FollowedAccountTags` (decisions §14).
  */
 export function WishlistItemTags({ itemKey, name }: WishlistItemTagsProps) {
   const own = useItemTags(itemKey);

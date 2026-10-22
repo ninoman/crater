@@ -1,4 +1,4 @@
-// Your own tags, on followings (decisions §8) and wishlist items (§13). Tag ids live on the
+// Your own tags, on followings (decisions §8) and wishlist items (§14). Tag ids live on the
 // following rows and in `itemTags`.
 
 import type { ItemKey } from '../../bandcamp';

@@ -20,8 +20,6 @@ export interface AlsoBoughtRow {
   url: string;
   coverUrl: string | null;
   reason: AlsoBoughtReason;
-  /** Tracks of this album you already own. */
-  ownedTracks: number;
 }
 
 /** How far the wait for trustworthy co-owned rows has got (decisions §12). */

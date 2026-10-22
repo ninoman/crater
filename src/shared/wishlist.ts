@@ -2,7 +2,7 @@
 
 import type { ItemKey } from '../bandcamp';
 
-/** A release in your wishlist, with your tags on it (decisions §13). */
+/** A release in your wishlist, with your tags on it (decisions §14). */
 export interface WishlistItem {
   itemKey: ItemKey;
   title: string;

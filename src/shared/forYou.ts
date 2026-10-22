@@ -14,8 +14,6 @@ export interface ForYouRow {
   coverUrl: string | null;
   /** How many of your top twins own it: "owned by 5 of your top twins". */
   twins: number;
-  /** Tracks of this album you already own. */
-  ownedTracks: number;
 }
 
 export interface ForYouResult {

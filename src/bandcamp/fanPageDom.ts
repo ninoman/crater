@@ -21,7 +21,7 @@ export const FAN_PAGE_DOM = {
   wishlistGrid: '#wishlist-grid',
   /** Inside it: what holds Bandcamp's paged list of items and its "view all" button. */
   wishlistItems: '#wishlist-items',
-  /** Bandcamp's own list and "view all", both hidden while ours stands in (decisions §13). */
+  /** Bandcamp's own list and "view all", both hidden while ours stands in (decisions §14). */
   wishlistNativeList: 'ol.collection-grid',
   wishlistExpand: '.expand-container',
   /** Bandcamp's following tab; it has `active` while open (me-following-tab.html). */
