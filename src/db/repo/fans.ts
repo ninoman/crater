@@ -1,6 +1,7 @@
 import type { ItemKey, Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
 import type { DigheadDb, FanRecord, FanStatus } from '../schema';
+import { deleteFanRows } from './fanRows';
 import { refreshFanMatches } from './matchIndex';
 
 const FULLY_READ: FanStatus[] = ['done', 'partial'];
@@ -166,7 +167,7 @@ export async function forgetFansNotSeenSince(
       'rw',
       [db.fans, db.ownership, db.fanMatches, db.matchOwners, db.twins, db.latelyTwins, db.queue],
       async () => {
-        await db.ownership.where('fanId').anyOf(ids).delete();
+        await deleteFanRows(db, ids);
         // Their rows are gone, so this drops their lists and lowers the owner counts.
         await refreshFanMatches(db, ids);
         await db.twins.bulkDelete(ids);

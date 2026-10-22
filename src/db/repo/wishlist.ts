@@ -3,6 +3,8 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { DigheadDb, ItemRecord, ItemTagsRecord } from '../schema';
+import { fanRows } from './fanRows';
+import { getItemList } from './items';
 
 /** A wishlisted item with what we know of the release and your tags on it. */
 export interface WishlistRow {
@@ -14,11 +16,11 @@ export interface WishlistRow {
 
 /** Your wishlist, newest first. Items whose metadata we lack are left out. */
 export async function listWishlist(db: DigheadDb, fanId: number): Promise<WishlistRow[]> {
-  return db.transaction('r', [db.ownership, db.items, db.itemTags], async () => {
-    const owned = await db.ownership.where('fanId').equals(fanId).toArray();
+  return db.transaction('r', [db.ownership, db.items, db.bands, db.itemTags], async () => {
+    const owned = await fanRows(db, fanId);
     const wished = owned.filter((row) => row.source === 'wishlist');
     const keys = wished.map((row) => row.itemKey);
-    const [items, tags] = await Promise.all([db.items.bulkGet(keys), db.itemTags.bulkGet(keys)]);
+    const [items, tags] = await Promise.all([getItemList(db, keys), db.itemTags.bulkGet(keys)]);
     const rows = wished.flatMap((row, i): WishlistRow[] => {
       const item = items[i];
       return item ? [{ item, addedAt: row.addedAt, tagIds: tags[i]?.tagIds ?? [] }] : [];

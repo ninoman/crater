@@ -2,6 +2,7 @@
 
 import { keyFromNumber, keyToNumber, matchKey, type ItemKey } from '../../bandcamp';
 import type { DigheadDb } from '../schema';
+import { getItemFields, itemFieldsWhere } from './items';
 
 /** What a release's supporters are ranked by before any of them is read. */
 export interface PassZeroBasis {
@@ -32,8 +33,8 @@ export async function gatherPassZero(
     'r',
     [db.items, db.releaseSupporters, db.fanMatches, db.matchOwners],
     async () => {
-      const [release, list] = await Promise.all([
-        db.items.get(releaseKey),
+      const [[release], list] = await Promise.all([
+        getItemFields(db, [releaseKey]),
         db.releaseSupporters.get(releaseKey),
       ]);
       if (!release || !list) return null;
@@ -42,8 +43,8 @@ export async function gatherPassZero(
       const [mineRecord, lists, bySeller, byLabel] = await Promise.all([
         meFanId === null ? undefined : db.fanMatches.get(meFanId),
         db.fanMatches.bulkGet(list.fanIds),
-        db.items.where('bandId').equals(release.bandId).toArray(),
-        release.labelId === null ? [] : db.items.where('labelId').equals(release.labelId).toArray(),
+        itemFieldsWhere(db, 'bandId', [release.bandId]),
+        release.labelId === null ? [] : itemFieldsWhere(db, 'labelId', [release.labelId]),
       ]);
       const mine = new Set(mineRecord?.matchIds ?? EMPTY);
       const sellerCatalog = new Set(
@@ -54,7 +55,7 @@ export async function gatherPassZero(
 
       const ids = [...new Set([...mine, ...sellerCatalog])];
       const [items, owners] = await Promise.all([
-        db.items.bulkGet(ids.map(keyFromNumber)),
+        getItemFields(db, ids.map(keyFromNumber)),
         db.matchOwners.bulkGet(ids),
       ]);
       const counts = new Map(

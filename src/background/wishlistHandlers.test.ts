@@ -30,7 +30,7 @@ beforeEach(async () => {
   db = new DigheadDb(`test-${crypto.randomUUID()}`);
   await db.open();
   h = wishlistHandlers(db);
-  await upsertCollectionItems(db, [ITEM], 0);
+  await upsertCollectionItems(db, [ITEM]);
   await putOwnership(db, ME, [ITEM], 'wishlist');
 });
 

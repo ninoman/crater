@@ -65,7 +65,7 @@ beforeEach(async () => {
     item('t41', 'a4'),
     item('a5'),
   ];
-  await upsertCollectionItems(db, all, 0);
+  await upsertCollectionItems(db, all);
   await saveViewer(db, { fanId: ME, username: 'me' });
   await putOwnership(db, ME, [item('a1'), item('t21', 'a2')], 'collection');
   await putOwnership(db, ME, [item('a3'), item('t41', 'a4')], 'wishlist');

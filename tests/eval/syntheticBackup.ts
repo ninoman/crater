@@ -26,7 +26,6 @@ function item(n: number, supporterCount: number): ItemRecord {
     tags: [],
     supporterCount,
     compilation: false,
-    fetchedAt: 0,
   };
 }
 

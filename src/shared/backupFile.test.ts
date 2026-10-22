@@ -22,7 +22,9 @@ const meta = {
 
 describe('backupFilename', () => {
   it('carries the UTC date', () => {
-    expect(backupFilename(new Date('2026-10-21T23:59:00Z'))).toBe('dighead-backup-2026-10-21.json');
+    expect(backupFilename(new Date('2026-10-21T23:59:00Z'))).toBe(
+      'dighead-backup-2026-10-21.json.gz',
+    );
   });
 });
 

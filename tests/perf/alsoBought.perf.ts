@@ -15,6 +15,7 @@ import {
   type OwnershipRecord,
   type TwinRecord,
 } from '../../src/db';
+import { storedRows } from './stored';
 
 const SUPPORTERS = 300;
 const ITEMS_PER_FAN = 1000;
@@ -97,7 +98,6 @@ beforeAll(async () => {
     tags: [],
     supporterCount: 10,
     compilation: false,
-    fetchedAt: 0,
   }));
 
   const twinIds = [
@@ -120,12 +120,14 @@ beforeAll(async () => {
 
   const started = performance.now();
   const index = buildMatchIndex(rows);
+  const stored = storedRows(items, rows);
   for (const [table, records] of [
-    [db.ownership, rows],
+    [db.ownership, stored.ownership],
     [db.fanMatches, index.fanMatches],
     [db.matchOwners, index.matchOwners],
     [db.fans, fans],
-    [db.items, items],
+    [db.items, stored.items],
+    [db.bands, stored.bands],
     [db.twins, twins],
     // Every supporter listed and scanned, so the warm-up is over and co-owned rows show.
     [

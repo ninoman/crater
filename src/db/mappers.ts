@@ -11,7 +11,7 @@ import {
 import type { SyncedFollowing } from './repo/following';
 import type { FanRecord, ItemRecord, OwnershipRecord } from './schema';
 
-export function itemFromCollection(item: CollectionItem, now: number): ItemRecord {
+export function itemFromCollection(item: CollectionItem): ItemRecord {
   return {
     itemKey: item.itemKey,
     albumKey: item.albumKey,
@@ -25,15 +25,13 @@ export function itemFromCollection(item: CollectionItem, now: number): ItemRecor
     tags: [],
     supporterCount: item.otherOwners === null ? null : item.otherOwners + 1,
     compilation: item.compilation,
-    fetchedAt: now,
   };
 }
 
 export function itemFromReleasePage(
   item: ReleasePageItem,
-  now: number,
 ): Omit<ItemRecord, 'supporterCount' | 'label' | 'labelId'> {
-  return { ...item, fetchedAt: now };
+  return { ...item };
 }
 
 export function ownershipFromCollection(

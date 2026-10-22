@@ -40,7 +40,7 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
   if (page.item.itemKey !== job.target) {
     throw new ParserError('release page', `expected ${job.target}, got ${page.item.itemKey}`);
   }
-  await upsertReleasePageItem(ctx.db, page.item, ctx.now);
+  await upsertReleasePageItem(ctx.db, page.item);
   const supporters = page.supporters.slice(0, ctx.settings.supportersPerReleaseCap);
   await saveReleaseSupporters(
     ctx.db,

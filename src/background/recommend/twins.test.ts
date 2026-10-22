@@ -69,7 +69,7 @@ function supporter(fanId: number): Supporter {
 }
 
 async function fan(fanId: number, items: CollectionItem[], status: FanStatus = 'done') {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await upsertSupporterFans(db, [supporter(fanId)], 0);
   await putOwnership(db, fanId, items, 'collection');
   if (status === 'quick') await markQuickRead(db, fanId, items.length, 0);
@@ -77,7 +77,7 @@ async function fan(fanId: number, items: CollectionItem[], status: FanStatus = '
 }
 
 async function mine(items: CollectionItem[]) {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await putOwnership(db, ME, items, 'collection');
 }
 

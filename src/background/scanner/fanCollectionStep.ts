@@ -47,7 +47,7 @@ async function readPage(
     await finishFanScan(ctx.db, fanId, scanned > 0 ? 'partial' : 'private', scanned, ctx.now);
     return null;
   }
-  await upsertCollectionItems(ctx.db, page.items, ctx.now);
+  await upsertCollectionItems(ctx.db, page.items);
   await putOwnership(ctx.db, fanId, page.items, 'collection');
   return page;
 }

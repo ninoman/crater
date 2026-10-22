@@ -55,7 +55,7 @@ function twin(fanId: number, score: number, labelCluster = false): TwinRecord {
 }
 
 async function fan(fanId: number, items: CollectionItem[], source: 'collection' | 'wishlist') {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await upsertSupporterFans(
     db,
     [
@@ -112,7 +112,7 @@ describe('computeReleaseTwins', () => {
   });
 
   it('finds album buyers from a track page', async () => {
-    await upsertCollectionItems(db, [item('t3', 'a1')], 0);
+    await upsertCollectionItems(db, [item('t3', 'a1')]);
 
     const result = await computeReleaseTwins(db, 't3');
     expect(result.rows.map((row) => row.fanId)).toEqual([11, 13]);

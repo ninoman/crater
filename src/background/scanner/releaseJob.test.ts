@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureJson, fixtureText } from '../../../tests/fixtures';
 import { ParserError, type BandcampRequest } from '../../bandcamp';
-import { DigheadDb, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
+import { DigheadDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
 import { runReleaseStep } from './releaseJob';
@@ -65,7 +65,7 @@ describe('runReleaseStep', () => {
       reviewsToken: expect.stringMatching(/^1:\d+:\d+:1:1:0$/),
       collected: 86,
     });
-    expect((await db.items.get(PROMISES))?.tags.length).toBeGreaterThan(0);
+    expect((await getItem(db, PROMISES))?.tags.length).toBeGreaterThan(0);
 
     expect(await runReleaseStep(ctx, job(cursor))).toBeNull();
     expect(requests).toEqual([{ kind: 'thumbs', count: 64, token: cursor?.thumbsToken }]);
@@ -74,7 +74,7 @@ describe('runReleaseStep', () => {
     expect(supporters?.fanIds).toHaveLength(150);
     expect(supporters?.fetchedAt).toBe(NOW);
     expect(await db.fans.count()).toBe(150);
-    expect(await db.ownership.where('itemKey').equals(PROMISES).count()).toBe(150);
+    expect(await db.ownership.where('matchKey').equals(PROMISES).count()).toBe(150);
     const queued = await db.queue.toArray();
     expect(queued).toHaveLength(150);
     expect(queued.every((q) => q.kind === 'fan' && q.priority === 1)).toBe(true);

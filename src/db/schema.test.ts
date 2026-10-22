@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseFanPage, type CollectionItem } from '../bandcamp';
 import { fixtureText } from '../../tests/fixtures';
 import { itemFromCollection, ownershipFromCollection } from './mappers';
+import { fanRows, getItem, putItems, readItems } from './repo';
 import { DigheadDb } from './schema';
 
 const album: CollectionItem = {
@@ -42,14 +43,13 @@ afterEach(async () => {
 describe('DigheadDb', () => {
   it('stores items and ownership mapped from a real fan page', async () => {
     const page = parseFanPage(fixtureText('fan-page.html'));
-    const now = Date.now();
-    await db.items.bulkPut(page.firstItems.map((item) => itemFromCollection(item, now)));
+    await putItems(db, page.firstItems.map(itemFromCollection));
     await db.ownership.bulkPut(
       page.firstItems.map((item) => ownershipFromCollection(page.fanId, item, 'collection')),
     );
 
-    expect(await db.ownership.where('fanId').equals(page.fanId).count()).toBe(10);
-    expect((await db.items.get('a3149089081'))?.supporterCount).toBe(18412);
+    expect(await fanRows(db, page.fanId)).toHaveLength(10);
+    expect((await getItem(db, 'a3149089081'))?.supporterCount).toBe(18412);
   });
 
   it('matches an album owner with a fan who owns one of its tracks', async () => {
@@ -176,15 +176,16 @@ describe('DigheadDb', () => {
     const name = `test-${crypto.randomUUID()}`;
     const old = new Dexie(name);
     old.version(9).stores({ items: 'itemKey, bandId, albumKey, labelId' });
+    const url = 'https://b.bandcamp.com/album/x';
     await old.table('items').bulkAdd([
-      { itemKey: 'a1', artist: 'Various Artists', title: 'Benefit' },
-      { itemKey: 'a2', artist: 'Some Label', title: 'VA - Sampler' },
-      { itemKey: 'a3', artist: 'Someone', title: 'LP' },
+      { itemKey: 'a1', artist: 'Various Artists', title: 'Benefit', bandId: 1, url },
+      { itemKey: 'a2', artist: 'Some Label', title: 'VA - Sampler', bandId: 1, url },
+      { itemKey: 'a3', artist: 'Someone', title: 'LP', bandId: 1, url },
     ]);
     old.close();
 
     const upgraded = new DigheadDb(name);
-    const items = await upgraded.items.toArray();
+    const items = await readItems(upgraded, await upgraded.items.toArray());
     expect(items.map((item) => [item.itemKey, item.compilation])).toEqual([
       ['a1', true],
       ['a2', true],

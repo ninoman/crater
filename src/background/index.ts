@@ -5,6 +5,7 @@ import { db } from '../db';
 import { listenForMessages } from '../shared/messages';
 import { opfsSnapshot } from './backupHandlers';
 import { recoverInterruptedImport } from './importRecovery';
+import { keepAliveWhile } from './keepAlive';
 import { chromeImportStateStore } from './importState';
 import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
 import { onSynced, startSync } from './meSync';
@@ -15,6 +16,12 @@ import { chromeScannerStore } from './scanner/state';
 
 listenForMessages(handlers);
 onSynced(seedFromSync);
+
+// Opening may run a schema upgrade that takes minutes on a big database. Every other use of `db`
+// waits for this same open.
+keepAliveWhile(db.open()).catch((error: unknown) =>
+  console.error('dighead: the database failed to open', error),
+);
 
 chrome.runtime.onStartup.addListener(() => {
   void startSync('incremental');

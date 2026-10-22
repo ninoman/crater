@@ -59,7 +59,7 @@ async function own(
   items: CollectionItem[],
   source: 'collection' | 'wishlist' = 'collection',
 ) {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await putOwnership(db, fanId, items, source);
 }
 

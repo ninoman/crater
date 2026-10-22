@@ -24,7 +24,12 @@ export interface BackupSummary {
 }
 
 export function backupFilename(date: Date): string {
-  return `dighead-backup-${date.toISOString().slice(0, 10)}.json`;
+  return `dighead-backup-${date.toISOString().slice(0, 10)}.json.gz`;
+}
+
+/** Whether a file starts with gzip's magic bytes, `1f 8b`. */
+export function isGzip(head: Uint8Array): boolean {
+  return head[0] === 0x1f && head[1] === 0x8b;
 }
 
 export function summarizeBackup(meta: BackupMeta): BackupSummary {

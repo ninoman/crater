@@ -1,5 +1,6 @@
 import { addOwnerDeltas, fanMatchLists } from '../matchIndex';
 import type { DigheadDb, FanMatchesRecord } from '../schema';
+import { fanRows } from './fanRows';
 
 const EMPTY = new Float64Array();
 
@@ -13,7 +14,7 @@ export async function refreshFanMatches(db: DigheadDb, fanIds: Iterable<number>)
   if (ids.length === 0) return;
   const [before, rows] = await Promise.all([
     db.fanMatches.bulkGet(ids),
-    Promise.all(ids.map((fanId) => db.ownership.where('fanId').equals(fanId).toArray())),
+    Promise.all(ids.map((fanId) => fanRows(db, fanId))),
   ]);
 
   const deltas = new Map<number, number>();

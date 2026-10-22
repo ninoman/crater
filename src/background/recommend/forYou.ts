@@ -5,12 +5,13 @@ import { keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherForYou,
   getDisplayItems,
+  getShownFields,
   getLatelyTwins,
   getOwnerCounts,
   getTwins,
   type DigheadDb,
   type ForYouData,
-  type ItemRecord,
+  type ItemFields,
   type MeRecord,
 } from '../../db';
 import { discountCompilations } from '../../scoring/compilations';
@@ -84,8 +85,14 @@ export async function computeForYou(
     const item = items.get(keyFromNumber(scored.id));
     if (item) artists.set(scored.id, item.artist);
   }
-  const rows = forYouPicks(ranked, artists, FOR_YOU_LIMIT).flatMap((pick) => {
-    const item = items.get(pick.matchKey);
+  const picks = forYouPicks(ranked, artists, FOR_YOU_LIMIT);
+  // Only the rows shown need URLs, so only they look up their bands (decisions §19).
+  const display = await getDisplayItems(
+    db,
+    picks.map((pick) => pick.matchKey),
+  );
+  const rows = picks.flatMap((pick) => {
+    const item = display.get(pick.matchKey);
     if (!item) return [];
     const id = keyToNumber(pick.matchKey);
     return [
@@ -148,9 +155,9 @@ async function scoreTop(
   candidates: readonly TwinOwned[],
   followed: ReadonlyMap<number, string>,
   ignoreCompilations: boolean,
-): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemRecord> }> {
+): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: ForYouScored[] = [];
-  const items = new Map<ItemKey, ItemRecord>();
+  const items = new Map<ItemKey, ItemFields>();
   const factor = maxFollowFactor(followed);
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
@@ -159,7 +166,7 @@ async function scoreTop(
       .slice(start, start + CHUNK)
       .filter((c) => couldRank(ranked, RANKED, c.twinScore * factor));
     const [display, owners] = await Promise.all([
-      getDisplayItems(
+      getShownFields(
         db,
         chunk.map((c) => keyFromNumber(c.id)),
       ),

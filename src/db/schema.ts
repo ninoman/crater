@@ -3,6 +3,7 @@
 import Dexie, { type EntityTable, type Table } from 'dexie';
 import { isCompilation, type ItemKey } from '../bandcamp';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
+import { readItem, readOwnership, storeItem } from './storage';
 
 export interface ItemRecord {
   itemKey: ItemKey;
@@ -22,7 +23,43 @@ export interface ItemRecord {
   supporterCount: number | null;
   /** A compilation: scorers ignore or down-weight it (decisions §17). */
   compilation: boolean;
-  fetchedAt: number;
+}
+
+/** Everything about an item but its URL: what scoring reads, without looking up its band. */
+export type ItemFields = Omit<ItemRecord, 'url'>;
+
+/**
+ * An item as `items` stores it (decisions §19): the URL split into its band's host and a slug,
+ * and default values left out. Repos turn it back into an ItemRecord (itemStore.ts). Rows from
+ * before v12 still have `url` and every field, and read the same way.
+ */
+export interface StoredItem {
+  itemKey: ItemKey;
+  title: string;
+  artist: string;
+  bandId: number;
+  /** The path segment after /album/ or /track/. */
+  slug?: string;
+  /** Set when this item's host isn't its band's default. */
+  host?: string;
+  /** The whole URL, only when it doesn't split into host and slug. */
+  url?: string;
+  albumKey?: ItemKey | null;
+  label?: string | null;
+  labelId?: number | null;
+  artId?: number | null;
+  supporterCount?: number | null;
+  tags?: string[];
+  compilation?: boolean;
+}
+
+/**
+ * The hosts a band's releases have been seen under: subdomains without `.bandcamp.com`, custom
+ * domains whole. The first is the default; items under another one name it (decisions §19).
+ */
+export interface BandRecord {
+  bandId: number;
+  hosts: string[];
 }
 
 /**
@@ -60,6 +97,11 @@ export interface OwnershipRecord {
   source: 'collection' | 'wishlist';
   addedAt: number | null;
 }
+
+/** An ownership row as stored: `source` is left out for collection rows (decisions §19). */
+export type StoredOwnership = Omit<OwnershipRecord, 'source'> & {
+  source?: OwnershipRecord['source'];
+};
 
 /**
  * A fan's distinct collection matchKeys, kept in step with their `ownership` rows. Scoring reads
@@ -231,17 +273,22 @@ export function upgradeJobToV8(job: QueueJob): void {
  * Flags an item stored before v11 from its artist and title. Track artists aren't stored, so
  * that rule waits for the release page's next fetch (decisions §17).
  */
-export function flagCompilation(item: ItemRecord): void {
+export function flagCompilation(item: StoredItem): void {
   item.compilation ??= isCompilation(item);
 }
 
 /** Tables newer than the oldest restorable backup, by the version that added them. */
-export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 7, itemTags: 9 };
+export const TABLES_ADDED: Readonly<Record<string, number>> = {
+  latelyTwins: 7,
+  itemTags: 9,
+  bands: 12,
+};
 
 export class DigheadDb extends Dexie {
-  items!: EntityTable<ItemRecord, 'itemKey'>;
+  items!: EntityTable<StoredItem, 'itemKey'>;
+  bands!: EntityTable<BandRecord, 'bandId'>;
   fans!: EntityTable<FanRecord, 'fanId'>;
-  ownership!: Table<OwnershipRecord, [number, ItemKey]>;
+  ownership!: Table<StoredOwnership, [number, ItemKey]>;
   releaseSupporters!: EntityTable<ReleaseSupportersRecord, 'itemKey'>;
   me!: EntityTable<MeRecord, 'id'>;
   twins!: EntityTable<TwinRecord, 'fanId'>;
@@ -333,7 +380,16 @@ export class DigheadDb extends Dexie {
     // v11: compilations flagged on items (decisions §17). No index, only the flag to fill in.
     this.version(11)
       .stores({})
-      .upgrade((tx) => tx.table<ItemRecord>('items').toCollection().modify(flagCompilation));
+      .upgrade((tx) => tx.table<StoredItem>('items').toCollection().modify(flagCompilation));
+    // v12: smaller rows and fewer indexes (decisions §19). Items keep a slug and their band its
+    // hosts, replacing the `url` index; ownership loses its unused `fanId` and `itemKey` indexes.
+    this.version(12)
+      .stores({
+        items: 'itemKey, bandId, albumKey, labelId',
+        bands: 'bandId, *hosts',
+        ownership: '[fanId+itemKey], matchKey',
+      })
+      .upgrade((tx) => slimToV12(tx.table('items'), tx.table('bands')));
   }
 }
 
@@ -344,11 +400,33 @@ export class DigheadDb extends Dexie {
  */
 export async function rebuildFanMatchLists(
   fanMatches: EntityTable<FanMatchesRecord, 'fanId'>,
-  ownership: Table<OwnershipRecord, [number, ItemKey]>,
+  ownership: Table<StoredOwnership, [number, ItemKey]>,
 ): Promise<void> {
   const fanIds = await fanMatches.toCollection().primaryKeys();
   for (const fanId of fanIds) {
-    const rows = await ownership.where('fanId').equals(fanId).toArray();
-    await fanMatches.put({ fanId, ...fanMatchLists(rows) });
+    const rows = await ownership
+      .where('[fanId+itemKey]')
+      .between([fanId, Dexie.minKey], [fanId, Dexie.maxKey])
+      .toArray();
+    await fanMatches.put({ fanId, ...fanMatchLists(rows.map(readOwnership)) });
   }
+}
+
+/**
+ * Rewrites items in the v12 shape (decisions §19): host and slug with defaults left out, and
+ * each band's hosts in `bands`. The Dexie upgrade runs it, and so does importing an older backup
+ * (migrateRows). Ownership rows aren't rewritten: reads take a stored 'collection' as written,
+ * new rows leave it out, and rewriting 10⁶ rows made the upgrade take minutes.
+ */
+export async function slimToV12(
+  items: EntityTable<StoredItem, 'itemKey'>,
+  bands: EntityTable<BandRecord, 'bandId'>,
+): Promise<void> {
+  const known = new Map<number, BandRecord>();
+  await items.toCollection().modify((row, ctx) => {
+    const { stored, band } = storeItem(readItem(row, undefined), known.get(row.bandId));
+    if (band) known.set(band.bandId, band);
+    ctx.value = stored;
+  });
+  await bands.bulkPut([...known.values()]);
 }

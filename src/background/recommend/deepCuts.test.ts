@@ -46,7 +46,7 @@ function item(itemKey: ItemKey, owners: number | null): CollectionItem {
 }
 
 async function own(fanId: number, items: CollectionItem[]) {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await putOwnership(db, fanId, items, 'collection');
 }
 

@@ -3,6 +3,7 @@
 
 import { keyToNumber, matchKey } from '../../bandcamp';
 import type { DigheadDb, FollowKind, FollowingRecord } from '../schema';
+import { itemFieldsWhere } from './items';
 
 export interface FollowedBandReleases {
   /** Band accounts (artists and labels) you follow, by band_id, with their names. */
@@ -27,8 +28,8 @@ export async function gatherFollowedBandReleases(db: DigheadDb): Promise<Followe
     if (bands.size === 0) return { bands, releases: [] };
     const ids = [...bands.keys()];
     const [bySeller, byLabel] = await Promise.all([
-      db.items.where('bandId').anyOf(ids).toArray(),
-      db.items.where('labelId').anyOf(ids).toArray(),
+      itemFieldsWhere(db, 'bandId', ids),
+      itemFieldsWhere(db, 'labelId', ids),
     ]);
     const releases = [...bySeller, ...byLabel].map((item) => ({
       id: keyToNumber(matchKey(item)),

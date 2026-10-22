@@ -6,7 +6,8 @@
 
 import { serialize } from 'node:v8';
 import { parseCollectionPage, parseSupportersPage } from '../src/bandcamp';
-import { fanFromSupporter, itemFromCollection, ownershipFromCollection } from '../src/db';
+import { fanFromSupporter, itemFromCollection, ownershipFromCollection } from '../src/db/mappers';
+import { storeItem, storeOwnership } from '../src/db/storage';
 import { DEFAULT_SETTINGS } from '../src/shared/settings';
 import { fixtureJson } from '../tests/fixtures';
 
@@ -47,8 +48,10 @@ const now = Date.now();
 
 const itemBytes = mean(
   collection.map((item) => {
-    const record = itemFromCollection(item, now);
-    return recordSize(record, record.itemKey, [
+    // Stored as v12 does (decisions §19), its band's host already known.
+    const record = itemFromCollection(item);
+    const { stored } = storeItem(record, storeItem(record, undefined).band);
+    return recordSize(stored, record.itemKey, [
       record.bandId,
       ...(record.albumKey ? [record.albumKey] : []),
       ...(record.labelId !== null ? [record.labelId] : []),
@@ -57,8 +60,8 @@ const itemBytes = mean(
 );
 const ownershipBytes = mean(
   collection.map((item) => {
-    const row = ownershipFromCollection(123_456_789, item, 'collection');
-    return recordSize(row, [row.fanId, row.itemKey], [row.fanId, row.itemKey, row.matchKey]);
+    const row = storeOwnership(ownershipFromCollection(123_456_789, item, 'collection'));
+    return recordSize(row, [row.fanId, row.itemKey], [row.matchKey]);
   }),
 );
 const fanBytes = mean(

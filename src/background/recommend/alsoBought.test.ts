@@ -57,7 +57,7 @@ const track = (key: ItemKey, album: ItemKey) => item(key, {}, album);
 
 /** Fans who own `items` and whose collection scan ended with `status`. */
 async function fans(ids: number[], items: CollectionItem[], status: FanStatus = 'done') {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   for (const fanId of ids) {
     await upsertSupporterFans(db, [supporter(fanId)], 0);
     await putOwnership(db, fanId, items, 'collection');
@@ -144,11 +144,9 @@ describe('computeAlsoBought', () => {
 
   it('down-weights a compilation among the picks, unless told not to', async () => {
     await seedBigRelease();
-    await upsertCollectionItems(
-      db,
-      [item('a300', { artist: 'Various Artists', compilation: true })],
-      0,
-    );
+    await upsertCollectionItems(db, [
+      item('a300', { artist: 'Various Artists', compilation: true }),
+    ]);
 
     // a300's ≈ 4.0 halves to ≈ 2.0, below a900's ≈ 2.6.
     expect(await ranking('a100')).toEqual(['a200', 'a400', 'a900', 'a300']);
@@ -185,7 +183,7 @@ describe('computeAlsoBought', () => {
 
   it('scores a track page against its album', async () => {
     await seedBigRelease();
-    await upsertCollectionItems(db, [track('t101', 'a100')], 0);
+    await upsertCollectionItems(db, [track('t101', 'a100')]);
     await listSupporters('t101', [...range(10, 19), 40]);
 
     expect(await ranking('t101')).toEqual(await ranking('a100'));
@@ -264,7 +262,7 @@ describe('computeAlsoBought', () => {
   it('nudges releases from an account you follow past a close call, and says so', async () => {
     await seedBigRelease();
     // a200 (≈ 3.85) sits just behind a300 (≈ 4.0); ×1.25 lifts it to ≈ 4.8.
-    await upsertCollectionItems(db, [item('a200', { bandId: 2 })], 0);
+    await upsertCollectionItems(db, [item('a200', { bandId: 2 })]);
     await putFollowing(db, [
       {
         kind: 'band',
@@ -313,7 +311,7 @@ describe('warm-up', () => {
 
   /** 30 listed supporters; `read` of them scanned, all owning a200 and 6 rare releases. */
   async function seed(read: number) {
-    await upsertCollectionItems(db, [release, item('a101', { artist: 'Solo', bandId: 5 })], 0);
+    await upsertCollectionItems(db, [release, item('a101', { artist: 'Solo', bandId: 5 })]);
     const rare = range(300, 305).map((n) => item(`a${n}`, other));
     await fans(range(10, 9 + read), [release, item('a200', other), ...rare]);
     await fans(range(10 + read, 39), [release], 'queued');
@@ -347,19 +345,15 @@ describe('small-release fallback', () => {
   const release = item('a1000', { ...solo, label: 'Tiny Label', labelId: 77 });
 
   async function seedSmallRelease() {
-    await upsertCollectionItems(
-      db,
-      [
-        release,
-        item('a1001', { ...solo, otherOwners: 2 }),
-        item('a1002', { ...solo, artist: 'Labelmate', otherOwners: 40 }),
-        item('a1003', { artist: 'Far', bandId: 9, label: 'Tiny Label', labelId: 77 }),
-        item('t1004', solo, 'a1001'),
-        item('a1005', { ...solo, otherOwners: 99 }),
-        item('a1006', { ...solo, otherOwners: 5 }),
-      ],
-      0,
-    );
+    await upsertCollectionItems(db, [
+      release,
+      item('a1001', { ...solo, otherOwners: 2 }),
+      item('a1002', { ...solo, artist: 'Labelmate', otherOwners: 40 }),
+      item('a1003', { artist: 'Far', bandId: 9, label: 'Tiny Label', labelId: 77 }),
+      item('t1004', solo, 'a1001'),
+      item('a1005', { ...solo, otherOwners: 99 }),
+      item('a1006', { ...solo, otherOwners: 5 }),
+    ]);
     await fans([10, 11], [release, item('a2000')]);
     await listSupporters('a1000', [10, 11]);
     await putOwnership(db, ME, [item('a1005', solo)], 'collection');

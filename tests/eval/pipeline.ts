@@ -7,11 +7,15 @@ import { keyFromNumber, keyToNumber } from '../../src/bandcamp';
 import { computeTwins } from '../../src/background/recommend/twins';
 import {
   type DigheadDb,
+  fanRows,
   gatherForYou,
-  getDisplayItems,
+  getShownFields,
   getOwnerCounts,
   importDatabase,
   type OwnershipRecord,
+  putItems,
+  readBackup,
+  readItem,
   refreshFanMatches,
   replaceAll,
   type SnapshotStore,
@@ -36,7 +40,11 @@ const MIN_DATED_SHARE = 0.5;
 const LOOKUP_CHUNK = 1000;
 /** Fold fans count down from here: far below any real Bandcamp fan id. */
 const HOLDOUT_FAN_ID = -1_000_000_000;
-/** From v7 on, the only migrations left (queue v8, compilation flags v11) can skip the importer. */
+/**
+ * From v7 on, the migrations left can skip the importer: queue ranks (v8) don't matter here,
+ * and item rows (v11 flags, v12 shape) are rewritten below. Ownership rows still saying
+ * 'collection' (v12 drops it) read the same.
+ */
 const MIN_FAST_VERSION = 7;
 
 function memorySnapshot(): SnapshotStore {
@@ -59,7 +67,8 @@ function memorySnapshot(): SnapshotStore {
  * on each overwrite, so `modify` over 10⁵ items never finishes. They are rewritten into an
  * emptied table instead.
  */
-export async function loadBackup(db: DigheadDb, file: Blob): Promise<void> {
+export async function loadBackup(db: DigheadDb, backup: Blob): Promise<void> {
+  const file = await readBackup(backup);
   // replaceAll first: it installs the FileReader that peakImportFile needs in Node.
   await replaceAll(db, file);
   const meta = parseBackupMeta(await peakImportFile(file));
@@ -67,10 +76,14 @@ export async function loadBackup(db: DigheadDb, file: Blob): Promise<void> {
     await importDatabase(db, file, memorySnapshot(), async () => undefined);
     return;
   }
-  const items = await db.items.toArray();
-  for (const item of items) flagCompilation(item);
+  if (meta.data.databaseVersion >= 12) return;
+  const rows = await db.items.toArray();
+  for (const row of rows) flagCompilation(row);
   await db.items.clear();
-  await db.items.bulkAdd(items);
+  await putItems(
+    db,
+    rows.map((row) => readItem(row, undefined)),
+  );
 }
 
 export interface EvalRun {
@@ -85,7 +98,7 @@ export async function runEval(
 ): Promise<EvalRun> {
   const me = await db.me.get('self');
   if (!me) throw new Error('The backup has no signed-in fan (the "me" table is empty).');
-  const mine = await db.ownership.where('fanId').equals(me.fanId).toArray();
+  const mine = await fanRows(db, me.fanId);
   const saved = mine.filter((row) => row.source === 'collection');
   const purchases = purchasesOf(saved);
   if (purchases.length < RANDOM_FOLDS * 2) {
@@ -247,7 +260,7 @@ async function resolvePopularity(
   for (let start = 0; start < todo.length; start += LOOKUP_CHUNK) {
     const chunk = todo.slice(start, start + LOOKUP_CHUNK);
     const [items, owners] = await Promise.all([
-      getDisplayItems(db, chunk.map(keyFromNumber)),
+      getShownFields(db, chunk.map(keyFromNumber)),
       getOwnerCounts(db, chunk),
     ]);
     for (const id of chunk) {
