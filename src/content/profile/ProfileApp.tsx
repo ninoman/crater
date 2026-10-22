@@ -2,6 +2,7 @@ import { useSyncExternalStore, type ComponentType } from 'react';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { NoticeStack } from '../../ui';
 import { ForYouTab } from './forYou/ForYouTab';
+import { LatestTab } from './latest/LatestTab';
 import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
 import { TwinsTab } from './twins/TwinsTab';
 
@@ -13,6 +14,7 @@ interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
 export const PROFILE_TABS = [
   { id: 'twins', label: 'twins', View: TwinsTab },
   { id: 'for-you', label: 'for you', View: ForYouTab },
+  { id: 'latest', label: "twins' latest", View: LatestTab },
 ] as const satisfies readonly ProfileTab<string>[];
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];

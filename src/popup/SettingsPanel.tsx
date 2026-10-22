@@ -42,6 +42,13 @@ const GROUPS: Group[] = [
     ],
     toggles: [{ key: 'labelClusterDownweight', label: 'Down-weight label-cluster twins' }],
   },
+  {
+    title: 'Lately re-reads',
+    fields: [
+      { key: 'latelyRescanTwins', label: 'Top lately twins (0 = off)' },
+      { key: 'latelyRescanDays', label: 'Every (days)' },
+    ],
+  },
 ];
 
 type ReadyView = Extract<ReturnType<typeof useSettings>['view'], { state: 'ready' }>;

@@ -132,9 +132,13 @@ export interface ReleaseCursor {
 /**
  * Where a fan job carries on (decisions §12). No cursor yet: the profile page (pass 1) is next.
  * `quick`: one collection page around when they bought the release. `full`: paging the whole
- * collection.
+ * collection. `latest`: a top lately twin's purchases since `since`, newest first (decisions
+ * §11); a null token starts from the top.
  */
-export type FanCursor = { stage: 'quick' } | { stage: 'full'; token: string; scanned: number };
+export type FanCursor =
+  | { stage: 'quick' }
+  | { stage: 'full'; token: string; scanned: number }
+  | { stage: 'latest'; since: number; token: string | null; added: number };
 
 interface JobBase {
   id?: number;

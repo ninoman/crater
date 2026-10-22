@@ -224,7 +224,7 @@ Design: decisions §11.
 4. [x] Twins tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.
 5. [x] For you *Fresh* mode, built from lately twins and their recent buys.
 6. [x] Lately rank in the profile badge ("your #2 twin lately").
-7. [ ] Re-scan top lately twins more often than every 30 days, and a "Twins' latest" feed of what they just bought.
+7. [x] Re-scan top lately twins more often than every 30 days, and a "Twins' latest" feed of what they just bought.
 
 **Done when:** on your real data the Lately board puts fans you're buying alongside now at the top, and long-standing twins you've drifted from show "apart".
 

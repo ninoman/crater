@@ -108,3 +108,13 @@ export async function purchasedAt(
 ): Promise<number | null> {
   return (await db.ownership.get([fanId, itemKey]))?.addedAt ?? null;
 }
+
+/** Which of these items a fan already has a row for, in either list. */
+export async function knownItemKeys(
+  db: DigheadDb,
+  fanId: number,
+  itemKeys: readonly ItemKey[],
+): Promise<Set<ItemKey>> {
+  const rows = await db.ownership.bulkGet(itemKeys.map((key): [number, ItemKey] => [fanId, key]));
+  return new Set(rows.flatMap((row) => (row ? [row.itemKey] : [])));
+}

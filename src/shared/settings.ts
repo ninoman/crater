@@ -19,6 +19,10 @@ export interface Settings {
   latelyHalfLifeMonths: number;
   /** Fans who bought less than this lately (purchases weighed by age) get no lately score. */
   latelyMinPurchases: number;
+  /** How many of the top lately twins get their newest purchases re-read more often. 0 turns it off. */
+  latelyRescanTwins: number;
+  /** Days between those re-reads (decisions §11). Everyone else waits the usual 30. */
+  latelyRescanDays: number;
   /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
   seedFromCollection: boolean;
 }
@@ -36,6 +40,8 @@ export const DEFAULT_SETTINGS: Settings = {
   labelClusterDownweight: true,
   latelyHalfLifeMonths: 6,
   latelyMinPurchases: 5,
+  latelyRescanTwins: 25,
+  latelyRescanDays: 7,
   seedFromCollection: true,
 };
 
@@ -63,6 +69,8 @@ export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }
   topTwinsK: { min: 5, max: 200 },
   latelyHalfLifeMonths: { min: 1, max: 36 },
   latelyMinPurchases: { min: 1, max: 100 },
+  latelyRescanTwins: { min: 0, max: 200 },
+  latelyRescanDays: { min: 1, max: 30 },
 };
 
 export type SettingsErrors = Partial<Record<keyof Settings, string>>;

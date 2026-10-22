@@ -160,3 +160,55 @@ export async function countJobs(db: DigheadDb): Promise<Record<QueueJob['kind'],
   ]);
   return { release, fan };
 }
+
+/** Of these fans, the ones with a scan of any kind waiting in the queue. */
+export async function queuedFans(db: DigheadDb, fanIds: readonly number[]): Promise<Set<number>> {
+  const jobs = await db.queue
+    .where('[kind+target]')
+    .anyOf(fanIds.map((fanId) => ['fan', `${fanId}`]))
+    .toArray();
+  return new Set(jobs.map((job) => Number(job.target)));
+}
+
+/** A twin to re-read from their newest purchase back to `since` (decisions §11). */
+export interface LatestRead {
+  fanId: number;
+  since: number;
+}
+
+/**
+ * Queues latest reads, ranked in the order given, all due from `at`. A fan who already has a
+ * job keeps it: that scan reads their newest purchases anyway.
+ */
+export async function enqueueLatestReads(
+  db: DigheadDb,
+  reads: readonly LatestRead[],
+  priority: number,
+  at: number,
+): Promise<number> {
+  if (reads.length === 0) return 0;
+  return db.transaction('rw', db.queue, async () => {
+    const queued = await queuedFans(
+      db,
+      reads.map((read) => read.fanId),
+    );
+    const jobs = reads.flatMap(({ fanId, since }, i): QueueJob[] =>
+      queued.has(fanId)
+        ? []
+        : [
+            {
+              kind: 'fan',
+              target: `${fanId}`,
+              via: null,
+              priority,
+              rank: i + 1,
+              attempts: 0,
+              nextAttemptAt: at,
+              cursor: { stage: 'latest', since, token: null, added: 0 },
+            },
+          ],
+    );
+    await db.queue.bulkAdd(jobs);
+    return jobs.length;
+  });
+}

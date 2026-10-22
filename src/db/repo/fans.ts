@@ -181,3 +181,25 @@ export async function forgetFansNotSeenSince(
     forgotten += ids.length;
   }
 }
+
+/**
+ * A latest read reached what the last read saw (decisions §11). The fan counts as freshly read
+ * and keeps their status; `added` purchases join what was scanned, and the collection size when
+ * it was known.
+ */
+export async function finishLatestRead(
+  db: DigheadDb,
+  fanId: number,
+  added: number,
+  now: number,
+): Promise<void> {
+  await db.fans
+    .where('fanId')
+    .equals(fanId)
+    .modify((fan) => {
+      fan.collectionFetchedAt = now;
+      fan.lastSeenAt = now;
+      fan.scannedItems += added;
+      if (fan.collectionSize !== null) fan.collectionSize += added;
+    });
+}
