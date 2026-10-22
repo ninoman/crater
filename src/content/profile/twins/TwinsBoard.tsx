@@ -59,6 +59,7 @@ const OVERLAP: Column = {
 const TREND: Column = {
   key: 'trend',
   header: 'trend',
+  nowrap: true,
   cell: (row) => {
     const { arrow, word } = TREND_LABELS[row.trend];
     return (
