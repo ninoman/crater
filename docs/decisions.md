@@ -508,3 +508,10 @@ Built 2026-10-21. Code: `src/scoring/alsoBought.ts` (`wilsonLower`, `voteWeight`
 
 - Saved a signed-in fan page as a fixture with personal data scrubbed (`fan-page-in-common.html`) and parsed the count from it. Text with a number in it that isn't the English pattern, or that mentions "common" without a count, throws `ParserError` rather than reading 0.
 - **Still unchecked live:** how the line reads for a fan with no favourite genre. The parser accepts "8 items in common" without the genre, and "1 item in common", both covered by synthetic tests; capture a real one when it turns up.
+
+## 13. Release sidebar follows the page design
+
+- **Source:** album, track and band pages carry the artist's colours as JSON in `#custom-design-rules-style`'s `data-design` (`bandcamp/pageDesign.ts`): `body_color`, `text_color`, `secondary_text_color`, `link_color`, plus `bg_color` and others we don't use. Hex without `#`. We theme from `body_color`, the content column the release sits on; `bg_color` is the page around it and can be a tiled image.
+- **Mapping** (`ui/theme.ts`, pure): background, text, muted and accent come straight from the design. Borders, hovers and subtle fills are mixes of text into background, so one rule works on light and dark pages. Tag, tooltip and status colours keep `tokens.css`. The tokens go on the shadow host as inline custom properties.
+- **Readability guards:** text under 4.5:1 on the background means no theme (default look). Secondary text under 4.5:1 falls back to a text/background mix, and a link under 3:1 to the text colour. A missing or broken `data-design` also means the default look, not a `ParserError`: it's cosmetic.
+- **Scope:** the release sidebar only for now. Band-page UI could take the same theme.

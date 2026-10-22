@@ -97,6 +97,15 @@ export interface FanPage {
   viewer: Viewer | null;
 }
 
+/** An artist's page colours, as `#rrggbb`. */
+export interface PageDesign {
+  /** The content column the release sits on. */
+  background: string;
+  text: string;
+  secondaryText: string;
+  link: string;
+}
+
 /** The logged-in fan, as seen in any page's `#pagedata`. */
 export interface Viewer {
   fanId: number;
