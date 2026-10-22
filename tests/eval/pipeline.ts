@@ -2,7 +2,8 @@
 // recomputes the twin board with the real worker code, and scores every method. Everything it
 // returns is aggregate numbers.
 
-import { keyFromNumber, keyToNumber, type ItemKey } from '../../src/bandcamp';
+import { peakImportFile } from 'dexie-export-import';
+import { keyFromNumber, keyToNumber } from '../../src/bandcamp';
 import { computeTwins } from '../../src/background/recommend/twins';
 import {
   type DigheadDb,
@@ -12,11 +13,13 @@ import {
   importDatabase,
   type OwnershipRecord,
   refreshFanMatches,
-  removeOwnershipExcept,
+  replaceAll,
   type SnapshotStore,
 } from '../../src/db';
+import { flagCompilation } from '../../src/db/schema';
 import { exclusions } from '../../src/scoring/exclusions';
 import { topTwins, twinOwnership } from '../../src/scoring/forYou';
+import { parseBackupMeta } from '../../src/shared/backupFile';
 import { DEFAULT_SETTINGS } from '../../src/shared/settings';
 import { aggregate } from './aggregate';
 import { evaluateFold } from './evaluate';
@@ -31,6 +34,10 @@ export const SEED = 1;
 /** Below this share of dated purchases, "newest" is meaningless and the temporal split is skipped. */
 const MIN_DATED_SHARE = 0.5;
 const LOOKUP_CHUNK = 1000;
+/** Fold fans count down from here: far below any real Bandcamp fan id. */
+const HOLDOUT_FAN_ID = -1_000_000_000;
+/** From v7 on, the only migrations left (queue v8, compilation flags v11) can skip the importer. */
+const MIN_FAST_VERSION = 7;
 
 function memorySnapshot(): SnapshotStore {
   let saved: Blob | null = null;
@@ -46,9 +53,24 @@ function memorySnapshot(): SnapshotStore {
   };
 }
 
-/** Loads a full-database backup into an empty database, through the extension's own importer. */
+/**
+ * Loads a full-database backup into an empty database. Small backups go through the extension's
+ * own importer. Large ones skip its in-place migrations: fake-indexeddb scans every index entry
+ * on each overwrite, so `modify` over 10⁵ items never finishes. They are rewritten into an
+ * emptied table instead.
+ */
 export async function loadBackup(db: DigheadDb, file: Blob): Promise<void> {
-  await importDatabase(db, file, memorySnapshot(), async () => undefined);
+  // replaceAll first: it installs the FileReader that peakImportFile needs in Node.
+  await replaceAll(db, file);
+  const meta = parseBackupMeta(await peakImportFile(file));
+  if (meta.data.databaseVersion < MIN_FAST_VERSION) {
+    await importDatabase(db, file, memorySnapshot(), async () => undefined);
+    return;
+  }
+  const items = await db.items.toArray();
+  for (const item of items) flagCompilation(item);
+  await db.items.clear();
+  await db.items.bulkAdd(items);
 }
 
 export interface EvalRun {
@@ -63,9 +85,8 @@ export async function runEval(
 ): Promise<EvalRun> {
   const me = await db.me.get('self');
   if (!me) throw new Error('The backup has no signed-in fan (the "me" table is empty).');
-  const saved = (await db.ownership.where('fanId').equals(me.fanId).toArray()).filter(
-    (row) => row.source === 'collection',
-  );
+  const mine = await db.ownership.where('fanId').equals(me.fanId).toArray();
+  const saved = mine.filter((row) => row.source === 'collection');
   const purchases = purchasesOf(saved);
   if (purchases.length < RANDOM_FOLDS * 2) {
     throw new Error(`Only ${purchases.length} releases in your collection: too few to hold out.`);
@@ -95,12 +116,17 @@ export async function runEval(
   const popularity = new Map<number, Popularity>();
   const lookup = (id: number): Popularity => popularity.get(id) ?? { supporters: null, owners: 0 };
   const splits: SplitResult[] = [];
+  // From here on you're a fresh fan id per fold, so the real id must not count as a scanned fan.
+  await dropFanMatches(db, me.fanId);
+  let foldFan = HOLDOUT_FAN_ID;
   for (const plan of plans) {
     const foldRows: FoldRow[][] = [];
     for (const [i, heldOut] of plan.folds.entries()) {
       log(`${plan.name}: fold ${i + 1}/${plan.folds.length} (${heldOut.length} held out)`);
-      const rows = await withHoldout(db, me.fanId, saved, new Set(heldOut), async () => {
-        const byK = await candidatesByK(db, me.fanId, twinKs);
+      foldFan -= 1;
+      const fanId = foldFan;
+      const rows = await withHoldout(db, fanId, mine, new Set(heldOut), async () => {
+        const byK = await candidatesByK(db, fanId, twinKs);
         const ids = [...byK.values()].flatMap((list) => list.map((c) => c.id)).concat(heldOut);
         await resolvePopularity(db, popularity, ids);
         return evaluateFold(methods, withPopularity(byK, lookup), new Set(heldOut), lookup);
@@ -135,24 +161,43 @@ function purchasesOf(rows: readonly OwnershipRecord[]): Purchase[] {
   return [...newest].map(([id, at]) => ({ id, at }));
 }
 
-/** Removes the held-out releases from your lists, runs `body`, and puts them back. */
+/**
+ * Writes your lists minus the held-out releases under `fanId`, runs `body` as that fan, then
+ * takes the fan out of the match index. Deleting ownership rows instead would be far too slow:
+ * fake-indexeddb scans every index entry on each delete. The rows left behind under old fold ids
+ * are only read by fan, and no one asks for those fans again.
+ */
 async function withHoldout<T>(
   db: DigheadDb,
   fanId: number,
-  saved: readonly OwnershipRecord[],
+  mine: readonly OwnershipRecord[],
   heldOut: ReadonlySet<number>,
   body: () => Promise<T>,
 ): Promise<T> {
-  const keep = new Set<ItemKey>(
-    saved.filter((row) => !heldOut.has(keyToNumber(row.matchKey))).map((row) => row.itemKey),
+  const kept = mine.filter(
+    (row) => row.source !== 'collection' || !heldOut.has(keyToNumber(row.matchKey)),
   );
-  await removeOwnershipExcept(db, fanId, 'collection', keep);
+  await db.ownership.bulkAdd(kept.map((row) => ({ ...row, fanId })));
+  await refreshFanMatches(db, [fanId]);
   try {
     return await body();
   } finally {
-    await db.ownership.bulkPut([...saved]);
-    await refreshFanMatches(db, [fanId]);
+    await dropFanMatches(db, fanId);
   }
+}
+
+/** Removes a fan from the match index and the owner counts, leaving its ownership rows. */
+async function dropFanMatches(db: DigheadDb, fanId: number): Promise<void> {
+  const lists = await db.fanMatches.get(fanId);
+  if (!lists) return;
+  const ids = [...lists.matchIds];
+  const current = await db.matchOwners.bulkGet(ids);
+  const put = current.flatMap((record) =>
+    record && record.owners > 1 ? [{ ...record, owners: record.owners - 1 }] : [],
+  );
+  await db.matchOwners.bulkPut(put);
+  await db.matchOwners.bulkDelete(ids.filter((_, i) => (current[i]?.owners ?? 0) <= 1));
+  await db.fanMatches.delete(fanId);
 }
 
 /**
