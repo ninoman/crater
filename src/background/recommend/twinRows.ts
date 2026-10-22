@@ -13,7 +13,8 @@ import {
   type TwinRecord,
 } from '../../db';
 import { trendOf } from '../../scoring/lately';
-import type { TwinRow, TwinsBasis, TwinsResult } from '../../shared/twins';
+import type { TwinBuy, TwinRow, TwinsBasis, TwinsResult } from '../../shared/twins';
+import { readTwinBuys } from './twinBuys';
 
 export async function readTwinsResult(
   db: DigheadDb,
@@ -26,10 +27,13 @@ export async function readTwinsResult(
     countReadFans(db),
     followedFanIds(db),
   ]);
+  const buys = await readTwinBuys(db, [
+    ...new Set([...twins, ...latelyTwins].map((twin) => twin.fanId)),
+  ]);
   return {
     basis: twinsBasis(me),
-    rows: await twinRows(db, twins, followed),
-    latelyRows: await twinRows(db, latelyTwins, followed),
+    rows: await twinRows(db, twins, followed, buys),
+    latelyRows: await twinRows(db, latelyTwins, followed, buys),
     latelyHalfLifeMonths,
     computedAt: twins[0]?.computedAt ?? latelyTwins[0]?.computedAt ?? null,
     fansRead,
@@ -41,6 +45,7 @@ async function twinRows(
   db: DigheadDb,
   twins: readonly TwinRecord[],
   followed: ReadonlySet<number>,
+  buys: ReadonlyMap<number, TwinBuy[]>,
 ): Promise<TwinRow[]> {
   const fans = await getFans(
     db,
@@ -65,6 +70,7 @@ async function twinRows(
         lately: twin.lately,
         latelyOverlap: twin.latelyOverlap,
         trend: trendOf(twin.lately, twin.yearAgo),
+        recentBuys: buys.get(twin.fanId) ?? [],
       },
     ];
   });

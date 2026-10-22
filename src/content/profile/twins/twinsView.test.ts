@@ -18,6 +18,7 @@ function row(rank: number, overrides: Partial<TwinRow> = {}): TwinRow {
     lately: null,
     latelyOverlap: 0,
     trend: 'quiet',
+    recentBuys: [],
     ...overrides,
   };
 }

@@ -1,5 +1,7 @@
 // Shapes of the taste-twins leaderboard, shared by the worker and the profile page.
 
+import type { ItemKey } from '../bandcamp';
+
 /**
  * Which way a twin is heading, from their lately score now and a year ago (decisions §11).
  * `new`: they bought too little a year ago to compare. `quiet`: they've bought too little lately.
@@ -29,6 +31,19 @@ export interface TwinRow {
   /** Releases you both bought within the last year. */
   latelyOverlap: number;
   trend: Trend;
+  /** What they bought last, newest first. */
+  recentBuys: TwinBuy[];
+}
+
+/** A release a twin bought, enough to show its cover and preview it. */
+export interface TwinBuy {
+  /** The album for album tracks (decisions §3.8). */
+  matchKey: ItemKey;
+  title: string;
+  artist: string;
+  url: string;
+  coverUrl: string | null;
+  boughtAt: number;
 }
 
 /** Why the leaderboard may be empty, so the page can say what to do next. */

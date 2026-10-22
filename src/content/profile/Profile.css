@@ -36,3 +36,42 @@
 .dh-profile__list {
   border-top: 1px solid var(--dh-color-border);
 }
+
+.dh-twin-buys {
+  display: flex;
+  gap: var(--dh-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Pinned to the bottom of the window while the leaderboard scrolls under it. */
+.dh-now-playing {
+  position: sticky;
+  bottom: 0;
+  margin-top: var(--dh-space-2);
+  padding: var(--dh-space-2) var(--dh-space-3);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+  box-shadow: var(--dh-shadow-panel);
+}
+
+.dh-now-playing__head {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  font-size: var(--dh-text-sm);
+}
+
+.dh-now-playing__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-now-playing__by {
+  flex: 1;
+  color: var(--dh-color-muted);
+  white-space: nowrap;
+}
