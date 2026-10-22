@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureJson, fixtureText } from '../../../tests/fixtures';
 import { ParserError, type BandcampRequest } from '../../bandcamp';
-import { DigheadDb, refreshFanMatches, type ReleaseJob } from '../../db';
+import { DigheadDb, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
 import { runReleaseStep } from './releaseJob';
@@ -146,6 +146,43 @@ describe('runReleaseStep', () => {
     await runReleaseStep(ctx, job());
 
     expect(await order()).toEqual([keen, ...fanIds.filter((id) => id !== keen)]);
+  });
+
+  it('reads supporters you follow first, ahead of the best expected overlap', async () => {
+    const ctx = context(86);
+    await runReleaseStep(ctx, job());
+    const fanIds = (await db.releaseSupporters.get(PROMISES))?.fanIds ?? [];
+    const keen = fanIds[40] as number;
+    const friend = fanIds[60] as number;
+    await db.me.put({ id: 'self', fanId: 1, username: 'me', syncedAt: NOW });
+    await db.ownership.bulkPut(
+      [1, keen].map((fanId) => ({
+        fanId,
+        itemKey: 'a5' as const,
+        matchKey: 'a5' as const,
+        source: 'collection' as const,
+        addedAt: null,
+      })),
+    );
+    await refreshFanMatches(db, [1, keen]);
+    await putFollowing(db, [
+      {
+        kind: 'fan',
+        id: friend,
+        name: 'Friend',
+        url: '',
+        imageId: null,
+        location: null,
+        followedAt: 0,
+      },
+    ]);
+    await db.queue.clear();
+    await runReleaseStep(ctx, job());
+
+    const order = (await db.queue.orderBy('[priority+nextAttemptAt+rank]').toArray()).map((q) =>
+      Number(q.target),
+    );
+    expect(order.slice(0, 2)).toEqual([friend, keen]);
   });
 
   it('refuses a page that is a different release than the job asked for', async () => {
