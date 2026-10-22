@@ -1,0 +1,8593 @@
+{
+ "twins": {
+  "basis": "ready",
+  "rows": [
+   {
+    "fanId": 116,
+    "rank": 1,
+    "username": "fan116",
+    "name": "Fan 116",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001160_42.jpg",
+    "url": "https://bandcamp.com/fan116",
+    "overlap": 19,
+    "jaccard": 0.4318181818181818,
+    "score": 0.16592063242809996,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.1349748236211622,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 134,
+    "rank": 2,
+    "username": "fan134",
+    "name": "Fan 134",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001340_42.jpg",
+    "url": "https://bandcamp.com/fan134",
+    "overlap": 19,
+    "jaccard": 0.4418604651162791,
+    "score": 0.16405371758015144,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05999879495410515,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 122,
+    "rank": 3,
+    "username": "fan122",
+    "name": "Fan 122",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001220_42.jpg",
+    "url": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "jaccard": 0.4418604651162791,
+    "score": 0.15538949649226153,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0640804675304488,
+    "latelyOverlap": 3,
+    "trend": "steady"
+   },
+   {
+    "fanId": 127,
+    "rank": 4,
+    "username": "fan127",
+    "name": "Fan 127",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001270_42.jpg",
+    "url": "https://bandcamp.com/fan127",
+    "overlap": 19,
+    "jaccard": 0.40425531914893614,
+    "score": 0.15524878269514092,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08466841525969225,
+    "latelyOverlap": 10,
+    "trend": "converging"
+   },
+   {
+    "fanId": 120,
+    "rank": 5,
+    "username": "fan120",
+    "name": "Fan 120",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan120",
+    "overlap": 16,
+    "jaccard": 0.4,
+    "score": 0.14996390946790017,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.07370690847668604,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 115,
+    "rank": 6,
+    "username": "fan115",
+    "name": "Fan 115",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001150_42.jpg",
+    "url": "https://bandcamp.com/fan115",
+    "overlap": 17,
+    "jaccard": 0.3541666666666667,
+    "score": 0.14781442088868343,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06744056001845908,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 129,
+    "rank": 7,
+    "username": "fan129",
+    "name": "Fan 129",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan129",
+    "overlap": 16,
+    "jaccard": 0.35555555555555557,
+    "score": 0.14665362905899904,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.10417873465216851,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 131,
+    "rank": 8,
+    "username": "fan131",
+    "name": "Fan 131",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001310_42.jpg",
+    "url": "https://bandcamp.com/fan131",
+    "overlap": 14,
+    "jaccard": 0.3684210526315789,
+    "score": 0.1457723287395909,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04406070107002445,
+    "latelyOverlap": 3,
+    "trend": "new"
+   },
+   {
+    "fanId": 110,
+    "rank": 9,
+    "username": "fan110",
+    "name": "Fan 110",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001100_42.jpg",
+    "url": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "jaccard": 0.375,
+    "score": 0.14575842548777856,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055271741860187754,
+    "latelyOverlap": 8,
+    "trend": "converging"
+   },
+   {
+    "fanId": 102,
+    "rank": 10,
+    "username": "fan102",
+    "name": "Fan 102",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "jaccard": 0.3617021276595745,
+    "score": 0.14504205984966248,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.09137969768478543,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 124,
+    "rank": 11,
+    "username": "fan124",
+    "name": "Fan 124",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001240_42.jpg",
+    "url": "https://bandcamp.com/fan124",
+    "overlap": 16,
+    "jaccard": 0.3404255319148936,
+    "score": 0.14363209442871264,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04731369481120308,
+    "latelyOverlap": 3,
+    "trend": "drifting"
+   },
+   {
+    "fanId": 113,
+    "rank": 12,
+    "username": "fan113",
+    "name": "Fan 113",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001130_42.jpg",
+    "url": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "jaccard": 0.36538461538461536,
+    "score": 0.14142180919515215,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0986962057972656,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 109,
+    "rank": 13,
+    "username": "fan109",
+    "name": "Fan 109",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001090_42.jpg",
+    "url": "https://bandcamp.com/fan109",
+    "overlap": 18,
+    "jaccard": 0.33962264150943394,
+    "score": 0.1352615022572987,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06334606927040262,
+    "latelyOverlap": 5,
+    "trend": "converging"
+   },
+   {
+    "fanId": 126,
+    "rank": 14,
+    "username": "fan126",
+    "name": "Fan 126",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan126",
+    "overlap": 15,
+    "jaccard": 0.3409090909090909,
+    "score": 0.1351096004970676,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055553545654159986,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 101,
+    "rank": 15,
+    "username": "fan101",
+    "name": "Fan 101",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001010_42.jpg",
+    "url": "https://bandcamp.com/fan101",
+    "overlap": 15,
+    "jaccard": 0.3125,
+    "score": 0.1347499559388027,
+    "labelCluster": false,
+    "followed": true,
+    "lately": 0.07092361683200538,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 136,
+    "rank": 16,
+    "username": "fan136",
+    "name": "Fan 136",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001360_42.jpg",
+    "url": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "jaccard": 0.30612244897959184,
+    "score": 0.1340535291263841,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0536014563244181,
+    "latelyOverlap": 7,
+    "trend": "steady"
+   },
+   {
+    "fanId": 125,
+    "rank": 17,
+    "username": "fan125",
+    "name": "Fan 125",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001250_42.jpg",
+    "url": "https://bandcamp.com/fan125",
+    "overlap": 15,
+    "jaccard": 0.36585365853658536,
+    "score": 0.13303673318598402,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08225955430438085,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 130,
+    "rank": 18,
+    "username": "fan130",
+    "name": "Fan 130",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001300_42.jpg",
+    "url": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "jaccard": 0.32,
+    "score": 0.13170147968870294,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.07164147963044216,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 100,
+    "rank": 19,
+    "username": "fan100",
+    "name": "Fan 100",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001000_42.jpg",
+    "url": "https://bandcamp.com/fan100",
+    "overlap": 18,
+    "jaccard": 0.32142857142857145,
+    "score": 0.12905320779604532,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0653437223403831,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 128,
+    "rank": 20,
+    "username": "fan128",
+    "name": "Fan 128",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001280_42.jpg",
+    "url": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "jaccard": 0.3469387755102041,
+    "score": 0.12699245640510776,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04668885986392159,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 104,
+    "rank": 21,
+    "username": "fan104",
+    "name": "Fan 104",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001040_42.jpg",
+    "url": "https://bandcamp.com/fan104",
+    "overlap": 14,
+    "jaccard": 0.30434782608695654,
+    "score": 0.12551988253056712,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.043820875122056624,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 118,
+    "rank": 22,
+    "username": "fan118",
+    "name": "Fan 118",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001180_42.jpg",
+    "url": "https://bandcamp.com/fan118",
+    "overlap": 18,
+    "jaccard": 0.4,
+    "score": 0.12527101569418353,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06140711879141622,
+    "latelyOverlap": 8,
+    "trend": "converging"
+   },
+   {
+    "fanId": 119,
+    "rank": 23,
+    "username": "fan119",
+    "name": "Fan 119",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001190_42.jpg",
+    "url": "https://bandcamp.com/fan119",
+    "overlap": 12,
+    "jaccard": 0.25,
+    "score": 0.12439731304645482,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.09932114248145851,
+    "latelyOverlap": 5,
+    "trend": "converging"
+   },
+   {
+    "fanId": 135,
+    "rank": 24,
+    "username": "fan135",
+    "name": "Fan 135",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan135",
+    "overlap": 16,
+    "jaccard": 0.35555555555555557,
+    "score": 0.1242026905667259,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08264918832061104,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 114,
+    "rank": 25,
+    "username": "fan114",
+    "name": "Fan 114",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan114",
+    "overlap": 14,
+    "jaccard": 0.30434782608695654,
+    "score": 0.12309902591396964,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05872903064614325,
+    "latelyOverlap": 3,
+    "trend": "converging"
+   },
+   {
+    "fanId": 123,
+    "rank": 26,
+    "username": "fan123",
+    "name": "Fan 123",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan123",
+    "overlap": 16,
+    "jaccard": 0.3137254901960784,
+    "score": 0.12194119824525455,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05922287818014012,
+    "latelyOverlap": 11,
+    "trend": "converging"
+   },
+   {
+    "fanId": 105,
+    "rank": 27,
+    "username": "fan105",
+    "name": "Fan 105",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "jaccard": 0.3617021276595745,
+    "score": 0.12101702952887183,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055477780310001445,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 117,
+    "rank": 28,
+    "username": "fan117",
+    "name": "Fan 117",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan117",
+    "overlap": 12,
+    "jaccard": 0.2727272727272727,
+    "score": 0.12041187046561348,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.044768141229353006,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 106,
+    "rank": 29,
+    "username": "fan106",
+    "name": "Fan 106",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001060_42.jpg",
+    "url": "https://bandcamp.com/fan106",
+    "overlap": 15,
+    "jaccard": 0.29411764705882354,
+    "score": 0.12000094009579766,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04740151038348149,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 112,
+    "rank": 30,
+    "username": "fan112",
+    "name": "Fan 112",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001120_42.jpg",
+    "url": "https://bandcamp.com/fan112",
+    "overlap": 16,
+    "jaccard": 0.34782608695652173,
+    "score": 0.1180882227656052,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08218436881243552,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 111,
+    "rank": 31,
+    "username": "fan111",
+    "name": "Fan 111",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "jaccard": 0.32558139534883723,
+    "score": 0.11807621774413318,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.03292714076608568,
+    "latelyOverlap": 3,
+    "trend": "drifting"
+   },
+   {
+    "fanId": 107,
+    "rank": 32,
+    "username": "fan107",
+    "name": "Fan 107",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001070_42.jpg",
+    "url": "https://bandcamp.com/fan107",
+    "overlap": 15,
+    "jaccard": 0.2727272727272727,
+    "score": 0.11784824376385858,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06460767026500569,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 121,
+    "rank": 33,
+    "username": "fan121",
+    "name": "Fan 121",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001210_42.jpg",
+    "url": "https://bandcamp.com/fan121",
+    "overlap": 16,
+    "jaccard": 0.32,
+    "score": 0.11429830743629914,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0533240054723104,
+    "latelyOverlap": 11,
+    "trend": "converging"
+   },
+   {
+    "fanId": 103,
+    "rank": 34,
+    "username": "fan103",
+    "name": "Fan 103",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001030_42.jpg",
+    "url": "https://bandcamp.com/fan103",
+    "overlap": 16,
+    "jaccard": 0.3333333333333333,
+    "score": 0.11086400497922465,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06835248522744539,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 108,
+    "rank": 35,
+    "username": "fan108",
+    "name": "Fan 108",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan108",
+    "overlap": 12,
+    "jaccard": 0.2727272727272727,
+    "score": 0.10947359939088157,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.10066517710765403,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 133,
+    "rank": 36,
+    "username": "fan133",
+    "name": "Fan 133",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001330_42.jpg",
+    "url": "https://bandcamp.com/fan133",
+    "overlap": 13,
+    "jaccard": 0.28888888888888886,
+    "score": 0.10249347354027814,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.03557406773891146,
+    "latelyOverlap": 4,
+    "trend": "converging"
+   },
+   {
+    "fanId": 132,
+    "rank": 37,
+    "username": "fan132",
+    "name": "Fan 132",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan132",
+    "overlap": 13,
+    "jaccard": 0.25,
+    "score": 0.10063136133933288,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0436541377219521,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   }
+  ],
+  "latelyRows": [
+   {
+    "fanId": 116,
+    "rank": 1,
+    "username": "fan116",
+    "name": "Fan 116",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001160_42.jpg",
+    "url": "https://bandcamp.com/fan116",
+    "overlap": 19,
+    "jaccard": 0.4318181818181818,
+    "score": 0.16592063242809996,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.1349748236211622,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 129,
+    "rank": 2,
+    "username": "fan129",
+    "name": "Fan 129",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan129",
+    "overlap": 16,
+    "jaccard": 0.35555555555555557,
+    "score": 0.14665362905899904,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.10417873465216851,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 108,
+    "rank": 3,
+    "username": "fan108",
+    "name": "Fan 108",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan108",
+    "overlap": 12,
+    "jaccard": 0.2727272727272727,
+    "score": 0.10947359939088157,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.10066517710765403,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 119,
+    "rank": 4,
+    "username": "fan119",
+    "name": "Fan 119",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001190_42.jpg",
+    "url": "https://bandcamp.com/fan119",
+    "overlap": 12,
+    "jaccard": 0.25,
+    "score": 0.12439731304645482,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.09932114248145851,
+    "latelyOverlap": 5,
+    "trend": "converging"
+   },
+   {
+    "fanId": 113,
+    "rank": 5,
+    "username": "fan113",
+    "name": "Fan 113",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001130_42.jpg",
+    "url": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "jaccard": 0.36538461538461536,
+    "score": 0.14142180919515215,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0986962057972656,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 102,
+    "rank": 6,
+    "username": "fan102",
+    "name": "Fan 102",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "jaccard": 0.3617021276595745,
+    "score": 0.14504205984966248,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.09137969768478543,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 127,
+    "rank": 7,
+    "username": "fan127",
+    "name": "Fan 127",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001270_42.jpg",
+    "url": "https://bandcamp.com/fan127",
+    "overlap": 19,
+    "jaccard": 0.40425531914893614,
+    "score": 0.15524878269514092,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08466841525969225,
+    "latelyOverlap": 10,
+    "trend": "converging"
+   },
+   {
+    "fanId": 135,
+    "rank": 8,
+    "username": "fan135",
+    "name": "Fan 135",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan135",
+    "overlap": 16,
+    "jaccard": 0.35555555555555557,
+    "score": 0.1242026905667259,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08264918832061104,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 125,
+    "rank": 9,
+    "username": "fan125",
+    "name": "Fan 125",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001250_42.jpg",
+    "url": "https://bandcamp.com/fan125",
+    "overlap": 15,
+    "jaccard": 0.36585365853658536,
+    "score": 0.13303673318598402,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08225955430438085,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 112,
+    "rank": 10,
+    "username": "fan112",
+    "name": "Fan 112",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001120_42.jpg",
+    "url": "https://bandcamp.com/fan112",
+    "overlap": 16,
+    "jaccard": 0.34782608695652173,
+    "score": 0.1180882227656052,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.08218436881243552,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 120,
+    "rank": 11,
+    "username": "fan120",
+    "name": "Fan 120",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan120",
+    "overlap": 16,
+    "jaccard": 0.4,
+    "score": 0.14996390946790017,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.07370690847668604,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 130,
+    "rank": 12,
+    "username": "fan130",
+    "name": "Fan 130",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001300_42.jpg",
+    "url": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "jaccard": 0.32,
+    "score": 0.13170147968870294,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.07164147963044216,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 101,
+    "rank": 13,
+    "username": "fan101",
+    "name": "Fan 101",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001010_42.jpg",
+    "url": "https://bandcamp.com/fan101",
+    "overlap": 15,
+    "jaccard": 0.3125,
+    "score": 0.1347499559388027,
+    "labelCluster": false,
+    "followed": true,
+    "lately": 0.07092361683200538,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 103,
+    "rank": 14,
+    "username": "fan103",
+    "name": "Fan 103",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001030_42.jpg",
+    "url": "https://bandcamp.com/fan103",
+    "overlap": 16,
+    "jaccard": 0.3333333333333333,
+    "score": 0.11086400497922465,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06835248522744539,
+    "latelyOverlap": 9,
+    "trend": "converging"
+   },
+   {
+    "fanId": 115,
+    "rank": 15,
+    "username": "fan115",
+    "name": "Fan 115",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001150_42.jpg",
+    "url": "https://bandcamp.com/fan115",
+    "overlap": 17,
+    "jaccard": 0.3541666666666667,
+    "score": 0.14781442088868343,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06744056001845908,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 100,
+    "rank": 16,
+    "username": "fan100",
+    "name": "Fan 100",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001000_42.jpg",
+    "url": "https://bandcamp.com/fan100",
+    "overlap": 18,
+    "jaccard": 0.32142857142857145,
+    "score": 0.12905320779604532,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0653437223403831,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 107,
+    "rank": 17,
+    "username": "fan107",
+    "name": "Fan 107",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001070_42.jpg",
+    "url": "https://bandcamp.com/fan107",
+    "overlap": 15,
+    "jaccard": 0.2727272727272727,
+    "score": 0.11784824376385858,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06460767026500569,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 122,
+    "rank": 18,
+    "username": "fan122",
+    "name": "Fan 122",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001220_42.jpg",
+    "url": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "jaccard": 0.4418604651162791,
+    "score": 0.15538949649226153,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0640804675304488,
+    "latelyOverlap": 3,
+    "trend": "steady"
+   },
+   {
+    "fanId": 109,
+    "rank": 19,
+    "username": "fan109",
+    "name": "Fan 109",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001090_42.jpg",
+    "url": "https://bandcamp.com/fan109",
+    "overlap": 18,
+    "jaccard": 0.33962264150943394,
+    "score": 0.1352615022572987,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06334606927040262,
+    "latelyOverlap": 5,
+    "trend": "converging"
+   },
+   {
+    "fanId": 118,
+    "rank": 20,
+    "username": "fan118",
+    "name": "Fan 118",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001180_42.jpg",
+    "url": "https://bandcamp.com/fan118",
+    "overlap": 18,
+    "jaccard": 0.4,
+    "score": 0.12527101569418353,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.06140711879141622,
+    "latelyOverlap": 8,
+    "trend": "converging"
+   },
+   {
+    "fanId": 134,
+    "rank": 21,
+    "username": "fan134",
+    "name": "Fan 134",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001340_42.jpg",
+    "url": "https://bandcamp.com/fan134",
+    "overlap": 19,
+    "jaccard": 0.4418604651162791,
+    "score": 0.16405371758015144,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05999879495410515,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 123,
+    "rank": 22,
+    "username": "fan123",
+    "name": "Fan 123",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan123",
+    "overlap": 16,
+    "jaccard": 0.3137254901960784,
+    "score": 0.12194119824525455,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05922287818014012,
+    "latelyOverlap": 11,
+    "trend": "converging"
+   },
+   {
+    "fanId": 114,
+    "rank": 23,
+    "username": "fan114",
+    "name": "Fan 114",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan114",
+    "overlap": 14,
+    "jaccard": 0.30434782608695654,
+    "score": 0.12309902591396964,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.05872903064614325,
+    "latelyOverlap": 3,
+    "trend": "converging"
+   },
+   {
+    "fanId": 126,
+    "rank": 24,
+    "username": "fan126",
+    "name": "Fan 126",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan126",
+    "overlap": 15,
+    "jaccard": 0.3409090909090909,
+    "score": 0.1351096004970676,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055553545654159986,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 105,
+    "rank": 25,
+    "username": "fan105",
+    "name": "Fan 105",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "jaccard": 0.3617021276595745,
+    "score": 0.12101702952887183,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055477780310001445,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 110,
+    "rank": 26,
+    "username": "fan110",
+    "name": "Fan 110",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001100_42.jpg",
+    "url": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "jaccard": 0.375,
+    "score": 0.14575842548777856,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.055271741860187754,
+    "latelyOverlap": 8,
+    "trend": "converging"
+   },
+   {
+    "fanId": 136,
+    "rank": 27,
+    "username": "fan136",
+    "name": "Fan 136",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001360_42.jpg",
+    "url": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "jaccard": 0.30612244897959184,
+    "score": 0.1340535291263841,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0536014563244181,
+    "latelyOverlap": 7,
+    "trend": "steady"
+   },
+   {
+    "fanId": 121,
+    "rank": 28,
+    "username": "fan121",
+    "name": "Fan 121",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001210_42.jpg",
+    "url": "https://bandcamp.com/fan121",
+    "overlap": 16,
+    "jaccard": 0.32,
+    "score": 0.11429830743629914,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0533240054723104,
+    "latelyOverlap": 11,
+    "trend": "converging"
+   },
+   {
+    "fanId": 106,
+    "rank": 29,
+    "username": "fan106",
+    "name": "Fan 106",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001060_42.jpg",
+    "url": "https://bandcamp.com/fan106",
+    "overlap": 15,
+    "jaccard": 0.29411764705882354,
+    "score": 0.12000094009579766,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04740151038348149,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 124,
+    "rank": 30,
+    "username": "fan124",
+    "name": "Fan 124",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001240_42.jpg",
+    "url": "https://bandcamp.com/fan124",
+    "overlap": 16,
+    "jaccard": 0.3404255319148936,
+    "score": 0.14363209442871264,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04731369481120308,
+    "latelyOverlap": 3,
+    "trend": "drifting"
+   },
+   {
+    "fanId": 128,
+    "rank": 31,
+    "username": "fan128",
+    "name": "Fan 128",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001280_42.jpg",
+    "url": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "jaccard": 0.3469387755102041,
+    "score": 0.12699245640510776,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04668885986392159,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 117,
+    "rank": 32,
+    "username": "fan117",
+    "name": "Fan 117",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan117",
+    "overlap": 12,
+    "jaccard": 0.2727272727272727,
+    "score": 0.12041187046561348,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.044768141229353006,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 131,
+    "rank": 33,
+    "username": "fan131",
+    "name": "Fan 131",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001310_42.jpg",
+    "url": "https://bandcamp.com/fan131",
+    "overlap": 14,
+    "jaccard": 0.3684210526315789,
+    "score": 0.1457723287395909,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.04406070107002445,
+    "latelyOverlap": 3,
+    "trend": "new"
+   },
+   {
+    "fanId": 104,
+    "rank": 34,
+    "username": "fan104",
+    "name": "Fan 104",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001040_42.jpg",
+    "url": "https://bandcamp.com/fan104",
+    "overlap": 14,
+    "jaccard": 0.30434782608695654,
+    "score": 0.12551988253056712,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.043820875122056624,
+    "latelyOverlap": 7,
+    "trend": "converging"
+   },
+   {
+    "fanId": 132,
+    "rank": 35,
+    "username": "fan132",
+    "name": "Fan 132",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan132",
+    "overlap": 13,
+    "jaccard": 0.25,
+    "score": 0.10063136133933288,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.0436541377219521,
+    "latelyOverlap": 6,
+    "trend": "converging"
+   },
+   {
+    "fanId": 133,
+    "rank": 36,
+    "username": "fan133",
+    "name": "Fan 133",
+    "avatarUrl": "https://f4.bcbits.com/img/0000001330_42.jpg",
+    "url": "https://bandcamp.com/fan133",
+    "overlap": 13,
+    "jaccard": 0.28888888888888886,
+    "score": 0.10249347354027814,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.03557406773891146,
+    "latelyOverlap": 4,
+    "trend": "converging"
+   },
+   {
+    "fanId": 111,
+    "rank": 37,
+    "username": "fan111",
+    "name": "Fan 111",
+    "avatarUrl": null,
+    "url": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "jaccard": 0.32558139534883723,
+    "score": 0.11807621774413318,
+    "labelCluster": false,
+    "followed": false,
+    "lately": 0.03292714076608568,
+    "latelyOverlap": 3,
+    "trend": "drifting"
+   }
+  ],
+  "latelyHalfLifeMonths": 6,
+  "computedAt": 1792627200000,
+  "fansRead": 37
+ },
+ "alsoBought a1000": {
+  "releaseKey": "a1000",
+  "rows": [
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 26,
+     "twins": 26
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 26,
+     "twins": 26
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 20,
+     "twins": 20
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 18,
+     "twins": 18
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 18,
+     "twins": 18
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 16,
+     "twins": 16
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 16,
+     "twins": 16
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 15,
+     "twins": 15
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1052",
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "t30005",
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "twins": 9
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "twins": 9
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1048",
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   }
+  ],
+  "warmup": null
+ },
+ "releaseTwins a1000": {
+  "releaseKey": "a1000",
+  "rows": [
+   {
+    "fanId": 116,
+    "rank": 1,
+    "name": "Fan 116",
+    "profileUrl": "https://bandcamp.com/fan116",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 134,
+    "rank": 2,
+    "name": "Fan 134",
+    "profileUrl": "https://bandcamp.com/fan134",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 122,
+    "rank": 3,
+    "name": "Fan 122",
+    "profileUrl": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 127,
+    "rank": 4,
+    "name": "Fan 127",
+    "profileUrl": "https://bandcamp.com/fan127",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 120,
+    "rank": 5,
+    "name": "Fan 120",
+    "profileUrl": "https://bandcamp.com/fan120",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 115,
+    "rank": 6,
+    "name": "Fan 115",
+    "profileUrl": "https://bandcamp.com/fan115",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 129,
+    "rank": 7,
+    "name": "Fan 129",
+    "profileUrl": "https://bandcamp.com/fan129",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 110,
+    "rank": 9,
+    "name": "Fan 110",
+    "profileUrl": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 102,
+    "rank": 10,
+    "name": "Fan 102",
+    "profileUrl": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 124,
+    "rank": 11,
+    "name": "Fan 124",
+    "profileUrl": "https://bandcamp.com/fan124",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 113,
+    "rank": 12,
+    "name": "Fan 113",
+    "profileUrl": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 109,
+    "rank": 13,
+    "name": "Fan 109",
+    "profileUrl": "https://bandcamp.com/fan109",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 126,
+    "rank": 14,
+    "name": "Fan 126",
+    "profileUrl": "https://bandcamp.com/fan126",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 101,
+    "rank": 15,
+    "name": "Fan 101",
+    "profileUrl": "https://bandcamp.com/fan101",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 136,
+    "rank": 16,
+    "name": "Fan 136",
+    "profileUrl": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 125,
+    "rank": 17,
+    "name": "Fan 125",
+    "profileUrl": "https://bandcamp.com/fan125",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 130,
+    "rank": 18,
+    "name": "Fan 130",
+    "profileUrl": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 100,
+    "rank": 19,
+    "name": "Fan 100",
+    "profileUrl": "https://bandcamp.com/fan100",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 128,
+    "rank": 20,
+    "name": "Fan 128",
+    "profileUrl": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 104,
+    "rank": 21,
+    "name": "Fan 104",
+    "profileUrl": "https://bandcamp.com/fan104",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 118,
+    "rank": 22,
+    "name": "Fan 118",
+    "profileUrl": "https://bandcamp.com/fan118",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 119,
+    "rank": 23,
+    "name": "Fan 119",
+    "profileUrl": "https://bandcamp.com/fan119",
+    "overlap": 12,
+    "labelCluster": false
+   },
+   {
+    "fanId": 135,
+    "rank": 24,
+    "name": "Fan 135",
+    "profileUrl": "https://bandcamp.com/fan135",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 114,
+    "rank": 25,
+    "name": "Fan 114",
+    "profileUrl": "https://bandcamp.com/fan114",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 123,
+    "rank": 26,
+    "name": "Fan 123",
+    "profileUrl": "https://bandcamp.com/fan123",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 105,
+    "rank": 27,
+    "name": "Fan 105",
+    "profileUrl": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 117,
+    "rank": 28,
+    "name": "Fan 117",
+    "profileUrl": "https://bandcamp.com/fan117",
+    "overlap": 12,
+    "labelCluster": false
+   },
+   {
+    "fanId": 106,
+    "rank": 29,
+    "name": "Fan 106",
+    "profileUrl": "https://bandcamp.com/fan106",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 112,
+    "rank": 30,
+    "name": "Fan 112",
+    "profileUrl": "https://bandcamp.com/fan112",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 111,
+    "rank": 31,
+    "name": "Fan 111",
+    "profileUrl": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 107,
+    "rank": 32,
+    "name": "Fan 107",
+    "profileUrl": "https://bandcamp.com/fan107",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 121,
+    "rank": 33,
+    "name": "Fan 121",
+    "profileUrl": "https://bandcamp.com/fan121",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 103,
+    "rank": 34,
+    "name": "Fan 103",
+    "profileUrl": "https://bandcamp.com/fan103",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 108,
+    "rank": 35,
+    "name": "Fan 108",
+    "profileUrl": "https://bandcamp.com/fan108",
+    "overlap": 12,
+    "labelCluster": false
+   }
+  ],
+  "twinCount": 37
+ },
+ "alsoBought a1005": {
+  "releaseKey": "a1005",
+  "rows": [
+   {
+    "matchKey": "a1065",
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "label": "Label Fifty",
+    "url": "https://music.label15.com/album/release-65",
+    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1077",
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "label": "Label Fifty-One",
+    "url": "https://music.label15.com/album/release-77",
+    "coverUrl": null,
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1053",
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-53",
+    "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1085",
+    "title": "Page Only",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/page-only",
+    "coverUrl": "https://f4.bcbits.com/img/a9999_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1070",
+    "title": "Release 70",
+    "artist": "Artist 20",
+    "label": "Label Fifty",
+    "url": "https://band20.bandcamp.com/album/release-70",
+    "coverUrl": "https://f4.bcbits.com/img/a5070_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1050",
+    "title": "Release 50",
+    "artist": "Artist 12",
+    "label": "Label Fifty",
+    "url": "https://band12.bandcamp.com/album/release-50",
+    "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   }
+  ],
+  "warmup": {
+   "read": 19,
+   "readTarget": 20,
+   "confident": 0,
+   "confidentTarget": 5
+  }
+ },
+ "releaseTwins a1005": {
+  "releaseKey": "a1005",
+  "rows": [
+   {
+    "fanId": 116,
+    "rank": 1,
+    "name": "Fan 116",
+    "profileUrl": "https://bandcamp.com/fan116",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 134,
+    "rank": 2,
+    "name": "Fan 134",
+    "profileUrl": "https://bandcamp.com/fan134",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 122,
+    "rank": 3,
+    "name": "Fan 122",
+    "profileUrl": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 110,
+    "rank": 9,
+    "name": "Fan 110",
+    "profileUrl": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 102,
+    "rank": 10,
+    "name": "Fan 102",
+    "profileUrl": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 113,
+    "rank": 12,
+    "name": "Fan 113",
+    "profileUrl": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 126,
+    "rank": 14,
+    "name": "Fan 126",
+    "profileUrl": "https://bandcamp.com/fan126",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 136,
+    "rank": 16,
+    "name": "Fan 136",
+    "profileUrl": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 125,
+    "rank": 17,
+    "name": "Fan 125",
+    "profileUrl": "https://bandcamp.com/fan125",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 130,
+    "rank": 18,
+    "name": "Fan 130",
+    "profileUrl": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 100,
+    "rank": 19,
+    "name": "Fan 100",
+    "profileUrl": "https://bandcamp.com/fan100",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 118,
+    "rank": 22,
+    "name": "Fan 118",
+    "profileUrl": "https://bandcamp.com/fan118",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 105,
+    "rank": 27,
+    "name": "Fan 105",
+    "profileUrl": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 106,
+    "rank": 29,
+    "name": "Fan 106",
+    "profileUrl": "https://bandcamp.com/fan106",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 112,
+    "rank": 30,
+    "name": "Fan 112",
+    "profileUrl": "https://bandcamp.com/fan112",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 107,
+    "rank": 32,
+    "name": "Fan 107",
+    "profileUrl": "https://bandcamp.com/fan107",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 121,
+    "rank": 33,
+    "name": "Fan 121",
+    "profileUrl": "https://bandcamp.com/fan121",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 132,
+    "rank": 37,
+    "name": "Fan 132",
+    "profileUrl": "https://bandcamp.com/fan132",
+    "overlap": 13,
+    "labelCluster": false
+   }
+  ],
+  "twinCount": 37
+ },
+ "alsoBought t20001": {
+  "releaseKey": "t20001",
+  "rows": [
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 26,
+     "twins": 26
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 26,
+     "twins": 26
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 20,
+     "twins": 20
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 18,
+     "twins": 18
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 18,
+     "twins": 18
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 16,
+     "twins": 16
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 16,
+     "twins": 16
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 15,
+     "twins": 15
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "twins": 14
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1052",
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "twins": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "t30005",
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "twins": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "twins": 9
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 11,
+     "twins": 11
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "twins": 9
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1048",
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "twins": 10
+    },
+    "followed": null
+   }
+  ],
+  "warmup": null
+ },
+ "releaseTwins t20001": {
+  "releaseKey": "t20001",
+  "rows": [
+   {
+    "fanId": 116,
+    "rank": 1,
+    "name": "Fan 116",
+    "profileUrl": "https://bandcamp.com/fan116",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 134,
+    "rank": 2,
+    "name": "Fan 134",
+    "profileUrl": "https://bandcamp.com/fan134",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 122,
+    "rank": 3,
+    "name": "Fan 122",
+    "profileUrl": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 127,
+    "rank": 4,
+    "name": "Fan 127",
+    "profileUrl": "https://bandcamp.com/fan127",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 120,
+    "rank": 5,
+    "name": "Fan 120",
+    "profileUrl": "https://bandcamp.com/fan120",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 115,
+    "rank": 6,
+    "name": "Fan 115",
+    "profileUrl": "https://bandcamp.com/fan115",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 129,
+    "rank": 7,
+    "name": "Fan 129",
+    "profileUrl": "https://bandcamp.com/fan129",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 110,
+    "rank": 9,
+    "name": "Fan 110",
+    "profileUrl": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 102,
+    "rank": 10,
+    "name": "Fan 102",
+    "profileUrl": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 124,
+    "rank": 11,
+    "name": "Fan 124",
+    "profileUrl": "https://bandcamp.com/fan124",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 113,
+    "rank": 12,
+    "name": "Fan 113",
+    "profileUrl": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 109,
+    "rank": 13,
+    "name": "Fan 109",
+    "profileUrl": "https://bandcamp.com/fan109",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 126,
+    "rank": 14,
+    "name": "Fan 126",
+    "profileUrl": "https://bandcamp.com/fan126",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 101,
+    "rank": 15,
+    "name": "Fan 101",
+    "profileUrl": "https://bandcamp.com/fan101",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 136,
+    "rank": 16,
+    "name": "Fan 136",
+    "profileUrl": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 125,
+    "rank": 17,
+    "name": "Fan 125",
+    "profileUrl": "https://bandcamp.com/fan125",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 130,
+    "rank": 18,
+    "name": "Fan 130",
+    "profileUrl": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 100,
+    "rank": 19,
+    "name": "Fan 100",
+    "profileUrl": "https://bandcamp.com/fan100",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 128,
+    "rank": 20,
+    "name": "Fan 128",
+    "profileUrl": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 104,
+    "rank": 21,
+    "name": "Fan 104",
+    "profileUrl": "https://bandcamp.com/fan104",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 118,
+    "rank": 22,
+    "name": "Fan 118",
+    "profileUrl": "https://bandcamp.com/fan118",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 119,
+    "rank": 23,
+    "name": "Fan 119",
+    "profileUrl": "https://bandcamp.com/fan119",
+    "overlap": 12,
+    "labelCluster": false
+   },
+   {
+    "fanId": 135,
+    "rank": 24,
+    "name": "Fan 135",
+    "profileUrl": "https://bandcamp.com/fan135",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 114,
+    "rank": 25,
+    "name": "Fan 114",
+    "profileUrl": "https://bandcamp.com/fan114",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 123,
+    "rank": 26,
+    "name": "Fan 123",
+    "profileUrl": "https://bandcamp.com/fan123",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 105,
+    "rank": 27,
+    "name": "Fan 105",
+    "profileUrl": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 117,
+    "rank": 28,
+    "name": "Fan 117",
+    "profileUrl": "https://bandcamp.com/fan117",
+    "overlap": 12,
+    "labelCluster": false
+   },
+   {
+    "fanId": 106,
+    "rank": 29,
+    "name": "Fan 106",
+    "profileUrl": "https://bandcamp.com/fan106",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 112,
+    "rank": 30,
+    "name": "Fan 112",
+    "profileUrl": "https://bandcamp.com/fan112",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 111,
+    "rank": 31,
+    "name": "Fan 111",
+    "profileUrl": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 107,
+    "rank": 32,
+    "name": "Fan 107",
+    "profileUrl": "https://bandcamp.com/fan107",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 121,
+    "rank": 33,
+    "name": "Fan 121",
+    "profileUrl": "https://bandcamp.com/fan121",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 103,
+    "rank": 34,
+    "name": "Fan 103",
+    "profileUrl": "https://bandcamp.com/fan103",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 108,
+    "rank": 35,
+    "name": "Fan 108",
+    "profileUrl": "https://bandcamp.com/fan108",
+    "overlap": 12,
+    "labelCluster": false
+   }
+  ],
+  "twinCount": 37
+ },
+ "alsoBought a1090": {
+  "releaseKey": "a1090",
+  "rows": [],
+  "warmup": {
+   "read": 14,
+   "readTarget": 20,
+   "confident": 0,
+   "confidentTarget": 5
+  }
+ },
+ "releaseTwins a1090": {
+  "releaseKey": "a1090",
+  "rows": [
+   {
+    "fanId": 122,
+    "rank": 3,
+    "name": "Fan 122",
+    "profileUrl": "https://bandcamp.com/fan122",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 127,
+    "rank": 4,
+    "name": "Fan 127",
+    "profileUrl": "https://bandcamp.com/fan127",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 113,
+    "rank": 12,
+    "name": "Fan 113",
+    "profileUrl": "https://bandcamp.com/fan113",
+    "overlap": 19,
+    "labelCluster": false
+   },
+   {
+    "fanId": 109,
+    "rank": 13,
+    "name": "Fan 109",
+    "profileUrl": "https://bandcamp.com/fan109",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 101,
+    "rank": 15,
+    "name": "Fan 101",
+    "profileUrl": "https://bandcamp.com/fan101",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 136,
+    "rank": 16,
+    "name": "Fan 136",
+    "profileUrl": "https://bandcamp.com/fan136",
+    "overlap": 15,
+    "labelCluster": false
+   },
+   {
+    "fanId": 130,
+    "rank": 18,
+    "name": "Fan 130",
+    "profileUrl": "https://bandcamp.com/fan130",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 128,
+    "rank": 20,
+    "name": "Fan 128",
+    "profileUrl": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 119,
+    "rank": 23,
+    "name": "Fan 119",
+    "profileUrl": "https://bandcamp.com/fan119",
+    "overlap": 12,
+    "labelCluster": false
+   },
+   {
+    "fanId": 114,
+    "rank": 25,
+    "name": "Fan 114",
+    "profileUrl": "https://bandcamp.com/fan114",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 105,
+    "rank": 27,
+    "name": "Fan 105",
+    "profileUrl": "https://bandcamp.com/fan105",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 111,
+    "rank": 31,
+    "name": "Fan 111",
+    "profileUrl": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 133,
+    "rank": 36,
+    "name": "Fan 133",
+    "profileUrl": "https://bandcamp.com/fan133",
+    "overlap": 13,
+    "labelCluster": false
+   },
+   {
+    "fanId": 132,
+    "rank": 37,
+    "name": "Fan 132",
+    "profileUrl": "https://bandcamp.com/fan132",
+    "overlap": 13,
+    "labelCluster": false
+   }
+  ],
+  "twinCount": 37
+ },
+ "alsoBought a1085": {
+  "releaseKey": "a1085",
+  "rows": [
+   {
+    "matchKey": "a1065",
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "label": "Label Fifty",
+    "url": "https://music.label15.com/album/release-65",
+    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1077",
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "label": "Label Fifty-One",
+    "url": "https://music.label15.com/album/release-77",
+    "coverUrl": null,
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1053",
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-53",
+    "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   }
+  ],
+  "warmup": {
+   "read": 0,
+   "readTarget": 20,
+   "confident": 0,
+   "confidentTarget": 5
+  }
+ },
+ "releaseTwins a1085": {
+  "releaseKey": "a1085",
+  "rows": [],
+  "twinCount": 37
+ },
+ "alsoBought a1050": {
+  "releaseKey": "a1050",
+  "rows": [
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "same-artist"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1070",
+    "title": "Release 70",
+    "artist": "Artist 20",
+    "label": "Label Fifty",
+    "url": "https://band20.bandcamp.com/album/release-70",
+    "coverUrl": "https://f4.bcbits.com/img/a5070_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1065",
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "label": "Label Fifty",
+    "url": "https://music.label15.com/album/release-65",
+    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "reason": {
+     "kind": "same-label",
+     "label": "Label Fifty"
+    },
+    "followed": null
+   }
+  ],
+  "warmup": {
+   "read": 7,
+   "readTarget": 20,
+   "confident": 0,
+   "confidentTarget": 5
+  }
+ },
+ "releaseTwins a1050": {
+  "releaseKey": "a1050",
+  "rows": [
+   {
+    "fanId": 110,
+    "rank": 9,
+    "name": "Fan 110",
+    "profileUrl": "https://bandcamp.com/fan110",
+    "overlap": 18,
+    "labelCluster": false
+   },
+   {
+    "fanId": 102,
+    "rank": 10,
+    "name": "Fan 102",
+    "profileUrl": "https://bandcamp.com/fan102",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 128,
+    "rank": 20,
+    "name": "Fan 128",
+    "profileUrl": "https://bandcamp.com/fan128",
+    "overlap": 17,
+    "labelCluster": false
+   },
+   {
+    "fanId": 104,
+    "rank": 21,
+    "name": "Fan 104",
+    "profileUrl": "https://bandcamp.com/fan104",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 135,
+    "rank": 24,
+    "name": "Fan 135",
+    "profileUrl": "https://bandcamp.com/fan135",
+    "overlap": 16,
+    "labelCluster": false
+   },
+   {
+    "fanId": 111,
+    "rank": 31,
+    "name": "Fan 111",
+    "profileUrl": "https://bandcamp.com/fan111",
+    "overlap": 14,
+    "labelCluster": false
+   },
+   {
+    "fanId": 132,
+    "rank": 37,
+    "name": "Fan 132",
+    "profileUrl": "https://bandcamp.com/fan132",
+    "overlap": 13,
+    "labelCluster": false
+   }
+  ],
+  "twinCount": 37
+ },
+ "forYou all": {
+  "basis": "ready",
+  "rows": [
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "twins": 22,
+    "supporters": 26,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "twins": 21,
+    "supporters": 21,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "twins": 18,
+    "supporters": 18,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "twins": 14,
+    "supporters": 14,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "twins": 12,
+    "supporters": 12,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "twins": 12,
+    "supporters": 12,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "twins": 12,
+    "supporters": 12,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "twins": 13,
+    "supporters": 17,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "twins": 13,
+    "supporters": 18,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "twins": 11,
+    "supporters": 11,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "twins": 11,
+    "supporters": 11,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "twins": 9,
+    "supporters": 9,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "twins": 16,
+    "supporters": 63,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "twins": 9,
+    "supporters": 9,
+    "bestTwinRank": 7,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "twins": 9,
+    "supporters": 9,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "twins": 9,
+    "supporters": 15,
+    "bestTwinRank": 12,
+    "lastBoughtAt": null,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "twins": 14,
+    "supporters": 41,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "twins": 9,
+    "supporters": 13,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1053",
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-53",
+    "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+    "twins": 7,
+    "supporters": 7,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+    "twins": 9,
+    "supporters": 14,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "twins": 9,
+    "supporters": 9,
+    "bestTwinRank": 4,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "twins": 11,
+    "supporters": 18,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "twins": 8,
+    "supporters": 8,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "t30003",
+    "title": "Song t30003",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30003",
+    "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+    "twins": 7,
+    "supporters": 7,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "twins": 8,
+    "supporters": 23,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1050",
+    "title": "Release 50",
+    "artist": "Artist 12",
+    "label": "Label Fifty",
+    "url": "https://band12.bandcamp.com/album/release-50",
+    "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
+    "twins": 5,
+    "supporters": 6,
+    "bestTwinRank": 9,
+    "lastBoughtAt": null,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "t30002",
+    "title": "Song t30002",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30002",
+    "coverUrl": "https://f4.bcbits.com/img/a37002_7.jpg",
+    "twins": 7,
+    "supporters": 8,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "twins": 12,
+    "supporters": 80,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "twins": 7,
+    "supporters": 12,
+    "bestTwinRank": 5,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1063",
+    "title": "Release 63",
+    "artist": "Artist 13",
+    "label": "Label Fifty-One",
+    "url": "https://band13.bandcamp.com/album/release-63",
+    "coverUrl": "https://f4.bcbits.com/img/a5063_7.jpg",
+    "twins": 6,
+    "supporters": 7,
+    "bestTwinRank": 8,
+    "lastBoughtAt": null,
+    "followed": null
+   }
+  ],
+  "twinsUsed": 30
+ },
+ "forYou fresh": {
+  "basis": "ready",
+  "rows": [
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "twins": 13,
+    "supporters": 13,
+    "bestTwinRank": 4,
+    "lastBoughtAt": 1791417600000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "twins": 9,
+    "supporters": 9,
+    "bestTwinRank": 3,
+    "lastBoughtAt": 1789344000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "twins": 10,
+    "supporters": 13,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1792627200000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "twins": 9,
+    "supporters": 18,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1788998400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "twins": 8,
+    "supporters": 8,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1784505600000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "twins": 5,
+    "supporters": 7,
+    "bestTwinRank": 4,
+    "lastBoughtAt": 1792627200000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "twins": 9,
+    "supporters": 26,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1787616000000,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "twins": 2,
+    "supporters": 2,
+    "bestTwinRank": 4,
+    "lastBoughtAt": 1789171200000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "twins": 4,
+    "supporters": 4,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1779926400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "twins": 4,
+    "supporters": 4,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1788825600000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "twins": 7,
+    "supporters": 7,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1786838400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "twins": 9,
+    "supporters": 80,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1792195200000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "twins": 10,
+    "supporters": 63,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1786752000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "twins": 6,
+    "supporters": 23,
+    "bestTwinRank": 6,
+    "lastBoughtAt": 1784332800000,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "twins": 8,
+    "supporters": 41,
+    "bestTwinRank": 3,
+    "lastBoughtAt": 1789862400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1059",
+    "title": "Release 59",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-59",
+    "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+    "twins": 7,
+    "supporters": 93,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1792368000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "twins": 6,
+    "supporters": 17,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1785542400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+    "twins": 4,
+    "supporters": 14,
+    "bestTwinRank": 6,
+    "lastBoughtAt": 1788480000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "twins": 3,
+    "supporters": 13,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1791590400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "twins": 4,
+    "supporters": 4,
+    "bestTwinRank": 4,
+    "lastBoughtAt": 1777852800000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "twins": 3,
+    "supporters": 3,
+    "bestTwinRank": 6,
+    "lastBoughtAt": 1783987200000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "twins": 6,
+    "supporters": 6,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1788566400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "twins": 5,
+    "supporters": 18,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1792368000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "twins": 3,
+    "supporters": 3,
+    "bestTwinRank": 5,
+    "lastBoughtAt": 1785888000000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "twins": 6,
+    "supporters": 69,
+    "bestTwinRank": 1,
+    "lastBoughtAt": 1790121600000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "twins": 4,
+    "supporters": 15,
+    "bestTwinRank": 5,
+    "lastBoughtAt": 1785542400000,
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "t30003",
+    "title": "Song t30003",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30003",
+    "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+    "twins": 3,
+    "supporters": 6,
+    "bestTwinRank": 5,
+    "lastBoughtAt": 1787356800000,
+    "followed": null
+   },
+   {
+    "matchKey": "t30005",
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
+    "twins": 5,
+    "supporters": 40,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1778198400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1053",
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-53",
+    "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+    "twins": 2,
+    "supporters": 2,
+    "bestTwinRank": 3,
+    "lastBoughtAt": 1781654400000,
+    "followed": null
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "twins": 3,
+    "supporters": 12,
+    "bestTwinRank": 2,
+    "lastBoughtAt": 1790985600000,
+    "followed": null
+   }
+  ],
+  "twinsUsed": 30
+ },
+ "deepCuts": {
+  "basis": "ready",
+  "rows": [
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "supporters": 28,
+    "twins": 28,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "supporters": 28,
+    "twins": 28,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "supporters": 21,
+    "twins": 21,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "supporters": 16,
+    "twins": 16,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "supporters": 14,
+    "twins": 14,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "supporters": 14,
+    "twins": 14,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "supporters": 13,
+    "twins": 13,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "supporters": 13,
+    "twins": 13,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "supporters": 18,
+    "twins": 15,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "supporters": 12,
+    "twins": 12,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "supporters": 11,
+    "twins": 11,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "supporters": 12,
+    "twins": 12,
+    "bestTwinRank": 4,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "supporters": 11,
+    "twins": 11,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "supporters": 10,
+    "twins": 10,
+    "bestTwinRank": 7,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1053",
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-53",
+    "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
+    "supporters": 9,
+    "twins": 9,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "supporters": 15,
+    "twins": 12,
+    "bestTwinRank": 12,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "supporters": 41,
+    "twins": 19,
+    "bestTwinRank": 3,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1076",
+    "title": "Release 76",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-76",
+    "coverUrl": "https://f4.bcbits.com/img/a5076_7.jpg",
+    "supporters": 7,
+    "twins": 7,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "supporters": 39,
+    "twins": 12,
+    "bestTwinRank": 5,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1058",
+    "title": "Release 58",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/album/release-58",
+    "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
+    "supporters": 33,
+    "twins": 9,
+    "bestTwinRank": 7,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "t30003",
+    "title": "Song t30003",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30003",
+    "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+    "supporters": 9,
+    "twins": 9,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "supporters": 8,
+    "twins": 8,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1077",
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "label": "Label Fifty-One",
+    "url": "https://music.label15.com/album/release-77",
+    "coverUrl": null,
+    "supporters": 7,
+    "twins": 7,
+    "bestTwinRank": 9,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1050",
+    "title": "Release 50",
+    "artist": "Artist 12",
+    "label": "Label Fifty",
+    "url": "https://band12.bandcamp.com/album/release-50",
+    "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
+    "supporters": 7,
+    "twins": 7,
+    "bestTwinRank": 9,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+    "supporters": 24,
+    "twins": 11,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "t30005",
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
+    "supporters": 40,
+    "twins": 13,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "supporters": 23,
+    "twins": 9,
+    "bestTwinRank": 6,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1052",
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
+    "supporters": 47,
+    "twins": 12,
+    "bestTwinRank": 1,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1064",
+    "title": "Release 64",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-64",
+    "coverUrl": "https://f4.bcbits.com/img/a5064_7.jpg",
+    "supporters": 8,
+    "twins": 4,
+    "bestTwinRank": 2,
+    "lastBoughtAt": null,
+    "followed": null
+   },
+   {
+    "matchKey": "a1068",
+    "title": "Release 68",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-68",
+    "coverUrl": "https://f4.bcbits.com/img/a5068_7.jpg",
+    "supporters": 27,
+    "twins": 6,
+    "bestTwinRank": 4,
+    "lastBoughtAt": null,
+    "followed": null
+   }
+  ],
+  "twinsUsed": 37
+ },
+ "twinsLatest": {
+  "basis": "ready",
+  "rows": [
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "boughtAt": 1792627200000,
+    "buyers": [
+     {
+      "fanId": 129,
+      "name": "Fan 129",
+      "url": "https://bandcamp.com/fan129"
+     },
+     {
+      "fanId": 127,
+      "name": "Fan 127",
+      "url": "https://bandcamp.com/fan127"
+     },
+     {
+      "fanId": 109,
+      "name": "Fan 109",
+      "url": "https://bandcamp.com/fan109"
+     },
+     {
+      "fanId": 104,
+      "name": "Fan 104",
+      "url": "https://bandcamp.com/fan104"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "boughtAt": 1792627200000,
+    "buyers": [
+     {
+      "fanId": 119,
+      "name": "Fan 119",
+      "url": "https://bandcamp.com/fan119"
+     },
+     {
+      "fanId": 102,
+      "name": "Fan 102",
+      "url": "https://bandcamp.com/fan102"
+     },
+     {
+      "fanId": 106,
+      "name": "Fan 106",
+      "url": "https://bandcamp.com/fan106"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "boughtAt": 1792368000000,
+    "buyers": [
+     {
+      "fanId": 135,
+      "name": "Fan 135",
+      "url": "https://bandcamp.com/fan135"
+     },
+     {
+      "fanId": 105,
+      "name": "Fan 105",
+      "url": "https://bandcamp.com/fan105"
+     },
+     {
+      "fanId": 121,
+      "name": "Fan 121",
+      "url": "https://bandcamp.com/fan121"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1059",
+    "title": "Release 59",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-59",
+    "coverUrl": "https://f4.bcbits.com/img/a5059_7.jpg",
+    "boughtAt": 1792368000000,
+    "buyers": [
+     {
+      "fanId": 116,
+      "name": "Fan 116",
+      "url": "https://bandcamp.com/fan116"
+     },
+     {
+      "fanId": 121,
+      "name": "Fan 121",
+      "url": "https://bandcamp.com/fan121"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1058",
+    "title": "Release 58",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/album/release-58",
+    "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
+    "boughtAt": 1792368000000,
+    "buyers": [
+     {
+      "fanId": 126,
+      "name": "Fan 126",
+      "url": "https://bandcamp.com/fan126"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "boughtAt": 1792195200000,
+    "buyers": [
+     {
+      "fanId": 129,
+      "name": "Fan 129",
+      "url": "https://bandcamp.com/fan129"
+     },
+     {
+      "fanId": 130,
+      "name": "Fan 130",
+      "url": "https://bandcamp.com/fan130"
+     },
+     {
+      "fanId": 126,
+      "name": "Fan 126",
+      "url": "https://bandcamp.com/fan126"
+     },
+     {
+      "fanId": 110,
+      "name": "Fan 110",
+      "url": "https://bandcamp.com/fan110"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "boughtAt": 1791590400000,
+    "buyers": [
+     {
+      "fanId": 116,
+      "name": "Fan 116",
+      "url": "https://bandcamp.com/fan116"
+     },
+     {
+      "fanId": 110,
+      "name": "Fan 110",
+      "url": "https://bandcamp.com/fan110"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "boughtAt": 1791417600000,
+    "buyers": [
+     {
+      "fanId": 119,
+      "name": "Fan 119",
+      "url": "https://bandcamp.com/fan119"
+     },
+     {
+      "fanId": 134,
+      "name": "Fan 134",
+      "url": "https://bandcamp.com/fan134"
+     },
+     {
+      "fanId": 123,
+      "name": "Fan 123",
+      "url": "https://bandcamp.com/fan123"
+     },
+     {
+      "fanId": 106,
+      "name": "Fan 106",
+      "url": "https://bandcamp.com/fan106"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "boughtAt": 1790985600000,
+    "buyers": [
+     {
+      "fanId": 136,
+      "name": "Fan 136",
+      "url": "https://bandcamp.com/fan136"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "boughtAt": 1790294400000,
+    "buyers": [
+     {
+      "fanId": 100,
+      "name": "Fan 100",
+      "url": "https://bandcamp.com/fan100"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "boughtAt": 1790121600000,
+    "buyers": [
+     {
+      "fanId": 134,
+      "name": "Fan 134",
+      "url": "https://bandcamp.com/fan134"
+     },
+     {
+      "fanId": 123,
+      "name": "Fan 123",
+      "url": "https://bandcamp.com/fan123"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "boughtAt": 1789862400000,
+    "buyers": [
+     {
+      "fanId": 108,
+      "name": "Fan 108",
+      "url": "https://bandcamp.com/fan108"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
+    "boughtAt": 1789516800000,
+    "buyers": [
+     {
+      "fanId": 135,
+      "name": "Fan 135",
+      "url": "https://bandcamp.com/fan135"
+     },
+     {
+      "fanId": 128,
+      "name": "Fan 128",
+      "url": "https://bandcamp.com/fan128"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "boughtAt": 1789344000000,
+    "buyers": [
+     {
+      "fanId": 135,
+      "name": "Fan 135",
+      "url": "https://bandcamp.com/fan135"
+     },
+     {
+      "fanId": 112,
+      "name": "Fan 112",
+      "url": "https://bandcamp.com/fan112"
+     },
+     {
+      "fanId": 110,
+      "name": "Fan 110",
+      "url": "https://bandcamp.com/fan110"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "boughtAt": 1789171200000,
+    "buyers": [
+     {
+      "fanId": 119,
+      "name": "Fan 119",
+      "url": "https://bandcamp.com/fan119"
+     },
+     {
+      "fanId": 100,
+      "name": "Fan 100",
+      "url": "https://bandcamp.com/fan100"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "boughtAt": 1788998400000,
+    "buyers": [
+     {
+      "fanId": 123,
+      "name": "Fan 123",
+      "url": "https://bandcamp.com/fan123"
+     },
+     {
+      "fanId": 136,
+      "name": "Fan 136",
+      "url": "https://bandcamp.com/fan136"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1069",
+    "title": "Release 69",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-69",
+    "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+    "boughtAt": 1788998400000,
+    "buyers": [
+     {
+      "fanId": 104,
+      "name": "Fan 104",
+      "url": "https://bandcamp.com/fan104"
+     },
+     {
+      "fanId": 117,
+      "name": "Fan 117",
+      "url": "https://bandcamp.com/fan117"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "boughtAt": 1788825600000,
+    "buyers": [
+     {
+      "fanId": 136,
+      "name": "Fan 136",
+      "url": "https://bandcamp.com/fan136"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1065",
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "label": "Label Fifty",
+    "url": "https://music.label15.com/album/release-65",
+    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "boughtAt": 1788652800000,
+    "buyers": [
+     {
+      "fanId": 108,
+      "name": "Fan 108",
+      "url": "https://bandcamp.com/fan108"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "boughtAt": 1788566400000,
+    "buyers": [
+     {
+      "fanId": 118,
+      "name": "Fan 118",
+      "url": "https://bandcamp.com/fan118"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1071",
+    "title": "Release 71",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-71",
+    "coverUrl": "https://f4.bcbits.com/img/a5071_7.jpg",
+    "boughtAt": 1788134400000,
+    "buyers": [
+     {
+      "fanId": 103,
+      "name": "Fan 103",
+      "url": "https://bandcamp.com/fan103"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "boughtAt": 1788048000000,
+    "buyers": [
+     {
+      "fanId": 104,
+      "name": "Fan 104",
+      "url": "https://bandcamp.com/fan104"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1063",
+    "title": "Release 63",
+    "artist": "Artist 13",
+    "label": "Label Fifty-One",
+    "url": "https://band13.bandcamp.com/album/release-63",
+    "coverUrl": "https://f4.bcbits.com/img/a5063_7.jpg",
+    "boughtAt": 1787961600000,
+    "buyers": [
+     {
+      "fanId": 123,
+      "name": "Fan 123",
+      "url": "https://bandcamp.com/fan123"
+     }
+    ]
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+    "boughtAt": 1787875200000,
+    "buyers": [
+     {
+      "fanId": 128,
+      "name": "Fan 128",
+      "url": "https://bandcamp.com/fan128"
+     }
+    ]
+   },
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "boughtAt": 1787616000000,
+    "buyers": [
+     {
+      "fanId": 103,
+      "name": "Fan 103",
+      "url": "https://bandcamp.com/fan103"
+     }
+    ]
+   }
+  ],
+  "twinsUsed": 34,
+  "windowDays": 60,
+  "checking": 8
+ },
+ "pageBadges": [
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 17,
+   "topTwins": 30
+  },
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 15,
+   "topTwins": 30
+  },
+  {
+   "owned": false,
+   "wishlisted": false,
+   "twins": 0,
+   "topTwins": 30
+  },
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 18,
+   "topTwins": 30
+  },
+  null,
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 29,
+   "topTwins": 30
+  },
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 11,
+   "topTwins": 30
+  },
+  {
+   "owned": false,
+   "wishlisted": true,
+   "twins": 7,
+   "topTwins": 30
+  },
+  null,
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 13,
+   "topTwins": 30
+  },
+  {
+   "owned": true,
+   "wishlisted": false,
+   "twins": 11,
+   "topTwins": 30
+  },
+  {
+   "owned": false,
+   "wishlisted": false,
+   "twins": 0,
+   "topTwins": 30
+  }
+ ],
+ "wishlist": [
+  {
+   "item": {
+    "itemKey": "a1040",
+    "albumKey": null,
+    "title": "Release 40",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-40",
+    "artId": 5040,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 94,
+    "compilation": false
+   },
+   "addedAt": 1792627200000,
+   "tagIds": []
+  },
+  {
+   "item": {
+    "itemKey": "a1041",
+    "albumKey": null,
+    "title": "Release 41",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-41",
+    "artId": 5041,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 49,
+    "compilation": false
+   },
+   "addedAt": 1792540800000,
+   "tagIds": []
+  },
+  {
+   "item": {
+    "itemKey": "t20262",
+    "albumKey": "a1026",
+    "title": "Song t20262",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20262",
+    "artId": 27262,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 24,
+    "compilation": false
+   },
+   "addedAt": 1792454400000,
+   "tagIds": []
+  },
+  {
+   "item": {
+    "itemKey": "t30001",
+    "albumKey": null,
+    "title": "Song t30001",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30001",
+    "artId": 37001,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 16,
+    "compilation": false
+   },
+   "addedAt": 1792368000000,
+   "tagIds": []
+  }
+ ],
+ "items": [
+  [
+   "a1000",
+   {
+    "itemKey": "a1000",
+    "albumKey": null,
+    "title": "Release 0",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-0",
+    "artId": null,
+    "purchaseKind": "album",
+    "label": "Label Fifty",
+    "labelId": 50,
+    "otherOwners": null,
+    "addedAt": null,
+    "compilation": false,
+    "tags": [
+     "dub",
+     "techno"
+    ],
+    "supporterCount": null
+   }
+  ],
+  [
+   "a1001",
+   {
+    "itemKey": "a1001",
+    "albumKey": null,
+    "title": "Release 1",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-1",
+    "artId": 5001,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1002",
+   {
+    "itemKey": "a1002",
+    "albumKey": null,
+    "title": "Release 2",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-2",
+    "artId": 5002,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 54,
+    "compilation": false
+   }
+  ],
+  [
+   "a1003",
+   {
+    "itemKey": "a1003",
+    "albumKey": null,
+    "title": "Release 3",
+    "artist": "Various Artists",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-3",
+    "artId": 5003,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": true
+   }
+  ],
+  [
+   "a1004",
+   {
+    "itemKey": "a1004",
+    "albumKey": null,
+    "title": "Release 4",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-4",
+    "artId": 5004,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 78,
+    "compilation": false
+   }
+  ],
+  [
+   "a1005",
+   {
+    "itemKey": "a1005",
+    "albumKey": null,
+    "title": "Release 5",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-5",
+    "artId": 5005,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 66,
+    "compilation": false
+   }
+  ],
+  [
+   "a1006",
+   {
+    "itemKey": "a1006",
+    "albumKey": null,
+    "title": "Release 6",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-6",
+    "artId": 5006,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 37,
+    "compilation": false
+   }
+  ],
+  [
+   "a1007",
+   {
+    "itemKey": "a1007",
+    "albumKey": null,
+    "title": "Release 7",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-7",
+    "artId": 5007,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": false
+   }
+  ],
+  [
+   "a1008",
+   {
+    "itemKey": "a1008",
+    "albumKey": null,
+    "title": "Release 8",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-8",
+    "artId": 5008,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 34,
+    "compilation": false
+   }
+  ],
+  [
+   "a1009",
+   {
+    "itemKey": "a1009",
+    "albumKey": null,
+    "title": "Release 9",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-9",
+    "artId": 5009,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1010",
+   {
+    "itemKey": "a1010",
+    "albumKey": null,
+    "title": "Release 10",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-10",
+    "artId": 5010,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1011",
+   {
+    "itemKey": "a1011",
+    "albumKey": null,
+    "title": "Release 11",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-11",
+    "artId": null,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 86,
+    "compilation": false
+   }
+  ],
+  [
+   "a1012",
+   {
+    "itemKey": "a1012",
+    "albumKey": null,
+    "title": "Release 12",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-12",
+    "artId": 5012,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1013",
+   {
+    "itemKey": "a1013",
+    "albumKey": null,
+    "title": "Release 13",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-13",
+    "artId": 5013,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 102,
+    "compilation": false
+   }
+  ],
+  [
+   "a1014",
+   {
+    "itemKey": "a1014",
+    "albumKey": null,
+    "title": "Release 14",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-14",
+    "artId": 5014,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 94,
+    "compilation": false
+   }
+  ],
+  [
+   "a1015",
+   {
+    "itemKey": "a1015",
+    "albumKey": null,
+    "title": "Release 15",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-15",
+    "artId": 5015,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 67,
+    "compilation": false
+   }
+  ],
+  [
+   "a1016",
+   {
+    "itemKey": "a1016",
+    "albumKey": null,
+    "title": "Release 16",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-16",
+    "artId": 5016,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 94,
+    "compilation": false
+   }
+  ],
+  [
+   "a1017",
+   {
+    "itemKey": "a1017",
+    "albumKey": null,
+    "title": "Release 17",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-17",
+    "artId": 5017,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 51,
+    "compilation": false
+   }
+  ],
+  [
+   "a1018",
+   {
+    "itemKey": "a1018",
+    "albumKey": null,
+    "title": "Release 18",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://oldname16.bandcamp.com/album/release-18",
+    "artId": 5018,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1019",
+   {
+    "itemKey": "a1019",
+    "albumKey": null,
+    "title": "Release 19",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-19",
+    "artId": 5019,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 52,
+    "compilation": false
+   }
+  ],
+  [
+   "a1020",
+   {
+    "itemKey": "a1020",
+    "albumKey": null,
+    "title": "Release 20",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-20",
+    "artId": 5020,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 7,
+    "compilation": false
+   }
+  ],
+  [
+   "a1021",
+   {
+    "itemKey": "a1021",
+    "albumKey": null,
+    "title": "Release 21",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-21",
+    "artId": 5021,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 4,
+    "compilation": false
+   }
+  ],
+  [
+   "a1022",
+   {
+    "itemKey": "a1022",
+    "albumKey": null,
+    "title": "Release 22",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-22",
+    "artId": null,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 39,
+    "compilation": false
+   }
+  ],
+  [
+   "a1023",
+   {
+    "itemKey": "a1023",
+    "albumKey": null,
+    "title": "Release 23",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-23",
+    "artId": 5023,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 4,
+    "compilation": false
+   }
+  ],
+  [
+   "a1024",
+   {
+    "itemKey": "a1024",
+    "albumKey": null,
+    "title": "Release 24",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-24",
+    "artId": 5024,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 60,
+    "compilation": false
+   }
+  ],
+  [
+   "a1025",
+   {
+    "itemKey": "a1025",
+    "albumKey": null,
+    "title": "Release 25",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-25",
+    "artId": 5025,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 43,
+    "compilation": false
+   }
+  ],
+  [
+   "a1026",
+   {
+    "itemKey": "a1026",
+    "albumKey": null,
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "artId": 5026,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 26,
+    "compilation": false
+   }
+  ],
+  [
+   "a1027",
+   {
+    "itemKey": "a1027",
+    "albumKey": null,
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "artId": 5027,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1028",
+   {
+    "itemKey": "a1028",
+    "albumKey": null,
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "artId": 5028,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 13,
+    "compilation": false
+   }
+  ],
+  [
+   "a1029",
+   {
+    "itemKey": "a1029",
+    "albumKey": null,
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-29",
+    "artId": 5029,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 4,
+    "compilation": false
+   }
+  ],
+  [
+   "a1030",
+   {
+    "itemKey": "a1030",
+    "albumKey": null,
+    "title": "Release 30",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-30",
+    "artId": 5030,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 66,
+    "compilation": false
+   }
+  ],
+  [
+   "a1031",
+   {
+    "itemKey": "a1031",
+    "albumKey": null,
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "artId": 5031,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 80,
+    "compilation": false
+   }
+  ],
+  [
+   "a1032",
+   {
+    "itemKey": "a1032",
+    "albumKey": null,
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "artId": 5032,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1033",
+   {
+    "itemKey": "a1033",
+    "albumKey": null,
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "artId": null,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1034",
+   {
+    "itemKey": "a1034",
+    "albumKey": null,
+    "title": "Release 34",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-34",
+    "artId": 5034,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 67,
+    "compilation": false
+   }
+  ],
+  [
+   "a1035",
+   {
+    "itemKey": "a1035",
+    "albumKey": null,
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "artId": 5035,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "a1036",
+   {
+    "itemKey": "a1036",
+    "albumKey": null,
+    "title": "Release 36",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "artId": 5036,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1037",
+   {
+    "itemKey": "a1037",
+    "albumKey": null,
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "artId": 5037,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1038",
+   {
+    "itemKey": "a1038",
+    "albumKey": null,
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "artId": 5038,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 15,
+    "compilation": false
+   }
+  ],
+  [
+   "a1039",
+   {
+    "itemKey": "a1039",
+    "albumKey": null,
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "artId": 5039,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1040",
+   {
+    "itemKey": "a1040",
+    "albumKey": null,
+    "title": "Release 40",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-40",
+    "artId": 5040,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 94,
+    "compilation": false
+   }
+  ],
+  [
+   "a1041",
+   {
+    "itemKey": "a1041",
+    "albumKey": null,
+    "title": "Release 41",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-41",
+    "artId": 5041,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 49,
+    "compilation": false
+   }
+  ],
+  [
+   "a1042",
+   {
+    "itemKey": "a1042",
+    "albumKey": null,
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "artId": 5042,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 63,
+    "compilation": false
+   }
+  ],
+  [
+   "a1043",
+   {
+    "itemKey": "a1043",
+    "albumKey": null,
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "artId": 5043,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 41,
+    "compilation": false
+   }
+  ],
+  [
+   "a1044",
+   {
+    "itemKey": "a1044",
+    "albumKey": null,
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "artId": null,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 69,
+    "compilation": false
+   }
+  ],
+  [
+   "a1045",
+   {
+    "itemKey": "a1045",
+    "albumKey": null,
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "artId": 5045,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1046",
+   {
+    "itemKey": "a1046",
+    "albumKey": null,
+    "title": "Release 46",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-46",
+    "artId": 5046,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 60,
+    "compilation": false
+   }
+  ],
+  [
+   "a1047",
+   {
+    "itemKey": "a1047",
+    "albumKey": null,
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "artId": 5047,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": false
+   }
+  ],
+  [
+   "a1048",
+   {
+    "itemKey": "a1048",
+    "albumKey": null,
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "artId": 5048,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 71,
+    "compilation": false
+   }
+  ],
+  [
+   "a1049",
+   {
+    "itemKey": "a1049",
+    "albumKey": null,
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "artId": 5049,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 7,
+    "compilation": false
+   }
+  ],
+  [
+   "a1050",
+   {
+    "itemKey": "a1050",
+    "albumKey": null,
+    "title": "Release 50",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-50",
+    "artId": 5050,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "a1051",
+   {
+    "itemKey": "a1051",
+    "albumKey": null,
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "artId": 5051,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 3,
+    "compilation": false
+   }
+  ],
+  [
+   "a1052",
+   {
+    "itemKey": "a1052",
+    "albumKey": null,
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "artId": 5052,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 47,
+    "compilation": false
+   }
+  ],
+  [
+   "a1053",
+   {
+    "itemKey": "a1053",
+    "albumKey": null,
+    "title": "Release 53",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-53",
+    "artId": 5053,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1054",
+   {
+    "itemKey": "a1054",
+    "albumKey": null,
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "artId": 5054,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1055",
+   {
+    "itemKey": "a1055",
+    "albumKey": null,
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "artId": null,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 39,
+    "compilation": false
+   }
+  ],
+  [
+   "a1056",
+   {
+    "itemKey": "a1056",
+    "albumKey": null,
+    "title": "Release 56",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-56",
+    "artId": 5056,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 112,
+    "compilation": false
+   }
+  ],
+  [
+   "a1057",
+   {
+    "itemKey": "a1057",
+    "albumKey": null,
+    "title": "Release 57",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-57",
+    "artId": 5057,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 90,
+    "compilation": false
+   }
+  ],
+  [
+   "a1058",
+   {
+    "itemKey": "a1058",
+    "albumKey": null,
+    "title": "Release 58",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-58",
+    "artId": 5058,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 33,
+    "compilation": false
+   }
+  ],
+  [
+   "a1059",
+   {
+    "itemKey": "a1059",
+    "albumKey": null,
+    "title": "Release 59",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-59",
+    "artId": 5059,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 93,
+    "compilation": false
+   }
+  ],
+  [
+   "a1060",
+   {
+    "itemKey": "a1060",
+    "albumKey": null,
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "artId": 5060,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1061",
+   {
+    "itemKey": "a1061",
+    "albumKey": null,
+    "title": "Release 61",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-61",
+    "artId": 5061,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 34,
+    "compilation": false
+   }
+  ],
+  [
+   "a1062",
+   {
+    "itemKey": "a1062",
+    "albumKey": null,
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "artId": 5062,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 71,
+    "compilation": false
+   }
+  ],
+  [
+   "a1063",
+   {
+    "itemKey": "a1063",
+    "albumKey": null,
+    "title": "Release 63",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-63",
+    "artId": 5063,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1064",
+   {
+    "itemKey": "a1064",
+    "albumKey": null,
+    "title": "Release 64",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-64",
+    "artId": 5064,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 8,
+    "compilation": false
+   }
+  ],
+  [
+   "a1065",
+   {
+    "itemKey": "a1065",
+    "albumKey": null,
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-65",
+    "artId": 5065,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 116,
+    "compilation": false
+   }
+  ],
+  [
+   "a1066",
+   {
+    "itemKey": "a1066",
+    "albumKey": null,
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "artId": null,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 3,
+    "compilation": false
+   }
+  ],
+  [
+   "a1067",
+   {
+    "itemKey": "a1067",
+    "albumKey": null,
+    "title": "Release 67",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-67",
+    "artId": 5067,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 92,
+    "compilation": false
+   }
+  ],
+  [
+   "a1068",
+   {
+    "itemKey": "a1068",
+    "albumKey": null,
+    "title": "Release 68",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/album/release-68",
+    "artId": 5068,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 27,
+    "compilation": false
+   }
+  ],
+  [
+   "a1069",
+   {
+    "itemKey": "a1069",
+    "albumKey": null,
+    "title": "Release 69",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/album/release-69",
+    "artId": 5069,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 104,
+    "compilation": false
+   }
+  ],
+  [
+   "a1070",
+   {
+    "itemKey": "a1070",
+    "albumKey": null,
+    "title": "Release 70",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/album/release-70",
+    "artId": 5070,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 118,
+    "compilation": false
+   }
+  ],
+  [
+   "a1071",
+   {
+    "itemKey": "a1071",
+    "albumKey": null,
+    "title": "Release 71",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/album/release-71",
+    "artId": 5071,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 19,
+    "compilation": false
+   }
+  ],
+  [
+   "a1072",
+   {
+    "itemKey": "a1072",
+    "albumKey": null,
+    "title": "Release 72",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-72",
+    "artId": 5072,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "a1073",
+   {
+    "itemKey": "a1073",
+    "albumKey": null,
+    "title": "Release 73",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/album/release-73",
+    "artId": 5073,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 26,
+    "compilation": false
+   }
+  ],
+  [
+   "a1074",
+   {
+    "itemKey": "a1074",
+    "albumKey": null,
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "artId": 5074,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 23,
+    "compilation": false
+   }
+  ],
+  [
+   "a1075",
+   {
+    "itemKey": "a1075",
+    "albumKey": null,
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "artId": 5075,
+    "label": "Label Fifty",
+    "labelId": 50,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1076",
+   {
+    "itemKey": "a1076",
+    "albumKey": null,
+    "title": "Release 76",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/album/release-76",
+    "artId": 5076,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 5,
+    "compilation": false
+   }
+  ],
+  [
+   "a1077",
+   {
+    "itemKey": "a1077",
+    "albumKey": null,
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/release-77",
+    "artId": null,
+    "label": "Label Fifty-One",
+    "labelId": 51,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "a1078",
+   {
+    "itemKey": "a1078",
+    "albumKey": null,
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "artId": 5078,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "a1079",
+   {
+    "itemKey": "a1079",
+    "albumKey": null,
+    "title": "Release 79",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/album/release-79",
+    "artId": 5079,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 106,
+    "compilation": false
+   }
+  ],
+  [
+   "a1085",
+   {
+    "itemKey": "a1085",
+    "albumKey": null,
+    "title": "Page Only",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/album/page-only",
+    "artId": 9999,
+    "tags": [
+     "ambient"
+    ],
+    "compilation": false,
+    "supporterCount": null,
+    "label": null,
+    "labelId": null
+   }
+  ],
+  [
+   "t20000",
+   {
+    "itemKey": "t20000",
+    "albumKey": "a1000",
+    "title": "Song t20000",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20000",
+    "artId": 27000,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 22,
+    "compilation": false
+   }
+  ],
+  [
+   "t20001",
+   {
+    "itemKey": "t20001",
+    "albumKey": "a1000",
+    "title": "Song t20001",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20001",
+    "artId": 27001,
+    "purchaseKind": "track",
+    "label": null,
+    "labelId": null,
+    "otherOwners": 23,
+    "addedAt": null,
+    "compilation": false,
+    "tags": [],
+    "supporterCount": 24
+   }
+  ],
+  [
+   "t20002",
+   {
+    "itemKey": "t20002",
+    "albumKey": "a1000",
+    "title": "Song t20002",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20002",
+    "artId": 27002,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 22,
+    "compilation": false
+   }
+  ],
+  [
+   "t20010",
+   {
+    "itemKey": "t20010",
+    "albumKey": "a1001",
+    "title": "Song t20010",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20010",
+    "artId": 27010,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 25,
+    "compilation": false
+   }
+  ],
+  [
+   "t20011",
+   {
+    "itemKey": "t20011",
+    "albumKey": "a1001",
+    "title": "Song t20011",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20011",
+    "artId": 27011,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 20,
+    "compilation": false
+   }
+  ],
+  [
+   "t20012",
+   {
+    "itemKey": "t20012",
+    "albumKey": "a1001",
+    "title": "Song t20012",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20012",
+    "artId": 27012,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 17,
+    "compilation": false
+   }
+  ],
+  [
+   "t20020",
+   {
+    "itemKey": "t20020",
+    "albumKey": "a1002",
+    "title": "Song t20020",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20020",
+    "artId": 27020,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 7,
+    "compilation": false
+   }
+  ],
+  [
+   "t20021",
+   {
+    "itemKey": "t20021",
+    "albumKey": "a1002",
+    "title": "Song t20021",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20021",
+    "artId": 27021,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20022",
+   {
+    "itemKey": "t20022",
+    "albumKey": "a1002",
+    "title": "Song t20022",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20022",
+    "artId": 27022,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 16,
+    "compilation": false
+   }
+  ],
+  [
+   "t20030",
+   {
+    "itemKey": "t20030",
+    "albumKey": "a1003",
+    "title": "Song t20030",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20030",
+    "artId": 27030,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "t20031",
+   {
+    "itemKey": "t20031",
+    "albumKey": "a1003",
+    "title": "Song t20031",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20031",
+    "artId": 27031,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 24,
+    "compilation": false
+   }
+  ],
+  [
+   "t20032",
+   {
+    "itemKey": "t20032",
+    "albumKey": "a1003",
+    "title": "Song t20032",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20032",
+    "artId": 27032,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 34,
+    "compilation": false
+   }
+  ],
+  [
+   "t20040",
+   {
+    "itemKey": "t20040",
+    "albumKey": "a1004",
+    "title": "Song t20040",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20040",
+    "artId": 27040,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 13,
+    "compilation": false
+   }
+  ],
+  [
+   "t20041",
+   {
+    "itemKey": "t20041",
+    "albumKey": "a1004",
+    "title": "Song t20041",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20041",
+    "artId": 27041,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 11,
+    "compilation": false
+   }
+  ],
+  [
+   "t20042",
+   {
+    "itemKey": "t20042",
+    "albumKey": "a1004",
+    "title": "Song t20042",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20042",
+    "artId": 27042,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20050",
+   {
+    "itemKey": "t20050",
+    "albumKey": "a1005",
+    "title": "Song t20050",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20050",
+    "artId": 27050,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 12,
+    "compilation": false
+   }
+  ],
+  [
+   "t20052",
+   {
+    "itemKey": "t20052",
+    "albumKey": "a1005",
+    "title": "Song t20052",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20052",
+    "artId": 27052,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 14,
+    "compilation": false
+   }
+  ],
+  [
+   "t20060",
+   {
+    "itemKey": "t20060",
+    "albumKey": "a1006",
+    "title": "Song t20060",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20060",
+    "artId": 27060,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 34,
+    "compilation": false
+   }
+  ],
+  [
+   "t20061",
+   {
+    "itemKey": "t20061",
+    "albumKey": "a1006",
+    "title": "Song t20061",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20061",
+    "artId": 27061,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20062",
+   {
+    "itemKey": "t20062",
+    "albumKey": "a1006",
+    "title": "Song t20062",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20062",
+    "artId": 27062,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 33,
+    "compilation": false
+   }
+  ],
+  [
+   "t20070",
+   {
+    "itemKey": "t20070",
+    "albumKey": "a1007",
+    "title": "Song t20070",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/track/song-20070",
+    "artId": 27070,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20071",
+   {
+    "itemKey": "t20071",
+    "albumKey": "a1007",
+    "title": "Song t20071",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/track/song-20071",
+    "artId": 27071,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20072",
+   {
+    "itemKey": "t20072",
+    "albumKey": "a1007",
+    "title": "Song t20072",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/track/song-20072",
+    "artId": 27072,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 20,
+    "compilation": false
+   }
+  ],
+  [
+   "t20080",
+   {
+    "itemKey": "t20080",
+    "albumKey": "a1008",
+    "title": "Song t20080",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20080",
+    "artId": 27080,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 21,
+    "compilation": false
+   }
+  ],
+  [
+   "t20081",
+   {
+    "itemKey": "t20081",
+    "albumKey": "a1008",
+    "title": "Song t20081",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20081",
+    "artId": 27081,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 4,
+    "compilation": false
+   }
+  ],
+  [
+   "t20082",
+   {
+    "itemKey": "t20082",
+    "albumKey": "a1008",
+    "title": "Song t20082",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20082",
+    "artId": 27082,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 2,
+    "compilation": false
+   }
+  ],
+  [
+   "t20091",
+   {
+    "itemKey": "t20091",
+    "albumKey": "a1009",
+    "title": "Song t20091",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/track/song-20091",
+    "artId": 27091,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": false
+   }
+  ],
+  [
+   "t20092",
+   {
+    "itemKey": "t20092",
+    "albumKey": "a1009",
+    "title": "Song t20092",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/track/song-20092",
+    "artId": 27092,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 15,
+    "compilation": false
+   }
+  ],
+  [
+   "t20100",
+   {
+    "itemKey": "t20100",
+    "albumKey": "a1010",
+    "title": "Song t20100",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20100",
+    "artId": 27100,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 17,
+    "compilation": false
+   }
+  ],
+  [
+   "t20101",
+   {
+    "itemKey": "t20101",
+    "albumKey": "a1010",
+    "title": "Song t20101",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20101",
+    "artId": 27101,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 13,
+    "compilation": false
+   }
+  ],
+  [
+   "t20102",
+   {
+    "itemKey": "t20102",
+    "albumKey": "a1010",
+    "title": "Song t20102",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20102",
+    "artId": 27102,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 14,
+    "compilation": false
+   }
+  ],
+  [
+   "t20110",
+   {
+    "itemKey": "t20110",
+    "albumKey": "a1011",
+    "title": "Song t20110",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20110",
+    "artId": 27110,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20111",
+   {
+    "itemKey": "t20111",
+    "albumKey": "a1011",
+    "title": "Song t20111",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20111",
+    "artId": 27111,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20112",
+   {
+    "itemKey": "t20112",
+    "albumKey": "a1011",
+    "title": "Song t20112",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20112",
+    "artId": 27112,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 25,
+    "compilation": false
+   }
+  ],
+  [
+   "t20120",
+   {
+    "itemKey": "t20120",
+    "albumKey": "a1012",
+    "title": "Song t20120",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20120",
+    "artId": 27120,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 16,
+    "compilation": false
+   }
+  ],
+  [
+   "t20121",
+   {
+    "itemKey": "t20121",
+    "albumKey": "a1012",
+    "title": "Song t20121",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20121",
+    "artId": 27121,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 35,
+    "compilation": false
+   }
+  ],
+  [
+   "t20122",
+   {
+    "itemKey": "t20122",
+    "albumKey": "a1012",
+    "title": "Song t20122",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20122",
+    "artId": 27122,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 17,
+    "compilation": false
+   }
+  ],
+  [
+   "t20130",
+   {
+    "itemKey": "t20130",
+    "albumKey": "a1013",
+    "title": "Song t20130",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20130",
+    "artId": 27130,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": false
+   }
+  ],
+  [
+   "t20131",
+   {
+    "itemKey": "t20131",
+    "albumKey": "a1013",
+    "title": "Song t20131",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20131",
+    "artId": 27131,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 21,
+    "compilation": false
+   }
+  ],
+  [
+   "t20140",
+   {
+    "itemKey": "t20140",
+    "albumKey": "a1014",
+    "title": "Song t20140",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20140",
+    "artId": 27140,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 17,
+    "compilation": false
+   }
+  ],
+  [
+   "t20142",
+   {
+    "itemKey": "t20142",
+    "albumKey": "a1014",
+    "title": "Song t20142",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20142",
+    "artId": 27142,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20150",
+   {
+    "itemKey": "t20150",
+    "albumKey": "a1015",
+    "title": "Song t20150",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20150",
+    "artId": 27150,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 21,
+    "compilation": false
+   }
+  ],
+  [
+   "t20151",
+   {
+    "itemKey": "t20151",
+    "albumKey": "a1015",
+    "title": "Song t20151",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20151",
+    "artId": 27151,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20152",
+   {
+    "itemKey": "t20152",
+    "albumKey": "a1015",
+    "title": "Song t20152",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20152",
+    "artId": 27152,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 25,
+    "compilation": false
+   }
+  ],
+  [
+   "t20160",
+   {
+    "itemKey": "t20160",
+    "albumKey": "a1016",
+    "title": "Song t20160",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20160",
+    "artId": 27160,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 24,
+    "compilation": false
+   }
+  ],
+  [
+   "t20161",
+   {
+    "itemKey": "t20161",
+    "albumKey": "a1016",
+    "title": "Song t20161",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20161",
+    "artId": 27161,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 23,
+    "compilation": false
+   }
+  ],
+  [
+   "t20162",
+   {
+    "itemKey": "t20162",
+    "albumKey": "a1016",
+    "title": "Song t20162",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20162",
+    "artId": 27162,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 4,
+    "compilation": false
+   }
+  ],
+  [
+   "t20170",
+   {
+    "itemKey": "t20170",
+    "albumKey": "a1017",
+    "title": "Song t20170",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20170",
+    "artId": 27170,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 40,
+    "compilation": false
+   }
+  ],
+  [
+   "t20171",
+   {
+    "itemKey": "t20171",
+    "albumKey": "a1017",
+    "title": "Song t20171",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20171",
+    "artId": 27171,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "t20172",
+   {
+    "itemKey": "t20172",
+    "albumKey": "a1017",
+    "title": "Song t20172",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20172",
+    "artId": 27172,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20180",
+   {
+    "itemKey": "t20180",
+    "albumKey": "a1018",
+    "title": "Song t20180",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20180",
+    "artId": 27180,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 39,
+    "compilation": false
+   }
+  ],
+  [
+   "t20181",
+   {
+    "itemKey": "t20181",
+    "albumKey": "a1018",
+    "title": "Song t20181",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20181",
+    "artId": 27181,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 38,
+    "compilation": false
+   }
+  ],
+  [
+   "t20182",
+   {
+    "itemKey": "t20182",
+    "albumKey": "a1018",
+    "title": "Song t20182",
+    "artist": "Artist 16",
+    "bandId": 16,
+    "url": "https://band16.bandcamp.com/track/song-20182",
+    "artId": 27182,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 31,
+    "compilation": false
+   }
+  ],
+  [
+   "t20191",
+   {
+    "itemKey": "t20191",
+    "albumKey": "a1019",
+    "title": "Song t20191",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/track/song-20191",
+    "artId": 27191,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 27,
+    "compilation": false
+   }
+  ],
+  [
+   "t20192",
+   {
+    "itemKey": "t20192",
+    "albumKey": "a1019",
+    "title": "Song t20192",
+    "artist": "Artist 17",
+    "bandId": 17,
+    "url": "https://band17.bandcamp.com/track/song-20192",
+    "artId": 27192,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 26,
+    "compilation": false
+   }
+  ],
+  [
+   "t20200",
+   {
+    "itemKey": "t20200",
+    "albumKey": "a1020",
+    "title": "Song t20200",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20200",
+    "artId": 27200,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 13,
+    "compilation": false
+   }
+  ],
+  [
+   "t20201",
+   {
+    "itemKey": "t20201",
+    "albumKey": "a1020",
+    "title": "Song t20201",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20201",
+    "artId": 27201,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20202",
+   {
+    "itemKey": "t20202",
+    "albumKey": "a1020",
+    "title": "Song t20202",
+    "artist": "Artist 18",
+    "bandId": 18,
+    "url": "https://band18.bandcamp.com/track/song-20202",
+    "artId": 27202,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 16,
+    "compilation": false
+   }
+  ],
+  [
+   "t20210",
+   {
+    "itemKey": "t20210",
+    "albumKey": "a1021",
+    "title": "Song t20210",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/track/song-20210",
+    "artId": 27210,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 38,
+    "compilation": false
+   }
+  ],
+  [
+   "t20211",
+   {
+    "itemKey": "t20211",
+    "albumKey": "a1021",
+    "title": "Song t20211",
+    "artist": "Artist 19",
+    "bandId": 19,
+    "url": "https://band19.bandcamp.com/track/song-20211",
+    "artId": 27211,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 1,
+    "compilation": false
+   }
+  ],
+  [
+   "t20220",
+   {
+    "itemKey": "t20220",
+    "albumKey": "a1022",
+    "title": "Song t20220",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20220",
+    "artId": 27220,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 26,
+    "compilation": false
+   }
+  ],
+  [
+   "t20221",
+   {
+    "itemKey": "t20221",
+    "albumKey": "a1022",
+    "title": "Song t20221",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20221",
+    "artId": 27221,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20222",
+   {
+    "itemKey": "t20222",
+    "albumKey": "a1022",
+    "title": "Song t20222",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-20222",
+    "artId": 27222,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 20,
+    "compilation": false
+   }
+  ],
+  [
+   "t20230",
+   {
+    "itemKey": "t20230",
+    "albumKey": "a1023",
+    "title": "Song t20230",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20230",
+    "artId": 27230,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 3,
+    "compilation": false
+   }
+  ],
+  [
+   "t20231",
+   {
+    "itemKey": "t20231",
+    "albumKey": "a1023",
+    "title": "Song t20231",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20231",
+    "artId": 27231,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20232",
+   {
+    "itemKey": "t20232",
+    "albumKey": "a1023",
+    "title": "Song t20232",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-20232",
+    "artId": 27232,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 25,
+    "compilation": false
+   }
+  ],
+  [
+   "t20240",
+   {
+    "itemKey": "t20240",
+    "albumKey": "a1024",
+    "title": "Song t20240",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20240",
+    "artId": 27240,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 37,
+    "compilation": false
+   }
+  ],
+  [
+   "t20241",
+   {
+    "itemKey": "t20241",
+    "albumKey": "a1024",
+    "title": "Song t20241",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/track/song-20241",
+    "artId": 27241,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 3,
+    "compilation": false
+   }
+  ],
+  [
+   "t20251",
+   {
+    "itemKey": "t20251",
+    "albumKey": "a1025",
+    "title": "Song t20251",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20251",
+    "artId": 27251,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 3,
+    "compilation": false
+   }
+  ],
+  [
+   "t20252",
+   {
+    "itemKey": "t20252",
+    "albumKey": "a1025",
+    "title": "Song t20252",
+    "artist": "Artist 11",
+    "bandId": 11,
+    "url": "https://band11.bandcamp.com/track/song-20252",
+    "artId": 27252,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20260",
+   {
+    "itemKey": "t20260",
+    "albumKey": "a1026",
+    "title": "Song t20260",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20260",
+    "artId": 27260,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 17,
+    "compilation": false
+   }
+  ],
+  [
+   "t20262",
+   {
+    "itemKey": "t20262",
+    "albumKey": "a1026",
+    "title": "Song t20262",
+    "artist": "Artist 12",
+    "bandId": 12,
+    "url": "https://band12.bandcamp.com/track/song-20262",
+    "artId": 27262,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 24,
+    "compilation": false
+   }
+  ],
+  [
+   "t20270",
+   {
+    "itemKey": "t20270",
+    "albumKey": "a1027",
+    "title": "Song t20270",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20270",
+    "artId": 27270,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 40,
+    "compilation": false
+   }
+  ],
+  [
+   "t20271",
+   {
+    "itemKey": "t20271",
+    "albumKey": "a1027",
+    "title": "Song t20271",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20271",
+    "artId": 27271,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 18,
+    "compilation": false
+   }
+  ],
+  [
+   "t20272",
+   {
+    "itemKey": "t20272",
+    "albumKey": "a1027",
+    "title": "Song t20272",
+    "artist": "Artist 13",
+    "bandId": 13,
+    "url": "https://band13.bandcamp.com/track/song-20272",
+    "artId": 27272,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 28,
+    "compilation": false
+   }
+  ],
+  [
+   "t20280",
+   {
+    "itemKey": "t20280",
+    "albumKey": "a1028",
+    "title": "Song t20280",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20280",
+    "artId": 27280,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 26,
+    "compilation": false
+   }
+  ],
+  [
+   "t20281",
+   {
+    "itemKey": "t20281",
+    "albumKey": "a1028",
+    "title": "Song t20281",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20281",
+    "artId": 27281,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20282",
+   {
+    "itemKey": "t20282",
+    "albumKey": "a1028",
+    "title": "Song t20282",
+    "artist": "Artist 14",
+    "bandId": 14,
+    "url": "https://band14.bandcamp.com/track/song-20282",
+    "artId": 27282,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t20290",
+   {
+    "itemKey": "t20290",
+    "albumKey": "a1029",
+    "title": "Song t20290",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20290",
+    "artId": 27290,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "t20291",
+   {
+    "itemKey": "t20291",
+    "albumKey": "a1029",
+    "title": "Song t20291",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20291",
+    "artId": 27291,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 8,
+    "compilation": false
+   }
+  ],
+  [
+   "t20292",
+   {
+    "itemKey": "t20292",
+    "albumKey": "a1029",
+    "title": "Song t20292",
+    "artist": "Artist 15",
+    "bandId": 15,
+    "url": "https://music.label15.com/track/song-20292",
+    "artId": 27292,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 34,
+    "compilation": false
+   }
+  ],
+  [
+   "t29000",
+   {
+    "itemKey": "t29000",
+    "albumKey": "a1090",
+    "title": "Song t29000",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29000",
+    "artId": 36000,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 23,
+    "compilation": false
+   }
+  ],
+  [
+   "t29001",
+   {
+    "itemKey": "t29001",
+    "albumKey": "a1090",
+    "title": "Song t29001",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29001",
+    "artId": 36001,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 38,
+    "compilation": false
+   }
+  ],
+  [
+   "t29002",
+   {
+    "itemKey": "t29002",
+    "albumKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "artId": 36002,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t29003",
+   {
+    "itemKey": "t29003",
+    "albumKey": "a1091",
+    "title": "Song t29003",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29003",
+    "artId": 36003,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 11,
+    "compilation": false
+   }
+  ],
+  [
+   "t30000",
+   {
+    "itemKey": "t30000",
+    "albumKey": null,
+    "title": "Song t30000",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30000",
+    "artId": 37000,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t30001",
+   {
+    "itemKey": "t30001",
+    "albumKey": null,
+    "title": "Song t30001",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30001",
+    "artId": 37001,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 16,
+    "compilation": false
+   }
+  ],
+  [
+   "t30002",
+   {
+    "itemKey": "t30002",
+    "albumKey": null,
+    "title": "Song t30002",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30002",
+    "artId": 37002,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t30003",
+   {
+    "itemKey": "t30003",
+    "albumKey": null,
+    "title": "Song t30003",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30003",
+    "artId": 37003,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 6,
+    "compilation": false
+   }
+  ],
+  [
+   "t30004",
+   {
+    "itemKey": "t30004",
+    "albumKey": null,
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "artId": 37004,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 24,
+    "compilation": false
+   }
+  ],
+  [
+   "t30005",
+   {
+    "itemKey": "t30005",
+    "albumKey": null,
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "artId": 37005,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 40,
+    "compilation": false
+   }
+  ]
+ ],
+ "displayItems": [
+  [
+   "a1000",
+   {
+    "itemKey": "a1000",
+    "albumKey": null,
+    "title": "Release 0",
+    "artist": "Artist 10",
+    "bandId": 10,
+    "url": "https://band10.bandcamp.com/album/release-0",
+    "artId": null,
+    "purchaseKind": "album",
+    "label": "Label Fifty",
+    "labelId": 50,
+    "otherOwners": null,
+    "addedAt": null,
+    "compilation": false,
+    "tags": [
+     "dub",
+     "techno"
+    ],
+    "supporterCount": null
+   }
+  ],
+  [
+   "a1090",
+   {
+    "itemKey": "t29000",
+    "albumKey": "a1090",
+    "title": "Song t29000",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29000",
+    "artId": 36000,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": 23,
+    "compilation": false
+   }
+  ],
+  [
+   "a1091",
+   {
+    "itemKey": "t29002",
+    "albumKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "bandId": 20,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "artId": 36002,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ],
+  [
+   "t30000",
+   {
+    "itemKey": "t30000",
+    "albumKey": null,
+    "title": "Song t30000",
+    "artist": "Artist 21",
+    "bandId": 21,
+    "url": "https://band21.bandcamp.com/track/song-30000",
+    "artId": 37000,
+    "label": null,
+    "labelId": null,
+    "tags": [],
+    "supporterCount": null,
+    "compilation": false
+   }
+  ]
+ ],
+ "sellerItems": [
+  "a1000",
+  "a1005",
+  "a1010",
+  "a1015",
+  "a1017",
+  "a1020",
+  "a1025",
+  "a1029",
+  "a1030",
+  "a1035",
+  "a1040",
+  "a1041",
+  "a1045",
+  "a1050",
+  "a1053",
+  "a1055",
+  "a1060",
+  "a1065",
+  "a1070",
+  "a1075",
+  "a1077",
+  "a1085",
+  "t20050",
+  "t20052",
+  "t20170",
+  "t20171",
+  "t20172",
+  "t20290",
+  "t20291",
+  "t20292"
+ ],
+ "compilations": [
+  1003
+ ],
+ "collectors": [
+  1,
+  100,
+  101,
+  102,
+  103,
+  104,
+  105,
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120,
+  121,
+  122,
+  123,
+  124,
+  125,
+  126,
+  127,
+  128,
+  129,
+  130,
+  134,
+  135,
+  136
+ ],
+ "collectorsTrack": [
+  1,
+  100,
+  101,
+  102,
+  103,
+  104,
+  105,
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120,
+  121,
+  122,
+  123,
+  124,
+  125,
+  126,
+  127,
+  128,
+  129,
+  130,
+  134,
+  135,
+  136
+ ],
+ "myCollection": [
+  "a1000",
+  "a1001",
+  "a1002",
+  "a1003",
+  "a1004",
+  "a1005",
+  "a1006",
+  "a1007",
+  "a1008",
+  "a1009",
+  "a1010",
+  "a1011",
+  "a1012",
+  "a1013",
+  "a1014",
+  "a1015",
+  "a1016",
+  "a1017",
+  "a1018",
+  "a1019",
+  "a1020",
+  "a1021",
+  "a1022",
+  "a1023",
+  "a1024",
+  "t20251",
+  "t29000",
+  "t30000"
+ ],
+ "myWishlist": [
+  "a1040",
+  "a1041",
+  "t20262",
+  "t30001"
+ ],
+ "myRows": [
+  {
+   "fanId": 1,
+   "itemKey": "a1000",
+   "matchKey": "a1000",
+   "source": "collection",
+   "addedAt": 1792627200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1001",
+   "matchKey": "a1001",
+   "source": "collection",
+   "addedAt": 1790899200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1002",
+   "matchKey": "a1002",
+   "source": "collection",
+   "addedAt": 1789171200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1003",
+   "matchKey": "a1003",
+   "source": "collection",
+   "addedAt": 1787443200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1004",
+   "matchKey": "a1004",
+   "source": "collection",
+   "addedAt": 1785715200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1005",
+   "matchKey": "a1005",
+   "source": "collection",
+   "addedAt": 1783987200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1006",
+   "matchKey": "a1006",
+   "source": "collection",
+   "addedAt": 1782259200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1007",
+   "matchKey": "a1007",
+   "source": "collection",
+   "addedAt": 1780531200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1008",
+   "matchKey": "a1008",
+   "source": "collection",
+   "addedAt": 1778803200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1009",
+   "matchKey": "a1009",
+   "source": "collection",
+   "addedAt": 1777075200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1010",
+   "matchKey": "a1010",
+   "source": "collection",
+   "addedAt": 1775347200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1011",
+   "matchKey": "a1011",
+   "source": "collection",
+   "addedAt": 1773619200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1012",
+   "matchKey": "a1012",
+   "source": "collection",
+   "addedAt": 1771891200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1013",
+   "matchKey": "a1013",
+   "source": "collection",
+   "addedAt": 1770163200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1014",
+   "matchKey": "a1014",
+   "source": "collection",
+   "addedAt": 1768435200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1015",
+   "matchKey": "a1015",
+   "source": "collection",
+   "addedAt": 1766707200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1016",
+   "matchKey": "a1016",
+   "source": "collection",
+   "addedAt": 1764979200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1017",
+   "matchKey": "a1017",
+   "source": "collection",
+   "addedAt": 1763251200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1018",
+   "matchKey": "a1018",
+   "source": "collection",
+   "addedAt": 1761523200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1019",
+   "matchKey": "a1019",
+   "source": "collection",
+   "addedAt": 1759795200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1020",
+   "matchKey": "a1020",
+   "source": "collection",
+   "addedAt": 1758067200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1021",
+   "matchKey": "a1021",
+   "source": "collection",
+   "addedAt": 1756339200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1022",
+   "matchKey": "a1022",
+   "source": "collection",
+   "addedAt": 1754611200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1023",
+   "matchKey": "a1023",
+   "source": "collection",
+   "addedAt": 1752883200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "a1024",
+   "matchKey": "a1024",
+   "source": "collection",
+   "addedAt": 1751155200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "t20251",
+   "matchKey": "a1025",
+   "source": "collection",
+   "addedAt": 1792368000000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "t29000",
+   "matchKey": "a1090",
+   "source": "collection",
+   "addedAt": 1758067200000
+  },
+  {
+   "fanId": 1,
+   "itemKey": "t30000",
+   "matchKey": "t30000",
+   "source": "collection",
+   "addedAt": null
+  }
+ ],
+ "counts": [
+  28,
+  4
+ ],
+ "known": [
+  "a1000",
+  "t30000"
+ ],
+ "purchasedAt": [
+  1759795200000,
+  1777075200000,
+  1743724800000,
+  1765411200000,
+  1737072000000
+ ],
+ "queue": [
+  {
+   "kind": "fan",
+   "target": "118",
+   "priority": 2,
+   "rank": 20,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "119",
+   "priority": 2,
+   "rank": 21,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "120",
+   "priority": 2,
+   "rank": 16,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "121",
+   "priority": 2,
+   "rank": 18,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "122",
+   "priority": 2,
+   "rank": 8,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "123",
+   "priority": 2,
+   "rank": 12,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "124",
+   "priority": 2,
+   "rank": 10,
+   "nextAttemptAt": 1792627200000
+  },
+  {
+   "kind": "fan",
+   "target": "125",
+   "priority": 2,
+   "rank": 23,
+   "nextAttemptAt": 1792627200000
+  }
+ ]
+}

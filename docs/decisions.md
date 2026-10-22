@@ -684,3 +684,95 @@ Researched 2026-10-21 ([docs/research/deep-cuts.md](research/deep-cuts.md)); sco
   - **The cap does the work so far.** Every β and c at cap 50 lands within the noise, and the plain filter scores the same. With one or two rare hits per fold the eval can't tell them apart. What the formula changes is the list's shape, which recall doesn't see: c = 2 keeps single-twin picks out of the top 100 (0% against 28% at c = 0), and a higher β puts 5-owner records above 45-owner ones.
   - Cap 25 is the only setting that clearly clears the bar, but its spread is as wide as its lead, so the default stays 50. Re-run after much more scanning before moving any default.
   - The eval runs on fake-indexeddb, which scans every index entry on each overwrite or delete. So it loads items into an emptied table and holds out by writing your remaining lists under a fresh fan id per fold, never by deleting rows. A full run takes ~3 minutes.
+
+## 19. Slimmer database, gzipped backups
+
+Decided 2026-10-22.
+
+### Measured
+
+A real backup from 2026-10-22 (schema v7, 2,144 fans, 1,270 of your own rows) was **377 MB** of JSON and **87 MB** gzipped (`gzip -6`). The live database it came from is a **446 MB** LevelDB folder in the browser profile, but that can't be split by table: by then it was on v11, still scanning, and held overwritten values LevelDB hadn't compacted yet. To compare layouts, the backup was loaded into a fresh headless Chrome 155, one origin per table, and each LevelDB folder measured after writing. LevelDB compresses values with Snappy and shares key prefixes, so disk and JSON sizes don't move together:
+
+| Table | Rows | JSON | Disk now | Disk after |
+| --- | --- | --- | --- | --- |
+| `items` | 543k | 180 MB | 188 MB | 126 MB |
+| `ownership` | 1.3M | 144 MB | 273 MB | 173 MB |
+| `fanMatches` | 2,144 | 40 MB | 21 MB | unchanged |
+| `matchOwners` | 286k | 9 MB | 12 MB | unchanged |
+| **Total** | | **377 MB** | **~494 MB** | **~332 MB** |
+
+- **Index entries cost more than values.** `ownership` is 144 MB of JSON but 273 MB on disk: each row is stored once as a record and three more times as `fanId`, `itemKey` and `matchKey` index entries, each carrying the `[fanId+itemKey]` key. The `url` index alone is 48 MB of `items`, because IndexedDB stores string keys as UTF-16.
+- **Who reads what.**
+  - **`ownership.itemKey` index:** nothing reads it.
+  - **`ownership.fanId` index:** every lookup by it can be a range over the primary key, which starts with `fanId`.
+  - **`ownership.matchKey` index:** Also bought and "twins who own this" read it, and they use only `fanId` and `source`.
+  - **Fields of every item, owned by anyone:** `bandId`, `labelId` and `albumKey`. They feed label catalogs (twins' label-cluster flag), same-seller fallback picks, pass 0 and the follow boost.
+  - **Display fields:** any candidate's record, through `getDisplayItems`. When an album has no record of its own, the record shown is a track.
+  - **`url`:** page badges, to turn a link into `itemKey`/`albumKey`.
+  - **Written, never read:** `tags` and `fetchedAt`.
+
+### Changes
+
+Each change lists what it saves, in JSON and on disk.
+
+**1. Scanned fans' purchases only in `fanMatches`: rejected.** It would save 253 MB on disk (`ownership` plus a new inverse table, 20 MB). It was rejected because it's one-way. `fanMatches` would become the only copy of other fans' purchases, so a bug in the merge code couldn't be repaired by recomputing from rows, only by re-scanning those fans. Per-item purchase times of other fans would also be lost. We keep the rows and slim them instead (change 4).
+
+**2. Minimal `items` records for tracks: rejected.**
+- 389k of 543k items are tracks, and every track's `albumKey`, `bandId` and `labelId` are read (see above).
+- 144k tracks are their album's only record, so they stand in for it on display (§6).
+- A track link on a page needs its record to fold into the album (§15).
+- Only the display fields of tracks whose album has its own record could go: 17.7 MB of JSON, about 10 MB on disk. Keeping results identical would need three special rules: strip those fields when the album's record arrives, but never for your own items (wishlist rows show the track) or for a track page you opened (its fallback picks compare the artist).
+
+**3. URLs split: accepted. Saves 21 MB of JSON and, with the dropped index, 48 MB on disk.**
+- `items.url` becomes `slug`: the path segment after `/album/` or `/track/`. The kind comes from the item key.
+- **New table `bands: 'bandId, *hosts'`.**
+  - The first host seen for a band is its default.
+  - A subdomain is stored without `.bandcamp.com`. A custom domain has dots, so it's stored whole.
+  - An item whose host differs (2 bands, 5 items in the backup) keeps its own `host`, which is also added to the band's `hosts`.
+  - A URL that doesn't round-trip as `https://<host>/<album|track>/<slug>` is stored verbatim in `url`. The backup has none.
+- **The `url` index is dropped, with no replacement.** Page badges find a link's host in `*hosts`, read those bands' items by the existing `bandId` index, and keep items whose rebuilt URL matches exactly. Every stored URL's host is in its band's `hosts`, so this finds exactly what the `url` index found. A `slug` index would still have cost ~31 MB on disk, and badge lookups are one batch per page.
+- Repos rebuild `url` when they read, so `ItemRecord` keeps its shape for every caller. Only `db/` knows about slugs.
+
+**4. Defaults omitted and unused indexes dropped: accepted.**
+- **`items`: saves 55 MB of JSON and 15 MB on disk.**
+  - Fields left out when they hold their default: `albumKey`, `label`, `labelId`, `artId` and `supporterCount` when null, `compilation` when false, `tags` when empty. Empty tags were the 20 MB of `$types` in the JSON.
+  - `fetchedAt` is no longer stored, since nothing reads it.
+  - Reads restore the defaults.
+- **`ownership`: saves 28 MB of JSON and 100 MB on disk.**
+  - Indexes become `[fanId+itemKey], matchKey`. Reads by fan become a range over the primary key.
+  - `source` is left out when it's `'collection'`, and reads restore it.
+  - `matchKey` is kept even when it equals `itemKey`. A row without it would drop out of the `matchKey` index, which Also bought and "twins who own this" depend on.
+
+**5. Display fields only where they can be shown: rejected.**
+- Items owned by one non-twin fan are 144k records (48 MB of JSON). But twins are recomputed after every 25 scans and after each sync, so today's non-twin can be tomorrow's Deep cuts single-twin pick, which would then have nothing to show without a re-fetch.
+- Same-seller fallback picks (§6) show any local item from the seller, whoever owns it.
+
+**Also dropped:** label names stored once per label. It saves 2.5 MB of JSON and nothing measurable on disk.
+
+### Gzip backups
+
+- **Export:** `exportDB`, then `CompressionStream('gzip')`, saved as `dighead-backup-YYYY-MM-DD.json.gz`. The OPFS import snapshot (§10) is gzipped the same way.
+- **Import:** one `readBackup(blob)` decompresses when the first two bytes are `1f 8b`, whatever the file is called; otherwise it reads plain JSON. The popup's import, snapshot restore, `importRecovery` and `pnpm eval` (`loadBackup`) all go through it.
+- **File picker:** accepts `.json`, `.gz` and `application/gzip`.
+
+### Migration (schema v12)
+
+- **One step function, `slimToV12`**, used by both the Dexie upgrade and `migrateRows`, so an older backup is written as-is and then migrated, as now. It rewrites every item (slug and defaults), builds `bands`, and drops `source: 'collection'` from ownership rows. Dexie removes the three dropped indexes itself.
+- **Reads accept both shapes.** A row without `source` is collection. An item with `url` and no `slug` is still read correctly, so the rows written before the migration step runs are never misread.
+- **The eval's fast path** (`loadBackup`, v7 and later) can't run `modify` over 10⁵ rows in fake-indexeddb. It runs the same pure per-item transform into an emptied `items` table instead, and leaves ownership rows as they are, which reads accept.
+- **Real-world cost:** a one-time rewrite of ~540k items and ~1.3M ownership rows inside the upgrade transaction. If the worker is killed partway through, the transaction is rolled back and the upgrade runs again on the next start.
+
+### Proving results stay identical
+
+- **Golden outputs, recorded before any code changes.** A test builds a small synthetic database through the real write paths: your sync, supporter lists, quick, full and latest reads, release pages, and a forgotten fan. It records every output to a golden file:
+  - Also bought: co-owned rows, fallback picks and warm-up.
+  - Twins who own this, and both twin boards.
+  - For you: All, Fresh and Deep cuts.
+  - Twins' latest.
+  - Page badges by id and by URL, including a custom domain.
+  - The wishlist.
+  - Pass-0 ranks.
+
+  It also saves that database as a v11 backup fixture.
+- **Three routes must reproduce the golden file exactly:** the same writes on the new code, the v11 fixture upgraded by Dexie, and the v11 fixture imported through `migrateRows`.
+- **Perf:** `pnpm perf` before and after. Before: Also bought median 59 ms and Deep cuts 127 ms, both against 200 ms budgets. Checks for a For you score and a twins recompute are added on the existing perf seed.
