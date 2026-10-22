@@ -5,7 +5,7 @@
 import type { ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
-import type { ForYouResult } from './forYou';
+import type { ForYouMode, ForYouResult } from './forYou';
 import type {
   Following,
   FollowingKey,
@@ -55,7 +55,7 @@ export interface MessageMap {
   /** The taste-twins leaderboard as last computed, with the fans' names and avatars. */
   getTwins: { request: NoPayload; response: TwinsResult };
   /** Releases your top twins own and you don't, for the For you tab on your profile. */
-  getForYou: { request: NoPayload; response: ForYouResult };
+  getForYou: { request: { mode: ForYouMode }; response: ForYouResult };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
   getTwinStanding: { request: { fanId: number }; response: TwinStanding | null };
   /** `getTwinStanding` for many fans in one board read. Fans not on the board are left out. */

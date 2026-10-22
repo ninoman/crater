@@ -47,7 +47,7 @@ export const handlers: MessageHandlers = {
   getTwinStanding: ({ fanId }) => getTwinStanding(db, fanId),
   getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
-  getForYou: () => getForYou(),
+  getForYou: ({ mode }) => getForYou(mode),
   ...followingHandlers(db),
   ...wishlistHandlers(db),
   ...backupHandlers(db),

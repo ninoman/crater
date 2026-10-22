@@ -10,8 +10,9 @@ import {
   replaceTwins,
   saveViewer,
   upsertCollectionItems,
+  type TwinRecord,
 } from '../../db';
-import { computeForYou } from './forYou';
+import { computeForYou, type ForYouInput } from './forYou';
 
 const ME = 1;
 
@@ -54,7 +55,7 @@ async function own(fanId: number, items: CollectionItem[], source: 'collection' 
   await putOwnership(db, fanId, items, source);
 }
 
-async function twins(scores: [fanId: number, score: number][]) {
+async function twins(scores: [fanId: number, score: number][], lately: TwinRecord[] = []) {
   await replaceTwins(
     db,
     scores.map(([fanId, score]) => ({
@@ -68,9 +69,30 @@ async function twins(scores: [fanId: number, score: number][]) {
       latelyOverlap: 0,
       computedAt: 0,
     })),
-    [],
+    lately,
   );
 }
+
+function latelyTwin(fanId: number, lately: number | null): TwinRecord {
+  return {
+    fanId,
+    overlap: 3,
+    jaccard: 0.1,
+    score: 1,
+    labelCluster: false,
+    lately,
+    yearAgo: null,
+    latelyOverlap: 1,
+    computedAt: 0,
+  };
+}
+
+const allTime = (topTwinsK: number): ForYouInput => ({
+  mode: 'all',
+  topTwinsK,
+  latelyHalfLifeMonths: 6,
+  now: 0,
+});
 
 async function me() {
   await saveViewer(db, { fanId: ME, username: 'me' });
@@ -111,7 +133,7 @@ describe('computeForYou', () => {
   it('ranks what your top twins own by twin score and rarity', async () => {
     await seed();
 
-    const result = await computeForYou(db, await me(), 3);
+    const result = await computeForYou(db, await me(), allTime(3));
 
     // a2: 4 × 1/log2(4) = 2; a3: 3 × 1/3; a5: 2 × 1/log2(6) ≈ 0.77; a1: 6 × 1/10. a4 is out:
     // you own a track of it.
@@ -127,7 +149,7 @@ describe('computeForYou', () => {
   it('dresses rows for display', async () => {
     await seed();
 
-    const { rows } = await computeForYou(db, await me(), 3);
+    const { rows } = await computeForYou(db, await me(), allTime(3));
 
     expect(rows[0]).toEqual({
       matchKey: 'a2',
@@ -137,6 +159,7 @@ describe('computeForYou', () => {
       url: 'https://artist.bandcamp.com/album/a2',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       twins: 2,
+      lastBoughtAt: null,
     });
     expect(rows.find((row) => row.matchKey === 'a5')?.title).toBe('Title t51');
   });
@@ -144,7 +167,7 @@ describe('computeForYou', () => {
   it('reads only the top K twins', async () => {
     await seed();
 
-    const result = await computeForYou(db, await me(), 4);
+    const result = await computeForYou(db, await me(), allTime(4));
 
     expect(result.twinsUsed).toBe(4);
     expect(result.rows.map((row) => row.matchKey)).toContain('a30');
@@ -160,18 +183,65 @@ describe('computeForYou', () => {
       [11, 1],
     ]);
 
-    const { rows } = await computeForYou(db, await me(), 30);
+    const { rows } = await computeForYou(db, await me(), allTime(30));
 
     expect(rows.map((row) => row.matchKey)).toEqual(['a1', 'a2', 'a4', 'a3']);
   });
 
   it('says why there is nothing to show', async () => {
-    expect(await computeForYou(db, undefined, 30)).toEqual({
+    expect(await computeForYou(db, undefined, allTime(30))).toEqual({
       basis: 'no-viewer',
       rows: [],
       twinsUsed: 0,
     });
-    expect(await computeForYou(db, await me(), 30)).toEqual({
+    expect(await computeForYou(db, await me(), allTime(30))).toEqual({
+      basis: 'ready',
+      rows: [],
+      twinsUsed: 0,
+    });
+  });
+});
+
+describe('computeForYou, Fresh', () => {
+  const DAY = 86_400_000;
+  const NOW = 1000 * DAY;
+  const fresh = (topTwinsK = 30): ForYouInput => ({
+    mode: 'fresh',
+    topTwinsK,
+    latelyHalfLifeMonths: 6,
+    now: NOW,
+  });
+  const bought = (key: ItemKey, daysAgo: number | null) =>
+    item(key, { addedAt: daysAgo === null ? null : NOW - daysAgo * DAY });
+
+  it('draws on lately twins and ranks recent buys above old ones', async () => {
+    // Twin 10 is a top all-time twin with nothing lately; twins 20 and 21 are lately twins.
+    await own(10, [bought('a9', 5)], 'collection');
+    await own(
+      20,
+      [bought('a1', 10), bought('a2', 300), bought('a3', 400), bought('a4', null)],
+      'collection',
+    );
+    await own(21, [bought('a2', 200), bought('a5', 3)], 'collection');
+    await own(ME, [bought('a5', 50)], 'collection');
+    await twins([[10, 5]], [latelyTwin(20, 2), latelyTwin(21, 1), latelyTwin(22, null)]);
+
+    const result = await computeForYou(db, await me(), fresh());
+
+    // a1: 2 × fade(10 days) ≈ 1.92; a2: 2 × fade(300) + 1 × fade(200) ≈ 0.64. a3 is over a year
+    // old, a4 undated, a5 yours, a9 from an all-time twin only.
+    expect(result.rows.map((row) => [row.matchKey, row.twins, row.lastBoughtAt])).toEqual([
+      ['a1', 1, NOW - 10 * DAY],
+      ['a2', 2, NOW - 200 * DAY],
+    ]);
+    expect(result.twinsUsed).toBe(2);
+  });
+
+  it('says there are no lately twins yet', async () => {
+    await own(10, [bought('a1', 5)], 'collection');
+    await twins([[10, 5]]);
+
+    expect(await computeForYou(db, await me(), fresh())).toEqual({
       basis: 'ready',
       rows: [],
       twinsUsed: 0,

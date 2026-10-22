@@ -222,7 +222,7 @@ Design: decisions §11.
 2. [x] `scoring/lately.ts`: time-faded overlap, a co-timing bonus, and the trend against a year ago.
 3. [x] A second leaderboard (`latelyTwins`) from the same recompute pass.
 4. [x] Twins tab: *All time / Lately* switch, a "this year" column and a trend column on both boards.
-5. [ ] For you *Fresh* mode, built from lately twins and their recent buys.
+5. [x] For you *Fresh* mode, built from lately twins and their recent buys.
 6. [x] Lately rank in the profile badge ("your #2 twin lately").
 7. [ ] Re-scan top lately twins more often than every 30 days, and a "Twins' latest" feed of what they just bought.
 

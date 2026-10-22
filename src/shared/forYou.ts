@@ -3,6 +3,9 @@
 import type { ItemKey } from '../bandcamp';
 import type { TwinsBasis } from './twins';
 
+/** All time draws on the twins leaderboard; Fresh on lately twins' buys of the last year (§11). */
+export type ForYouMode = 'all' | 'fresh';
+
 export interface ForYouRow {
   /** What was ranked: the album for album tracks (decisions §3.8). Hide uses this. */
   matchKey: ItemKey;
@@ -14,6 +17,8 @@ export interface ForYouRow {
   coverUrl: string | null;
   /** How many of your top twins own it: "owned by 5 of your top twins". */
   twins: number;
+  /** Fresh only: the newest purchase of it among those twins (ms). Null in All time. */
+  lastBoughtAt: number | null;
 }
 
 export interface ForYouResult {
@@ -21,6 +26,6 @@ export interface ForYouResult {
   basis: TwinsBasis;
   /** Best first, at most FOR_YOU_LIMIT. */
   rows: ForYouRow[];
-  /** Top twins the picks came from: up to settings.topTwinsK. 0 means no twins yet. */
+  /** Top twins the picks came from: up to settings.topTwinsK. 0 means no twins yet (on that board). */
   twinsUsed: number;
 }

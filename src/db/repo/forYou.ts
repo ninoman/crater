@@ -6,7 +6,7 @@ import { hiddenMatchKeys } from './hidden';
 
 export interface ForYouData {
   /** Each twin's distinct collection match ids, in the order asked for. Twins with none are left out. */
-  twinLists: { fanId: number; matchIds: Float64Array }[];
+  twinLists: { fanId: number; matchIds: Float64Array; matchTimes: Float64Array }[];
   /** Your own ownership rows, collection and wishlist. */
   mine: OwnershipRecord[];
   hidden: Set<ItemKey>;
@@ -24,7 +24,9 @@ export async function gatherForYou(
       hiddenMatchKeys(db),
     ]);
     const twinLists = lists.flatMap((record) =>
-      record ? [{ fanId: record.fanId, matchIds: record.matchIds }] : [],
+      record
+        ? [{ fanId: record.fanId, matchIds: record.matchIds, matchTimes: record.matchTimes }]
+        : [],
     );
     return { twinLists, mine, hidden };
   });
