@@ -14,7 +14,7 @@ interface ProfileTab<Id extends string> extends ProfileTabSpec<Id> {
 export const PROFILE_TABS = [
   { id: 'crate-mates', label: 'crate mates', View: CrateMatesTab },
   { id: 'for-you', label: 'for you', View: ForYouTab },
-  { id: 'latest', label: "crate mates' latest", View: LatestTab },
+  { id: 'latest', label: "mates' latest", View: LatestTab },
 ] as const satisfies readonly ProfileTab<string>[];
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];
