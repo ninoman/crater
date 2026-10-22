@@ -47,6 +47,10 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    title: 'Deep cuts',
+    fields: [{ key: 'deepCutMaxSupporters', label: 'Deep cut: at most N owners' }],
+  },
+  {
     title: 'Lately re-reads',
     fields: [
       { key: 'latelyRescanTwins', label: 'Top lately twins (0 = off)' },
