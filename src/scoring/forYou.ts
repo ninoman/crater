@@ -54,9 +54,12 @@ export function twinOwnership(
       } else byId.set(id, { id, twinScore: twin.score, twins: 1 });
     }
   }
-  return [...byId.values()].sort(
-    (a, b) => b.twinScore - a.twinScore || b.twins - a.twins || a.id - b.id,
-  );
+  return [...byId.values()].sort(byTwinScore);
+}
+
+/** Candidate order for pruning: highest twinScore first, then most twins, then id. */
+export function byTwinScore(a: TwinOwned, b: TwinOwned): number {
+  return b.twinScore - a.twinScore || b.twins - a.twins || a.id - b.id;
 }
 
 export interface ForYouScored extends TwinOwned {

@@ -4,7 +4,7 @@
 import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
-import type { ForYouResult } from '../../shared/forYou';
+import type { ForYouMode, ForYouResult } from '../../shared/forYou';
 import type { ReleaseTwinsResult } from '../../shared/releaseTwins';
 import type { TwinsResult } from '../../shared/twins';
 import { broadcastToTabs } from '../../shared/messages';
@@ -34,10 +34,15 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
   return computeAlsoBought(db, releaseKey, me?.fanId ?? null);
 }
 
-/** For you on your profile, from the stored twins leaderboard. */
-export async function getForYou(): Promise<ForYouResult> {
+/** For you on your profile, from the stored twins leaderboard, or the lately one for Fresh. */
+export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
-  return computeForYou(db, me, settings.topTwinsK);
+  return computeForYou(db, me, {
+    mode,
+    topTwinsK: settings.topTwinsK,
+    latelyHalfLifeMonths: settings.latelyHalfLifeMonths,
+    now: Date.now(),
+  });
 }
 
 /** Both twins leaderboards for the Twins tab on your profile. */
