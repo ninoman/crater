@@ -175,7 +175,7 @@ export type JobKind = QueueJob['kind'];
 export type FollowKind = 'fan' | 'band';
 export type FollowingKey = [kind: FollowKind, id: number];
 
-/** An account you follow, from your own sync. Only followings can be tagged (decisions §8). */
+/** An account you follow, from your own sync. Taggable, like wishlist items (decisions §8, §13). */
 export interface FollowingRecord {
   kind: FollowKind;
   /** fan_id or band_id. */
@@ -189,6 +189,12 @@ export interface FollowingRecord {
   tagIds: number[];
   /** Unfollowed on the tab since the last sync. Keeps its tags until a full sync deletes it. */
   unfollowed: boolean;
+}
+
+/** Your tags on an item in your wishlist, keyed apart from `items`, which scans rewrite (§13). */
+export interface ItemTagsRecord {
+  itemKey: ItemKey;
+  tagIds: number[];
 }
 
 export interface TagRecord {
@@ -216,7 +222,7 @@ export function upgradeJobToV8(job: QueueJob): void {
 }
 
 /** Tables newer than the oldest restorable backup, by the version that added them. */
-export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 7 };
+export const TABLES_ADDED: Readonly<Record<string, number>> = { latelyTwins: 7, itemTags: 9 };
 
 export class DigheadDb extends Dexie {
   items!: EntityTable<ItemRecord, 'itemKey'>;
@@ -233,6 +239,7 @@ export class DigheadDb extends Dexie {
   hidden!: EntityTable<HiddenRecord, 'matchKey'>;
   following!: Table<FollowingRecord, FollowingKey>;
   tags!: EntityTable<TagRecord, 'id'>;
+  itemTags!: EntityTable<ItemTagsRecord, 'itemKey'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -305,6 +312,8 @@ export class DigheadDb extends Dexie {
     this.version(8)
       .stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt+rank]' })
       .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(upgradeJobToV8));
+    // v9: your tags on wishlist items (decisions §13). A new table, so nothing to migrate.
+    this.version(9).stores({ itemTags: 'itemKey, *tagIds' });
   }
 }
 

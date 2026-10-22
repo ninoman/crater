@@ -8,14 +8,14 @@ import { mountProfile } from './profile/mountProfile';
 import { ReleaseSidebar } from './release/ReleaseSidebar';
 import sidebarCss from './release/ReleaseSidebar.css?inline';
 import { reportPage } from './reportPage';
-import { accountTagsStyles } from './shared/accountTagsStyles';
+import { pageTagsStyles } from './shared/tagStyles';
 import { mountShadow } from './shared/mountShadow';
 
 reportPage();
 
 switch (detectPageKind(document)) {
   case 'release':
-    mountShadow(document.body, <ReleaseSidebar />, sidebarCss + accountTagsStyles);
+    mountShadow(document.body, <ReleaseSidebar />, sidebarCss + pageTagsStyles);
     break;
   case 'band':
     mountBand(document);

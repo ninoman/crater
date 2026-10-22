@@ -154,6 +154,23 @@ describe('DigheadDb', () => {
     await upgraded.delete();
   });
 
+  it('keeps v8 data when adding item tags in v9, and indexes them by tag', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(8).stores({ tags: '++id, &nameKey' });
+    await old.table('tags').add({ name: 'dub', nameKey: 'dub' });
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    expect(await upgraded.tags.count()).toBe(1);
+    await upgraded.itemTags.bulkPut([
+      { itemKey: 'a1', tagIds: [1, 2] },
+      { itemKey: 't2', tagIds: [2] },
+    ]);
+    expect(await upgraded.itemTags.where('tagIds').equals(2).primaryKeys()).toEqual(['a1', 't2']);
+    await upgraded.delete();
+  });
+
   it('ranks v7 jobs at 0 and stages their fan cursors in v8', async () => {
     const name = `test-${crypto.randomUUID()}`;
     const old = new Dexie(name);

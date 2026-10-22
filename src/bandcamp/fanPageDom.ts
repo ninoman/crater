@@ -17,6 +17,13 @@ export const FAN_PAGE_DOM = {
   tabBar: '.grid-tabs-anchor',
   /** Bandcamp's tab contents and their search and visibility controls. */
   tabContents: ['.grid', '.owner-controls'],
+  /** Bandcamp's wishlist tab; `active` while open, like every grid (me-fan-page.html). */
+  wishlistGrid: '#wishlist-grid',
+  /** Inside it: what holds Bandcamp's paged list of items and its "view all" button. */
+  wishlistItems: '#wishlist-items',
+  /** Bandcamp's own list and "view all", both hidden while ours stands in (decisions §13). */
+  wishlistNativeList: 'ol.collection-grid',
+  wishlistExpand: '.expand-container',
   /** Bandcamp's following tab; it has `active` while open (me-following-tab.html). */
   followingGrid: '#following-grid',
   /** The sub-tabs inside it: artists & labels, fans, genres. `active` marks the open one. */

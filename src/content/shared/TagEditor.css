@@ -1,4 +1,4 @@
-.dh-follow-tags {
+.dh-tag-editor {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -8,7 +8,7 @@
   list-style: none;
 }
 
-.dh-follow-tags > li {
+.dh-tag-editor > li {
   display: inline-flex;
   min-width: 0;
 }

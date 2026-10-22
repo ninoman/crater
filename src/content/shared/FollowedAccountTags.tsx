@@ -2,8 +2,8 @@ import { useEffect, useMemo } from 'react';
 import { useFollowTags } from '../../hooks/useFollowTags';
 import { useTags } from '../../hooks/useTags';
 import type { FollowKind } from '../../shared/following';
-import { FollowTagEditor } from './FollowTagEditor';
-import { followTagHandlers } from './followTagActions';
+import { followTagHandlers } from './tagActions';
+import { TagEditor } from './TagEditor';
 
 export interface FollowedAccountTagsProps {
   kind: FollowKind;
@@ -18,8 +18,8 @@ export interface FollowedAccountTagsProps {
 export function FollowedAccountTags({ kind, id, name }: FollowedAccountTagsProps) {
   const own = useFollowTags(kind, id);
   const all = useTags();
-  const { create, assign } = all;
-  const mutations = useMemo(() => ({ create, assign }), [create, assign]);
+  const { create, assign, assignItems } = all;
+  const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
 
   useEffect(() => {
     if (own.state === 'unreachable') console.warn('dighead: tag lookup failed', own.error);
@@ -32,13 +32,8 @@ export function FollowedAccountTags({ kind, id, name }: FollowedAccountTagsProps
     console.warn('dighead: tagging failed', message),
   );
   return (
-    <div className="dh-account-tags">
-      <FollowTagEditor
-        tags={all.view.data}
-        assignedIds={own.data}
-        accountName={name}
-        {...handlers}
-      />
+    <div className="dh-page-tags">
+      <TagEditor tags={all.view.data} assignedIds={own.data} name={name} {...handlers} />
     </div>
   );
 }

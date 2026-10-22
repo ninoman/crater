@@ -265,7 +265,7 @@ Code: `src/content/fan/`, `getTwinStanding` in `background/recommend/twinStandin
 
 Planned 2026-10-20; data source verified the same day. Roadmap: *Following tags*.
 
-You create your own tags and assign them to the fans, artists and labels you follow. Then you filter your followings by tag. **Tags apply only to followings**, not to twins, supporters or other fans you don't follow.
+You create your own tags and assign them to the fans, artists and labels you follow. Then you filter your followings by tag. **Tags apply only to followings** (and, since §13, to releases in your wishlist), not to twins, supporters or other fans you don't follow.
 
 ### Data source (verified 2026-10-20)
 
@@ -362,7 +362,7 @@ Code: `src/content/following/`, mounted by `mountProfile`. Built 2026-10-21 and 
 - **Cards are reused** across refetches and only moved when the order changes, so focus inside a card and Bandcamp's button state survive a tag change. A row unfollowed since the last sync is built without `following` on its button, so it offers "Follow".
 - **Unfollow tracking** compares each button's class before its first change in a mutation batch with its class now, so a burst of class edits reports once.
 - **Filtering** is in memory over the whole list (`followingFilter.ts`), since `listFollowing` with no tags answers every row. **Bulk actions** act on the checked cards still shown; hidden ones stay checked. The bulk bar floats at the bottom of the window, so it's in reach on a long list.
-- **The tag editor** (`FollowTagEditor` and `followTagHandlers` in `src/content/shared/`) is presentational: callers pass your tags, the account's tag ids and `useTags()`'s mutations. Step 11 reuses it on fan, release and band pages.
+- **The tag editor** (`TagEditor` and `followTagHandlers` in `src/content/shared/`, renamed from `FollowTagEditor` when §13 shared it) is presentational: callers pass your tags, the account's tag ids and `useTags()`'s mutations. Step 11 reuses it on fan, release and band pages.
 - **Parser errors** show as the scanner notices (`NoticeStack`) above the open list. A failed sync shows its message in the empty state.
 - DOM tests run under jsdom (`// @vitest-environment jsdom`), on the fan page with its following grid swapped for the rendered one (`tests/followingTabDom.ts`).
 
@@ -508,3 +508,29 @@ Built 2026-10-21. Code: `src/scoring/alsoBought.ts` (`wilsonLower`, `voteWeight`
 
 - Saved a signed-in fan page as a fixture with personal data scrubbed (`fan-page-in-common.html`) and parsed the count from it. Text with a number in it that isn't the English pattern, or that mentions "common" without a count, throws `ParserError` rather than reading 0.
 - **Still unchecked live:** how the line reads for a fan with no favourite genre. The parser accepts "8 items in common" without the genre, and "1 item in common", both covered by synthetic tests; capture a real one when it turns up.
+
+## 13. Wishlist tags
+
+Decided and built 2026-10-22. Roadmap: *Wishlist tags*. Code: `src/content/wishlist/`, `db/repo/wishlist.ts`, `background/wishlistHandlers.ts`, `src/content/release/WishlistItemTags.tsx`. Tested on the fixtures (jsdom); not yet tried on the live wishlist tab.
+
+The same tags as §8, on the releases in your wishlist, with the same filter (all / any, plus a search over artist and title), bulk tagging and backup.
+
+### Data
+
+- **One tag pool.** Followings and wishlist items share the `tags` table, so "dub" on an artist and on a release is one tag, with one colour. Deleting a tag takes it off both, in one transaction.
+- **Schema v9 (additive):** `itemTags: 'itemKey, *tagIds'`, one `{ itemKey, tagIds }` row per tagged item. Not on `items`, which every scan rewrites, and not on `ownership`, whose wishlist row is overwritten when you buy the item. `TABLES_ADDED` lists it at 9, so a v8 full backup still restores.
+- **What's in your wishlist** is your `ownership` rows with `source: 'wishlist'` (§4). `listWishlist` joins them with `items` for the release and `itemTags` for the tags, newest wishlisted first. `getItemTags` answers null for an item that isn't in your wishlist, so a release page you haven't wishlisted shows nothing.
+- **Sync keeps tags.** A sync rewriting an item or its ownership row leaves `itemTags` alone. A **full** wishlist sync deletes the tags of items that left the wishlist, removed or bought, like unfollowed accounts losing theirs (§8). A hidden wishlist answers an error and returns early, so it keeps them. Until the next full sync, a bought item's tags just sit unused.
+- **Backup:** the tags file is version 2, with an `items` list next to `assignments` in every tag. Version 1 files still import (no items). Import skips items not in your wishlist, as it skips accounts you no longer follow.
+
+### UI: Bandcamp's wishlist tab, modified
+
+- **Why take it over:** like the following tab, Bandcamp renders the wishlist 20 items at a time behind "view all", so a filter over what's loaded would be wrong.
+- **Markup:** on your own page, `#wishlist-grid` holds `#wishlist-items` with an empty `ol.collection-grid` and `.expand-container` ("view all N items"); Bandcamp's JS fills the list when the tab opens. `#wishlist-grid` gets `active` while open, like every grid (me-fan-page.html). Selectors live in `FAN_PAGE_DOM`.
+- **All ours, in one shadow root.** Following cards had to stay light DOM for Bandcamp's follow handler (§8). Wishlist rows don't need any Bandcamp handler, so the whole list is our own `Row`s inside one shadow root placed before Bandcamp's hidden list. No Bandcamp markup is copied, so its delegated handlers on collection items can't misfire on ours. The cost: no heart button to un-wishlist from the list; do that on the release page.
+- **Lazy takeover:** the list is taken over the first time the tab opens, then stays mounted, filters and selection included. Bandcamp's own list comes back while ours can't stand in (worker unreachable, or empty and the sync hasn't finished, has failed, or hasn't seen you log in). The same rules as §8, from the shared `syncEmpty.ts`.
+- **Each row:** select box, playable cover (our own preview player, one open at a time), title linking to the release, artist and "added 3 Oct 2026", then the tags and "+ tag", and "open in a new tab". Filtering re-renders the list rather than hiding rows, since no Bandcamp state lives in them.
+- **Shared with the following tab:** `TagEditor`, `FilterControls`, `BulkBar`, the tag-bar CSS, `tagActions.ts` (`followTagHandlers`, `itemTagHandlers`) and the pure `tagFilter.ts`, which works over any rows through key, tags and text accessors.
+- **Release pages:** when the release is in your wishlist, the sidebar shows "In your wishlist" with its tags and "+ tag", under the artist's tags (§8). Only the exact item: wishlisting an album doesn't tag its track pages.
+- **Gap:** Bandcamp's own wishlist search box (`#wishlist-controls`) is left as it is and searches Bandcamp's list, not ours.
+

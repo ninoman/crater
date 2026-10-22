@@ -7,12 +7,12 @@ import { useTags } from '../../hooks/useTags';
 import { useTwinStandings } from '../../hooks/useTwinStandings';
 import type { Following, FollowingKey, Tag } from '../../shared/following';
 import { Button, EmptyState, Notice, NoticeStack, PortalContainerProvider } from '../../ui';
-import { followTagHandlers } from '../shared/followTagActions';
-import { BulkBar } from './BulkBar';
+import { BulkBar } from '../shared/BulkBar';
+import { FilterControls } from '../shared/FilterControls';
+import { followTagHandlers } from '../shared/tagActions';
 import { CardExtras } from './CardExtras';
 import { CardSelect } from './CardSelect';
 import { EmptyFollowing } from './EmptyFollowing';
-import { FilterControls } from './FilterControls';
 import {
   actionable,
   commonTagIds,
@@ -39,8 +39,8 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
   const { kind, list, bar, showBandcampList } = taken;
   const { view, setUnfollowed } = useFollowing(kind, NO_TAG_IDS, 'all');
   const tagsQuery = useTags();
-  const { create, assign } = tagsQuery;
-  const mutations = useMemo(() => ({ create, assign }), [create, assign]);
+  const { create, assign, assignItems } = tagsQuery;
+  const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
   const rows = view.state === 'ready' ? view.data : null;
   const allRows = rows ?? NO_ROWS;
   const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
@@ -139,9 +139,15 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
         }
         return (
           <>
-            <FilterControls tags={tags} filter={filter} onChange={setFilter} />
+            <FilterControls
+              tags={tags}
+              filter={filter}
+              onChange={setFilter}
+              modeLabel="Show follows with"
+              searchLabel="Search names"
+            />
             {tags.length === 0 && (
-              <p className="dh-following-bar__note">
+              <p className="dh-tag-bar__note">
                 No tags yet. Use “+ tag” on a card to make your first, or check a few cards to tag
                 them together.
               </p>
@@ -153,13 +159,14 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
               />
             ) : (
               isFiltering(filter) && (
-                <p className="dh-following-bar__note" aria-live="polite">
+                <p className="dh-tag-bar__note" aria-live="polite">
                   Showing {visible.size} of {allRows.length}
                 </p>
               )
             )}
             {picked.length > 0 && (
               <BulkBar
+                label="Selected follows"
                 count={picked.length}
                 tags={tags}
                 commonIds={common}
@@ -176,7 +183,7 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
     <>
       {createPortal(
         <PortalContainerProvider container={bar.container}>
-          <section className="dh-following-bar" aria-label="Dighead: your follows">
+          <section className="dh-tag-bar" aria-label="Dighead: your follows">
             {open && <ScannerNotices />}
             {error && (
               <Notice tone="error" title="Couldn't save that change.">

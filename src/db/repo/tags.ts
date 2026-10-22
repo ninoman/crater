@@ -1,8 +1,17 @@
-// Your own tags on followings (decisions §8). Tag ids live on the following rows.
+// Your own tags, on followings (decisions §8) and wishlist items (§13). Tag ids live on the
+// following rows and in `itemTags`.
 
-import type { DigheadDb, FollowingKey, FollowingRecord, TagRecord } from '../schema';
+import type { ItemKey } from '../../bandcamp';
+import type {
+  DigheadDb,
+  FollowingKey,
+  FollowingRecord,
+  ItemTagsRecord,
+  TagRecord,
+} from '../schema';
 import type { TagBackup } from '../tagBackup';
 import { followingKey } from './following';
+import { wishlistedKeys } from './wishlist';
 
 export type TagResult =
   | { ok: true; tag: TagRecord }
@@ -11,7 +20,7 @@ export type TagResult =
 export interface TagImportSummary {
   tagsCreated: number;
   assigned: number;
-  /** Assignments to accounts you no longer follow. */
+  /** Assignments to accounts you no longer follow, or items no longer in your wishlist. */
   skipped: number;
 }
 
@@ -47,15 +56,14 @@ export async function renameTag(db: DigheadDb, id: number, name: string): Promis
   });
 }
 
-/** Deletes a tag and takes it off every following, in one transaction. */
+/** Deletes a tag and takes it off every following and item, in one transaction. */
 export async function deleteTag(db: DigheadDb, id: number): Promise<void> {
-  await db.transaction('rw', [db.tags, db.following], async () => {
-    await db.following
-      .where('tagIds')
-      .equals(id)
-      .modify((row) => {
-        row.tagIds = row.tagIds.filter((tagId) => tagId !== id);
-      });
+  await db.transaction('rw', [db.tags, db.following, db.itemTags], async () => {
+    const untag = (row: { tagIds: number[] }) => {
+      row.tagIds = row.tagIds.filter((tagId) => tagId !== id);
+    };
+    await db.following.where('tagIds').equals(id).modify(untag);
+    await db.itemTags.where('tagIds').equals(id).modify(untag);
     await db.tags.delete(id);
   });
 }
@@ -84,27 +92,39 @@ export async function assignTag(
   });
 }
 
-/** Every tag with the followings it's on, in the backup file's shape. */
+/** Every tag with the followings and items it's on, in the backup file's shape. */
 export async function exportTags(db: DigheadDb): Promise<TagBackup> {
-  return db.transaction('r', [db.tags, db.following], async () => {
+  return db.transaction('r', [db.tags, db.following, db.itemTags], async () => {
     const tags = await listTags(db);
     const assignments = new Map<number, FollowingKey[]>(tags.map((tag) => [tag.id, []]));
+    const items = new Map<number, ItemKey[]>(tags.map((tag) => [tag.id, []]));
     for (const row of await db.following.toArray()) {
       for (const tagId of row.tagIds) assignments.get(tagId)?.push(followingKey(row));
     }
+    for (const row of await db.itemTags.toArray()) {
+      for (const tagId of row.tagIds) items.get(tagId)?.push(row.itemKey);
+    }
     return {
-      version: 1,
-      tags: tags.map((tag) => ({ name: tag.name, assignments: assignments.get(tag.id) ?? [] })),
+      version: 2,
+      tags: tags.map((tag) => ({
+        name: tag.name,
+        assignments: assignments.get(tag.id) ?? [],
+        items: items.get(tag.id) ?? [],
+      })),
     };
   });
 }
 
 /**
- * Merges a backup in: tags match by name key, and assignments to accounts you no longer
- * follow (gone, or unfollowed on the tab) are skipped.
+ * Merges a backup in: tags match by name key. Assignments to accounts you no longer follow
+ * (gone, or unfollowed on the tab) and to items not in `fanId`'s wishlist are skipped.
  */
-export async function importTags(db: DigheadDb, backup: TagBackup): Promise<TagImportSummary> {
-  return db.transaction('rw', [db.tags, db.following], async () => {
+export async function importTags(
+  db: DigheadDb,
+  backup: TagBackup,
+  fanId: number | null,
+): Promise<TagImportSummary> {
+  return db.transaction('rw', [db.tags, db.following, db.itemTags, db.ownership], async () => {
     const summary: TagImportSummary = { tagsCreated: 0, assigned: 0, skipped: 0 };
     for (const entry of backup.tags) {
       if (!tagNameKey(entry.name)) continue;
@@ -120,6 +140,18 @@ export async function importTags(db: DigheadDb, backup: TagBackup): Promise<TagI
       }
       await db.following.bulkPut(changed);
       summary.assigned += changed.length;
+
+      const wished =
+        fanId === null ? new Set<ItemKey>() : await wishlistedKeys(db, fanId, entry.items);
+      const present = await db.itemTags.bulkGet(entry.items);
+      const tagged: ItemTagsRecord[] = [];
+      entry.items.forEach((itemKey, i) => {
+        const tagIds = present[i]?.tagIds ?? [];
+        if (!wished.has(itemKey)) summary.skipped++;
+        else if (!tagIds.includes(tag.id)) tagged.push({ itemKey, tagIds: [...tagIds, tag.id] });
+      });
+      await db.itemTags.bulkPut(tagged);
+      summary.assigned += tagged.length;
     }
     return summary;
   });

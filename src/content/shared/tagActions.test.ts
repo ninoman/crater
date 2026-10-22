@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FollowingKey, TagResult } from '../../shared/following';
-import { followTagHandlers, type TagMutations } from './followTagActions';
+import { followTagHandlers, itemTagHandlers, type TagMutations } from './tagActions';
 
 const KEYS: FollowingKey[] = [
   ['band', 1],
@@ -11,6 +11,7 @@ function fakes(created: TagResult = { ok: true, tag: { id: 9, name: 'dub', nameK
   const mutations = {
     create: vi.fn<TagMutations['create']>(async () => created),
     assign: vi.fn<TagMutations['assign']>(async () => 2),
+    assignItems: vi.fn<TagMutations['assignItems']>(async () => 2),
   };
   const onError = vi.fn<(message: string) => void>();
   return { mutations, onError };
@@ -50,5 +51,17 @@ describe('followTagHandlers', () => {
     expect(refused.mutations.assign).not.toHaveBeenCalled();
     expect(refused.onError).toHaveBeenCalledWith("Couldn't create the tag (empty).");
     expect(failed.onError).toHaveBeenCalledWith('worker gone');
+  });
+});
+
+describe('itemTagHandlers', () => {
+  it('tags and untags wishlist items, creating a tag first when asked', async () => {
+    const { mutations, onError } = fakes();
+    itemTagHandlers(mutations, ['a1', 't2'], [3], onError).onToggle(3);
+    itemTagHandlers(mutations, ['a1'], [], onError).onCreate('dub');
+    await settle();
+    expect(mutations.assignItems).toHaveBeenNthCalledWith(1, 3, ['a1', 't2'], 'remove');
+    expect(mutations.assignItems).toHaveBeenNthCalledWith(2, 9, ['a1'], 'add');
+    expect(mutations.assign).not.toHaveBeenCalled();
   });
 });

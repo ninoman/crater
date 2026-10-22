@@ -1,0 +1,13 @@
+.dh-page-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-1) var(--dh-space-2);
+  margin: var(--dh-space-2) 0 0;
+}
+
+/* Tells a release's tags apart from its artist's, which sit right above. */
+.dh-page-tags__label {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}

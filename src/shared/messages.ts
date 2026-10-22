@@ -21,6 +21,7 @@ import type { ReleaseTwinsResult } from './releaseTwins';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { TwinsResult, TwinStanding } from './twins';
+import type { WishlistItem } from './wishlist';
 
 type NoPayload = Record<string, never>;
 
@@ -69,7 +70,7 @@ export interface MessageMap {
   /** A name that already exists answers with that tag. */
   createTag: { request: { name: string }; response: TagResult };
   renameTag: { request: { id: number; name: string }; response: TagResult };
-  /** Also takes the tag off every following. */
+  /** Also takes the tag off every following and wishlist item. */
   deleteTag: { request: { id: number }; response: null };
   /** Adds a tag to, or removes it from, many followings at once. Answers with how many changed. */
   assignTag: {
@@ -90,6 +91,15 @@ export interface MessageMap {
   setUnfollowed: {
     request: { key: FollowingKey; unfollowed: boolean };
     response: null;
+  };
+  /** Your wishlist with your tags, newest first. Empty before your first sync. */
+  listWishlist: { request: NoPayload; response: WishlistItem[] };
+  /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
+  getItemTags: { request: { itemKey: ItemKey }; response: number[] | null };
+  /** Adds a tag to, or removes it from, many wishlist items at once. Answers with how many changed. */
+  assignItemTag: {
+    request: { tagId: number; itemKeys: ItemKey[]; action: TagAction };
+    response: number;
   };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };

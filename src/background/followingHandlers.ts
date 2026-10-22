@@ -6,6 +6,7 @@ import {
   deleteTag,
   exportTags,
   getFollowing,
+  getMe,
   importTags,
   listFollowing,
   listTags,
@@ -51,6 +52,6 @@ export function followingHandlers(db: DigheadDb): FollowingHandlers {
       return null;
     },
     exportTags: () => exportTags(db),
-    importTags: ({ backup }) => importTags(db, backup),
+    importTags: async ({ backup }) => importTags(db, backup, (await getMe(db))?.fanId ?? null),
   };
 }

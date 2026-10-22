@@ -2,8 +2,8 @@ import { memo } from 'react';
 import type { Following } from '../../shared/following';
 import type { TwinStanding } from '../../shared/twins';
 import type { TagOption } from '../../ui';
-import { FollowTagEditor } from '../shared/FollowTagEditor';
-import { followTagHandlers, type TagMutations } from '../shared/followTagActions';
+import { followTagHandlers, type TagMutations } from '../shared/tagActions';
+import { TagEditor } from '../shared/TagEditor';
 import { TwinRank } from './TwinRank';
 
 export interface CardExtrasProps {
@@ -29,7 +29,7 @@ export const CardExtras = memo(function CardExtras({
   const handlers = followTagHandlers(mutations, [[row.kind, row.id]], row.tagIds, onError);
   return (
     <div className="dh-follow-card">
-      <FollowTagEditor tags={tags} assignedIds={row.tagIds} accountName={row.name} {...handlers} />
+      <TagEditor tags={tags} assignedIds={row.tagIds} name={row.name} {...handlers} />
       {standing && <TwinRank standing={standing} />}
     </div>
   );

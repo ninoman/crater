@@ -150,6 +150,6 @@ describe('the following tab', () => {
       ?.shadowRoot?.querySelector('button[role="checkbox"]') as HTMLButtonElement | undefined;
     await act(async () => box?.click());
 
-    expect(bar(doc)?.querySelector('.dh-following-bulk')?.textContent).toContain('1 selected');
+    expect(bar(doc)?.querySelector('.dh-bulk-bar')?.textContent).toContain('1 selected');
   });
 });

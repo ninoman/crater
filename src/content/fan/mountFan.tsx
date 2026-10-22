@@ -1,6 +1,6 @@
 import { FAN_PAGE_DOM, ParserError, parseViewedFanId } from '../../bandcamp';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
-import { accountTagsStyles } from '../shared/accountTagsStyles';
+import { pageTagsStyles } from '../shared/tagStyles';
 import { mountShadow } from '../shared/mountShadow';
 import fanCss from './Fan.css?inline';
 import { TwinStandingBadge } from './TwinStandingBadge';
@@ -29,6 +29,6 @@ export function mountFan(doc: Document): void {
       <TwinStandingBadge fanId={fanId} />
       <FollowedAccountTags kind="fan" id={fanId} name={fanName} />
     </>,
-    fanCss + accountTagsStyles,
+    fanCss + pageTagsStyles,
   );
 }

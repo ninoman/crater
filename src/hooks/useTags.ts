@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { ItemKey } from '../bandcamp';
 import type {
   FollowingKey,
   Tag,
@@ -19,11 +20,13 @@ export interface TagActions {
   remove: (id: number) => Promise<void>;
   /** Adds or removes a tag on many followings. Answers with how many changed. */
   assign: (tagId: number, keys: FollowingKey[], action: TagAction) => Promise<number>;
+  /** Adds or removes a tag on many wishlist items. Answers with how many changed. */
+  assignItems: (tagId: number, itemKeys: ItemKey[], action: TagAction) => Promise<number>;
   exportBackup: () => Promise<TagBackup>;
   importBackup: (backup: TagBackup) => Promise<TagImportSummary>;
 }
 
-/** Runs a mutation, then tells every following hook to refetch. Rejects if the worker does. */
+/** Runs a mutation, then tells every tag-reading hook to refetch. Rejects if the worker does. */
 async function changing<T>(run: Promise<T>): Promise<T> {
   const result = await run;
   notifyFollowingChanged();
@@ -37,11 +40,13 @@ const actions: TagActions = {
     await changing(sendMessage('deleteTag', { id }));
   },
   assign: (tagId, keys, action) => changing(sendMessage('assignTag', { tagId, keys, action })),
+  assignItems: (tagId, itemKeys, action) =>
+    changing(sendMessage('assignItemTag', { tagId, itemKeys, action })),
   exportBackup: () => sendMessage('exportTags', {}),
   importBackup: (backup) => changing(sendMessage('importTags', { backup })),
 };
 
-/** Your tags by name, with the mutations. Every following hook refetches after one. */
+/** Your tags by name, with the mutations. Every tag-reading hook refetches after one. */
 export function useTags(): { view: TagsView } & TagActions {
   const view = useFollowingQuery('tags', () => sendMessage('listTags', {}));
   return useMemo(() => ({ view, ...actions }), [view]);

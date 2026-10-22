@@ -182,7 +182,7 @@ describe('tag backup', () => {
     );
 
     expect(await exportTags(db)).toEqual({
-      version: 1,
+      version: 2,
       tags: [
         {
           name: 'Ambient',
@@ -190,8 +190,9 @@ describe('tag backup', () => {
             ['band', 1],
             ['band', 2],
           ],
+          items: [],
         },
-        { name: 'dub', assignments: [] },
+        { name: 'dub', assignments: [], items: [] },
       ],
     });
   });
@@ -210,12 +211,13 @@ describe('tag backup', () => {
             ['band', 2],
             ['fan', 9],
           ],
+          items: [],
         },
-        { name: 'Dub', assignments: [['band', 3]] },
+        { name: 'Dub', assignments: [['band', 3]], items: [] },
       ],
     };
 
-    const summary = await importTags(db, backup);
+    const summary = await importTags(db, backup, null);
 
     expect(summary).toEqual({ tagsCreated: 1, assigned: 1, skipped: 2 });
     const tags = await listTags(db);
@@ -233,8 +235,17 @@ describe('tag backup', () => {
     expect(parseTagBackup(json)).toEqual(await exportTags(db));
   });
 
+  it('reads a version 1 file, from before wishlist tags', () => {
+    expect(
+      parseTagBackup({ version: 1, tags: [{ name: 'x', assignments: [['band', 1]] }] }),
+    ).toEqual({ version: 1, tags: [{ name: 'x', assignments: [['band', 1]], items: [] }] });
+  });
+
   it('rejects a file that is not a tags backup', () => {
-    expect(parseTagBackup({ version: 2, tags: [] })).toBeNull();
+    expect(parseTagBackup({ version: 3, tags: [] })).toBeNull();
+    expect(
+      parseTagBackup({ version: 2, tags: [{ name: 'x', assignments: [], items: ['x1'] }] }),
+    ).toBeNull();
     expect(
       parseTagBackup({ version: 1, tags: [{ name: 'x', assignments: [['label', 1]] }] }),
     ).toBeNull();

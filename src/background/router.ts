@@ -21,6 +21,7 @@ import {
   requestRelease,
   resumeScanner,
 } from './scanner';
+import { wishlistHandlers } from './wishlistHandlers';
 
 export const handlers: MessageHandlers = {
   ping: () => ({ version: chrome.runtime.getManifest().version }),
@@ -48,6 +49,7 @@ export const handlers: MessageHandlers = {
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
   getForYou: () => getForYou(),
   ...followingHandlers(db),
+  ...wishlistHandlers(db),
   ...backupHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();

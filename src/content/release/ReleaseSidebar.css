@@ -48,7 +48,7 @@
   color: var(--dh-color-muted);
 }
 
-.dh-sidebar .dh-account-tags {
+.dh-sidebar .dh-page-tags {
   margin: 0;
   padding: var(--dh-space-2) var(--dh-space-4) 0;
 }

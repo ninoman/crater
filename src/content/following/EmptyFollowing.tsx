@@ -3,7 +3,8 @@ import { notifyFollowingChanged } from '../../hooks/followingChanges';
 import { useSyncStatus } from '../../hooks/useSyncStatus';
 import type { FollowKind } from '../../shared/following';
 import { EmptyState } from '../../ui';
-import { emptyReason, kindLabel, showsBandcampList } from './followingEmpty';
+import { emptyReason, showsBandcampList } from '../shared/syncEmpty';
+import { kindLabel } from './followingEmpty';
 
 const BELOW = "Bandcamp's own list is below.";
 
@@ -56,7 +57,7 @@ export function EmptyFollowing({
       return (
         <EmptyState
           title="Syncing your follows…"
-          description={`${reason.fetched} so far. They show here with your tags once the sync finishes. ${BELOW}`}
+          description={`${reason.followingFetched} so far. They show here with your tags once the sync finishes. ${BELOW}`}
         />
       );
     case 'sync-failed':

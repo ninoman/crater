@@ -1,6 +1,6 @@
 import type { TagMode } from '../../shared/following';
 import { Chip, SearchField, Segmented, type TagOption } from '../../ui';
-import type { FollowingFilter } from './followingFilter';
+import type { TagFilter } from './tagFilter';
 
 const MODES = [
   { value: 'all', label: 'all' },
@@ -9,22 +9,32 @@ const MODES = [
 
 export interface FilterControlsProps {
   tags: readonly TagOption[];
-  filter: FollowingFilter;
-  onChange: (filter: FollowingFilter) => void;
+  filter: TagFilter;
+  onChange: (filter: TagFilter) => void;
+  /** Names the all/any switch, e.g. "Show follows with". */
+  modeLabel: string;
+  /** What the search box searches, e.g. "Search names". */
+  searchLabel: string;
 }
 
-/** Tag chips to filter by, all/any, and a name search. Tag filters show once you have tags. */
-export function FilterControls({ tags, filter, onChange }: FilterControlsProps) {
+/** Tag chips to filter by, all/any, and a search. Tag filters show once you have tags. */
+export function FilterControls({
+  tags,
+  filter,
+  onChange,
+  modeLabel,
+  searchLabel,
+}: FilterControlsProps) {
   function toggleTag(id: number, pressed: boolean) {
     const tagIds = pressed ? [...filter.tagIds, id] : filter.tagIds.filter((t) => t !== id);
     onChange({ ...filter, tagIds });
   }
 
   return (
-    <div className="dh-following-bar__filters">
+    <div className="dh-tag-bar__filters">
       {tags.length > 0 && (
         <>
-          <ul className="dh-following-bar__tags" aria-label="Filter by tag">
+          <ul className="dh-tag-bar__tags" aria-label="Filter by tag">
             {tags.map((tag) => (
               <li key={tag.id}>
                 <Chip
@@ -36,7 +46,7 @@ export function FilterControls({ tags, filter, onChange }: FilterControlsProps) 
             ))}
           </ul>
           <Segmented
-            label="Show follows with"
+            label={modeLabel}
             options={MODES}
             value={filter.mode}
             onChange={(mode) => onChange({ ...filter, mode })}
@@ -44,8 +54,8 @@ export function FilterControls({ tags, filter, onChange }: FilterControlsProps) 
         </>
       )}
       <SearchField
-        label="Search names"
-        placeholder="Search names"
+        label={searchLabel}
+        placeholder={searchLabel}
         value={filter.query}
         onChange={(query) => onChange({ ...filter, query })}
       />

@@ -1,6 +1,6 @@
 import { BAND_PAGE_DOM, ParserError, parseBandId } from '../../bandcamp';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
-import { accountTagsStyles } from '../shared/accountTagsStyles';
+import { pageTagsStyles } from '../shared/tagStyles';
 import { mountShadow } from '../shared/mountShadow';
 
 /** Adds your tags under the band's name on its home page, when you follow the band. */
@@ -25,6 +25,6 @@ export function mountBand(doc: Document): void {
   mountShadow(
     name,
     <FollowedAccountTags kind="band" id={bandId} name={bandName} />,
-    accountTagsStyles,
+    pageTagsStyles,
   );
 }

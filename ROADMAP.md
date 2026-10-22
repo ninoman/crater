@@ -8,6 +8,7 @@ Each phase ends with something you can load unpacked in Chrome and use. Phases 0
 P0 Recon ─► P1 Skeleton ─► P2 Sync me ─► P3 Scanner ─► P4 Also bought ─► P5 Twins ─► P6 For you ─► P7 Harden ─► P8 Ship
                                   └────────────── (P2 and P3 can overlap once P1 is done) ──┘
                                                                          └─► Following tags (after P6, modifies Bandcamp's following tab; not MVP)
+                                                                               └─► Wishlist tags (same tags, on Bandcamp's wishlist tab)
 ```
 
 ---
@@ -190,6 +191,24 @@ It isn't part of the MVP. Design and data source: decisions §8.
 12. [x] Tag export/import.
 
 **Done when:** the following tab lists everyone you follow, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, follow/unfollow on our cards works through Bandcamp's own handler, and a followed artist's release page shows its tags.
+
+---
+
+## Wishlist tags (not MVP)
+
+**Goal:** tag the releases in your wishlist with the same tags as your follows, then filter your wishlist by tag, on Bandcamp's own wishlist tab.
+
+Design: decisions §13.
+
+1. [x] Schema v9: `itemTags`, keyed by item, so scans and syncs never wipe them. A full wishlist sync drops the tags of items that left it.
+2. [x] Repo, messages and hooks: `listWishlist`, `getItemTags`, `assignItemTag`; deleting a tag takes it off items too.
+3. [x] Share the tag filter, editor, filter bar and bulk bar between the following and wishlist tabs.
+4. [x] Take over the wishlist tab: every release as a row with a playable cover, tags, "+ tag", a select box, the filter bar, bulk tagging and all view states.
+5. [x] Tags on a wishlisted release's own page, in the sidebar.
+6. [x] Item tags in the tag export/import (file version 2; version 1 files still import).
+7. [ ] Try the takeover on the live wishlist tab, with Bandcamp's own JS running.
+
+**Done when:** the wishlist tab lists every wishlisted release, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, and a wishlisted release's page shows its tags.
 
 ---
 

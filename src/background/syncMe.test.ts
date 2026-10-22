@@ -1,7 +1,17 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { BandcampRequest } from '../bandcamp';
-import { countOwnership, DigheadDb, getMe, ownedItemKeys, saveViewer, type MeRecord } from '../db';
+import {
+  assignItemTag,
+  countOwnership,
+  createTag,
+  DigheadDb,
+  getItemTags,
+  getMe,
+  ownedItemKeys,
+  saveViewer,
+  type MeRecord,
+} from '../db';
 import { syncMe, type SyncDeps } from './syncMe';
 
 const FAN = 77;
@@ -118,6 +128,29 @@ describe('syncMe', () => {
     await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [11] }).fetchJson), me, 'full');
 
     expect(await ownedItemKeys(db, FAN, 'wishlist')).toEqual(new Set(['a11']));
+  });
+
+  it('keeps tags on wishlist items across syncs, and drops them with items that left', async () => {
+    await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [10, 11] }).fetchJson), me, 'full');
+    const created = await createTag(db, 'dub');
+    if (!created.ok) throw new Error(created.reason);
+    await assignItemTag(db, created.tag.id, ['a10', 'a11'], 'add');
+
+    await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [11] }).fetchJson), me, 'full');
+
+    expect(await getItemTags(db, FAN, 'a11')).toEqual([created.tag.id]);
+    expect(await db.itemTags.get('a10')).toBeUndefined();
+  });
+
+  it('keeps wishlist tags when the wishlist is hidden', async () => {
+    await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [10] }).fetchJson), me, 'full');
+    const created = await createTag(db, 'dub');
+    if (!created.ok) throw new Error(created.reason);
+    await assignItemTag(db, created.tag.id, ['a10'], 'add');
+
+    await syncMe(deps(fakeBandcamp({ collection: [], wishlist: 'hidden' }).fetchJson), me, 'full');
+
+    expect(await getItemTags(db, FAN, 'a10')).toEqual([created.tag.id]);
   });
 
   it('moves a bought wishlist item to the collection', async () => {

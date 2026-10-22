@@ -12,6 +12,7 @@ import { AlsoBoughtList } from './AlsoBoughtList';
 import { ReleaseTwinsList } from './ReleaseTwinsList';
 import { ScanHeader } from './ScanHeader';
 import { useCurrentRelease } from './useCurrentRelease';
+import { WishlistItemTags } from './WishlistItemTags';
 
 /** The sidebar checks the queue's health less often than the popup does. */
 const SCANNER_POLL_MS = 5000;
@@ -47,6 +48,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
       <FollowedAccountTags kind="band" id={item.bandId} name={item.artist} />
+      <WishlistItemTags itemKey={item.itemKey} name={`${item.artist} – ${item.title}`} />
       <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"

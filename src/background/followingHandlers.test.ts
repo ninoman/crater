@@ -121,7 +121,7 @@ describe('exportTags and importTags', () => {
     const tagId = await newTag('Keep');
     await h.assignTag({ tagId, keys: [['band', 2]], action: 'add' }, sender);
     const backup = await h.exportTags({}, sender);
-    expect(backup.tags).toEqual([{ name: 'Keep', assignments: [['band', 2]] }]);
+    expect(backup.tags).toEqual([{ name: 'Keep', assignments: [['band', 2]], items: [] }]);
 
     await h.deleteTag({ id: tagId }, sender);
     const summary = await h.importTags({ backup }, sender);
