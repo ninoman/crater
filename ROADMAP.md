@@ -249,14 +249,14 @@ Design: decisions §12. The scoring half (confidence bound, omnivore damping, wa
 
 **Goal:** a For you mode that surfaces releases few people own but your closest twins do, with an honest "only N owners" reason.
 
-Design: [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twin scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 50).
+Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twin scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 50).
 
-1. [ ] `scoring/deepCuts.ts` (the cap passed in), plus the constants and `nichePenalty` in `weights.ts`, and the `deepCutMaxSupporters` setting (default 50, 5–1000) in `shared/settings.ts`, with the synthetic test set (niche beats staple, cap, agreement shrink, no-count skip, ceiling safety).
-2. [ ] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
-3. [ ] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
-4. [ ] For you tab: an `All / Deep cuts` switch (Fresh joins it when built), a "Deep cut: at most N owners" field in the popup's settings, the reason line ("Only 4 owners on Bandcamp · 3 are your twins"), and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
+1. [x] `scoring/deepCuts.ts` (the cap passed in), plus the constants and `nichePenalty` in `weights.ts`, and the `deepCutMaxSupporters` setting (default 50, 5–1000) in `shared/settings.ts`, with the synthetic test set (niche beats staple, cap, agreement shrink, no-count skip, ceiling safety).
+2. [x] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
+3. [x] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
+4. [ ] For you tab: a Deep cuts option in the `All time / Fresh` switch, a "Deep cut: at most N owners" field in the popup's settings, the reason line ("Only 4 owners on Bandcamp · 3 are your twins"), and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
 5. [ ] Offline eval script (`tests/eval/`, out of `pnpm test`): temporal and random holdout on a local backup, twins recomputed without the held-out releases, recall@k, niche recall@k, mean popularity of the list, median owners of the hits, and a grid over β, the shrink constant and the cap.
-6. [ ] Tune the defaults from the eval on real data, and record the decision and numbers in `docs/decisions.md`.
+6. [ ] Tune the defaults from the eval on real data, and record the numbers in decisions §18.
 7. [ ] Later: an early-adopter boost, tested first ("do early buyers overlap more with your twins?").
 8. [ ] Later: β adapted to how mainstream your own collection is.
 

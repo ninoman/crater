@@ -16,3 +16,15 @@ export function supporters(
 export function weight(supporterCount: number): number {
   return 1 / Math.log2(2 + Math.max(0, supporterCount));
 }
+
+/** Deep cuts: twins drawn on. More than For you's K, since niche picks are spread thin. */
+export const DEEP_CUT_TWINS_K = 100;
+/** Candidate popularity penalty n^−β. 0.6: RP³β's default, and Zhou et al.'s tuned λ on RYM. */
+export const DEEP_CUT_BETA = 0.6;
+/** Agreement shrink t/(t + c): one twin alone counts 1/3, two 1/2, four 2/3. */
+export const DEEP_CUT_AGREEMENT = 2;
+
+/** n^−β for a release's Bandcamp owner count. 1 for a release only one fan owns. */
+export function nichePenalty(supporterCount: number, beta = DEEP_CUT_BETA): number {
+  return Math.max(1, supporterCount) ** -beta;
+}

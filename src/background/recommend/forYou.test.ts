@@ -183,6 +183,8 @@ describe('computeForYou', () => {
       url: 'https://artist.bandcamp.com/album/a2',
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       twins: 2,
+      supporters: 2,
+      bestTwinRank: 1,
       lastBoughtAt: null,
       followed: null,
     });

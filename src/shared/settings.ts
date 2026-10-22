@@ -31,6 +31,8 @@ export interface Settings {
   pageBadges: boolean;
   /** Releases from artists and labels you follow score a little higher (decisions §16). */
   followingBoost: boolean;
+  /** Releases with more Bandcamp owners than this are not deep cuts (decisions §18). */
+  deepCutMaxSupporters: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -52,6 +54,8 @@ export const DEFAULT_SETTINGS: Settings = {
   seedFromCollection: true,
   pageBadges: false,
   followingBoost: true,
+  // Underground electronic runs small; what counts as rare depends on the genre you dig in.
+  deepCutMaxSupporters: 50,
 };
 
 export type NumericSetting = {
@@ -80,6 +84,7 @@ export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }
   latelyMinPurchases: { min: 1, max: 100 },
   latelyRescanTwins: { min: 0, max: 200 },
   latelyRescanDays: { min: 1, max: 30 },
+  deepCutMaxSupporters: { min: 5, max: 1000 },
 };
 
 export type SettingsErrors = Partial<Record<keyof Settings, string>>;

@@ -134,3 +134,31 @@ export function couldRank(top: readonly ForYouScored[], limit: number, twinScore
   const last = top[limit - 1];
   return top.length < limit || last === undefined || twinScore >= last.score;
 }
+
+/**
+ * The rank of the first twin, in `ranked` order (best first), whose sorted match list holds `id`.
+ * Twins without a list (never scanned) keep their place, so ranks match the leaderboard.
+ */
+export function bestTwinRank(
+  id: number,
+  ranked: readonly (Float64Array | undefined)[],
+): number | null {
+  for (let i = 0; i < ranked.length; i++) {
+    const list = ranked[i];
+    if (list && holds(list, id)) return i + 1;
+  }
+  return null;
+}
+
+function holds(sorted: Float64Array, id: number): boolean {
+  let lo = 0;
+  let hi = sorted.length - 1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >>> 1;
+    const value = sorted[mid] as number;
+    if (value === id) return true;
+    if (value < id) lo = mid + 1;
+    else hi = mid - 1;
+  }
+  return false;
+}

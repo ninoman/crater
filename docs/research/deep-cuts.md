@@ -96,7 +96,7 @@ The cap is a user setting, not a constant: what counts as rare depends on the ge
 
 ```ts
 // src/shared/settings.ts
-/** Releases with more Bandcamp owners than this are not deep cuts (decisions §13). */
+/** Releases with more Bandcamp owners than this are not deep cuts (decisions §18). */
 deepCutMaxSupporters: number; // default 50: underground electronic runs small. Range 5–1000.
 ```
 
@@ -173,9 +173,9 @@ If the full mode is too much for now: an *Edge* toggle on For you that only filt
 
 ## Decision
 
-*(Copy into `docs/decisions.md` as §13.)*
+*(Recorded in `docs/decisions.md` as §18, since §13 was taken by then.)*
 
-> ## 13. Deep cuts (planned)
+> ## 18. Deep cuts (planned)
 >
 > Researched 2026-10-21: `docs/research/deep-cuts.md`.
 >
@@ -194,14 +194,14 @@ If the full mode is too much for now: an *Edge* toggle on For you that only filt
 
 **Goal:** a For you mode that surfaces releases few people own but your closest twins do, with an honest "only N owners" reason.
 
-Design: decisions §13, research in docs/research/deep-cuts.md.
+Design: decisions §18, research in docs/research/deep-cuts.md.
 
 1. [ ] `scoring/deepCuts.ts` (taking the cap as an argument) and the constants and `nichePenalty` in `weights.ts`, plus the `deepCutMaxSupporters` setting (default 50, 5–1000), with the synthetic test set (niche beats staple, cap, shrink, no-count skip, ceiling safety).
 2. [ ] `computeDeepCuts` in `background/recommend/`, with K = 100 twins and ceiling pruning; `pnpm perf` with a 100-twin board. Add the `items.supporterCount` index only if it's over budget.
 3. [ ] `getForYou { mode }` on the message bus, and `ForYouRow.supporters` plus the best twin's rank.
 4. [ ] For you tab: an `All / Deep cuts` switch (Fresh joins it when built), the cap in the popup's settings, the reason-line copy, and the empty state "No deep cuts yet: your twins' rare records show up as more of them are scanned".
 5. [ ] Offline eval script (`tests/eval/`): temporal and random holdout, twins recomputed, recall@k, niche recall@k, ARP, median hit n, and the β / c / cap grid.
-6. [ ] Tune the defaults from the eval on real data and record the numbers in decisions §13.
+6. [ ] Tune the defaults from the eval on real data and record the numbers in decisions §18.
 7. [ ] Later: early-adopter boost, tested first ("do early buyers overlap more with twins?").
 8. [ ] Later: β adapted to how mainstream your own collection is.
 ```

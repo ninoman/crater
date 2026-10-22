@@ -12,6 +12,7 @@ import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { computeAlsoBought } from './alsoBought';
+import { computeDeepCuts } from './deepCuts';
 import { computeForYou } from './forYou';
 import { computeReleaseTwins } from './releaseTwins';
 import { rescoreDue } from './rescore';
@@ -42,6 +43,12 @@ export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResu
 /** For you on your profile, from the stored twins leaderboard, or the lately one for Fresh. */
 export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
+  if (mode === 'deep') {
+    return computeDeepCuts(db, me, {
+      maxSupporters: settings.deepCutMaxSupporters,
+      ignoreCompilations: settings.ignoreCompilations,
+    });
+  }
   return computeForYou(db, me, {
     mode,
     topTwinsK: settings.topTwinsK,

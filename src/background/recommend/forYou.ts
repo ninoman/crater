@@ -1,7 +1,7 @@
 // Runs the For-you scorer: what your top twins own (or, for Fresh, what your lately twins
 // bought recently), scored with pruning, diversified, then dressed for display.
 
-import { artUrl, keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
+import { keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherForYou,
   getDisplayItems,
@@ -17,6 +17,7 @@ import { discountCompilations } from '../../scoring/compilations';
 import { exclusions } from '../../scoring/exclusions';
 import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import {
+  bestTwinRank,
   couldRank,
   FOR_YOU_LIMIT,
   forYouPicks,
@@ -31,8 +32,9 @@ import {
 import { freshOwnership, type FreshOwned } from '../../scoring/fresh';
 import { MONTH_MS } from '../../scoring/lately';
 import { supporters } from '../../scoring/weights';
-import type { ForYouMode, ForYouResult, ForYouRow } from '../../shared/forYou';
+import type { ForYouMode, ForYouResult } from '../../shared/forYou';
 import { loadFollowedReleases } from './followSignal';
+import { listsInRankOrder, toRow } from './forYouRow';
 import { twinsBasis } from './twinRows';
 
 /** Ranked before diversifying, so artists' moved-down extras leave room for others. */
@@ -40,8 +42,11 @@ const RANKED = FOR_YOU_LIMIT * 2;
 /** Item records and owner counts are looked up this many candidates at a time. */
 const CHUNK = 200;
 
+/** Deep cuts has its own runner (`deepCuts.ts`). */
+export type RankedForYouMode = Exclude<ForYouMode, 'deep'>;
+
 export interface ForYouInput {
-  mode: ForYouMode;
+  mode: RankedForYouMode;
   topTwinsK: number;
   /** Fresh fades each twin's purchases with this half-life, as the lately score does. */
   latelyHalfLifeMonths: number;
@@ -72,6 +77,8 @@ export async function computeForYou(
 
   const followed = await loadFollowedReleases(db, input.followingBoost);
   const { ranked, items } = await scoreTop(db, candidates, followed, input.ignoreCompilations);
+  const supportersOf = new Map(ranked.map((scored) => [scored.id, scored.supporters]));
+  const lists = listsInRankOrder(twins, data);
   const artists = new Map<number, string>();
   for (const scored of ranked) {
     const item = items.get(keyFromNumber(scored.id));
@@ -81,14 +88,21 @@ export async function computeForYou(
     const item = items.get(pick.matchKey);
     if (!item) return [];
     const id = keyToNumber(pick.matchKey);
-    const boughtAt = lastBought.get(id) ?? null;
-    return [toRow(pick.matchKey, item, pick.twins, boughtAt, followed.get(id) ?? null)];
+    return [
+      toRow(pick.matchKey, item, {
+        twins: pick.twins,
+        supporters: supportersOf.get(id) ?? pick.twins,
+        bestTwinRank: bestTwinRank(id, lists),
+        lastBoughtAt: lastBought.get(id) ?? null,
+        followed: followed.get(id) ?? null,
+      }),
+    ];
   });
   return { basis, rows, twinsUsed: data.twinLists.length };
 }
 
 /** The board a mode draws on, as twins scored by it. Lately twins without a lately score are out. */
-async function boardFor(db: DigheadDb, mode: ForYouMode): Promise<Twin[]> {
+async function boardFor(db: DigheadDb, mode: RankedForYouMode): Promise<Twin[]> {
   if (mode === 'all') return getTwins(db);
   return (await getLatelyTwins(db)).flatMap((twin) =>
     twin.lately === null ? [] : [{ fanId: twin.fanId, score: twin.lately }],
@@ -166,24 +180,4 @@ async function scoreTop(
     ranked = rankForYou([...ranked, ...adjusted], RANKED);
   }
   return { ranked, items };
-}
-
-function toRow(
-  matchKey: ItemKey,
-  item: ItemRecord,
-  twins: number,
-  lastBoughtAt: number | null,
-  followed: string | null,
-): ForYouRow {
-  return {
-    matchKey,
-    title: item.title,
-    artist: item.artist,
-    label: item.label,
-    url: item.url,
-    coverUrl: item.artId === null ? null : artUrl(item.artId),
-    twins,
-    lastBoughtAt,
-    followed,
-  };
 }
