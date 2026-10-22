@@ -7,7 +7,7 @@ const BANDCAMP_MATCHES = ['https://bandcamp.com/*', 'https://*.bandcamp.com/*'];
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Dighead',
+  name: 'Dighead – Music discovery for Bandcamp',
   description: 'Purchase-based discovery for Bandcamp. Everything stays in your browser.',
   version: pkg.version,
   icons: {
