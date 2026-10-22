@@ -1,0 +1,15 @@
+.dh-info-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--dh-radius-sm);
+  background: none;
+  color: var(--dh-color-muted);
+  cursor: help;
+  vertical-align: middle;
+}
+
+.dh-info-hint:hover {
+  color: var(--dh-color-text);
+}

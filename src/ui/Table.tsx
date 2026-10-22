@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cx } from './cx';
+import { InfoHint } from './InfoHint';
 
 export interface TableColumn<Row, SortKey extends string = string> {
   key: string;
@@ -9,6 +10,10 @@ export interface TableColumn<Row, SortKey extends string = string> {
   numeric?: boolean;
   /** Makes the header a button that sorts by this key. */
   sortKey?: SortKey;
+  /** Explains the column in an ⓘ tooltip after its header. */
+  hint?: { label: string; content: ReactNode };
+  /** Takes the table's spare width; the other columns shrink to fit their content. */
+  grow?: boolean;
 }
 
 export interface TableProps<Row, SortKey extends string = string> {
@@ -41,7 +46,11 @@ export function Table<Row, SortKey extends string = string>({
               <th
                 key={column.key}
                 scope="col"
-                className={cx('dh-table__head', column.numeric && 'dh-table__cell--numeric')}
+                className={cx(
+                  'dh-table__head',
+                  column.numeric && 'dh-table__cell--numeric',
+                  column.grow && 'dh-table__head--grow',
+                )}
                 aria-sort={active ? 'descending' : undefined}
               >
                 {column.sortKey === undefined || !onSortChange ? (
@@ -57,6 +66,12 @@ export function Table<Row, SortKey extends string = string>({
                       ▾
                     </span>
                   </button>
+                )}
+                {column.hint && (
+                  <>
+                    {' '}
+                    <InfoHint label={column.hint.label}>{column.hint.content}</InfoHint>
+                  </>
                 )}
               </th>
             );

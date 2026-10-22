@@ -8,6 +8,7 @@ export { Cover } from './Cover';
 export { cx } from './cx';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
+export { InfoHint, type InfoHintProps } from './InfoHint';
 export { ExternalIcon, HideIcon, PauseIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { NumberField, type NumberFieldProps } from './NumberField';
