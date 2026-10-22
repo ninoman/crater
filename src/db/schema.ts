@@ -389,7 +389,7 @@ export class DigheadDb extends Dexie {
         bands: 'bandId, *hosts',
         ownership: '[fanId+itemKey], matchKey',
       })
-      .upgrade((tx) => slimToV12(tx.table('items'), tx.table('bands'), tx.table('ownership')));
+      .upgrade((tx) => slimToV12(tx.table('items'), tx.table('bands')));
   }
 }
 
@@ -413,14 +413,14 @@ export async function rebuildFanMatchLists(
 }
 
 /**
- * Rewrites rows in the v12 shape (decisions §19): each item as host and slug with defaults left
- * out, its band's hosts in `bands`, and ownership rows without `source: 'collection'`. The Dexie
- * upgrade runs it, and so does importing an older backup (migrateRows).
+ * Rewrites items in the v12 shape (decisions §19): host and slug with defaults left out, and
+ * each band's hosts in `bands`. The Dexie upgrade runs it, and so does importing an older backup
+ * (migrateRows). Ownership rows aren't rewritten: reads take a stored 'collection' as written,
+ * new rows leave it out, and rewriting 10⁶ rows made the upgrade take minutes.
  */
 export async function slimToV12(
   items: EntityTable<StoredItem, 'itemKey'>,
   bands: EntityTable<BandRecord, 'bandId'>,
-  ownership: Table<StoredOwnership, [number, ItemKey]>,
 ): Promise<void> {
   const known = new Map<number, BandRecord>();
   await items.toCollection().modify((row, ctx) => {
@@ -429,7 +429,4 @@ export async function slimToV12(
     ctx.value = stored;
   });
   await bands.bulkPut([...known.values()]);
-  await ownership.toCollection().modify((row) => {
-    if (row.source === 'collection') delete row.source;
-  });
 }

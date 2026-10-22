@@ -738,7 +738,7 @@ Each change lists what it saves, in JSON and on disk.
   - Fields left out when they hold their default: `albumKey`, `label`, `labelId`, `artId` and `supporterCount` when null, `compilation` when false, `tags` when empty. Empty tags were the 20 MB of `$types` in the JSON.
   - `fetchedAt` is no longer stored, since nothing reads it.
   - Reads restore the defaults.
-- **`ownership`: saves 28 MB of JSON and 100 MB on disk.**
+- **`ownership`: saves 28 MB of JSON and 100 MB on disk** (the `source` part only for rows written from v12 on).
   - Indexes become `[fanId+itemKey], matchKey`. Reads by fan become a range over the primary key.
   - `source` is left out when it's `'collection'`, and reads restore it.
   - `matchKey` is kept even when it equals `itemKey`. A row without it would drop out of the `matchKey` index, which Also bought and "twins who own this" depend on.
@@ -757,10 +757,11 @@ Each change lists what it saves, in JSON and on disk.
 
 ### Migration (schema v12)
 
-- **One step function, `slimToV12`**, used by both the Dexie upgrade and `migrateRows`, so an older backup is written as-is and then migrated, as now. It rewrites every item (slug and defaults), builds `bands`, and drops `source: 'collection'` from ownership rows. Dexie removes the three dropped indexes itself.
+- **One step function, `slimToV12`**, used by both the Dexie upgrade and `migrateRows`, so an older backup is written as-is and then migrated, as now. It rewrites every item (slug and defaults) and builds `bands`. Dexie removes the three dropped indexes itself. **Ownership rows aren't rewritten** (changed 2026-10-22, below): old rows keep `source: 'collection'`, which reads accept, and rows written from v12 on leave it out, so that part of the saving arrives as fans are re-scanned.
+- **The worker is kept alive while the database opens** (`keepAliveWhile` in `background/keepAlive.ts`), and during backup import and export. Chrome stops an MV3 worker ~30 s after its last extension event or API call, and IndexedDB work doesn't count, so the worker calls `chrome.runtime.getPlatformInfo()` every 20 s until the open finishes. Why: the first real upgrade (446 MB database, 2026-10-22) rewrote items and 1.3M ownership rows in one transaction, took minutes, and was cut off and rolled back on every wake-up, leaving the extension unable to open its database. The data was intact (an aborted upgrade rolls back), and the way back was a backup converted to the v12 shape offline, which imports without migrating. fake-indexeddb has no worker lifetime, so no test could have caught it. `keepAlive.test.ts` now checks the pinging itself.
 - **Reads accept both shapes.** A row without `source` is collection. An item with `url` and no `slug` is still read correctly, so the rows written before the migration step runs are never misread.
 - **The eval's fast path** (`loadBackup`, v7 and later) can't run `modify` over 10⁵ rows in fake-indexeddb. It runs the same pure per-item transform into an emptied `items` table instead, and leaves ownership rows as they are, which reads accept.
-- **Real-world cost:** a one-time rewrite of ~540k items and ~1.3M ownership rows inside the upgrade transaction. If the worker is killed partway through, the transaction is rolled back and the upgrade runs again on the next start.
+- **Real-world cost:** a one-time rewrite of ~540k items inside the upgrade transaction, with the worker kept alive. If it's killed anyway, the transaction rolls back and the upgrade runs again on the next start.
 
 ### Proving results stay identical
 

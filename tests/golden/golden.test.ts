@@ -42,15 +42,18 @@ const V11_STORES = {
 
 const golden = () => JSON.parse(readFileSync(GOLDEN, 'utf8'));
 
-/** Rows are in the v12 shape: no URLs or defaults on items, no 'collection' on ownership. */
+/** Items are in the v12 shape: no URLs or defaults, and their bands' hosts stored. */
 async function expectSlim(target: DigheadDb): Promise<void> {
   const items = await target.items.toArray();
   expect(items.length).toBeGreaterThan(0);
   expect(items.filter((item) => 'url' in item || 'fetchedAt' in item)).toEqual([]);
   expect(items.filter((item) => item.albumKey === null || item.tags?.length === 0)).toEqual([]);
   expect(await target.bands.count()).toBeGreaterThan(0);
-  expect(await target.ownership.filter((row) => row.source === 'collection').count()).toBe(0);
 }
+
+/** Ownership rows written by v12 leave out `source: 'collection'`; migrated ones keep it. */
+const collectionRows = (target: DigheadDb) =>
+  target.ownership.filter((row) => row.source === 'collection').count();
 const v11Backup = () => new Blob([readFileSync(V11_BACKUP)]);
 const outputsOf = async (target: DigheadDb) =>
   JSON.parse(JSON.stringify(await collectOutputs(target)));
@@ -71,6 +74,7 @@ it('every recommender answers as recorded', async () => {
   await db.open();
   await buildScenario(db);
   await expectSlim(db);
+  expect(await collectionRows(db)).toBe(0);
   const outputs = await outputsOf(db);
   if (process.env.UPDATE_GOLDEN || !existsSync(GOLDEN)) {
     writeFileSync(GOLDEN, `${JSON.stringify(outputs, null, 1)}\n`);
@@ -88,6 +92,7 @@ it('answers the same after Dexie upgrades a v11 database', async () => {
   await db.open();
   expect(db.verno).toBe(12);
   await expectSlim(db);
+  expect(await collectionRows(db)).toBeGreaterThan(0);
   expect(await outputsOf(db)).toEqual(golden());
 });
 

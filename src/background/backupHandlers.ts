@@ -9,6 +9,7 @@ import {
 } from '../shared/backupStaging';
 import type { MessageHandlers } from '../shared/messages';
 import { chromeImportStateStore } from './importState';
+import { keepAliveWhile } from './keepAlive';
 import { refreshTwins } from './recommend';
 import { resetScanDataAfterImport, whileScannerPausedForImport } from './scanner';
 
@@ -27,18 +28,17 @@ export const opfsSnapshot: SnapshotStore = {
 export function backupHandlers(db: DigheadDb): BackupHandlers {
   return {
     exportBackup: async () => {
-      const { file, summary } = await exportDatabase(db);
+      const { file, summary } = await keepAliveWhile(exportDatabase(db));
       await stageFile('export', file);
       return summary;
     },
     importBackup: async () => {
       try {
         return await whileScannerPausedForImport(async () => {
-          const summary = await importDatabase(
-            db,
-            await readStagedFile('import'),
-            opfsSnapshot,
-            (phase) => chromeImportStateStore.save({ phase, notice: null }),
+          const summary = await keepAliveWhile(
+            importDatabase(db, await readStagedFile('import'), opfsSnapshot, (phase) =>
+              chromeImportStateStore.save({ phase, notice: null }),
+            ),
           );
           await resetScanDataAfterImport();
           return summary;

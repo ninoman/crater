@@ -94,9 +94,7 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   if (fromVersion < 11) await db.items.toCollection().modify(flagCompilation);
   // v12 slimmed items and ownership rows (decisions §19).
   if (fromVersion < 12) {
-    await db.transaction('rw', [db.items, db.bands, db.ownership], () =>
-      slimToV12(db.items, db.bands, db.ownership),
-    );
+    await db.transaction('rw', [db.items, db.bands], () => slimToV12(db.items, db.bands));
   }
 }
 
