@@ -53,8 +53,10 @@ export interface TwinsResult {
 
 /** Where one fan stands among your twins, for the badge on their profile. */
 export interface TwinStanding {
-  /** Place on the leaderboard, 1 for your closest twin. */
-  rank: number;
+  /** Place on the all-time leaderboard, 1 for your closest twin. Null when only on the lately one. */
+  rank: number | null;
+  /** Place on the lately leaderboard. Null when only on the all-time one. */
+  latelyRank: number | null;
   /** Releases you both own. */
   overlap: number;
   /** Jaccard as a percentage (0 to 100). */

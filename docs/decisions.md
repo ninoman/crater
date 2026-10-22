@@ -436,6 +436,7 @@ Code: `src/scoring/lately.ts` (pure), lately parts of `src/scoring/twins.ts`, `s
 - **Trend:** the same score taken a year ago (`yearAgo`), with only purchases made by then, faded to then. `converging` above ×1.25 of it, `drifting` below 1/1.25, else `steady`; `new` when they had no score a year ago, `quiet` when they have none now. Shown as "↑ closer", "→ steady", "↓ apart", "new", "quiet" on both boards.
 - **This year** (`latelyOverlap`): shared releases you both bought within the last 365 days. It's also the bar for the Lately board: a fan needs a lately score **and** at least one such release. Old overlap alone still scores a sliver above 0, which would fill the bottom of the board with noise.
 - **A second table, `latelyTwins`,** holds the top 200 by lately score from the same recompute pass (one intersect per fan feeds both). The all-time `twins` table and everything that reads it (For you, Also bought's twin boost, twins who own this, profile badges) are unchanged; its rows just carry the lately fields too, for the trend column.
+- **Profile badge and following cards** show both places when a fan is on both boards ("your #4 twin (#2 lately)"), and "your #2 twin lately" when only the Lately board has them. `TwinStanding.rank` is null in that case.
 - **Limits:** fans are re-read every 30 days (§5), so a fan's last month of purchases may be missing; the 6-month half-life keeps that from mattering much. Bandcamp Friday sprees aren't capped.
 
 ## 12. Smarter supporter scanning
