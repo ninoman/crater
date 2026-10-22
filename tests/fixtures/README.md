@@ -26,6 +26,8 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `band-page.html` | `GET https://floatingpoints.bandcamp.com/music`, logged out (2026-10-20). `/` 303s to the latest album, so `/music` is the band's home page. `data-tralbum` there holds only a url (no item), `data-band` has `id` and `name`, and the name sits in `#band-name-location` | `parseBandId`, `hasTralbumItem`, `detectPageKind` |
 
 
+`fan-page.html`, `band-page.html`, `album-page.html` and `track-page.html` also test `findReleaseLinks` (page badges, decisions §15): the id-carrying cards, the skipped tracklist and links back to the page itself.
+
 ## Refreshing the public fixtures
 
 ```bash

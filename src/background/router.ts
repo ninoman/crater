@@ -5,6 +5,7 @@ import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
 import { fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
+import { getPageBadges } from './pageBadges';
 import {
   getAlsoBought,
   getForYou,
@@ -48,6 +49,7 @@ export const handlers: MessageHandlers = {
   getTwinStanding: ({ fanId }) => getTwinStanding(db, fanId),
   getTwinStandings: ({ fanIds }) => getTwinStandings(db, fanIds),
   getReleaseTwins: ({ itemKey }) => getReleaseTwins(itemKey),
+  getPageBadges: ({ links }) => getPageBadges(db, links),
   getForYou: ({ mode }) => getForYou(mode),
   getTwinsLatest: () => getTwinsLatest(),
   ...followingHandlers(db),

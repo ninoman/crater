@@ -1,6 +1,7 @@
 // Content script entry: detects the page type and mounts the matching UI.
 // Content scripts never fetch; all network goes through the service worker (decisions §5).
 
+import { mountPageBadges } from './badges/mountPageBadges';
 import { mountBand } from './band/mountBand';
 import { mountFan } from './fan/mountFan';
 import { detectPageKind } from './pageKind';
@@ -14,7 +15,8 @@ import { pageTheme } from './shared/pageTheme';
 
 reportPage();
 
-switch (detectPageKind(document)) {
+const kind = detectPageKind(document);
+switch (kind) {
   case 'release':
     mountShadow(
       document.body,
@@ -35,3 +37,7 @@ switch (detectPageKind(document)) {
   case 'other':
     break;
 }
+
+mountPageBadges(document, kind).catch((error: unknown) => {
+  console.warn('dighead: page badges failed to start', error);
+});

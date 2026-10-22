@@ -264,6 +264,23 @@ Design: [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ twi
 
 ---
 
+## Page badges (not MVP)
+
+**Goal:** see at a glance, anywhere on bandcamp.com, which linked releases you own, have wishlisted, or your top twins own ("owned", "wishlist", "6 twins"), without any extra Bandcamp requests.
+
+Design: decisions §15.
+
+1. [x] `bandcamp/pageLinks.ts`: release links and their ids from fan, band and release pages, else a normalised URL, with fixture tests.
+2. [x] Schema v10: an index on `items.url`, and `pageBadges` in `db/repo/`: owned, wishlisted and top-twin counts for a whole batch of links in one read.
+3. [x] `getPageBadges` on the message bus.
+4. [x] Content script: one batched lookup per page, a debounced `MutationObserver` for pages that grow, one badge per release per card, rendered through one React root into small shadow roots.
+5. [x] Setting, off by default: *Pages* → "Badges next to release links" in the popup.
+6. [ ] Try it on live pages: Discover, the feed, a fan's collection, a band page and a release page's recommendations.
+
+**Done when:** with the setting on, a fan page and Discover show "owned" on your releases and "N twins" on releases your twins own, with one worker message per batch of links and no Bandcamp requests.
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".
@@ -289,7 +306,6 @@ Also added: full database export and import on the popup's Settings tab (backup,
 
 ## Post-MVP backlog (roughly by value)
 
-- Page badges ("6 twins" / "owned") next to release links anywhere on bandcamp.com, behind a setting
 - Export picks as CSV or M3U-style text for DJ library tools
 - Followers / following as an extra signal. The following sync from *Following tags* would provide its data.
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)

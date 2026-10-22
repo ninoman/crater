@@ -25,6 +25,8 @@ export interface Settings {
   latelyRescanDays: number;
   /** Queue your own releases' supporters after each sync of your collection (decisions §5). */
   seedFromCollection: boolean;
+  /** "owned" / "wishlist" / "3 twins" next to release links on Bandcamp pages (decisions §15). */
+  pageBadges: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -43,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   latelyRescanTwins: 25,
   latelyRescanDays: 7,
   seedFromCollection: true,
+  pageBadges: false,
 };
 
 export type NumericSetting = {

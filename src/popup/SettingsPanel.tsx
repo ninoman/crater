@@ -49,6 +49,11 @@ const GROUPS: Group[] = [
       { key: 'latelyRescanDays', label: 'Every (days)' },
     ],
   },
+  {
+    title: 'Pages',
+    fields: [],
+    toggles: [{ key: 'pageBadges', label: 'Badges next to release links (owned, twins)' }],
+  },
 ];
 
 type ReadyView = Extract<ReturnType<typeof useSettings>['view'], { state: 'ready' }>;

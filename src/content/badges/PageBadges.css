@@ -1,0 +1,10 @@
+/* A badge sits inline right after its link, like a word of the page. */
+:host {
+  display: inline;
+}
+
+.dh-root {
+  display: inline;
+  margin-left: var(--dh-space-1);
+  vertical-align: baseline;
+}

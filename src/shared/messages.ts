@@ -17,6 +17,7 @@ import type {
   TagMode,
   TagResult,
 } from './following';
+import type { PageBadge, ReleaseRef } from './pageBadges';
 import type { ReleaseTwinsResult } from './releaseTwins';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
@@ -66,6 +67,8 @@ export interface MessageMap {
     request: { fanIds: number[] };
     response: Record<number, TwinStanding>;
   };
+  /** Badges for a page's release links, one per link in order; null for an unknown release. */
+  getPageBadges: { request: { links: ReleaseRef[] }; response: (PageBadge | null)[] };
   /** Your taste twins who own a release, for the sidebar's "Twins who own this" tab. */
   getReleaseTwins: { request: { itemKey: ItemKey }; response: ReleaseTwinsResult };
   /** Your tags, by name. */

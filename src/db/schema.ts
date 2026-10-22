@@ -318,6 +318,8 @@ export class DigheadDb extends Dexie {
       .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(upgradeJobToV8));
     // v9: your tags on wishlist items (decisions §14). A new table, so nothing to migrate.
     this.version(9).stores({ itemTags: 'itemKey, *tagIds' });
+    // v10: items by url, so page badges find a release from a link (decisions §15). Index only.
+    this.version(10).stores({ items: 'itemKey, bandId, albumKey, labelId, url' });
   }
 }
 

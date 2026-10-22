@@ -9,6 +9,7 @@ export * from './items';
 export * from './matchIndex';
 export * from './me';
 export * from './ownership';
+export * from './pageBadges';
 export * from './queue';
 export * from './releaseSupporters';
 export * from './supporterRank';
