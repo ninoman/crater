@@ -14,8 +14,10 @@ import {
 import {
   filterTwins,
   formatMatch,
-  formatScore,
+  formatRelativeScore,
+  type ScoreKey,
   sortTwins,
+  topScore,
   TREND_LABELS,
   type TwinBoard,
   type TwinSort,
@@ -27,6 +29,7 @@ const RANK: Column = { key: 'rank', header: '#', numeric: true, cell: (row) => r
 const FAN: Column = {
   key: 'fan',
   header: 'fan',
+  grow: true,
   cell: (row) => (
     <Identity
       avatarUrl={row.avatarUrl}
@@ -41,6 +44,11 @@ const OVERLAP: Column = {
   header: 'in common',
   numeric: true,
   sortKey: 'overlap',
+  hint: {
+    label: 'How in common is counted',
+    content:
+      'Releases you both own. An album counts against one of its tracks, and several shared tracks of one album count once; two different tracks of one album don’t count. So this can differ from Bandcamp’s own “in common”.',
+  },
   cell: (row) => row.overlap,
 };
 const TREND: Column = {
@@ -57,50 +65,55 @@ const TREND: Column = {
   },
 };
 
-const COLUMNS: Record<TwinBoard, Column[]> = {
-  all: [
-    RANK,
-    FAN,
-    OVERLAP,
-    {
-      key: 'jaccard',
-      header: 'match',
-      numeric: true,
-      sortKey: 'jaccard',
-      cell: (row) => formatMatch(row.jaccard),
-    },
-    {
-      key: 'score',
-      header: 'score',
-      numeric: true,
-      sortKey: 'score',
-      cell: (row) => formatScore(row.score),
-    },
-    TREND,
-  ],
-  lately: [
-    RANK,
-    FAN,
-    {
-      key: 'latelyOverlap',
-      header: 'this year',
-      numeric: true,
-      sortKey: 'latelyOverlap',
-      cell: (row) => row.latelyOverlap,
-    },
-    OVERLAP,
-    {
-      key: 'lately',
-      header: 'score',
-      numeric: true,
-      sortKey: 'lately',
-      cell: (row) => formatScore(row.lately ?? 0),
-    },
-    TREND,
-  ],
+const MATCH: Column = {
+  key: 'jaccard',
+  header: 'match',
+  numeric: true,
+  sortKey: 'jaccard',
+  cell: (row) => formatMatch(row.jaccard),
+};
+const THIS_YEAR: Column = {
+  key: 'latelyOverlap',
+  header: 'this year',
+  numeric: true,
+  sortKey: 'latelyOverlap',
+  cell: (row) => row.latelyOverlap,
 };
 
-const DEFAULT_SORT: Record<TwinBoard, TwinSort> = { all: 'score', lately: 'lately' };
+const SCORE_HINTS: Record<ScoreKey, Column['hint']> = {
+  score: {
+    label: 'How score works',
+    content:
+      'Every release you both own adds to it, rare ones more than popular ones. The total is divided by √(your collection size × theirs), so a big collection doesn’t win on size alone. A label cluster counts 0.3×. Shown out of 100, your closest twin.',
+  },
+  lately: {
+    label: 'How lately score works',
+    content:
+      'The all-time score, with every purchase fading as it ages, so recent buying counts most. A release you both bought within two months of each other counts up to 1.5×. Shown out of 100, your closest twin lately.',
+  },
+};
+
+/** Scores show against the board's best twin, so the column needs that board's top. */
+function scoreColumn(key: ScoreKey, top: number): Column {
+  return {
+    key,
+    header: 'score',
+    numeric: true,
+    sortKey: key,
+    hint: SCORE_HINTS[key],
+    cell: (row) => formatRelativeScore(row[key] ?? 0, top),
+  };
+}
+
+function columnsFor(board: TwinBoard, top: number): Column[] {
+  return board === 'all'
+    ? [RANK, FAN, OVERLAP, MATCH, scoreColumn('score', top), TREND]
+    : [RANK, FAN, THIS_YEAR, OVERLAP, scoreColumn('lately', top), TREND];
+}
+
+const SCORE_KEY: Record<TwinBoard, ScoreKey> = { all: 'score', lately: 'lately' };
+
+const DEFAULT_SORT: Record<TwinBoard, TwinSort> = SCORE_KEY;
 
 const BOARDS = [
   { value: 'all', label: 'All time' },
@@ -116,6 +129,11 @@ export function TwinsBoard({ result, now }: { result: TwinsResult; now: number }
   const rows = useMemo(
     () => sortTwins(filterTwins(boardRows, query), sortedBy),
     [boardRows, query, sortedBy],
+  );
+  // Against the whole board, not the filtered rows, so a score doesn't change as you type.
+  const columns = useMemo(
+    () => columnsFor(board, topScore(boardRows, SCORE_KEY[board])),
+    [board, boardRows],
   );
   const flagged = boardRows.some((row) => row.labelCluster);
 
@@ -145,7 +163,7 @@ export function TwinsBoard({ result, now }: { result: TwinsResult; now: number }
       {rows.length > 0 ? (
         <Table
           label={board === 'all' ? 'Taste twins' : 'Taste twins lately'}
-          columns={COLUMNS[board]}
+          columns={columns}
           rows={rows}
           rowKey={(row) => row.fanId}
           sortedBy={sortedBy}

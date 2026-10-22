@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TwinRow } from '../../../shared/twins';
-import { filterTwins, formatMatch, formatScore, sortTwins } from './twinsView';
+import { filterTwins, formatMatch, formatRelativeScore, sortTwins, topScore } from './twinsView';
 
 function row(rank: number, overrides: Partial<TwinRow> = {}): TwinRow {
   return {
@@ -78,8 +78,18 @@ describe('formats', () => {
     expect(formatMatch(1)).toBe('100%');
   });
 
-  it('shows scores with two significant digits', () => {
-    expect(formatScore(0.08345)).toBe('0.083');
-    expect(formatScore(0)).toBe('0');
+  it('shows scores out of 100 for the top twin', () => {
+    expect(formatRelativeScore(0.021, 0.021)).toBe('100');
+    expect(formatRelativeScore(0.019, 0.021)).toBe('90');
+    expect(formatRelativeScore(0.0001, 0.021)).toBe('<1');
+    expect(formatRelativeScore(0, 0.021)).toBe('0');
+    expect(formatRelativeScore(0, 0)).toBe('0');
+  });
+
+  it('takes the top score per board, a missing lately score as 0', () => {
+    const rows = [row(1, { score: 0.02, lately: null }), row(2, { score: 0.03, lately: 0.01 })];
+    expect(topScore(rows, 'score')).toBe(0.03);
+    expect(topScore(rows, 'lately')).toBe(0.01);
+    expect(topScore([], 'score')).toBe(0);
   });
 });
