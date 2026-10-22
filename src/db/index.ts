@@ -1,9 +1,11 @@
 import { DigheadDb } from './schema';
 
 export * from './backup';
+export * from './gzip';
 export * from './mappers';
 export * from './matchIndex';
 export * from './repo';
+export * from './storage';
 export * from './tagBackup';
 export * from './tagFilter';
 export type * from './schema';

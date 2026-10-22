@@ -2,10 +2,14 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { memorySnapshot } from '../../tests/memorySnapshot';
 import { exportDatabase, importDatabase } from './backup';
-import { clearAllData } from './repo';
+import { readBackup } from './gzip';
+import { clearAllData, getItemList } from './repo';
 import { DigheadDb } from './schema';
 
 const noPhase = async () => {};
+
+/** An exported backup's JSON, unzipped. */
+const jsonText = async (file: Blob) => (await readBackup(file)).text();
 
 let db: DigheadDb;
 
@@ -125,7 +129,7 @@ describe('older backups', () => {
       addedAt: null,
     });
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 5;
     for (const table of json.data.data) {
       if (table.tableName !== 'fanMatches') continue;
@@ -157,7 +161,7 @@ describe('older backups', () => {
       addedAt: 400,
     });
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 6;
     json.data.tables = json.data.tables.filter((t: { name: string }) => t.name !== 'latelyTwins');
     json.data.data = json.data.data.filter(
@@ -184,7 +188,7 @@ describe('older backups', () => {
   it('imports a v7 file, ranking its jobs and staging fan cursors', async () => {
     await seed(db);
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 7;
     for (const table of json.data.data) {
       if (table.tableName !== 'queue') continue;
@@ -214,7 +218,7 @@ describe('older backups', () => {
       { ...record, itemKey: 'a2', title: 'LP', artist: 'Someone' },
     ]);
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 9;
     for (const table of json.data.data) {
       if (table.tableName !== 'items') continue;
@@ -224,7 +228,8 @@ describe('older backups', () => {
 
     await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
 
-    expect((await db.items.toArray()).map((i) => [i.itemKey, i.compilation])).toEqual([
+    const items = await getItemList(db, ['a1', 'a2']);
+    expect(items.map((i) => [i?.itemKey, i?.compilation])).toEqual([
       ['a1', true],
       ['a2', false],
     ]);
@@ -236,7 +241,7 @@ describe('refused files', () => {
     await seed(db);
     const before = await snapshot(db);
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = db.verno + 1;
 
     await expect(
@@ -248,7 +253,7 @@ describe('refused files', () => {
   it('refuses a backup older than any build that made backups', async () => {
     await seed(db);
     const { file } = await exportDatabase(db);
-    const json = JSON.parse(await file.text());
+    const json = JSON.parse(await jsonText(file));
     json.data.databaseVersion = 4;
 
     await expect(
@@ -260,7 +265,7 @@ describe('refused files', () => {
     await seed(db);
     const before = await snapshot(db);
     const { file } = await exportDatabase(db);
-    const text = await file.text();
+    const text = await jsonText(file);
 
     await expect(
       importDatabase(
@@ -307,7 +312,7 @@ describe('all or nothing', () => {
       status: 'queued',
       lastSeenAt: 1,
     });
-    const text = (await (await exportDatabase(other)).file.text()).replace('"dup2"', '"dup"');
+    const text = (await jsonText((await exportDatabase(other)).file)).replace('"dup2"', '"dup"');
     other.close();
     await other.delete();
     return new Blob([text]);

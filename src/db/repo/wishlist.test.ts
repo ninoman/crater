@@ -40,7 +40,7 @@ beforeEach(async () => {
   await db.open();
   const wished = [item('a1', 100), item('a2', 300), item('t3', null)];
   const owned = [item('a4', 200)];
-  await upsertCollectionItems(db, [...wished, ...owned], 0);
+  await upsertCollectionItems(db, [...wished, ...owned]);
   await putOwnership(db, ME, wished, 'wishlist');
   await putOwnership(db, ME, owned, 'collection');
 });
@@ -104,7 +104,7 @@ describe('item tags and the rest', () => {
   it('survive the item being saved again by a sync', async () => {
     const dub = await tagId('dub');
     await assignItemTag(db, dub, ['a1'], 'add');
-    await upsertCollectionItems(db, [item('a1', 100)], 1);
+    await upsertCollectionItems(db, [item('a1', 100)]);
     await putOwnership(db, ME, [item('a1', 100)], 'wishlist');
 
     expect(await getItemTags(db, ME, 'a1')).toEqual([dub]);

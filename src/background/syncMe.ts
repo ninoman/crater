@@ -69,7 +69,7 @@ async function syncList(
       if (mode === 'incremental' && keys.length > 0 && keys.every((key) => known.has(key))) {
         return fetched;
       }
-      await upsertCollectionItems(db, page.items, deps.now());
+      await upsertCollectionItems(db, page.items);
       await putOwnership(db, fanId, page.items, list);
       for (const key of keys) seen.add(key);
       fetched += page.items.length;

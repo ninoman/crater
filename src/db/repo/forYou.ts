@@ -2,6 +2,7 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { DigheadDb, OwnershipRecord } from '../schema';
+import { fanRows } from './fanRows';
 import { hiddenMatchKeys } from './hidden';
 
 export interface ForYouData {
@@ -20,7 +21,7 @@ export async function gatherForYou(
   return db.transaction('r', [db.fanMatches, db.ownership, db.hidden], async () => {
     const [lists, mine, hidden] = await Promise.all([
       db.fanMatches.bulkGet([...twinFanIds]),
-      db.ownership.where('fanId').equals(meFanId).toArray(),
+      fanRows(db, meFanId),
       hiddenMatchKeys(db),
     ]);
     const twinLists = lists.flatMap((record) =>

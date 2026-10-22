@@ -1,8 +1,10 @@
 // Reads what the twins scorer needs, as plain data, and stores the leaderboard it produces.
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanMatchesRecord, ItemRecord, TwinRecord } from '../schema';
+import type { DigheadDb, FanMatchesRecord, ItemFields, TwinRecord } from '../schema';
 import { collectionFullyRead } from './fans';
+import { fanRows } from './fanRows';
+import { getItemFields, itemFieldsWhere } from './items';
 
 /** What rarity weighs a release by: Bandcamp's counts (album first) and the owners we've seen. */
 export interface SupporterCounts {
@@ -32,7 +34,7 @@ export interface TwinCandidate extends MatchLists {
 }
 
 /** label_id when collection pages gave one, else the selling account (decisions §3.3). */
-function labelKey(item: ItemRecord): number {
+function labelKey(item: ItemFields): number {
   return item.labelId ?? item.bandId;
 }
 
@@ -44,17 +46,14 @@ const NO_LISTS: MatchLists = {
   matchTimes: EMPTY,
 };
 
-function matchId(item: ItemRecord): number {
+function matchId(item: ItemFields): number {
   return keyToNumber(item.albumKey ?? item.itemKey);
 }
 
 /** Your side of the comparison. Empty when you have no synced collection. */
 export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<TwinBasis> {
   return db.transaction('r', [db.ownership, db.fanMatches, db.matchOwners, db.items], async () => {
-    const [list, rows] = await Promise.all([
-      db.fanMatches.get(meFanId),
-      db.ownership.where('fanId').equals(meFanId).toArray(),
-    ]);
+    const [list, rows] = await Promise.all([db.fanMatches.get(meFanId), fanRows(db, meFanId)]);
     const lists = list ?? NO_LISTS;
     const owned = rows.filter((row) => row.source === 'collection');
     const albumOfTrack = new Map<number, number>();
@@ -65,10 +64,10 @@ export async function gatherTwinBasis(db: DigheadDb, meFanId: number): Promise<T
     }
     const keys = [...new Set(owned.flatMap((row) => [row.matchKey, row.itemKey]))];
     const [items, owners] = await Promise.all([
-      db.items.bulkGet(keys),
+      getItemFields(db, keys),
       db.matchOwners.bulkGet([...lists.matchIds]),
     ]);
-    const byKey = new Map<ItemKey, ItemRecord>();
+    const byKey = new Map<ItemKey, ItemFields>();
     for (const item of items) if (item) byKey.set(item.itemKey, item);
 
     const counts = new Map<number, SupporterCounts>();
@@ -108,8 +107,8 @@ async function labelCatalogs(db: DigheadDb, labels: Set<number>) {
   await Promise.all(
     [...labels].map(async (label) => {
       const [byLabel, byBand] = await Promise.all([
-        db.items.where('labelId').equals(label).toArray(),
-        db.items.where('bandId').equals(label).toArray(),
+        itemFieldsWhere(db, 'labelId', [label]),
+        itemFieldsWhere(db, 'bandId', [label]),
       ]);
       const catalog = new Set<number>();
       for (const item of [...byLabel, ...byBand]) {

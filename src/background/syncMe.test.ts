@@ -162,7 +162,7 @@ describe('syncMe', () => {
       'full',
     );
 
-    expect((await db.ownership.get([FAN, 'a10']))?.source).toBe('collection');
+    expect(await ownedItemKeys(db, FAN, 'collection')).toContain('a10');
     expect(added).toEqual(['a10']);
   });
 

@@ -5172,17 +5172,14 @@
     "bandId": 10,
     "url": "https://band10.bandcamp.com/album/release-0",
     "artId": null,
-    "purchaseKind": "album",
-    "label": "Label Fifty",
-    "labelId": 50,
-    "otherOwners": null,
-    "addedAt": null,
-    "compilation": false,
     "tags": [
      "dub",
      "techno"
     ],
-    "supporterCount": null
+    "compilation": false,
+    "supporterCount": null,
+    "label": "Label Fifty",
+    "labelId": 50
    }
   ],
   [
@@ -6574,14 +6571,11 @@
     "bandId": 10,
     "url": "https://band10.bandcamp.com/track/song-20001",
     "artId": 27001,
-    "purchaseKind": "track",
-    "label": null,
-    "labelId": null,
-    "otherOwners": 23,
-    "addedAt": null,
-    "compilation": false,
     "tags": [],
-    "supporterCount": 24
+    "compilation": false,
+    "supporterCount": 24,
+    "label": null,
+    "labelId": null
    }
   ],
   [
@@ -8109,17 +8103,14 @@
     "bandId": 10,
     "url": "https://band10.bandcamp.com/album/release-0",
     "artId": null,
-    "purchaseKind": "album",
-    "label": "Label Fifty",
-    "labelId": 50,
-    "otherOwners": null,
-    "addedAt": null,
-    "compilation": false,
     "tags": [
      "dub",
      "techno"
     ],
-    "supporterCount": null
+    "compilation": false,
+    "supporterCount": null,
+    "label": "Label Fifty",
+    "labelId": 50
    }
   ],
   [

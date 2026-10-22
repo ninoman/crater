@@ -1,6 +1,9 @@
 import type { CollectionItem, ItemKey, ReleaseInfo, Supporter } from '../../bandcamp';
 import { ownershipFromCollection, ownershipFromSupporter } from '../mappers';
 import type { DigheadDb, OwnershipRecord } from '../schema';
+import { readOwnership, storeOwnership } from '../storage';
+import { getItemFields } from './items';
+import { byFan, fanRows } from './fanRows';
 import { refreshFanMatches } from './matchIndex';
 
 type Source = OwnershipRecord['source'];
@@ -17,7 +20,9 @@ export async function putOwnership(
   source: Source,
 ): Promise<void> {
   await writeOwnership(db, async () => {
-    await db.ownership.bulkPut(items.map((item) => ownershipFromCollection(fanId, item, source)));
+    await db.ownership.bulkPut(
+      items.map((item) => storeOwnership(ownershipFromCollection(fanId, item, source))),
+    );
     await refreshFanMatches(db, [fanId]);
   });
 }
@@ -28,12 +33,14 @@ export async function putOwnership(
  */
 export async function collectorsOf(db: DigheadDb, releaseKey: ItemKey): Promise<Set<number>> {
   return db.transaction('r', [db.items, db.ownership], async () => {
-    const release = await db.items.get(releaseKey);
+    const [release] = await getItemFields(db, [releaseKey]);
     const rows = await db.ownership
       .where('matchKey')
       .equals(release?.albumKey ?? releaseKey)
       .toArray();
-    return new Set(rows.filter((row) => row.source === 'collection').map((row) => row.fanId));
+    return new Set(
+      rows.map(readOwnership).flatMap((row) => (row.source === 'collection' ? [row.fanId] : [])),
+    );
   });
 }
 
@@ -43,21 +50,19 @@ export async function ownedItemKeys(
   fanId: number,
   source: Source,
 ): Promise<Set<ItemKey>> {
-  const rows = await db.ownership.where('fanId').equals(fanId).toArray();
+  const rows = await fanRows(db, fanId);
   return new Set(rows.filter((row) => row.source === source).map((row) => row.itemKey));
 }
 
 /** A fan's collection rows (not the wishlist). */
 export async function collectionRows(db: DigheadDb, fanId: number): Promise<OwnershipRecord[]> {
-  const rows = await db.ownership.where('fanId').equals(fanId).toArray();
+  const rows = await fanRows(db, fanId);
   return rows.filter((row) => row.source === 'collection');
 }
 
 export async function countOwnership(db: DigheadDb, fanId: number, source: Source) {
-  return db.ownership
-    .where('fanId')
-    .equals(fanId)
-    .filter((row) => row.source === source)
+  return byFan(db, fanId)
+    .filter((row) => readOwnership(row).source === source)
     .count();
 }
 
@@ -69,10 +74,8 @@ export async function removeOwnershipExcept(
   keep: ReadonlySet<ItemKey>,
 ): Promise<void> {
   await writeOwnership(db, async () => {
-    const stale = await db.ownership
-      .where('fanId')
-      .equals(fanId)
-      .filter((row) => row.source === source && !keep.has(row.itemKey))
+    const stale = await byFan(db, fanId)
+      .filter((row) => readOwnership(row).source === source && !keep.has(row.itemKey))
       .primaryKeys();
     await db.ownership.bulkDelete(stale);
     await refreshFanMatches(db, [fanId]);
@@ -92,7 +95,9 @@ export async function addSupporterOwnership(
     const keys = supporters.map((s): [number, ItemKey] => [s.fanId, release.itemKey]);
     const existing = await db.ownership.bulkGet(keys);
     const missing = supporters.filter((_, i) => existing[i] === undefined);
-    await db.ownership.bulkPut(missing.map((s) => ownershipFromSupporter(release, s)));
+    await db.ownership.bulkPut(
+      missing.map((s) => storeOwnership(ownershipFromSupporter(release, s))),
+    );
     await refreshFanMatches(
       db,
       missing.map((s) => s.fanId),

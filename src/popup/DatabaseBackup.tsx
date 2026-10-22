@@ -39,7 +39,7 @@ export function DatabaseBackup() {
       <input
         ref={input}
         type="file"
-        accept="application/json,.json"
+        accept="application/json,application/gzip,.json,.gz"
         hidden
         onChange={(event) => {
           const file = event.target.files?.[0];

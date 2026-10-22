@@ -418,7 +418,7 @@ Code: `src/db/backup.ts`, `src/shared/backupFile.ts`, `src/shared/backupStaging.
 - **All or nothing by snapshot, not one transaction:** the library only keeps an IndexedDB transaction open across file reads with `FileReaderSync`, which service workers don't have (so `db/backup.ts` also shims `FileReader` with `Blob.arrayBuffer()`). Import therefore runs: read-through (above), then export the current data to `backup-snapshot.json` in OPFS, then clear and write, and on any failure write the snapshot back and delete it. If the snapshot can't be saved (disk full), nothing was touched. If the restore itself fails, the snapshot is kept and the error says the old data couldn't be restored automatically. Chosen over an offscreen document with a dedicated worker, which would add a manifest permission, a second runtime and a Blob-less handoff, for the same guarantee.
 - **Disk cost:** at the ~4 GB heavy-user size an import briefly holds the staged file, the snapshot and the new database: roughly 3x the database size free, on top of what the old data uses. Short of that, the snapshot step fails cleanly.
 - **Scanner pause:** import sets `importing` in the scanner state (reason `import` in `pauseFor`, so your own `paused` flag is never touched), waits for the loop's lock to be released so the request in flight finishes, and for your own sync to settle, then lifts it afterwards however the import ended. The scheduler re-checks the pause after its pace wait. A sync that starts during the import isn't blocked.
-- **Handing the file over:** runtime messages are JSON, so a Blob can't travel in one. The popup and worker share the origin-private file system: export stages `backup-export.json` and the popup saves it through a blob URL; import stages `backup-import.json` from the chosen file and the worker reads it. Both are deleted afterwards.
+- **Handing the file over:** runtime messages are JSON, so a Blob can't travel in one. The popup and worker share the origin-private file system: export stages `backup-export.json` and the popup saves it through a blob URL; import stages `backup-import.json` from the chosen file and the worker reads it. Both are deleted afterwards. Since §19 the exported file (and the snapshot) is gzipped; the staged names keep `.json`, since reading sniffs the content, not the name.
 - **What's replaced:** every table, `me` included, exactly as exported. Settings, pause and today's budget stay. After an import the watched-release list and scanner errors are cleared and twins are recomputed.
 - **Crash recovery:** the import records its phase in `chrome.storage.local` (`import` key): `snapshotting` → `writing` → `cleanup` → cleared. On worker start, before the scanner or any sync runs (the import flag a dead worker left behind holds them off), `recoverInterruptedImport` acts on it: `writing` restores the snapshot and deletes it; `snapshotting` deletes the partial snapshot (old data was never touched); `cleanup` deletes the snapshot (the import had succeeded). No phase but a snapshot present, which is a restore that failed earlier, is only reported, so startup can't loop on it. A failed restore keeps the snapshot. Every branch lifts the import flag, and the outcome shows once in the popup's Full backup row until dismissed.
 - **Sync during an import:** `runSync` returns at once while the import flag is set. Skipped, not queued: every trigger (startup, page view, purchase page, Re-sync) goes through `startSync`, and the next one syncs as usual.
@@ -570,7 +570,7 @@ A quiet pill after release links anywhere on bandcamp.com: **owned**, **wishlist
 ### Lookup
 
 - **One message per batch:** `getPageBadges { links: { url, itemKey }[] }` answers one badge (or null) per link, in order. The content script collects links, de-dupes them, and sends them together; there's never a request per link, and **no Bandcamp request at all**: only the local DB is read.
-- **URL → item** is an index read: schema v10 adds an index on `items.url` (no data change, so no upgrade or backup migration). An unknown URL answers null.
+- **URL → item** was an index read on `items.url` (schema v10). Since v12 (§19) a link's host finds its bands and their items are read by `bandId`, with the same answers. An unknown URL answers null.
 - **owned:** your collection has the exact item or its album, or, for an album link, any track of it (§3.8: a track bought means the album counts as yours).
 - **wishlist:** the exact item or its album is in your wishlist, and you don't own it.
 - **N twins:** how many of your top `topTwinsK` twins (the For you set, §7) own it by matchKey, so a twin owning a track of an album counts for the album, as in For you. Read from their `fanMatches` lists with a binary search, so a batch costs K record reads, not a query per link.
@@ -687,7 +687,7 @@ Researched 2026-10-21 ([docs/research/deep-cuts.md](research/deep-cuts.md)); sco
 
 ## 19. Slimmer database, gzipped backups
 
-Decided 2026-10-22.
+Decided and built 2026-10-22. Code: `src/db/storage.ts` (row shapes, pure), `src/db/gzip.ts`, `slimToV12` in `src/db/schema.ts`, `src/db/repo/items.ts` and `fanRows.ts`, `tests/golden/`.
 
 ### Measured
 
@@ -775,4 +775,22 @@ Each change lists what it saves, in JSON and on disk.
 
   It also saves that database as a v11 backup fixture.
 - **Three routes must reproduce the golden file exactly:** the same writes on the new code, the v11 fixture upgraded by Dexie, and the v11 fixture imported through `migrateRows`.
-- **Perf:** `pnpm perf` before and after. Before: Also bought median 59 ms and Deep cuts 127 ms, both against 200 ms budgets. Checks for a For you score and a twins recompute are added on the existing perf seed.
+- **Perf:** `pnpm perf` medians, before and after, on the same seeds:
+
+  | Check | Budget | Before | After |
+  | --- | --- | --- | --- |
+  | Also bought re-score | 200 ms | 59 ms | 61 ms |
+  | Deep cuts | 200 ms | 132 ms | 132 ms |
+  | For you, All (new check) | 200 ms | 107 ms | 107 ms |
+  | Twins recompute, 200 full collections (new check) | 2 s | 513 ms | 482 ms |
+
+  The before figures for the two new checks come from running them on the code before the change.
+
+### As built
+
+- **URLs are rebuilt only where they're shown.** Rebuilding a URL means reading the item's band, and doing that for every scoring chunk made For you and Deep cuts ~50% slower. So there are two kinds of read:
+  - Readers that never show a URL get `ItemFields` (an `ItemRecord` without `url`) and touch no bands: twins, pass 0, the follow boost, Also bought's release and seller items, and the scoring chunks of For you and Deep cuts (`getShownFields`).
+  - `getDisplayItems` reads the bands for the rows actually shown. It picks the same record as `getShownFields`.
+- **Single-value index reads use `equals`, not `anyOf`.** fake-indexeddb scans the whole index for `anyOf`, which made the twins recompute's label catalogs ten times slower.
+- **`ItemRecord` lost `fetchedAt`**, and the item writers lost their `now` argument.
+- **Results:** all three routes (fresh writes, Dexie upgrade, backup import) and a gzipped export and import reproduce the golden outputs exactly. The real backup in the v12 shape is 275 MB of JSON and **77.6 MB gzipped**, down from 377 MB. Gzipping the old JSON alone would give 87 MB, so most of the file-size win comes from gzip. The slimming pays off on disk instead: ~494 → ~332 MB in the headless-Chrome measurement above.

@@ -55,7 +55,7 @@ export async function latestStep(
     fanId,
     page.items.map((item) => item.itemKey),
   );
-  await upsertCollectionItems(db, page.items, now);
+  await upsertCollectionItems(db, page.items);
   await putOwnership(db, fanId, page.items, 'collection');
   const added = cursor.added + page.items.filter((item) => !known.has(item.itemKey)).length;
 

@@ -53,7 +53,7 @@ function item(
 }
 
 async function own(fanId: number, items: CollectionItem[], source: 'collection' | 'wishlist') {
-  await upsertCollectionItems(db, items, 0);
+  await upsertCollectionItems(db, items);
   await putOwnership(db, fanId, items, source);
 }
 
@@ -152,11 +152,7 @@ describe('computeForYou', () => {
 
   it('down-weights a compilation your twins own, unless told not to', async () => {
     await seed();
-    await upsertCollectionItems(
-      db,
-      [item('a3', { artist: 'Various Artists', compilation: true })],
-      0,
-    );
+    await upsertCollectionItems(db, [item('a3', { artist: 'Various Artists', compilation: true })]);
     const keys = async (input: ForYouInput) =>
       (await computeForYou(db, await me(), input)).rows.map((row) => row.matchKey);
 
@@ -193,7 +189,7 @@ describe('computeForYou', () => {
 
   it('names a followed label behind a track-only release, nudging without reordering', async () => {
     await seed();
-    await upsertCollectionItems(db, [item('t51', { otherOwners: 3, labelId: 9 }, 'a5')], 0);
+    await upsertCollectionItems(db, [item('t51', { otherOwners: 3, labelId: 9 }, 'a5')]);
     await putFollowing(db, [
       { kind: 'band', id: 9, name: 'Label', url: '', imageId: null, location: null, followedAt: 0 },
     ]);

@@ -2,7 +2,7 @@
 // fan scans, release pages, follows, a hidden release and a forgotten fan. Deterministic, so
 // every recommender's output can be compared before and after a storage change (decisions §19).
 
-import type { CollectionItem, ItemKey, Supporter } from '../../src/bandcamp';
+import type { CollectionItem, ItemKey, ReleasePageItem, Supporter } from '../../src/bandcamp';
 import { computeTwins } from '../../src/background/recommend/twins';
 import {
   addSupporterOwnership,
@@ -109,6 +109,12 @@ const dated = (item: CollectionItem, addedAt: number | null): CollectionItem => 
   addedAt,
 });
 
+/** What a release page says about an item seen in collections. */
+function pageItem(item: CollectionItem, tags: string[]): ReleasePageItem {
+  const { itemKey, albumKey, title, artist, bandId, url, artId } = item;
+  return { itemKey, albumKey, title, artist, bandId, url, artId, tags, compilation: false };
+}
+
 function supporter(fanId: number, purchasedAt: number | null): Supporter {
   return {
     fanId,
@@ -150,7 +156,7 @@ export async function buildScenario(db: DigheadDb): Promise<void> {
   const wish = [albumKey(40), albumKey(41), trackKey(26, 2), 't30001' as ItemKey].map((key, i) =>
     dated(get(key), NOW - i * DAY),
   );
-  await upsertCollectionItems(db, [...mine, ...wish], NOW);
+  await upsertCollectionItems(db, [...mine, ...wish]);
   await putOwnership(db, ME, wish, 'wishlist');
   await putOwnership(db, ME, mine, 'collection');
   await markSynced(db, NOW);
@@ -172,7 +178,7 @@ export async function buildScenario(db: DigheadDb): Promise<void> {
     }
     const seenAt = fanId === FORGOTTEN ? NOW - 400 * DAY : NOW;
     await upsertSupporterFans(db, [supporter(fanId, null)], seenAt);
-    await upsertCollectionItems(db, owned, seenAt);
+    await upsertCollectionItems(db, owned);
     await putOwnership(db, fanId, owned, 'collection');
     if (fanId === 137) continue; // still queued
     if (fanId === 138) await markQuickRead(db, fanId, owned.length, NOW);
@@ -182,27 +188,19 @@ export async function buildScenario(db: DigheadDb): Promise<void> {
   await forgetFansNotSeenSince(db, NOW - 180 * DAY, ME);
 
   // Release pages you opened: tags, a track page, and a release no collection has shown.
-  await upsertReleasePageItem(
-    db,
-    { ...get(albumKey(0)), tags: ['dub', 'techno'], compilation: false },
-    NOW,
-  );
-  await upsertReleasePageItem(db, { ...get(trackKey(0, 1)), tags: [], compilation: false }, NOW);
-  await upsertReleasePageItem(
-    db,
-    {
-      itemKey: 'a1085',
-      albumKey: null,
-      title: 'Page Only',
-      artist: 'Artist 15',
-      bandId: 15,
-      url: 'https://music.label15.com/album/page-only',
-      artId: 9999,
-      tags: ['ambient'],
-      compilation: false,
-    },
-    NOW,
-  );
+  await upsertReleasePageItem(db, pageItem(get(albumKey(0)), ['dub', 'techno']));
+  await upsertReleasePageItem(db, pageItem(get(trackKey(0, 1)), []));
+  await upsertReleasePageItem(db, {
+    itemKey: 'a1085',
+    albumKey: null,
+    title: 'Page Only',
+    artist: 'Artist 15',
+    bandId: 15,
+    url: 'https://music.label15.com/album/page-only',
+    artId: 9999,
+    tags: ['ambient'],
+    compilation: false,
+  });
 
   await putFollowing(db, [
     {

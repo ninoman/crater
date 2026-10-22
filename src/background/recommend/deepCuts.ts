@@ -5,9 +5,10 @@ import { keyFromNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherForYou,
   getDisplayItems,
+  getShownFields,
   getTwins,
   type DigheadDb,
-  type ItemRecord,
+  type ItemFields,
   type MeRecord,
 } from '../../db';
 import {
@@ -66,20 +67,24 @@ export async function computeDeepCuts(
     if (item) artists.set(scored.id, item.artist);
   }
   const lists = listsInRankOrder(twins, data);
-  const rows = diversify(ranked, artists)
-    .slice(0, FOR_YOU_LIMIT)
-    .flatMap((scored) => {
-      const matchKey = keyFromNumber(scored.id);
-      const item = items.get(matchKey);
-      if (!item) return [];
-      return [
-        toRow(matchKey, item, {
-          ...deepCutReason(scored, lists),
-          lastBoughtAt: null,
-          followed: null,
-        }),
-      ];
-    });
+  const picks = diversify(ranked, artists).slice(0, FOR_YOU_LIMIT);
+  // Only the rows shown need URLs, so only they look up their bands (decisions §19).
+  const display = await getDisplayItems(
+    db,
+    picks.map((scored) => keyFromNumber(scored.id)),
+  );
+  const rows = picks.flatMap((scored) => {
+    const matchKey = keyFromNumber(scored.id);
+    const item = display.get(matchKey);
+    if (!item) return [];
+    return [
+      toRow(matchKey, item, {
+        ...deepCutReason(scored, lists),
+        lastBoughtAt: null,
+        followed: null,
+      }),
+    ];
+  });
   return { basis, rows, twinsUsed: data.twinLists.length };
 }
 
@@ -92,15 +97,15 @@ async function scoreTop(
   candidates: readonly DeepCutCandidate[],
   options: DeepCutOptions & { limit: number },
   input: DeepCutsInput,
-): Promise<{ ranked: DeepCutScored[]; items: Map<ItemKey, ItemRecord> }> {
+): Promise<{ ranked: DeepCutScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: DeepCutScored[] = [];
-  const items = new Map<ItemKey, ItemRecord>();
+  const items = new Map<ItemKey, ItemFields>();
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const chunk = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldRankDeepCut(ranked, options.limit, c.ceiling));
     if (chunk.length === 0) break;
-    const display = await getDisplayItems(
+    const display = await getShownFields(
       db,
       chunk.map((c) => keyFromNumber(c.id)),
     );

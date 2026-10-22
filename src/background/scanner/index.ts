@@ -117,7 +117,7 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
   if (!isBandcampUrl(url)) throw new Error(`Not a bandcamp.com release: ${url}`);
   const now = Date.now();
   // The open page already tells us about the release, so scoring needn't wait for its job.
-  await upsertReleasePageItem(db, item, now);
+  await upsertReleasePageItem(db, item);
   await watchRelease(itemKey);
   const supporters = await getReleaseSupporters(db, itemKey);
   if (!supportersAreFresh(supporters, now)) {

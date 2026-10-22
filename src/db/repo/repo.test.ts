@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, Supporter } from '../../bandcamp';
 import { DigheadDb } from '../schema';
 import { finishFanScan, upsertSupporterFans } from './fans';
-import { upsertCollectionItems } from './items';
+import { getItem, upsertCollectionItems } from './items';
 import { getMe, markSynced, saveViewer } from './me';
 import {
   addSupporterOwnership,
@@ -49,16 +49,12 @@ afterEach(async () => {
 
 describe('upsertCollectionItems', () => {
   it('keeps tags and a known supporter count', async () => {
-    await upsertCollectionItems(db, [item('a1', 9)], 1);
+    await upsertCollectionItems(db, [item('a1', 9)]);
     await db.items.update('a1', { tags: ['ambient'] });
 
-    await upsertCollectionItems(db, [item('a1', null)], 2);
+    await upsertCollectionItems(db, [item('a1', null)]);
 
-    expect(await db.items.get('a1')).toMatchObject({
-      tags: ['ambient'],
-      supporterCount: 10,
-      fetchedAt: 2,
-    });
+    expect(await getItem(db, 'a1')).toMatchObject({ tags: ['ambient'], supporterCount: 10 });
   });
 });
 

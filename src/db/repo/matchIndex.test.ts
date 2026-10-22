@@ -5,6 +5,7 @@ import { keyFromNumber, type CollectionItem, type ItemKey, type Supporter } from
 import { buildMatchIndex, fanMatchLists } from '../matchIndex';
 import { DigheadDb, type OwnershipRecord } from '../schema';
 import { hiddenMatchKeys, hideRelease } from './hidden';
+import { getItem } from './items';
 import { getOwnerCounts } from './matchIndex';
 import { addSupporterOwnership, putOwnership, removeOwnershipExcept } from './ownership';
 
@@ -213,7 +214,7 @@ describe('upgrade to v3', () => {
     });
     await old
       .table('items')
-      .put({ itemKey: 'a1', bandId: 1, albumKey: null, title: 'T', artist: 'A' });
+      .put({ itemKey: 'a1', bandId: 1, albumKey: null, title: 'T', artist: 'A', url: 'u' });
     await old.table('ownership').bulkPut([
       { fanId: 1, itemKey: 'a1', matchKey: 'a1', source: 'collection', addedAt: null },
       { fanId: 2, itemKey: 't2', matchKey: 'a1', source: 'collection', addedAt: null },
@@ -223,7 +224,7 @@ describe('upgrade to v3', () => {
     const upgraded = new DigheadDb(name);
     await upgraded.open();
 
-    expect(await upgraded.items.get('a1')).toMatchObject({ label: null, labelId: null });
+    expect(await getItem(upgraded, 'a1')).toMatchObject({ label: null, labelId: null });
     expect(await upgraded.matchOwners.get(1)).toEqual({ matchId: 1, owners: 2 });
     expect(await upgraded.fanMatches.count()).toBe(2);
     await upgraded.delete();

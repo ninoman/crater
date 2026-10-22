@@ -10,17 +10,19 @@ import {
   type BackupMeta,
   type BackupSummary,
 } from '../shared/backupFile';
+import { gzip, readBackup } from './gzip';
 import {
   blankLately,
   type DigheadDb,
   flagCompilation,
   rebuildFanMatchLists,
+  slimToV12,
   TABLES_ADDED,
   upgradeJobToV8,
 } from './schema';
 
 /** The library reads blob slices with FileReader, which service workers don't have. */
-function ensureFileReader(): void {
+export function ensureFileReader(): void {
   if ('FileReader' in globalThis) return;
   class BlobFileReader {
     result: ArrayBuffer | null = null;
@@ -44,13 +46,14 @@ function ensureFileReader(): void {
   Object.assign(globalThis, { FileReader: BlobFileReader });
 }
 
+/** The whole database as a gzipped backup file. */
 export async function exportDatabase(
   db: DigheadDb,
 ): Promise<{ file: Blob; summary: BackupSummary }> {
   ensureFileReader();
-  const file = await exportDB(db, { prettyJson: false });
-  const meta = parseBackupMeta(await peakImportFile(file));
-  return { file, summary: summarizeBackup(meta) };
+  const json = await exportDB(db, { prettyJson: false });
+  const meta = parseBackupMeta(await peakImportFile(json));
+  return { file: await gzip(json), summary: summarizeBackup(meta) };
 }
 
 /** Reads every row without writing; the library doesn't notice a file cut short, so rows are counted. */
@@ -89,6 +92,12 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   if (fromVersion < 8) await db.queue.toCollection().modify(upgradeJobToV8);
   // v11 flagged compilations on items.
   if (fromVersion < 11) await db.items.toCollection().modify(flagCompilation);
+  // v12 slimmed items and ownership rows (decisions §19).
+  if (fromVersion < 12) {
+    await db.transaction('rw', [db.items, db.bands, db.ownership], () =>
+      slimToV12(db.items, db.bands, db.ownership),
+    );
+  }
 }
 
 /** Where the safety copy of the current data waits while an import runs. */
@@ -102,8 +111,9 @@ export interface SnapshotStore {
 /** Clears every table and writes the file's rows. Also how a snapshot is put back. */
 export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
   ensureFileReader();
+  const json = await readBackup(file);
   await Promise.all(db.tables.map((table) => table.clear()));
-  await importInto(db, file, READ_ONLY);
+  await importInto(db, json, READ_ONLY);
 }
 
 /**
@@ -119,11 +129,12 @@ export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
  */
 export async function importDatabase(
   db: DigheadDb,
-  file: Blob,
+  backup: Blob,
   snapshot: SnapshotStore,
   onPhase: (phase: ImportPhase | null) => Promise<void>,
 ): Promise<BackupSummary> {
   ensureFileReader();
+  const file = await readBackup(backup);
   const meta = parseBackupMeta(await peakImportFile(file).catch(() => null));
   const fileVersion = meta.data.databaseVersion;
   assertRestorableVersion(fileVersion, db.verno);

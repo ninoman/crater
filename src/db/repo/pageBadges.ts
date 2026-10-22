@@ -2,7 +2,10 @@
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { PageBadge, ReleaseRef } from '../../shared/pageBadges';
-import type { DigheadDb, ItemRecord, OwnershipRecord } from '../schema';
+import type { DigheadDb, ItemFields, ItemRecord, OwnershipRecord } from '../schema';
+import { releaseUrlHost } from '../storage';
+import { fanRows } from './fanRows';
+import { getItemFields, itemsWhere } from './items';
 import { getTwins } from './twins';
 
 interface Release {
@@ -24,15 +27,26 @@ function contains(sorted: Float64Array, value: number): boolean {
   return false;
 }
 
+/**
+ * Items that may sit at these URLs: every release of the bands seen under their hosts. Each
+ * stored URL's host is in its band's `hosts` (decisions §19), so none is missed.
+ */
+async function itemsAtUrls(db: DigheadDb, urls: string[]): Promise<ItemRecord[]> {
+  const hosts = [...new Set(urls.flatMap((url) => releaseUrlHost(url) ?? []))];
+  if (hosts.length === 0) return [];
+  const bandIds = await db.bands.where('hosts').anyOf(hosts).primaryKeys();
+  return itemsWhere(db, 'bandId', [...new Set(bandIds)]);
+}
+
 /** Each ref's release: its item record when we have one, else its id alone. Null when unknown. */
 async function resolve(db: DigheadDb, refs: ReleaseRef[]): Promise<(Release | null)[]> {
   const keys = refs.flatMap((ref) => (ref.itemKey ? [ref.itemKey] : []));
   const urls = refs.flatMap((ref) => (ref.itemKey ? [] : [ref.url]));
   const [byKeyList, byUrlList] = await Promise.all([
-    db.items.bulkGet(keys),
-    urls.length > 0 ? db.items.where('url').anyOf(urls).toArray() : [],
+    getItemFields(db, keys),
+    itemsAtUrls(db, urls),
   ]);
-  const byKey = new Map<ItemKey, ItemRecord>();
+  const byKey = new Map<ItemKey, ItemFields>();
   for (const item of byKeyList) if (item) byKey.set(item.itemKey, item);
   const byUrl = new Map(byUrlList.map((item) => [item.url, item]));
   return refs.map((ref) => {
@@ -61,29 +75,35 @@ export async function pageBadges(
   topTwinsK: number,
 ): Promise<(PageBadge | null)[]> {
   if (refs.length === 0) return [];
-  return db.transaction('r', [db.items, db.me, db.ownership, db.twins, db.fanMatches], async () => {
-    const [releases, me, board] = await Promise.all([
-      resolve(db, refs),
-      db.me.get('self'),
-      getTwins(db),
-    ]);
-    const mine = me ? await db.ownership.where('fanId').equals(me.fanId).toArray() : [];
-    const collection = mine.filter((row) => row.source === 'collection');
-    const wishlist = mine.filter((row) => row.source === 'wishlist');
-    const top = board.slice(0, topTwinsK);
-    const lists = (await db.fanMatches.bulkGet(top.map((twin) => twin.fanId))).flatMap((list) =>
-      list ? [list.matchIds] : [],
-    );
+  return db.transaction(
+    'r',
+    [db.items, db.bands, db.me, db.ownership, db.twins, db.fanMatches],
+    async () => {
+      const [releases, me, board] = await Promise.all([
+        resolve(db, refs),
+        db.me.get('self'),
+        getTwins(db),
+      ]);
+      const mine = me ? await fanRows(db, me.fanId) : [];
+      const collection = mine.filter((row) => row.source === 'collection');
+      const wishlist = mine.filter((row) => row.source === 'wishlist');
+      const top = board.slice(0, topTwinsK);
+      const lists = (await db.fanMatches.bulkGet(top.map((twin) => twin.fanId))).flatMap((list) =>
+        list ? [list.matchIds] : [],
+      );
 
-    return releases.map((release) => {
-      if (!release) return null;
-      const owned = ownsRelease(collection, release);
-      const wishlisted =
-        !owned &&
-        wishlist.some((row) => row.itemKey === release.itemKey || row.itemKey === release.albumKey);
-      const id = keyToNumber(release.albumKey ?? release.itemKey);
-      const twins = lists.filter((matchIds) => contains(matchIds, id)).length;
-      return { owned, wishlisted, twins, topTwins: top.length };
-    });
-  });
+      return releases.map((release) => {
+        if (!release) return null;
+        const owned = ownsRelease(collection, release);
+        const wishlisted =
+          !owned &&
+          wishlist.some(
+            (row) => row.itemKey === release.itemKey || row.itemKey === release.albumKey,
+          );
+        const id = keyToNumber(release.albumKey ?? release.itemKey);
+        const twins = lists.filter((matchIds) => contains(matchIds, id)).length;
+        return { owned, wishlisted, twins, topTwins: top.length };
+      });
+    },
+  );
 }

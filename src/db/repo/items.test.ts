@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
 import { keyToNumber, parseReleasePage, type CollectionItem } from '../../bandcamp';
 import { DigheadDb } from '../schema';
-import { getCompilations, upsertCollectionItems, upsertReleasePageItem } from './items';
+import { getCompilations, getItem, upsertCollectionItems, upsertReleasePageItem } from './items';
 
 let db: DigheadDb;
 
@@ -34,8 +34,8 @@ function seenInCollection(compilation: boolean): CollectionItem {
 
 describe('compilation flag on items', () => {
   it('keeps a release page verdict when a collection page sees only the name', async () => {
-    await upsertReleasePageItem(db, comp, 0);
-    await upsertCollectionItems(db, [seenInCollection(false)], 1);
+    await upsertReleasePageItem(db, comp);
+    await upsertCollectionItems(db, [seenInCollection(false)]);
 
     expect(await db.items.get(comp.itemKey)).toMatchObject({
       compilation: true,
@@ -44,15 +44,15 @@ describe('compilation flag on items', () => {
   });
 
   it('lets a release page clear what a collection page set', async () => {
-    await upsertCollectionItems(db, [seenInCollection(true)], 0);
-    await upsertReleasePageItem(db, { ...comp, compilation: false }, 1);
+    await upsertCollectionItems(db, [seenInCollection(true)]);
+    await upsertReleasePageItem(db, { ...comp, compilation: false });
 
-    expect((await db.items.get(comp.itemKey))?.compilation).toBe(false);
+    expect((await getItem(db, comp.itemKey))?.compilation).toBe(false);
   });
 
   it('answers which match ids are compilations', async () => {
-    await upsertReleasePageItem(db, comp, 0);
-    await upsertCollectionItems(db, [{ ...seenInCollection(false), itemKey: 'a2' }], 0);
+    await upsertReleasePageItem(db, comp);
+    await upsertCollectionItems(db, [{ ...seenInCollection(false), itemKey: 'a2' }]);
 
     const id = keyToNumber(comp.itemKey);
     expect(await getCompilations(db, [id, 2, 5])).toEqual(new Set([id]));
