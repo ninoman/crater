@@ -1,0 +1,5 @@
+.dh-load-more {
+  display: flex;
+  justify-content: center;
+  padding: var(--dh-space-4) 0;
+}

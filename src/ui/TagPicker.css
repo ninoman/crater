@@ -21,6 +21,11 @@
   color: var(--dh-color-text);
 }
 
+.dh-tag-picker__title {
+  margin: 0;
+  font-weight: var(--dh-weight-bold);
+}
+
 .dh-tag-picker__input {
   height: 28px;
   width: 100%;

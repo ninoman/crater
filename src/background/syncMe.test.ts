@@ -80,6 +80,7 @@ function deps(fetchJson: SyncDeps['fetchJson'], overrides: Partial<SyncDeps> = {
     now: () => 1000,
     onProgress: () => {},
     onFollowingProgress: () => {},
+    onStep: () => {},
     ...overrides,
   };
 }

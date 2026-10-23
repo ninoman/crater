@@ -13,3 +13,17 @@ export interface WishlistItem {
   addedAt: number | null;
   tagIds: number[];
 }
+
+/** Whether two reads of the same item would render the same card. */
+export function sameWishlistItem(a: WishlistItem, b: WishlistItem): boolean {
+  return (
+    a.itemKey === b.itemKey &&
+    a.title === b.title &&
+    a.artist === b.artist &&
+    a.url === b.url &&
+    a.coverUrl === b.coverUrl &&
+    a.addedAt === b.addedAt &&
+    a.tagIds.length === b.tagIds.length &&
+    a.tagIds.every((id, i) => id === b.tagIds[i])
+  );
+}

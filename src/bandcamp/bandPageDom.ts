@@ -6,4 +6,6 @@ export const BAND_PAGE_DOM = {
   name: '#band-name-location',
   /** The name itself, inside `name`. */
   title: '.title',
+  /** Where the band is, inside `name`; not every band says. */
+  location: '.location',
 } as const;

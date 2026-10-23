@@ -1,0 +1,76 @@
+<!-- Bandcamp's wishlist and follow controls as its JS renders them, captured 2026-10-23.
+     Release and band pages: https://floatingpoints.bandcamp.com/album/promises, logged out.
+     Fan page: the server-rendered button in fan-page.html. See README.md. -->
+<section id="release">
+<ul>
+<li id="collect-item" class="wishlist">
+    <span id="wishlist-msg" class="action compound-button" title="Add this track to your wishlist">
+        <span class="bc-ui2 collect-item-icon"></span>
+        <span class="collect-msg">
+            <span><a>Wishlist</a></span>
+        </span>
+    </span>
+
+    <span id="wishlisted-msg" class="compound-button">
+        <span class="action" title="Remove this track from your wishlist">
+            <span class="bc-ui2 collect-item-icon"></span>
+            <span class="collect-msg">
+                <span><a>In Wishlist</a></span>
+            </span>
+        </span>
+        <span class="wishlist-wrapper">
+            <a target="_blank" class="view" href="#">
+                view
+            </a>
+            <div class="signup-tooltip-outer wishlist-button-tooltip-outer"></div>
+        </span>
+    </span>
+
+    <span id="purchased-msg" class="collect-msg compound-button">
+        <span class="bc-ui2 collect-item-icon"></span>
+        <span><a target="_blank" href="#">You own this</a></span>
+    </span>
+</li>
+</ul>
+
+<p id="band-name-location">
+    <span class="title">Floating Points</span>
+    <span class="location secondaryText">UK</span>
+</p>
+<div class="following-actions-wrapper signup-tooltip-parent" data-tooltip-id="b">
+<div id="following-actions">
+
+<a class="dismiss-link dismiss-tooltip"></a>
+<button id="follow-unfollow" type="button" class="follow-unfollow compound-button">
+    <div>Follow</div>
+</button>
+
+</div>
+</div>
+</section>
+
+<section id="band-placeholder">
+<div id="following-actions">
+    <button type="button" class="follow-unfollow compound-button" style="visibility: hidden;">
+        <div>placeholder</div>
+    </button>
+</div>
+</section>
+
+<section id="band-subscribed">
+<div id="following-actions">
+<button type="button" class="follow-unfollow subscribed compound-button">
+    <div>Subscribed!</div>
+</button>
+</div>
+</section>
+
+<section id="fan">
+<div id="following-actions" class="following-actions nofollowers signup-tooltip-parent" data-tooltip-id="o">
+    <button id="follow-unfollow_5325531" type="button" class="follow-unfollow ">
+        <div class="follow-msg">Follow</div>
+        <div class="following-msg">Following</div>
+        <div class="unfollow-msg">Unfollow</div>
+    </button>
+</div>
+</section>

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import { DigheadDb } from '../schema';
 import { upsertCollectionItems } from './items';
-import { putOwnership } from './ownership';
+import { markUnwishlisted, markWishlisted, putOwnership } from './ownership';
 import { createTag, deleteTag, exportTags, importTags } from './tags';
 import {
   assignItemTag,
@@ -69,6 +69,47 @@ describe('listWishlist', () => {
 
   it('is empty for someone else', async () => {
     expect(await listWishlist(db, 99)).toEqual([]);
+  });
+});
+
+describe('markWishlisted / markUnwishlisted', () => {
+  it('puts an item hearted on its page in the wishlist', async () => {
+    await upsertCollectionItems(db, [item('a5', null)]);
+
+    await markWishlisted(db, ME, { itemKey: 'a5', albumKey: null }, 500);
+
+    expect((await listWishlist(db, ME))[0]).toMatchObject({
+      item: { itemKey: 'a5' },
+      addedAt: 500,
+    });
+    expect(await getItemTags(db, ME, 'a5')).toEqual([]);
+  });
+
+  it('leaves an owned item owned and a wishlisted one its date', async () => {
+    await markWishlisted(db, ME, { itemKey: 'a4', albumKey: null }, 500);
+    await markWishlisted(db, ME, { itemKey: 'a1', albumKey: null }, 500);
+
+    expect(await getItemTags(db, ME, 'a4')).toBeNull();
+    expect((await listWishlist(db, ME)).find((row) => row.item.itemKey === 'a1')?.addedAt).toBe(
+      100,
+    );
+  });
+
+  it('keeps the tags of a removed item for a quick re-add', async () => {
+    const dub = await tagId('dub');
+    await assignItemTag(db, dub, ['a1'], 'add');
+
+    await markUnwishlisted(db, ME, 'a1');
+    expect(await getItemTags(db, ME, 'a1')).toBeNull();
+
+    await markWishlisted(db, ME, { itemKey: 'a1', albumKey: null }, 500);
+    expect(await getItemTags(db, ME, 'a1')).toEqual([dub]);
+  });
+
+  it('never removes an owned item', async () => {
+    await markUnwishlisted(db, ME, 'a4');
+
+    expect(await db.ownership.get([ME, 'a4'])).toBeDefined();
   });
 });
 

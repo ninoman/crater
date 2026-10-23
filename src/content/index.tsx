@@ -7,6 +7,7 @@ import { mountFan } from './fan/mountFan';
 import { detectPageKind } from './pageKind';
 import { mountProfile } from './profile/mountProfile';
 import { ReleaseSidebar } from './release/ReleaseSidebar';
+import { ReleaseTagPrompts } from './release/ReleaseTagPrompts';
 import sidebarCss from './release/ReleaseSidebar.css?inline';
 import { reportPage } from './reportPage';
 import { pageTagsStyles } from './shared/tagStyles';
@@ -24,6 +25,8 @@ switch (kind) {
       sidebarCss + pageTagsStyles,
       pageTheme(document),
     );
+    // Apart from the sidebar, which renders nothing inside while collapsed.
+    mountShadow(document.body, <ReleaseTagPrompts />, '', pageTheme(document));
     break;
   case 'band':
     mountBand(document);

@@ -3,19 +3,24 @@ import type { ItemKey } from '../../bandcamp';
 import { notifyFollowingChanged } from '../../hooks/followingChanges';
 import { useTags } from '../../hooks/useTags';
 import { useWishlist } from '../../hooks/useWishlist';
+import { useSyncReload } from '../../hooks/useSyncReload';
 import type { Tag } from '../../shared/following';
 import type { WishlistItem } from '../../shared/wishlist';
-import { Button, CardGrid, EmptyState, Notice } from '../../ui';
+import { Button, CardGrid, EmptyState, LoadMore, Notice } from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { EmptyWishlist } from './EmptyWishlist';
 import { FilterControls } from '../shared/FilterControls';
+import { syncingStep } from '../shared/syncEmpty';
 import { itemTagHandlers } from '../shared/tagActions';
 import { actionable, isFiltering, liveTagIds, NO_FILTER, toggled } from '../shared/tagFilter';
 import { commonItemTagIds, visibleItemKeys } from './wishlistFilter';
 import { WishlistCard } from './WishlistCard';
 
-const NO_ITEMS: WishlistItem[] = [];
+const NO_ITEMS: readonly WishlistItem[] = [];
 const NO_TAGS: Tag[] = [];
+const wishlistedCount = (status: { wishlisted: number }) => status.wishlisted;
+/** Cards rendered at a time. A 2,000-item wishlist all at once is ~60k elements. */
+const PAGE_SIZE = 120;
 
 export interface WishlistViewProps {
   /** Whether the wishlist tab is on screen; the empty state polls the sync only then. */
@@ -34,6 +39,8 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
   const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
   const items = view.state === 'ready' ? view.data : NO_ITEMS;
   const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
+  const sync = useSyncReload(open, wishlistedCount);
+  const stillSyncing = sync.state === 'ready' && syncingStep(sync.status, 'wishlist');
 
   const [rawFilter, setFilter] = useState(NO_FILTER);
   const filter = useMemo(
@@ -42,6 +49,11 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
   );
   const visible = useMemo(() => visibleItemKeys(items, filter), [items, filter]);
   const shown = useMemo(() => items.filter((item) => visible.has(item.itemKey)), [items, visible]);
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  // A new filter starts from the top. Keyed on the raw filter: tag refetches rebuild `filter`.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when the filter changes
+  useEffect(() => setLimit(PAGE_SIZE), [rawFilter]);
+  const rendered = useMemo(() => shown.slice(0, limit), [shown, limit]);
   const [selected, setSelected] = useState<ReadonlySet<ItemKey>>(new Set());
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +91,7 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
         );
       case 'ready':
         if (items.length === 0) {
-          return open && <EmptyWishlist showBandcampList={showBandcampList} />;
+          return open && <EmptyWishlist view={sync} showBandcampList={showBandcampList} />;
         }
         return (
           <>
@@ -90,6 +102,12 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
               modeLabel="Show releases with"
               searchLabel="Search artists and titles"
             />
+            {stillSyncing && (
+              <p className="dh-tag-bar__note" aria-live="polite">
+                Still syncing your wishlist: {items.length} releases so far. The rest show up here
+                as they arrive.
+              </p>
+            )}
             {tags.length === 0 && (
               <p className="dh-tag-bar__note">
                 No tags yet. Use “+ tag” on a release to make your first, or check a few to tag them
@@ -136,7 +154,7 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
       {shown.length > 0 && (
         <div className="dh-wishlist__list">
           <CardGrid label="Your wishlist">
-            {shown.map((item) => (
+            {rendered.map((item) => (
               <WishlistCard
                 key={item.itemKey}
                 item={item}
@@ -150,6 +168,10 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
               />
             ))}
           </CardGrid>
+          <LoadMore
+            remaining={shown.length - rendered.length}
+            onMore={() => setLimit((current) => current + PAGE_SIZE)}
+          />
         </div>
       )}
     </>

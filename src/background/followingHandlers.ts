@@ -10,6 +10,7 @@ import {
   importTags,
   listFollowing,
   listTags,
+  markFollowed,
   renameTag,
   setUnfollowed,
   type DigheadDb,
@@ -25,6 +26,7 @@ export type FollowingHandlers = Pick<
   | 'assignTag'
   | 'listFollowing'
   | 'getFollowTags'
+  | 'markFollowed'
   | 'setUnfollowed'
   | 'exportTags'
   | 'importTags'
@@ -46,6 +48,10 @@ export function followingHandlers(db: DigheadDb): FollowingHandlers {
       const row = await getFollowing(db, [kind, id]);
       // An unfollowed row only keeps its tags in case you follow again.
       return row && !row.unfollowed ? row.tagIds : null;
+    },
+    markFollowed: async ({ account }) => {
+      await markFollowed(db, account);
+      return null;
     },
     setUnfollowed: async ({ key, unfollowed }) => {
       await setUnfollowed(db, key, unfollowed);

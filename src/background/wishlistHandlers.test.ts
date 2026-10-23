@@ -59,4 +59,16 @@ describe('wishlist handlers', () => {
     expect(row?.tagIds).toEqual([created.tag.id]);
     expect(await h.getItemTags({ itemKey: 'a1' }, sender)).toEqual([created.tag.id]);
   });
+
+  it('records hearts and un-hearts made on a release page once it knows you', async () => {
+    const release = { itemKey: 'a2' as const, albumKey: null };
+    expect(await h.markWishlisted({ release }, sender)).toBe(false);
+
+    await saveViewer(db, { fanId: ME, username: 'me' });
+    expect(await h.markWishlisted({ release }, sender)).toBe(true);
+    expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toEqual([]);
+
+    await h.markUnwishlisted({ itemKey: 'a2' }, sender);
+    expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toBeNull();
+  });
 });

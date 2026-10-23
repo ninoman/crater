@@ -7,6 +7,7 @@ import { fixtureText } from '../../../tests/fixtures';
 import { flushObservers, followingTabDocument } from '../../../tests/followingTabDom';
 import { parseFanPage } from '../../bandcamp';
 import type { Following, FollowingKey, Tag } from '../../shared/following';
+import type { SyncStatus } from '../../shared/sync';
 import { mountFollowing } from './mountFollowing';
 
 const TAGS: Tag[] = [
@@ -14,6 +15,17 @@ const TAGS: Tag[] = [
   { id: 2, name: 'techno', nameKey: 'techno' },
 ];
 let rows: Following[];
+let status: SyncStatus;
+
+const SYNCED: SyncStatus = {
+  state: 'known',
+  username: 'me',
+  owned: 0,
+  wishlisted: 0,
+  followed: 5,
+  syncedAt: 1,
+  activity: { state: 'idle' },
+};
 const unfollowCalls: { key: FollowingKey; unfollowed: boolean }[] = [];
 
 /** Answers the messages the tab sends, like the worker would. */
@@ -25,6 +37,8 @@ function answer(message: { type: string; payload: Record<string, unknown> }): un
       return TAGS;
     case 'getCrateMateStandings':
       return {};
+    case 'getSyncStatus':
+      return status;
     case 'setUnfollowed': {
       const { key, unfollowed } = message.payload as { key: FollowingKey; unfollowed: boolean };
       unfollowCalls.push({ key, unfollowed });
@@ -47,6 +61,7 @@ beforeEach(() => {
       unfollowed: false,
     }));
   unfollowCalls.length = 0;
+  status = SYNCED;
   vi.stubGlobal('chrome', {
     runtime: {
       sendMessage: async (message: { type: string; payload: Record<string, unknown> }) => {
@@ -72,6 +87,14 @@ async function settle(): Promise<void> {
   });
 }
 
+/** Waits out one sync-status poll (every second) and what it triggers. */
+async function nextPoll(): Promise<void> {
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1050));
+  });
+  await settle();
+}
+
 const ourCards = (doc: Document) => [
   ...doc.querySelectorAll<HTMLLIElement>('.dighead-following-list > li.followeer'),
 ];
@@ -79,7 +102,7 @@ const bar = (doc: Document) =>
   doc.querySelector('#following-bands-container dighead-following-bar')?.shadowRoot;
 
 describe('the following tab', () => {
-  it('shows every follow as a card with its tags, and filters by tag by hiding cards', async () => {
+  it('shows every follow as a card with its tags, and filters by tag', async () => {
     const doc = followingTabDocument();
     await act(async () => mountFollowing(doc));
     await settle();
@@ -98,7 +121,7 @@ describe('the following tab', () => {
     ) as HTMLButtonElement | undefined;
     await act(async () => techno?.click());
 
-    expect(ourCards(doc).map((card) => card.hidden)).toEqual([false, true, true, true, true]);
+    expect(ourCards(doc)).toHaveLength(1);
     expect(bar(doc)?.textContent).toContain('Showing 1 of 5');
   });
 
@@ -114,13 +137,13 @@ describe('the following tab', () => {
       search.dispatchEvent(new Event('input', { bubbles: true }));
     });
 
-    expect(ourCards(doc).every((card) => card.hidden)).toBe(true);
+    expect(ourCards(doc)).toHaveLength(0);
     expect(bar(doc)?.textContent).toContain('No follows match these filters');
     const clear = [...(bar(doc)?.querySelectorAll('button') ?? [])].find(
       (button) => button.textContent === 'Clear filters',
     );
     await act(async () => clear?.click());
-    expect(ourCards(doc).some((card) => card.hidden)).toBe(false);
+    expect(ourCards(doc)).toHaveLength(5);
   });
 
   it('marks a card unfollowed when Bandcamp’s handler flips its button, keeping its tags', async () => {
@@ -151,5 +174,61 @@ describe('the following tab', () => {
     await act(async () => box?.click());
 
     expect(bar(doc)?.querySelector('.dh-bulk-bar')?.textContent).toContain('1 selected');
+  });
+
+  it('shows follows while they sync, and adds them as they arrive', async () => {
+    const all = rows;
+    rows = [];
+    status = {
+      ...SYNCED,
+      followed: 0,
+      syncedAt: null,
+      activity: {
+        state: 'syncing',
+        mode: 'full',
+        step: 'following',
+        itemsFetched: 0,
+        followingFetched: 0,
+      },
+    };
+    const doc = followingTabDocument();
+    await act(async () => mountFollowing(doc));
+    await settle();
+    expect(bar(doc)?.textContent).toContain('Syncing your follows');
+
+    rows = all.slice(0, 2);
+    status = { ...status, followed: 2 };
+    await nextPoll();
+    expect(ourCards(doc)).toHaveLength(2);
+    expect(bar(doc)?.textContent).toContain('Still syncing your follows: 2 so far');
+
+    rows = all;
+    status = { ...SYNCED, followed: 5 };
+    await nextPoll();
+    expect(ourCards(doc)).toHaveLength(5);
+    expect(bar(doc)?.textContent).not.toContain('Still syncing');
+  });
+
+  it('builds cards a page at a time', async () => {
+    const [first] = rows;
+    if (!first) throw new Error('no fixture rows');
+    rows = Array.from({ length: 300 }, (_, n) => ({
+      ...first,
+      id: n + 1,
+      name: `Band ${n}`,
+      tagIds: [],
+    }));
+    status = { ...SYNCED, followed: 300 };
+    const doc = followingTabDocument();
+    await act(async () => mountFollowing(doc));
+    await settle();
+
+    expect(ourCards(doc)).toHaveLength(120);
+    const more = doc
+      .querySelector('#following-bands-container dighead-following-more')
+      ?.shadowRoot?.querySelector('button');
+    expect(more?.textContent).toBe('Show more (180 left)');
+    await act(async () => more?.click());
+    expect(ourCards(doc)).toHaveLength(240);
   });
 });

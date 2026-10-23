@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { notifyFollowingChanged } from '../../hooks/followingChanges';
-import { useSyncStatus } from '../../hooks/useSyncStatus';
+import { useEffect } from 'react';
+import type { SyncStatusView } from '../../hooks/useSyncStatus';
 import type { FollowKind } from '../../shared/following';
 import { EmptyState } from '../../ui';
 import { emptyReason, showsBandcampList } from '../shared/syncEmpty';
@@ -8,31 +7,22 @@ import { kindLabel } from './followingEmpty';
 
 const BELOW = "Bandcamp's own list is below.";
 
-/**
- * Why there are no followings of this kind. Mounted only while the list is empty, so the sync
- * status is polled only then. Refetches the list once a running sync finishes.
- */
+/** Why there are no followings of this kind, from the sync status the list polls while open. */
 export function EmptyFollowing({
   kind,
+  view,
   showBandcampList,
 }: {
   kind: FollowKind;
+  view: SyncStatusView;
   showBandcampList: (shown: boolean) => void;
 }) {
-  const { view } = useSyncStatus();
   const reason = view.state === 'ready' ? emptyReason(view.status) : null;
   const shown = reason ? showsBandcampList(reason) : null;
-  const syncing = reason?.kind === 'syncing';
 
   useEffect(() => {
     if (shown !== null) showBandcampList(shown);
   }, [shown, showBandcampList]);
-
-  const wasSyncing = useRef(false);
-  useEffect(() => {
-    if (wasSyncing.current && !syncing) notifyFollowingChanged();
-    wasSyncing.current = syncing;
-  }, [syncing]);
 
   if (view.state === 'unreachable') {
     return (
@@ -57,7 +47,7 @@ export function EmptyFollowing({
       return (
         <EmptyState
           title="Syncing your follows…"
-          description={`${reason.followingFetched} so far. They show here with your tags once the sync finishes. ${BELOW}`}
+          description={`${reason.followingFetched} so far. They show up here, ready to tag, as they arrive. ${BELOW}`}
         />
       );
     case 'sync-failed':

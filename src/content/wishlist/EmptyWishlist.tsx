@@ -1,34 +1,24 @@
-import { useEffect, useRef } from 'react';
-import { notifyFollowingChanged } from '../../hooks/followingChanges';
-import { useSyncStatus } from '../../hooks/useSyncStatus';
+import { useEffect } from 'react';
+import type { SyncStatusView } from '../../hooks/useSyncStatus';
 import { EmptyState } from '../../ui';
 import { emptyReason, showsBandcampList } from '../shared/syncEmpty';
 
 const BELOW = "Bandcamp's own list is below.";
 
-/**
- * Why the wishlist is empty. Mounted only while it is, and while the tab is open, so the sync
- * status is polled only then. Refetches the wishlist once a running sync finishes.
- */
+/** Why the wishlist is empty, from the sync status the view polls while the tab is open. */
 export function EmptyWishlist({
+  view,
   showBandcampList,
 }: {
+  view: SyncStatusView;
   showBandcampList: (shown: boolean) => void;
 }) {
-  const { view } = useSyncStatus();
   const reason = view.state === 'ready' ? emptyReason(view.status) : null;
   const shown = reason ? showsBandcampList(reason) : null;
-  const syncing = reason?.kind === 'syncing';
 
   useEffect(() => {
     if (shown !== null) showBandcampList(shown);
   }, [shown, showBandcampList]);
-
-  const wasSyncing = useRef(false);
-  useEffect(() => {
-    if (wasSyncing.current && !syncing) notifyFollowingChanged();
-    wasSyncing.current = syncing;
-  }, [syncing]);
 
   if (view.state === 'unreachable') {
     return (
@@ -53,7 +43,7 @@ export function EmptyWishlist({
       return (
         <EmptyState
           title="Syncing your collection and wishlist…"
-          description={`${reason.itemsFetched} items so far. Your wishlist shows here, ready to tag, once the sync finishes. ${BELOW}`}
+          description={`${reason.itemsFetched} items so far. Wishlisted releases show up here, ready to tag, as they arrive. ${BELOW}`}
         />
       );
     case 'sync-failed':

@@ -1,14 +1,23 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { notifyFollowingChanged } from '../../hooks/followingChanges';
 import { useFollowing } from '../../hooks/useFollowing';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
+import { useSyncReload } from '../../hooks/useSyncReload';
 import { useTags } from '../../hooks/useTags';
 import { useCrateMateStandings } from '../../hooks/useCrateMateStandings';
 import type { Following, FollowingKey, Tag } from '../../shared/following';
-import { Button, EmptyState, Notice, NoticeStack, PortalContainerProvider } from '../../ui';
+import {
+  Button,
+  EmptyState,
+  LoadMore,
+  Notice,
+  NoticeStack,
+  PortalContainerProvider,
+} from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { FilterControls } from '../shared/FilterControls';
+import { syncingStep } from '../shared/syncEmpty';
 import { followTagHandlers } from '../shared/tagActions';
 import { CardExtras } from './CardExtras';
 import { CardSelect } from './CardSelect';
@@ -26,14 +35,18 @@ import type { TakenList } from './takeOverList';
 import { useCards } from './useCards';
 
 const NO_TAG_IDS: number[] = [];
-const NO_ROWS: Following[] = [];
+const NO_ROWS: readonly Following[] = [];
 const NO_TAGS: Tag[] = [];
 /** As often as the profile tabs check the queue's health. */
 const SCANNER_POLL_MS = 5000;
+/** Cards built at a time; each has two shadow roots, so hundreds at once is slow. */
+const PAGE_SIZE = 120;
+const followedCount = (status: { followed: number }) => status.followed;
 
 /**
- * One taken-over list: the filter bar above it, and our additions inside each of its cards,
- * all through portals from the one React root. Filtering hides cards; it never rebuilds them.
+ * One taken-over list: the filter bar above it, our additions inside each of its cards and
+ * "Show more" below, all through portals from the one React root. Only the first pages of the
+ * rows passing the filter have cards; cards that stay are reused, not rebuilt.
  */
 export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boolean }) {
   const { kind, list, bar, showBandcampList } = taken;
@@ -44,7 +57,8 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
   const rows = view.state === 'ready' ? view.data : null;
   const allRows = rows ?? NO_ROWS;
   const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
-  const { cardList, cards } = useCards(list, rows);
+  const sync = useSyncReload(open, followedCount);
+  const stillSyncing = sync.state === 'ready' && syncingStep(sync.status, 'following');
 
   const fanIds = useMemo(
     () => (kind === 'fan' ? allRows.map((row) => row.id) : NO_TAG_IDS),
@@ -58,11 +72,17 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
     [rawFilter, tags],
   );
   const visible = useMemo(() => visibleIds(allRows, filter), [allRows, filter]);
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  // A new filter starts from the top. Keyed on the raw filter: tag refetches rebuild `filter`.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset when the filter changes
+  useEffect(() => setLimit(PAGE_SIZE), [rawFilter]);
+  const rendered = useMemo(
+    () => rows?.filter((row) => visible.has(row.id)).slice(0, limit) ?? null,
+    [rows, visible, limit],
+  );
+  const { cardList, cards } = useCards(list, rendered);
   const [selected, setSelected] = useState<ReadonlySet<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
-
-  // Runs after useCards' layout effect, so new cards are already in the list.
-  useLayoutEffect(() => cardList.show(visible), [cardList, visible]);
 
   // Ours can't stand in for Bandcamp's list until it has loaded; an empty list decides itself.
   useEffect(() => {
@@ -135,7 +155,9 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
       case 'ready':
         // It polls the sync status, so only while this list is the one on screen.
         if (allRows.length === 0) {
-          return open && <EmptyFollowing kind={kind} showBandcampList={showBandcampList} />;
+          return (
+            open && <EmptyFollowing kind={kind} view={sync} showBandcampList={showBandcampList} />
+          );
         }
         return (
           <>
@@ -146,6 +168,12 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
               modeLabel="Show follows with"
               searchLabel="Search names"
             />
+            {stillSyncing && (
+              <p className="dh-tag-bar__note" aria-live="polite">
+                Still syncing your follows: {allRows.length} so far. The rest show up here as they
+                arrive.
+              </p>
+            )}
             {tags.length === 0 && (
               <p className="dh-tag-bar__note">
                 No tags yet. Use “+ tag” on a card to make your first, or check a few cards to tag
@@ -196,6 +224,13 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
         bar.container,
       )}
       {portals}
+      {createPortal(
+        <LoadMore
+          remaining={visible.size - (rendered?.length ?? 0)}
+          onMore={() => setLimit((current) => current + PAGE_SIZE)}
+        />,
+        taken.footer.container,
+      )}
     </>
   );
 }

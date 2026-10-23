@@ -5,6 +5,7 @@ import { DigheadDb } from '../schema';
 import {
   getFollowing,
   listFollowing,
+  markFollowed,
   putFollowing,
   replaceFollowing,
   setUnfollowed,
@@ -51,6 +52,28 @@ describe('putFollowing', () => {
     await putFollowing(db, [follow('fan', 1)]);
 
     expect((await getFollowing(db, ['fan', 1]))?.unfollowed).toBe(false);
+  });
+});
+
+describe('markFollowed', () => {
+  it('adds an account followed on its page, untagged', async () => {
+    await markFollowed(db, follow('band', 1));
+
+    expect(await getFollowing(db, ['band', 1])).toMatchObject({ tagIds: [], unfollowed: false });
+  });
+
+  it('keeps what the sync wrote and the tags on a re-follow', async () => {
+    await putFollowing(db, [{ ...follow('band', 1), imageId: 42 }]);
+    await db.following.update(['band', 1], { tagIds: [5] });
+    await setUnfollowed(db, ['band', 1], true);
+
+    await markFollowed(db, follow('band', 1));
+
+    expect(await getFollowing(db, ['band', 1])).toMatchObject({
+      imageId: 42,
+      tagIds: [5],
+      unfollowed: false,
+    });
   });
 });
 

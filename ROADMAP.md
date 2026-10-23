@@ -297,6 +297,23 @@ Design: decisions §15.
 
 ---
 
+## Tag on follow and wishlist (not MVP)
+
+**Goal:** tag a release or an account the moment you heart or follow it on its page, instead of after the next sync.
+
+Design: decisions §21. Uses the tags of *Following tags* and *Wishlist tags*; no new requests.
+
+1. [x] Fixture of Bandcamp's heart and follow controls as its JS renders them, and pure readers for their state in `bandcamp/pageActions.ts`.
+2. [x] Repo and messages: `markFollowed`, `markWishlisted`, `markUnwishlisted`; unfollow reuses `setUnfollowed`. Tags survive an undo.
+3. [x] `AnchoredTagPicker`, and `useTagPrompt` watching the heart, saving it and opening the picker next to it. Follows are saved (`useRecordFollow`) but open no picker: Bandcamp's mailing-list dialog closes it.
+4. [x] On band, release and fan pages, with a setting to turn the picker off.
+5. [ ] Try it logged in on live pages.
+6. [x] Wishlist and following tabs during a sync and with long lists (followings now sync before the collection, page by page): shows items as they sync, reloads only when the count changes, keeps unchanged cards, renders 120 cards at a time (decisions §14).
+
+**Done when:** hearting a release or following an account on its page opens the tag picker by the button, the tag shows on the page and on the wishlist or following tab without a sync, and undoing it keeps the tags for a re-add.
+
+---
+
 ## Following as a signal (not MVP)
 
 **Goal:** what you follow on Bandcamp nudges recommendations and scanning, without drowning out what collections say.

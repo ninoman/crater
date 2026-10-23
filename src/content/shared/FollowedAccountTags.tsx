@@ -33,6 +33,8 @@ export function FollowedAccountTags({ kind, id, name }: FollowedAccountTagsProps
   );
   return (
     <div className="dh-page-tags">
+      {/* Says what the tags are for; a bare "+ tag" under a name doesn't. */}
+      <span className="dh-page-tags__label">You follow {name}</span>
       <TagEditor tags={all.view.data} assignedIds={own.data} name={name} {...handlers} />
     </div>
   );

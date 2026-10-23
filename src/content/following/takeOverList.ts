@@ -20,8 +20,8 @@ export const FOLLOWING_CLASSES = {
 const STYLE_ID = 'dighead-following';
 
 /**
- * Bandcamp's list and "view all" go while ours is up, so its paging never runs. Bandcamp's CSS
- * may give cards a display, so `hidden` needs the push. An unfollowed card is dimmed; its
+ * Bandcamp's list and "view all" go while ours is up, so its paging never runs. An unfollowed
+ * card is dimmed; its
  * button then reads "Follow". The avatar is the containing block for our select box. Bandcamp's
  * paging can still append a page of its own cards to the first `ol.followeer-grid` it finds,
  * which is ours; those stay hidden.
@@ -31,11 +31,10 @@ function pageCss(): string {
   const { list, card, taken, unfollowed } = FOLLOWING_CLASSES;
   return `.${taken} ${followingNativeList}:not(.${list}),
 .${taken} ${followingExpand} { display: none !important; }
-.${list} ${followingCard}[hidden],
 .${list} > ${followingCard}:not(.${card}) { display: none !important; }
 .${list} ${followingCard}.${unfollowed} { opacity: 0.5; }
 .${list} ${followingImage} { position: relative; }
-dighead-following-bar { display: block; }`;
+dighead-following-bar, dighead-following-more { display: block; }`;
 }
 
 function addPageStyle(doc: Document): void {
@@ -52,6 +51,8 @@ export interface TakenList {
   list: HTMLOListElement;
   /** The filter bar's shadow root, right above the list. */
   bar: ShadowSlot;
+  /** Right below the list, for "Show more". */
+  footer: ShadowSlot;
   /** Shows Bandcamp's own list (and hides nothing of ours) when ours can't stand in for it. */
   showBandcampList: (shown: boolean) => void;
 }
@@ -68,15 +69,17 @@ export function takeOverList(doc: Document, grid: Element, kind: FollowKind): Ta
   const list = doc.createElement('ol');
   list.className = `${FAN_PAGE_DOM.followingListClass} ${FOLLOWING_CLASSES.list}`;
   const bar = createShadowSlot(doc, 'dighead-following-bar', followingCss);
+  const footer = createShadowSlot(doc, 'dighead-following-more', followingCss);
   const native = container.querySelector(FAN_PAGE_DOM.followingNativeList);
-  if (native) native.before(bar.host, list);
-  else container.append(bar.host, list);
+  if (native) native.before(bar.host, list, footer.host);
+  else container.append(bar.host, list, footer.host);
   container.classList.add(FOLLOWING_CLASSES.taken);
 
   return {
     kind,
     list,
     bar,
+    footer,
     showBandcampList: (shown) => container.classList.toggle(FOLLOWING_CLASSES.taken, !shown),
   };
 }

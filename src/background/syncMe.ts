@@ -17,7 +17,7 @@ import {
   type DigheadDb,
   type MeRecord,
 } from '../db';
-import type { SyncMode } from '../shared/sync';
+import type { SyncMode, SyncStep } from '../shared/sync';
 import { syncFollowing } from './syncFollowing';
 
 export interface SyncDeps {
@@ -29,24 +29,29 @@ export interface SyncDeps {
   now: () => number;
   onProgress: (itemsFetched: number) => void;
   onFollowingProgress: (followingFetched: number) => void;
+  onStep: (step: SyncStep) => void;
 }
 
-// Wishlist first: if an item was bought since, the collection pass overwrites its row.
-const LISTS: CollectionList[] = ['wishlist', 'collection'];
-
-/** Syncs both lists, then your followings. Returns the collection items that weren't in your collection before. */
+/**
+ * Syncs your wishlist, then your followings, then your collection. The two short lists go
+ * first, so their tabs fill in within seconds of a first sync instead of after a big
+ * collection (decisions §14). The wishlist goes before the collection so that, if an item was
+ * bought since, the collection pass overwrites its row. Returns the collection items that
+ * weren't in your collection before.
+ */
 export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Promise<ItemKey[]> {
   const before = await ownedItemKeys(deps.db, me.fanId, 'collection');
-  let fetched = 0;
-  for (const list of LISTS) {
-    fetched = await syncList(deps, me.fanId, list, mode, fetched);
-  }
-  await markSynced(deps.db, deps.now());
-  const after = await ownedItemKeys(deps.db, me.fanId, 'collection');
-  // Its own failure leaves the followings as they were and doesn't undo the collection sync.
+  deps.onStep('wishlist');
+  const fetched = await syncList(deps, me.fanId, 'wishlist', mode, 0);
+  deps.onStep('following');
+  // Its own failure leaves the followings as they were and doesn't stop the collection sync.
   await syncFollowing(deps, me.fanId).catch((error: unknown) =>
     console.error('dighead: following sync failed', error),
   );
+  deps.onStep('collection');
+  await syncList(deps, me.fanId, 'collection', mode, fetched);
+  await markSynced(deps.db, deps.now());
+  const after = await ownedItemKeys(deps.db, me.fanId, 'collection');
   return [...after].filter((key) => !before.has(key));
 }
 

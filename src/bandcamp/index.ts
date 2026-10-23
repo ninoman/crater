@@ -23,5 +23,13 @@ export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
 export { FAN_PAGE_DOM } from './fanPageDom';
 export { isOwnFanPage, parseViewer } from './viewer';
+export {
+  actionChange,
+  FOLLOW_ACTION,
+  fanProfileUrl,
+  type PageAction,
+  readBandHeader,
+  WISHLIST_ACTION,
+} from './pageActions';
 export { parseViewedFanId } from './viewedFan';
 export type * from './types';

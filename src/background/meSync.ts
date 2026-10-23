@@ -51,7 +51,7 @@ async function runSync(requested: SyncMode): Promise<void> {
   // Without a finished sync there's nothing to be incremental against.
   const mode = me.syncedAt === null ? 'full' : requested;
   const settings = await loadSettings();
-  activity = { state: 'syncing', mode, itemsFetched: 0, followingFetched: 0 };
+  activity = { state: 'syncing', mode, step: 'wishlist', itemsFetched: 0, followingFetched: 0 };
   try {
     const added = await syncMe(
       {
@@ -62,10 +62,13 @@ async function runSync(requested: SyncMode): Promise<void> {
         pause: async () => sleep(paceDelayMs(await loadSettings(), Math.random)),
         now: Date.now,
         onProgress: (itemsFetched) => {
-          activity = { state: 'syncing', mode, itemsFetched, followingFetched: 0 };
+          if (activity.state === 'syncing') activity = { ...activity, itemsFetched };
         },
         onFollowingProgress: (followingFetched) => {
           if (activity.state === 'syncing') activity = { ...activity, followingFetched };
+        },
+        onStep: (step) => {
+          if (activity.state === 'syncing') activity = { ...activity, step };
         },
       },
       me,

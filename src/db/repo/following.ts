@@ -45,6 +45,18 @@ export async function replaceFollowing(
   });
 }
 
+/**
+ * Records a follow made on an account's page, before the next sync lists it (decisions §21).
+ * A row we already have keeps what the sync wrote and its tags; only the unfollowed mark goes.
+ */
+export async function markFollowed(db: DigheadDb, row: SyncedFollowing): Promise<void> {
+  await db.transaction('rw', db.following, async () => {
+    const key = followingKey(row);
+    if (await db.following.get(key)) await db.following.update(key, { unfollowed: false });
+    else await db.following.add({ ...row, tagIds: [], unfollowed: false });
+  });
+}
+
 /** Marks or clears an unfollow made on the tab, so a quick re-follow keeps the tags. */
 export async function setUnfollowed(
   db: DigheadDb,

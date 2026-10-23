@@ -300,7 +300,7 @@ We never send follow or unfollow requests. Bandcamp's fan-page script (read 2026
 
 ### Sync
 
-- Followings are part of your own sync (§4): paced and off the budget.
+- Followings are part of your own sync (§4): paced and off the budget. Since 2026-10-23 they run between the wishlist and the collection, so the tab fills in within seconds of a first sync, and each page is saved as it arrives (`putFollowing`, which keeps tags). Only the final `replaceFollowing` deletes, so a list that fails part-way can add followings but never delete any.
 - **Always full.** With 500-row batches, even 600 follows is two requests per list, so there's no incremental mode. A full sync is the only way to notice an unfollow made elsewhere, and it deletes those rows.
 
 ### Data
@@ -342,7 +342,8 @@ We change Bandcamp's own **following** tab on your profile instead of adding a t
 - **So we render the whole list in Bandcamp's markup:** inside `#following-grid`, Bandcamp's sub-tab bar (artists & labels / fans / genres) stays. In the artists & labels and fans containers, we hide Bandcamp's `ol.followeer-grid` and `.expand-container` (so its paging never runs), and insert our own `ol.followeer-grid` before them. It holds every following row from the DB as a light-DOM `li.followeer` built by `followCard.ts`. Bandcamp's CSS styles the cards, and its handler runs their follow buttons. The genres sub-tab is untouched. Selectors live in `FAN_PAGE_DOM`.
 - **Card details:** the avatar is `https://f4.bcbits.com/img/<image_id, 10 digits>_41.jpg` for fans and bands alike. The link is `trackpipe_url` for fans and the band's subdomain or custom domain for bands.
 - **Our additions sit in shadow roots:** the filter bar sits above our list. Each card gets one small host element holding its checkbox, tag chips, "+ tag" and, on fan cards, crate mate rank ("#4 crate mate"). The card itself must stay light DOM, because events from inside a shadow root don't match Bandcamp's `.followeer .follow-unfollow` selector. That's the one exception to "all injected UI in a shadow root". One React root renders into every card's host through portals, not one root per card.
-- **Filtering** hides non-matching cards (`hidden`) instead of re-rendering, so Bandcamp's button state stays put.
+- **Filtering** ~~hides non-matching cards (`hidden`)~~ (changed 2026-10-23) builds cards for the first 120 rows passing the filter, with "Show more" below the list (in its own shadow root) for the next 120. 600 follows meant 1,200 shadow roots up front: 2.1 s → 0.4 s in jsdom. Cards that stay are reused, so focus and button state survive; a card the filter drops is removed and rebuilt from the DB later. The one loss: an unfollow click whose request is still running when you filter its card away isn't marked until the next sync.
+- **During a sync** the list reloads when `followed` changes and says "Still syncing your follows" while the sync is on that step (as the wishlist, §14).
 - **Bulk tagging:** each card has a checkbox. With any checked, a bar shows "N selected · Tag… · Clear".
 - **Tag colours** come from a fixed set of design tokens (`--dh-tag-1` … `--dh-tag-8`), picked by tag id, so a rename keeps the colour. No colour picker.
 - New `src/ui/` components: `Chip`, `Checkbox`, and `TagPicker` (a wrapped Radix Popover with a combobox, where Enter creates a tag). Its portal goes to the shadow-root container.
@@ -556,6 +557,8 @@ The same tags as §8, on the releases in your wishlist, with the same filter (al
 - **Shared with the following tab:** `TagEditor`, `FilterControls`, `BulkBar`, the tag-bar CSS, `tagActions.ts` (`followTagHandlers`, `itemTagHandlers`) and the pure `tagFilter.ts`, which works over any rows through key, tags and text accessors.
 - **Release pages:** when the release is in your wishlist, the sidebar shows "In your wishlist" with its tags and "+ tag", under the artist's tags (§8). Only the exact item: wishlisting an album doesn't tag its track pages.
 - **Gap:** Bandcamp's own wishlist search box (`#wishlist-controls`) is left as it is and searches Bandcamp's list, not ours.
+- **During a sync** (changed 2026-10-23): the wishlist is fetched first and saved page by page, so the tab shows what's in as soon as it has anything, with "Still syncing your wishlist: N releases so far" while the sync is on that step. The sync status says which list it's fetching (`activity.step`: wishlist, then following, then collection). While the tab is open it polls the sync status every second and reloads the list only when `wishlisted` changes (`useSyncReload`), so a 2,000-item wishlist reloads about 20 times, once per page. Before, it waited for the whole sync, collection included, which on a big collection took minutes.
+- **Big wishlists** (2026-10-23): cards render 120 at a time; "Show more" fires by itself 800px before it scrolls into view and stays as a button for keyboards. Filters and search still run over the whole list. A reload keeps the objects of unchanged items (`reuseUnchanged`), so the memoised cards that didn't change skip rendering. Measured in jsdom with 2,000 items: first render 2.4 s → 0.4 s (58k → 3.5k elements), a reload 0.75 s → 0.07 s.
 
 ## 15. Page badges
 
@@ -809,3 +812,37 @@ Decided and built 2026-10-22. Code: `TABLES_RENAMED` and v13 in `src/db/schema.t
 - **Stored names follow.** Schema v13 creates `crateMates` and `latelyCrateMates`, copies the rows of the old `twins` and `latelyTwins` tables and drops them in the same upgrade (Dexie deletes removed tables after the upgrade runs). Older versions in the schema keep the names they shipped with.
 - **Older backups.** A backup made before v13 names the old tables, and dexie-export-import can't import a table the database doesn't have. Importing (and restoring a snapshot) first streams the JSON through `renameTables`, which rewrites only the two places the format names a table: `{"name":…,"schema":` in the header and `{"tableName":…,"inbound":` before each table's rows. Row values can't match, since quotes inside strings are escaped. The v11 golden backup still has the old names, so the golden tests cover both the upgrade and the import.
 - **Settings.** `topTwinsK` and `latelyRescanTwins` became `topCrateMatesK` and `latelyRescanCrateMates`. Saved values under the old keys are read as the new ones, and the next save writes only the new keys.
+
+## 21. Tag on follow and wishlist
+
+Decided and built 2026-10-23. Roadmap: *Tag on follow and wishlist*. Code: `bandcamp/pageActions.ts` (+ `pageActionsDom.ts`), `hooks/useTagPrompt.ts`, `hooks/useRecordFollow.ts`, `content/shared/TagPrompt.tsx`, `content/release/ReleaseTagPrompts.tsx`. Tested on a fixture of the controls as Bandcamp's JS renders them (jsdom, logged out); not yet tried logged in on live pages.
+
+Before this, tags on a new follow or heart only showed after the next sync (§8, §14), so the moment you'd most want to tag it passed.
+
+### Which controls
+
+- **The heart** on album and track pages: `li#collect-item`, server-rendered as `#collect-item-placeholder` and filled in by Bandcamp's JS. Its `collectItem` / `uncollectItem` swap `wishlist` ↔ `wishlisted` **before** the request, and swap back if it fails. A revert reads as an un-heart, which undoes our mark. Neither class (owned: `purchased`) means nothing.
+- **Follow** on band, release and fan pages: `#following-actions button.follow-unfollow`. `following` is on while you follow. After a band follow, Bandcamp may re-render it as a "Subscribed!" button (mailing list, class `subscribed`, no id), which counts as following. The server-rendered placeholder has no id and is ignored, so Bandcamp's first render isn't read as a follow.
+- On release pages, Follow is the selling account (`bandId`), the same account whose tags the sidebar shows.
+- **We send no follow or wishlist requests**, as in §8: Bandcamp's handler does. We watch class changes.
+
+### Watching
+
+- One `MutationObserver` per control on `document.body` (subtree, child list, `class` only). Neither element lives for the whole page (the heart appears after load, the follow button is re-rendered), so watching the element itself would miss changes.
+- A change counts only between two known states. Unknown (not rendered, owned) keeps the last known state.
+
+### Saving
+
+- **Follow:** `markFollowed` adds the account with the details on the page (name, URL, location; no avatar) and no tags. A row we already have keeps what the sync wrote and its tags; only the unfollowed mark is cleared. **Unfollow** reuses `setUnfollowed`, so a quick re-follow keeps the tags, and the next full sync deletes the row (§8).
+- **Heart:** `markWishlisted` writes your wishlist `ownership` row (dated now) and refreshes your match index. An item you own stays owned; one already wishlisted keeps its date. It answers false before Dighead knows who you are, and then nothing opens. **Un-heart** deletes the wishlist row but keeps `itemTags`, so a quick re-add keeps the tags; the next full sync drops them (§14).
+- The release itself is in `items` already: opening its page saved it (`releaseOpened`).
+- After either, the page's hooks refetch, so the inline tag editor shows at once.
+
+### The picker
+
+- After a heart, the usual tag picker opens **next to Bandcamp's button**, titled "Tag <name>", with the input focused. Escape or a click outside closes it. An un-heart closes it.
+- It's `AnchoredTagPicker`: the same combobox as "+ tag", anchored to the page's element through Radix's `virtualRef` and portalled into our shadow root.
+- It opens only once your tags and the saved heart have loaded; until then, and on errors (logged), nothing shows. The inline editor carries the error and empty states.
+- On release pages the prompts mount in a shadow root of their own, since the sidebar renders nothing inside while collapsed.
+- **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
+- **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.

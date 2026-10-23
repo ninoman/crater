@@ -29,6 +29,8 @@ export interface Settings {
   seedFromCollection: boolean;
   /** "owned" / "wishlist" / "3 crate mates" next to release links on Bandcamp pages (decisions §15). */
   pageBadges: boolean;
+  /** Open the tag picker when you wishlist a release on its page (decisions §21). */
+  tagPrompt: boolean;
   /** Releases from artists and labels you follow score a little higher (decisions §16). */
   followingBoost: boolean;
   /** Releases with more Bandcamp owners than this are not deep cuts (decisions §18). */
@@ -53,6 +55,7 @@ export const DEFAULT_SETTINGS: Settings = {
   latelyRescanDays: 7,
   seedFromCollection: true,
   pageBadges: false,
+  tagPrompt: true,
   followingBoost: true,
   // Underground electronic runs small; what counts as rare depends on the genre you dig in.
   deepCutMaxSupporters: 50,

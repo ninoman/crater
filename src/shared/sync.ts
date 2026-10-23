@@ -3,9 +3,18 @@
 /** full: page everything and drop removed items. incremental: stop at already-known items. */
 export type SyncMode = 'full' | 'incremental';
 
+/** What a running sync is fetching, in order (syncMe). */
+export type SyncStep = 'wishlist' | 'following' | 'collection';
+
 export type SyncActivity =
   | { state: 'idle' }
-  | { state: 'syncing'; mode: SyncMode; itemsFetched: number; followingFetched: number }
+  | {
+      state: 'syncing';
+      mode: SyncMode;
+      step: SyncStep;
+      itemsFetched: number;
+      followingFetched: number;
+    }
   | { state: 'error'; message: string };
 
 export type SyncStatus =

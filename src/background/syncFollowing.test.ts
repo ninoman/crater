@@ -88,6 +88,7 @@ function deps(fetchJson: SyncDeps['fetchJson'], overrides: Partial<SyncDeps> = {
     now: () => 1000,
     onProgress: () => {},
     onFollowingProgress: () => {},
+    onStep: () => {},
     ...overrides,
   };
 }
@@ -147,27 +148,30 @@ describe('syncFollowing', () => {
     expect(pauses).toBe(2);
   });
 
-  it('replaces nothing when a list fails part-way', async () => {
+  it('adds what it fetched but deletes nothing when a list fails part-way', async () => {
     await syncFollowing(deps(fakeFollowing({ band: [1, 2], fan: [9] }).fetchJson), FAN);
     await db.following.update(['band', 1], { tagIds: [5] });
 
-    // Bands succeed, then the fan list fails: the new band list must not be written either.
+    // Bands succeed, then the fan list fails: band 3 is saved, but bands 1 and 2, missing from
+    // the new list, must not be deleted.
     const failing = fakeFollowing({ band: [3], fan: [9], failAfter: 1 });
     await expect(syncFollowing(deps(failing.fetchJson), FAN)).rejects.toThrow('network down');
 
-    expect(await db.following.count()).toBe(3);
+    expect(await db.following.count()).toBe(4);
     expect((await getFollowing(db, ['band', 1]))?.tagIds).toEqual([5]);
-    expect(await getFollowing(db, ['band', 3])).toBeUndefined();
+    expect(await getFollowing(db, ['band', 3])).toBeDefined();
   });
 
-  it('replaces nothing when a later band page fails', async () => {
+  it('deletes nothing when a later band page fails', async () => {
     await syncFollowing(deps(fakeFollowing({ band: [1], fan: [] }).fetchJson), FAN);
     const band = Array.from({ length: 600 }, (_, i) => i + 10);
 
     const failing = fakeFollowing({ band, fan: [], failAfter: 1 });
     await expect(syncFollowing(deps(failing.fetchJson), FAN)).rejects.toThrow();
 
-    expect(await db.following.count()).toBe(1);
+    // The first page of 500 is saved; band 1, not on it, stays.
+    expect(await db.following.count()).toBe(501);
+    expect(await getFollowing(db, ['band', 1])).toBeDefined();
   });
 });
 
@@ -180,5 +184,27 @@ describe('syncMe with followings', () => {
     };
 
     await expect(syncMe(deps(fetchJson), me, 'full')).resolves.toEqual([]);
+  });
+
+  it('syncs the wishlist, then followings, then the collection, saying which', async () => {
+    const me = await saveViewer(db, { fanId: FAN, username: 'me' });
+    const steps: string[] = [];
+    const requests: string[] = [];
+    const fetchJson = async ({ url }: BandcampRequest) => {
+      requests.push(url.split('/').pop() ?? url);
+      if (url.includes('following_'))
+        return { followeers: [], more_available: false, last_token: null };
+      return { items: [], more_available: false, last_token: null };
+    };
+
+    await syncMe(deps(fetchJson, { onStep: (step) => steps.push(step) }), me, 'full');
+
+    expect(steps).toEqual(['wishlist', 'following', 'collection']);
+    expect(requests).toEqual([
+      'wishlist_items',
+      'following_bands',
+      'following_fans',
+      'collection_items',
+    ]);
   });
 });

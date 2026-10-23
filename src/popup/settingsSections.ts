@@ -69,6 +69,12 @@ export const MAIN_SECTIONS: SettingSection[] = [
         description:
           'Mark releases you own or wishlisted, and how many of your crate mates bought them.',
       },
+      {
+        kind: 'toggle',
+        key: 'tagPrompt',
+        label: 'Ask for tags when you wishlist',
+        description: 'Opens the tag picker next to Bandcamp’s heart.',
+      },
     ],
   },
 ];

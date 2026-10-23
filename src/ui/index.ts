@@ -13,6 +13,7 @@ export { Identity, type IdentityProps } from './Identity';
 export { InfoHint, type InfoHintProps } from './InfoHint';
 export { ExternalIcon, HideIcon, PauseIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
+export { LoadMore, type LoadMoreProps } from './LoadMore';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';
 export { PlayableCover, type PlayableCoverProps } from './PlayableCover';
@@ -30,7 +31,12 @@ export { StatusDot, type StatusDotProps } from './StatusDot';
 export { injectStyles, uiStyles } from './styles';
 export { Table, type TableColumn, type TableProps } from './Table';
 export { type TagOption, tagColor } from './tag';
-export { TagPicker, type TagPickerProps } from './TagPicker';
+export {
+  AnchoredTagPicker,
+  type AnchoredTagPickerProps,
+  TagPicker,
+  type TagPickerProps,
+} from './TagPicker';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { type PageColors, type ThemeVariables, themeVariables } from './theme';
 export { Toggle, type ToggleProps } from './Toggle';

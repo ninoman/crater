@@ -10,8 +10,11 @@ export type SyncStatusView =
 
 const POLL_MS = 1000;
 
-/** Polls the worker's sync status while mounted. The popup is short-lived, so polling is cheap. */
-export function useSyncStatus(): { view: SyncStatusView; resync: () => void } {
+/**
+ * Polls the worker's sync status while mounted and `enabled`. The popup is short-lived, so
+ * polling is cheap; a tab passes `enabled` so it polls only while on screen.
+ */
+export function useSyncStatus(enabled = true): { view: SyncStatusView; resync: () => void } {
   const [view, setView] = useState<SyncStatusView>({ state: 'loading' });
 
   const refresh = useCallback(() => {
@@ -22,10 +25,11 @@ export function useSyncStatus(): { view: SyncStatusView; resync: () => void } {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     refresh();
     const timer = setInterval(refresh, POLL_MS);
     return () => clearInterval(timer);
-  }, [refresh]);
+  }, [refresh, enabled]);
 
   const resync = useCallback(() => {
     sendMessage('resync', {}).then(refresh, (error: unknown) =>

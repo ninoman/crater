@@ -1,7 +1,7 @@
 // Why a list synced from your account (followings, wishlist) is empty, from the sync status,
 // so the tab can say what to do next.
 
-import type { SyncStatus } from '../../shared/sync';
+import type { SyncStatus, SyncStep } from '../../shared/sync';
 
 export type EmptyReason =
   /** The worker hasn't seen you logged in. */
@@ -31,4 +31,11 @@ export function emptyReason(status: SyncStatus): EmptyReason {
  */
 export function showsBandcampList(reason: EmptyReason): boolean {
   return reason.kind !== 'none';
+}
+
+/** Whether a running sync is still fetching this list, so more of it is on its way. */
+export function syncingStep(status: SyncStatus, step: SyncStep): boolean {
+  return status.state === 'known' && status.activity.state === 'syncing'
+    ? status.activity.step === step
+    : false;
 }

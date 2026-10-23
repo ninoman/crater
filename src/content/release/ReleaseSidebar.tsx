@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ReleasePageItem } from '../../bandcamp';
+import { type ReleasePageItem, readBandHeader } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
 import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
@@ -53,7 +53,11 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
-      <FollowedAccountTags kind="band" id={item.bandId} name={item.artist} />
+      <FollowedAccountTags
+        kind="band"
+        id={item.bandId}
+        name={readBandHeader(document)?.name ?? item.artist}
+      />
       <WishlistItemTags itemKey={item.itemKey} name={`${item.artist} – ${item.title}`} />
       <ScanHeader progress={progress} notices={notices} />
       <Tabs

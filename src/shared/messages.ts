@@ -10,6 +10,7 @@ import type {
   Following,
   FollowingKey,
   FollowKind,
+  SyncedFollowing,
   Tag,
   TagAction,
   TagBackup,
@@ -93,7 +94,9 @@ export interface MessageMap {
     request: { kind: FollowKind; id: number };
     response: number[] | null;
   };
-  /** Marks or clears an unfollow made on the tab. */
+  /** A follow made on an account's own page, before the next sync lists it (decisions §21). */
+  markFollowed: { request: { account: SyncedFollowing }; response: null };
+  /** Marks or clears an unfollow made on the tab or on the account's page. */
   setUnfollowed: {
     request: { key: FollowingKey; unfollowed: boolean };
     response: null;
@@ -107,6 +110,15 @@ export interface MessageMap {
     request: { tagId: number; itemKeys: ItemKey[]; action: TagAction };
     response: number;
   };
+  /**
+   * A heart clicked on a release page, before the next sync sees it. Answers false when we
+   * don't know who you are yet, so there's nothing to tag.
+   */
+  markWishlisted: {
+    request: { release: Pick<ReleasePageItem, 'itemKey' | 'albumKey'> };
+    response: boolean;
+  };
+  markUnwishlisted: { request: { itemKey: ItemKey }; response: null };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
   /** Writes a full backup to the staging file (shared/backupStaging.ts); the popup saves it. */

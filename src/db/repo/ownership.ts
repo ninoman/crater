@@ -1,4 +1,10 @@
-import type { CollectionItem, ItemKey, ReleaseInfo, Supporter } from '../../bandcamp';
+import {
+  type CollectionItem,
+  type ItemKey,
+  matchKey,
+  type ReleaseInfo,
+  type Supporter,
+} from '../../bandcamp';
 import { ownershipFromCollection, ownershipFromSupporter } from '../mappers';
 import type { DigheadDb, OwnershipRecord } from '../schema';
 import { readOwnership, storeOwnership } from '../storage';
@@ -23,6 +29,48 @@ export async function putOwnership(
     await db.ownership.bulkPut(
       items.map((item) => storeOwnership(ownershipFromCollection(fanId, item, source))),
     );
+    await refreshFanMatches(db, [fanId]);
+  });
+}
+
+/**
+ * Records a wishlist add made on the release page, before the next sync sees it (decisions §21).
+ * An item you own stays owned, and one already wishlisted keeps its date.
+ */
+export async function markWishlisted(
+  db: DigheadDb,
+  fanId: number,
+  release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
+  addedAt: number,
+): Promise<void> {
+  await writeOwnership(db, async () => {
+    if (await db.ownership.get([fanId, release.itemKey])) return;
+    await db.ownership.put(
+      storeOwnership({
+        fanId,
+        itemKey: release.itemKey,
+        matchKey: matchKey(release),
+        source: 'wishlist',
+        addedAt,
+      }),
+    );
+    await refreshFanMatches(db, [fanId]);
+  });
+}
+
+/**
+ * Records a wishlist removal made on the release page. Its tags stay, so a quick re-add loses
+ * nothing; the next full sync drops them (decisions §14).
+ */
+export async function markUnwishlisted(
+  db: DigheadDb,
+  fanId: number,
+  itemKey: ItemKey,
+): Promise<void> {
+  await writeOwnership(db, async () => {
+    const row = await db.ownership.get([fanId, itemKey]);
+    if (!row || readOwnership(row).source !== 'wishlist') return;
+    await db.ownership.delete([fanId, itemKey]);
     await refreshFanMatches(db, [fanId]);
   });
 }

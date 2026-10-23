@@ -100,20 +100,6 @@ describe('createCardList', () => {
     expect(after[1]?.item.classList.contains(FOLLOWING_CLASSES.unfollowed)).toBe(true);
   });
 
-  it('hides cards the filter drops instead of removing them', () => {
-    const { list } = takeOver('band');
-    const cardList = createCardList(list);
-    const cards = cardList.update(BANDS.slice(0, 3));
-
-    cardList.show(new Set([BANDS[1]?.id ?? 0]));
-
-    expect(cards.map((card) => card.item.hidden)).toEqual([true, false, true]);
-    expect(cards.every((card) => card.item.isConnected)).toBe(true);
-    expect(doc.defaultView?.getComputedStyle(cards[0]?.item as Element).display).toBe('none');
-    cardList.show(new Set(BANDS.map((row) => row.id)));
-    expect(cards.some((card) => card.item.hidden)).toBe(false);
-  });
-
   it('hides cards Bandcamp’s paging appends to our list', () => {
     const { list } = takeOver('band');
     const cardList = createCardList(list);

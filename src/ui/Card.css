@@ -18,21 +18,26 @@
   margin-bottom: var(--dh-space-2);
 }
 
-.dh-card__select,
+/* The box sits flush in the corner, lifted off busy artwork like on following cards. Flex, so
+   it isn't placed on a line box that would pad it out. */
+.dh-card__select {
+  position: absolute;
+  top: var(--dh-space-2);
+  left: var(--dh-space-2);
+  display: flex;
+}
+
+.dh-card__select .dh-checkbox__box {
+  box-shadow: var(--dh-shadow-tooltip);
+}
+
 .dh-card__actions {
   position: absolute;
   top: var(--dh-space-1);
+  right: var(--dh-space-1);
   padding: 2px;
   border-radius: var(--dh-radius-sm);
   background: var(--dh-color-bg);
-}
-
-.dh-card__select {
-  left: var(--dh-space-1);
-}
-
-.dh-card__actions {
-  right: var(--dh-space-1);
   opacity: 0;
   transition: opacity var(--dh-duration);
 }

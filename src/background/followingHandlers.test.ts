@@ -114,6 +114,20 @@ describe('getFollowTags and setUnfollowed', () => {
     await h.setUnfollowed({ key: ['band', 1], unfollowed: false }, sender);
     expect(await h.getFollowTags({ kind: 'band', id: 1 }, sender)).toEqual([tagId]);
   });
+
+  it('makes an account followed on its page taggable at once', async () => {
+    const account = {
+      kind: 'fan' as const,
+      id: 7,
+      name: 'G',
+      url: 'g',
+      imageId: null,
+      location: null,
+      followedAt: 4,
+    };
+    await h.markFollowed({ account }, sender);
+    expect(await h.getFollowTags({ kind: 'fan', id: 7 }, sender)).toEqual([]);
+  });
 });
 
 describe('exportTags and importTags', () => {

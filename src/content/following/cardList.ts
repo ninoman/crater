@@ -21,8 +21,6 @@ export interface Card {
 export interface CardList {
   /** Makes the list hold exactly `rows`, in order. Answers with their cards, in the same order. */
   update: (rows: readonly Following[]) => Card[];
-  /** Hides every card whose id isn't in `visible`. */
-  show: (visible: ReadonlySet<number>) => void;
   /** Calls back when a follow button changes. Returns a function that stops watching. */
   watchFollows: (onChange: (id: number, following: boolean) => void) => () => void;
 }
@@ -80,10 +78,6 @@ export function createCardList(list: HTMLOListElement): CardList {
         return card;
       });
       return ordered;
-    },
-
-    show(visible) {
-      for (const [id, card] of cards) card.item.hidden = !visible.has(id);
     },
 
     watchFollows(onChange) {

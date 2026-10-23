@@ -15,6 +15,7 @@ import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import infoHint from './InfoHint.css?inline';
+import loadMore from './LoadMore.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import playableCover from './PlayableCover.css?inline';
@@ -65,6 +66,7 @@ export const uiStyles = [
   skeleton,
   sectionHeading,
   disclosure,
+  loadMore,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */
