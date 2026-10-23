@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { importInto } from 'dexie-export-import';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { afterEach, beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import {
   DigheadDb,
   ensureFileReader,
@@ -21,6 +21,10 @@ import { buildScenario } from './scenario';
 // `UPDATE_GOLDEN=1 pnpm test tests/golden` re-records both: only on code known to be right.
 const GOLDEN = join(import.meta.dirname, 'golden.json');
 const V11_BACKUP = join(import.meta.dirname, 'v11-backup.json');
+
+// The scenario is a whole database in fake-indexeddb: ~0.5s alone, but several seconds when
+// the full suite's workers compete for CPU, which overran the 5s default.
+vi.setConfig({ testTimeout: 30_000 });
 
 /** The v11 stores, so a test can make a database as that build left it. */
 const V11_STORES = {
