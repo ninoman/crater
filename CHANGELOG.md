@@ -1,11 +1,39 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] - 2026-10-23
+
+### Added
+
+- **Following tags**: tag the fans, artists and labels you follow, filter and bulk-tag them
+  on the following tab, see tags on their own pages, and export or import your tags.
+- Tags on wishlist items, with a tag filter on the wishlist tab.
+- **For you** gets *Fresh* (crate mates' recent buys) and *Deep cuts* modes, with a reason
+  line on each pick and a boost for artists and labels you follow.
+- **Crate mates' latest** feed on your profile, with playable covers of their newest buys.
+- Badges next to release links across Bandcamp: owned, wishlisted, or how many crate mates
+  own it.
+- Previews play in our own player with a seek bar, straight from the cover.
+- Also bought shows a skeleton while loading, then early picks as the scan finds them, and
+  takes its colours from the artist's page.
+- Full database export and import in settings (gzipped, all-or-nothing, resumes if
+  interrupted).
+- Plain-language settings with an Advanced section.
+- The =D logo as the extension icon.
 
 ### Changed
 
 - The fan leaderboard is now called **Crate mates**, everywhere in the extension. Your
   leaderboard, settings and backups carry over.
+- Smarter scanning: supporters are ranked by known overlap and read in passes, so Also bought
+  fills in much faster. The default daily request budget is now 10,000.
+- Crate mates scores are out of 100, weighted toward recent buys, and ignore compilations.
+- Much smaller database on disk.
+
+### Fixed
+
+- No more recommendations for albums you already own a track of.
+- Purchase detection matches the real purchase page only.
+- Assorted layout fixes on the profile tabs, following cards and settings.
 
 ## [0.1.0] - 2026-10-20
 
