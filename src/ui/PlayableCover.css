@@ -27,3 +27,8 @@
 .dh-playable-cover:focus-visible .dh-playable-cover__icon {
   opacity: 1;
 }
+
+.dh-playable-cover--fill {
+  display: block;
+  width: 100%;
+}

@@ -10,3 +10,9 @@
 .dh-cover--empty {
   background: var(--dh-color-bg-hover);
 }
+
+.dh-cover--fill {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}

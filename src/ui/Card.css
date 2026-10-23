@@ -1,0 +1,64 @@
+.dh-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--dh-space-5) var(--dh-space-4);
+  margin: 0;
+  padding: var(--dh-space-4) 0;
+  list-style: none;
+}
+
+.dh-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dh-card__media {
+  position: relative;
+  margin-bottom: var(--dh-space-2);
+}
+
+.dh-card__select,
+.dh-card__actions {
+  position: absolute;
+  top: var(--dh-space-1);
+  padding: 2px;
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+}
+
+.dh-card__select {
+  left: var(--dh-space-1);
+}
+
+.dh-card__actions {
+  right: var(--dh-space-1);
+  opacity: 0;
+  transition: opacity var(--dh-duration);
+}
+
+.dh-card:hover .dh-card__actions,
+.dh-card:focus-within .dh-card__actions {
+  opacity: 1;
+}
+
+.dh-card__title,
+.dh-card__meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dh-card__title {
+  font-size: var(--dh-text-sm);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-card__meta {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
+
+.dh-card__badges {
+  margin-top: var(--dh-space-1);
+}

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// The whole wishlist tab against a fake worker: takeover on first open, rows with their tags,
+// The whole wishlist tab against a fake worker: takeover on first open, cards with their tags,
 // filtering, bulk tagging and the empty state.
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -94,7 +94,7 @@ async function settle(): Promise<void> {
 
 const grid = (doc: Document) => doc.getElementById('wishlist-grid') as HTMLElement;
 const root = (doc: Document) => doc.querySelector('#wishlist-items dighead-wishlist')?.shadowRoot;
-const rows = (doc: Document) => [...(root(doc)?.querySelectorAll('li.dh-row') ?? [])];
+const cards = (doc: Document) => [...(root(doc)?.querySelectorAll('li.dh-card') ?? [])];
 const buttonNamed = (doc: Document, text: string) =>
   [...(root(doc)?.querySelectorAll('button') ?? [])].find(
     (button) => button.textContent === text,
@@ -119,12 +119,12 @@ describe('the wishlist tab', () => {
     await openTab(doc);
 
     expect(doc.getElementById('wishlist-items')?.classList).toContain('dighead-wishlist-taken');
-    expect(rows(doc).map((row) => row.querySelector('.dh-row__title')?.textContent)).toEqual([
+    expect(cards(doc).map((row) => row.querySelector('.dh-card__title')?.textContent)).toEqual([
       'Title 3',
       'Title 2',
       'Title 1',
     ]);
-    const chips = [...(rows(doc)[0]?.querySelectorAll('.dh-tag-editor .dh-chip') ?? [])];
+    const chips = [...(cards(doc)[0]?.querySelectorAll('.dh-tag-editor .dh-chip') ?? [])];
     expect(chips.map((chip) => chip.textContent)).toEqual(['dub', 'techno']);
   });
 
@@ -136,7 +136,7 @@ describe('the wishlist tab', () => {
       (button) => button.textContent === 'techno' && button.closest('.dh-tag-bar__tags'),
     ) as HTMLButtonElement | undefined;
     await act(async () => techno?.click());
-    expect(rows(doc)).toHaveLength(1);
+    expect(cards(doc)).toHaveLength(1);
     expect(root(doc)?.textContent).toContain('Showing 1 of 3');
 
     const search = root(doc)?.querySelector('input[type="search"]') as HTMLInputElement;
@@ -145,17 +145,17 @@ describe('the wishlist tab', () => {
       setValue?.call(search, 'no such release');
       search.dispatchEvent(new Event('input', { bubbles: true }));
     });
-    expect(rows(doc)).toHaveLength(0);
+    expect(cards(doc)).toHaveLength(0);
     expect(root(doc)?.textContent).toContain('No releases match these filters');
     await act(async () => buttonNamed(doc, 'Clear filters')?.click());
-    expect(rows(doc)).toHaveLength(3);
+    expect(cards(doc)).toHaveLength(3);
   });
 
   it('shows the bulk bar for checked releases', async () => {
     const doc = fanPage();
     await openTab(doc);
 
-    const boxes = rows(doc).map(
+    const boxes = cards(doc).map(
       (row) => row.querySelector('button[role="checkbox"]') as HTMLButtonElement,
     );
     await act(async () => boxes[0]?.click());
@@ -168,7 +168,7 @@ describe('the wishlist tab', () => {
     const doc = fanPage();
     await openTab(doc);
 
-    const remove = rows(doc)[1]?.querySelector(
+    const remove = cards(doc)[1]?.querySelector(
       '.dh-tag-editor .dh-chip button',
     ) as HTMLButtonElement | null;
     await act(async () => remove?.click());

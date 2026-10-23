@@ -5,14 +5,14 @@ import { useTags } from '../../hooks/useTags';
 import { useWishlist } from '../../hooks/useWishlist';
 import type { Tag } from '../../shared/following';
 import type { WishlistItem } from '../../shared/wishlist';
-import { Button, EmptyState, Notice, RowList } from '../../ui';
+import { Button, CardGrid, EmptyState, Notice } from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { EmptyWishlist } from './EmptyWishlist';
 import { FilterControls } from '../shared/FilterControls';
 import { itemTagHandlers } from '../shared/tagActions';
 import { actionable, isFiltering, liveTagIds, NO_FILTER, toggled } from '../shared/tagFilter';
 import { commonItemTagIds, visibleItemKeys } from './wishlistFilter';
-import { WishlistRow } from './WishlistRow';
+import { WishlistCard } from './WishlistCard';
 
 const NO_ITEMS: WishlistItem[] = [];
 const NO_TAGS: Tag[] = [];
@@ -24,8 +24,8 @@ export interface WishlistViewProps {
 }
 
 /**
- * Your whole wishlist in place of Bandcamp's paged one: a filter bar, then every release with
- * its tags, one preview open at a time, and bulk tagging of the checked ones (decisions §14).
+ * Your whole wishlist in place of Bandcamp's paged one: a filter bar, then every release as a
+ * grid card with its tags, one preview open at a time, and bulk tagging of the checked ones (decisions §14).
  */
 export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
   const view = useWishlist();
@@ -135,9 +135,9 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
       </section>
       {shown.length > 0 && (
         <div className="dh-wishlist__list">
-          <RowList label="Your wishlist">
+          <CardGrid label="Your wishlist">
             {shown.map((item) => (
-              <WishlistRow
+              <WishlistCard
                 key={item.itemKey}
                 item={item}
                 tags={tags}
@@ -149,7 +149,7 @@ export function WishlistView({ open, showBandcampList }: WishlistViewProps) {
                 onError={setError}
               />
             ))}
-          </RowList>
+          </CardGrid>
         </div>
       )}
     </>

@@ -203,7 +203,7 @@ Design: decisions §14.
 1. [x] Schema v9: `itemTags`, keyed by item, so scans and syncs never wipe them. A full wishlist sync drops the tags of items that left it.
 2. [x] Repo, messages and hooks: `listWishlist`, `getItemTags`, `assignItemTag`; deleting a tag takes it off items too.
 3. [x] Share the tag filter, editor, filter bar and bulk bar between the following and wishlist tabs.
-4. [x] Take over the wishlist tab: every release as a row with a playable cover, tags, "+ tag", a select box, the filter bar, bulk tagging and all view states.
+4. [x] Take over the wishlist tab: every release as a grid card with a playable cover, tags, "+ tag", a select box, the filter bar, bulk tagging and all view states.
 5. [x] Tags on a wishlisted release's own page, in the sidebar.
 6. [x] Item tags in the tag export/import (file version 2; version 1 files still import).
 7. [ ] Try the takeover on the live wishlist tab, with Bandcamp's own JS running.

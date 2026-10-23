@@ -5,6 +5,7 @@ import audioPlayer from './AudioPlayer.css?inline';
 import badge from './Badge.css?inline';
 import base from './base.css?inline';
 import button from './Button.css?inline';
+import card from './Card.css?inline';
 import checkbox from './Checkbox.css?inline';
 import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
@@ -48,6 +49,7 @@ export const uiStyles = [
   notice,
   progress,
   row,
+  card,
   releaseRow,
   table,
   searchField,
