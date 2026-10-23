@@ -2,11 +2,11 @@ import { memo } from 'react';
 import type { ItemKey } from '../../bandcamp';
 import type { WishlistItem } from '../../shared/wishlist';
 import {
+  Card,
   Checkbox,
   ExternalIcon,
   LinkButton,
   PlayableCover,
-  Row,
   type TagOption,
   Tooltip,
 } from '../../ui';
@@ -15,7 +15,7 @@ import { itemTagHandlers, type TagMutations } from '../shared/tagActions';
 import { TagEditor } from '../shared/TagEditor';
 import { addedText } from './wishlistFilter';
 
-export interface WishlistRowProps {
+export interface WishlistCardProps {
   item: WishlistItem;
   tags: readonly TagOption[];
   mutations: TagMutations;
@@ -27,10 +27,10 @@ export interface WishlistRowProps {
 }
 
 /**
- * One wishlisted release: select box, playable cover, title and artist, your tags and
- * "+ tag". Memoised, since a wishlist can hold hundreds and re-renders as a whole.
+ * One wishlisted release as a grid card: playable cover with a select box, title and artist,
+ * your tags and "+ tag". Memoised, since a wishlist can hold hundreds and re-renders as a whole.
  */
-export const WishlistRow = memo(function WishlistRow({
+export const WishlistCard = memo(function WishlistCard({
   item,
   tags,
   mutations,
@@ -39,38 +39,28 @@ export const WishlistRow = memo(function WishlistRow({
   onSelect,
   onPreview,
   onError,
-}: WishlistRowProps) {
+}: WishlistCardProps) {
   const name = `${item.artist} – ${item.title}`;
   const added = addedText(item.addedAt);
   const handlers = itemTagHandlers(mutations, [item.itemKey], item.tagIds, onError);
   return (
-    <Row
+    <Card
       media={
-        <div className="dh-wishlist-row__media">
-          <Checkbox
-            label={`Select ${name}`}
-            hideLabel
-            checked={selected}
-            onChange={(checked) => onSelect(item.itemKey, checked)}
-          />
-          <PlayableCover
-            src={item.coverUrl}
-            playing={previewing}
-            label={name}
-            onToggle={() => onPreview(item.itemKey, !previewing)}
-          />
-        </div>
+        <PlayableCover
+          src={item.coverUrl}
+          size="fill"
+          playing={previewing}
+          label={name}
+          onToggle={() => onPreview(item.itemKey, !previewing)}
+        />
       }
-      title={
-        <a href={item.url} title={name}>
-          {item.title}
-        </a>
-      }
-      meta={added ? [item.artist, added] : [item.artist]}
-      badges={
-        <span className="dh-wishlist-row__tags">
-          <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
-        </span>
+      select={
+        <Checkbox
+          label={`Select ${name}`}
+          hideLabel
+          checked={selected}
+          onChange={(checked) => onSelect(item.itemKey, checked)}
+        />
       }
       actions={
         <Tooltip content="Open in a new tab">
@@ -86,8 +76,15 @@ export const WishlistRow = memo(function WishlistRow({
           </LinkButton>
         </Tooltip>
       }
+      title={
+        <a href={item.url} title={name}>
+          {item.title}
+        </a>
+      }
+      meta={added ? [item.artist, added] : [item.artist]}
+      badges={<TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />}
     >
       {previewing && <ReleasePreview url={item.url} name={name} />}
-    </Row>
+    </Card>
   );
 });

@@ -1,6 +1,7 @@
 export { AudioPlayer, type AudioPlayerProps, type AudioPlayerState } from './AudioPlayer';
 export { Badge } from './Badge';
 export { Button, LinkButton, type ButtonProps, type LinkButtonProps } from './Button';
+export { Card, CardGrid, type CardProps } from './Card';
 export { Checkbox, type CheckboxProps } from './Checkbox';
 export { Chip, type ChipProps } from './Chip';
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog';
