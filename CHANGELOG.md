@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0] - 2026-10-23
+
+### Added
+
+- Heart a release and the tag picker opens right next to the heart. A follow made on an
+  account's page is saved at once, so you can tag it there without waiting for a sync.
+- "You follow <name>" before an account's tags; on release pages it names the account
+  selling the release (a label shows as the label).
+
+### Changed
+
+- The wishlist and following tabs fill in while your sync runs, instead of after it.
+  Followings now sync before your collection.
+- Big wishlists and follow lists open much faster: cards load as you scroll, and reloads
+  only redraw what changed.
+
+### Fixed
+
+- The select box on wishlist cards no longer sits on a white plate.
+
 ## [0.2.0] - 2026-10-23
 
 ### Added
