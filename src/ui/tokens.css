@@ -74,6 +74,7 @@
   --dh-picker-list-height: 200px;
   --dh-duration: 120ms;
   --dh-duration-reveal: 180ms;
+  --dh-duration-shimmer: 1400ms;
 
   --dh-z-panel: 2147483000;
   --dh-z-tooltip: 2147483001;

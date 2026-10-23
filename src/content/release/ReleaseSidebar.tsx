@@ -5,6 +5,7 @@ import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useScanProgress } from '../../hooks/useScanProgress';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
+import { useTimePassed } from '../../hooks/useTimePassed';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
@@ -16,6 +17,9 @@ import { WishlistItemTags } from './WishlistItemTags';
 
 /** The sidebar checks the queue's health less often than the popup does. */
 const SCANNER_POLL_MS = 5000;
+
+/** How long Also bought shows only the loader before early picks may appear. */
+const EARLY_PICKS_AFTER_MS = 10_000;
 
 export function ReleaseSidebar() {
   const release = useCurrentRelease();
@@ -31,7 +35,8 @@ export function ReleaseSidebar() {
       </SidebarShell>
     );
   }
-  return <ReleaseRecommendations item={release.page.item} />;
+  // Keyed so a new release starts its wait, and the early-picks timer, from scratch.
+  return <ReleaseRecommendations key={release.page.item.itemKey} item={release.page.item} />;
 }
 
 /**
@@ -44,6 +49,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const releaseSaved = progress.state !== 'loading';
   const { view, hide } = useAlsoBought(item.itemKey, releaseSaved);
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
+  const showEarly = useTimePassed(EARLY_PICKS_AFTER_MS);
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
@@ -61,6 +67,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 view={view}
                 progress={progress}
                 scanStopped={notices.length > 0}
+                showEarly={showEarly}
                 onHide={hide}
               />
             ),

@@ -1,0 +1,88 @@
+/* Rows share Row's spacing, so the list doesn't jump when real rows replace them. */
+.dh-skeleton {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dh-skeleton__row {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-3);
+  padding: var(--dh-space-2) var(--dh-space-3) var(--dh-space-2) var(--dh-space-4);
+  border-bottom: 1px solid var(--dh-color-border);
+}
+
+.dh-skeleton__row:last-child {
+  border-bottom: 0;
+}
+
+/* Each row fades a little, so the list trails off rather than ending in a hard edge. */
+.dh-skeleton__row:nth-child(2) {
+  opacity: 0.75;
+}
+
+.dh-skeleton__row:nth-child(3) {
+  opacity: 0.5;
+}
+
+.dh-skeleton__row:nth-child(n + 4) {
+  opacity: 0.3;
+}
+
+.dh-skeleton__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--dh-space-2);
+}
+
+.dh-skeleton__block {
+  display: block;
+  border-radius: var(--dh-radius-sm);
+  background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--dh-color-bg-subtle) 50%,
+      transparent 100%
+    )
+    var(--dh-color-bg-hover);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: dh-skeleton-shimmer var(--dh-duration-shimmer) ease-in-out infinite;
+}
+
+.dh-skeleton__cover {
+  flex: none;
+  width: var(--dh-cover-sm);
+  height: var(--dh-cover-sm);
+}
+
+.dh-skeleton__line {
+  width: 70%;
+  height: var(--dh-text-sm);
+}
+
+.dh-skeleton__line--short {
+  width: 45%;
+  height: var(--dh-text-xs);
+}
+
+@keyframes dh-skeleton-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+.dh-skeleton--paused .dh-skeleton__block {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-skeleton__block {
+    animation: none;
+  }
+}

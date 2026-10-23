@@ -42,37 +42,85 @@ afterEach(() => {
   container.remove();
 });
 
-function render(result: AlsoBoughtResult, progress: ScanProgressView = listed, stopped = false) {
+function render(
+  result: AlsoBoughtResult,
+  progress: ScanProgressView = listed,
+  stopped = false,
+  showEarly = false,
+) {
   const view: AlsoBoughtView = { state: 'ready', result };
   act(() =>
     root.render(
-      <AlsoBoughtList view={view} progress={progress} scanStopped={stopped} onHide={() => {}} />,
+      <AlsoBoughtList
+        view={view}
+        progress={progress}
+        scanStopped={stopped}
+        showEarly={showEarly}
+        onHide={() => {}}
+      />,
     ),
   );
 }
 
 describe('AlsoBoughtList', () => {
-  it('shows warm-up progress with labelled same-artist picks below', () => {
+  it('shows early picks under the warm-up progress once the first wait is over', () => {
+    const rows = [
+      row('a3', { kind: 'co-owned', owners: 2, crateMates: 0 }),
+      row('a2', { kind: 'same-artist' }),
+    ];
+    render({ releaseKey: 'a1', warmup, rows }, listed, false, true);
+
+    expect(container.querySelector('.dh-warmup__title')?.textContent).toBe('Early picks');
+    expect(container.textContent).toContain('12 of 20 supporters read');
+    expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Early picks');
+    expect(container.textContent).toContain('More from this artist');
+    expect(container.querySelector('.dh-skeleton')).toBeNull();
+  });
+
+  it('keeps the loader after the first wait while there are no picks', () => {
+    render({ releaseKey: 'a1', warmup, rows: [] }, listed, false, true);
+
+    expect(container.querySelector('.dh-warmup__title')?.textContent).toBe(
+      'Reading supporters before picking',
+    );
+    expect(container.querySelector('.dh-skeleton')).not.toBeNull();
+  });
+
+  it('shows warm-up progress over placeholder rows, and no picks, during the first wait', () => {
     render({ releaseKey: 'a1', warmup, rows: [row('a2', { kind: 'same-artist' })] });
 
-    expect(container.querySelector('[role="status"]')?.textContent).toContain(
-      '12 of 20 supporters read · 3 of 5 strong picks',
-    );
+    const status = container.querySelector('[role="status"]');
+    expect(status?.textContent).toContain('12 of 20 supporters read · 3 of 5 strong picks');
+    expect(status?.getAttribute('aria-busy')).toBe('true');
     expect(container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe(
       '15',
     );
-    expect(container.querySelector('h3')?.textContent).toBe(
-      'Meanwhile, from the same artist and label',
-    );
-    expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Same artist and label');
-    expect(container.textContent).toContain('More from this artist');
+    expect(container.querySelectorAll('.dh-skeleton__row')).toHaveLength(4);
+    expect(container.textContent).not.toContain('More from this artist');
   });
 
-  it('shows only the progress when there are no picks to fill the wait', () => {
+  it('stills the placeholders when the scanner is stopped', () => {
     render({ releaseKey: 'a1', warmup, rows: [] }, listed, true);
 
     expect(container.textContent).toContain('The scanner is stopped for now');
-    expect(container.querySelector('h3')).toBeNull();
+    expect(container.querySelector('.dh-skeleton--paused')).not.toBeNull();
+  });
+
+  it('shows placeholders while the first result loads', () => {
+    act(() =>
+      root.render(
+        <AlsoBoughtList
+          view={{ state: 'loading' }}
+          progress={listed}
+          scanStopped={false}
+          showEarly={false}
+          onHide={() => {}}
+        />,
+      ),
+    );
+
+    expect(container.textContent).toContain('Loading recommendations…');
+    expect(container.querySelector('.dh-skeleton')).not.toBeNull();
   });
 
   it('says it is queued before the supporter list is in', () => {

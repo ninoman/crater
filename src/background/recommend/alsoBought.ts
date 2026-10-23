@@ -77,10 +77,11 @@ export async function computeAlsoBought(
     { read: data.supporters.length, allScanned: data.allScanned, listed: data.listed },
     scored.filter(isConfident).length,
   );
-  // While warming up, same-artist and same-label picks fill the panel for any release.
+  // While warming up the co-owned rows are early picks, and same-artist and same-label picks
+  // fill in behind them for any release.
   const fallback =
     wait !== null || isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, excluded) : [];
-  const picks = blendPicks(wait === null ? scored : [], fallback, ALSO_BOUGHT_LIMIT);
+  const picks = blendPicks(scored, fallback, ALSO_BOUGHT_LIMIT);
 
   const items = await getDisplayItems(
     db,
