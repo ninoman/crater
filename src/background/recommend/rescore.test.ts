@@ -9,9 +9,14 @@ const progress = (scanned: number, total: number) => ({
 });
 
 describe('rescoreDue', () => {
-  it('re-scores every 5 fans', () => {
-    expect(rescoreDue('fan', 4, progress(4, 48))).toBe(false);
-    expect(rescoreDue('fan', 5, progress(5, 48))).toBe(true);
+  it('re-scores after every fan for the first 20 supporters', () => {
+    expect(rescoreDue('fan', 1, progress(1, 48))).toBe(true);
+    expect(rescoreDue('fan', 1, progress(19, 48))).toBe(true);
+  });
+
+  it('re-scores every 5 fans after that', () => {
+    expect(rescoreDue('fan', 4, progress(24, 48))).toBe(false);
+    expect(rescoreDue('fan', 5, progress(25, 48))).toBe(true);
   });
 
   it('re-scores when the last supporter is scanned', () => {

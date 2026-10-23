@@ -5601,14 +5601,30 @@
   "releaseKey": "a1005",
   "rows": [
    {
-    "matchKey": "a1065",
-    "title": "Release 65",
-    "artist": "Artist 15",
-    "label": "Label Fifty",
-    "url": "https://music.label15.com/album/release-65",
-    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 14,
+     "crateMates": 13
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "crateMates": 11
     },
     "followed": null
    },
@@ -5620,19 +5636,149 @@
     "url": "https://music.label15.com/album/release-29",
     "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 13,
+     "crateMates": 13
     },
     "followed": null
    },
    {
-    "matchKey": "a1077",
-    "title": "Release 77",
-    "artist": "Artist 15",
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
     "label": "Label Fifty-One",
-    "url": "https://music.label15.com/album/release-77",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 14,
+     "crateMates": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 12,
+     "crateMates": 12
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 8
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "t30003",
+    "title": "Song t30003",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30003",
+    "coverUrl": "https://f4.bcbits.com/img/a37003_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 6
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "crateMates": 9
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
     "coverUrl": null,
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 7
     },
     "followed": null
    },
@@ -5644,58 +5790,9 @@
     "url": "https://music.label15.com/album/release-53",
     "coverUrl": "https://f4.bcbits.com/img/a5053_7.jpg",
     "reason": {
-     "kind": "same-artist"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1085",
-    "title": "Page Only",
-    "artist": "Artist 15",
-    "label": null,
-    "url": "https://music.label15.com/album/page-only",
-    "coverUrl": "https://f4.bcbits.com/img/a9999_7.jpg",
-    "reason": {
-     "kind": "same-artist"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1070",
-    "title": "Release 70",
-    "artist": "Artist 20",
-    "label": "Label Fifty",
-    "url": "https://band20.bandcamp.com/album/release-70",
-    "coverUrl": "https://f4.bcbits.com/img/a5070_7.jpg",
-    "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1055",
-    "title": "Release 55",
-    "artist": "Artist 17",
-    "label": "Label Fifty",
-    "url": "https://band17.bandcamp.com/album/release-55",
-    "coverUrl": null,
-    "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1045",
-    "title": "Release 45",
-    "artist": "Artist 19",
-    "label": "Label Fifty",
-    "url": "https://band19.bandcamp.com/album/release-45",
-    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
-    "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 6
     },
     "followed": null
    },
@@ -5707,21 +5804,51 @@
     "url": "https://band21.bandcamp.com/album/release-35",
     "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 7
     },
     "followed": null
    },
    {
-    "matchKey": "a1050",
-    "title": "Release 50",
-    "artist": "Artist 12",
-    "label": "Label Fifty",
-    "url": "https://band12.bandcamp.com/album/release-50",
-    "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
+    "matchKey": "a1077",
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "label": "Label Fifty-One",
+    "url": "https://music.label15.com/album/release-77",
+    "coverUrl": null,
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1048",
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 7
     },
     "followed": null
    },
@@ -5733,8 +5860,149 @@
     "url": "https://band13.bandcamp.com/album/release-75",
     "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1056",
+    "title": "Release 56",
+    "artist": "Artist 18",
+    "label": "Label Fifty-One",
+    "url": "https://band18.bandcamp.com/album/release-56",
+    "coverUrl": "https://f4.bcbits.com/img/a5056_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1039",
+    "title": "Release 39",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-39",
+    "coverUrl": "https://f4.bcbits.com/img/a5039_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 7
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1045",
+    "title": "Release 45",
+    "artist": "Artist 19",
+    "label": "Label Fifty",
+    "url": "https://band19.bandcamp.com/album/release-45",
+    "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1052",
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
     },
     "followed": null
    },
@@ -5746,8 +6014,9 @@
     "url": "https://band10.bandcamp.com/album/release-60",
     "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
     },
     "followed": null
    }
@@ -6615,7 +6884,428 @@
  },
  "alsoBought a1090": {
   "releaseKey": "a1090",
-  "rows": [],
+  "rows": [
+   {
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 13,
+     "crateMates": 13
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1026",
+    "title": "Release 26",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-26",
+    "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 10,
+     "crateMates": 10
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "crateMates": 9
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 9,
+     "crateMates": 9
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1068",
+    "title": "Release 68",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-68",
+    "coverUrl": "https://f4.bcbits.com/img/a5068_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1091",
+    "title": "Song t29002",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/track/song-29002",
+    "coverUrl": "https://f4.bcbits.com/img/a36002_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 8,
+     "crateMates": 8
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 7
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1043",
+    "title": "Release 43",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-43",
+    "coverUrl": "https://f4.bcbits.com/img/a5043_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 7,
+     "crateMates": 7
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1037",
+    "title": "Release 37",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-37",
+    "coverUrl": "https://f4.bcbits.com/img/a5037_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1073",
+    "title": "Release 73",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-73",
+    "coverUrl": "https://f4.bcbits.com/img/a5073_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1066",
+    "title": "Release 66",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-66",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1067",
+    "title": "Release 67",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-67",
+    "coverUrl": "https://f4.bcbits.com/img/a5067_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1060",
+    "title": "Release 60",
+    "artist": "Artist 10",
+    "label": "Label Fifty",
+    "url": "https://band10.bandcamp.com/album/release-60",
+    "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1065",
+    "title": "Release 65",
+    "artist": "Artist 15",
+    "label": "Label Fifty",
+    "url": "https://music.label15.com/album/release-65",
+    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1035",
+    "title": "Release 35",
+    "artist": "Artist 21",
+    "label": "Label Fifty",
+    "url": "https://band21.bandcamp.com/album/release-35",
+    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1062",
+    "title": "Release 62",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-62",
+    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1061",
+    "title": "Release 61",
+    "artist": "Artist 11",
+    "label": null,
+    "url": "https://band11.bandcamp.com/album/release-61",
+    "coverUrl": "https://f4.bcbits.com/img/a5061_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1031",
+    "title": "Release 31",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-31",
+    "coverUrl": "https://f4.bcbits.com/img/a5031_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1044",
+    "title": "Release 44",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-44",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1056",
+    "title": "Release 56",
+    "artist": "Artist 18",
+    "label": "Label Fifty-One",
+    "url": "https://band18.bandcamp.com/album/release-56",
+    "coverUrl": "https://f4.bcbits.com/img/a5056_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1050",
+    "title": "Release 50",
+    "artist": "Artist 12",
+    "label": "Label Fifty",
+    "url": "https://band12.bandcamp.com/album/release-50",
+    "coverUrl": "https://f4.bcbits.com/img/a5050_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1048",
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   }
+  ],
   "warmup": {
    "read": 14,
    "readTarget": 20,
@@ -6809,18 +7499,6 @@
   "releaseKey": "a1050",
   "rows": [
    {
-    "matchKey": "a1062",
-    "title": "Release 62",
-    "artist": "Artist 12",
-    "label": null,
-    "url": "https://band12.bandcamp.com/album/release-62",
-    "coverUrl": "https://f4.bcbits.com/img/a5062_7.jpg",
-    "reason": {
-     "kind": "same-artist"
-    },
-    "followed": null
-   },
-   {
     "matchKey": "a1026",
     "title": "Release 26",
     "artist": "Artist 12",
@@ -6828,70 +7506,135 @@
     "url": "https://band12.bandcamp.com/album/release-26",
     "coverUrl": "https://f4.bcbits.com/img/a5026_7.jpg",
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
     },
-    "followed": null
+    "followed": "Artist 12"
    },
    {
-    "matchKey": "a1074",
-    "title": "Release 74",
-    "artist": "Artist 12",
+    "matchKey": "a1036",
+    "title": "Release 36",
+    "artist": "Artist 10",
     "label": null,
-    "url": "https://band12.bandcamp.com/album/release-74",
-    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "url": "https://band10.bandcamp.com/album/release-36",
+    "coverUrl": "https://f4.bcbits.com/img/a5036_7.jpg",
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
     },
     "followed": null
    },
    {
-    "matchKey": "a1038",
-    "title": "Release 38",
-    "artist": "Artist 12",
+    "matchKey": "a1028",
+    "title": "Release 28",
+    "artist": "Artist 14",
+    "label": "Label Fifty-One",
+    "url": "https://band14.bandcamp.com/album/release-28",
+    "coverUrl": "https://f4.bcbits.com/img/a5028_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 6,
+     "crateMates": 6
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1042",
+    "title": "Release 42",
+    "artist": "Artist 16",
+    "label": "Label Fifty-One",
+    "url": "https://band16.bandcamp.com/album/release-42",
+    "coverUrl": "https://f4.bcbits.com/img/a5042_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 5,
+     "crateMates": 5
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "t30004",
+    "title": "Song t30004",
+    "artist": "Artist 21",
     "label": null,
-    "url": "https://band12.bandcamp.com/album/release-38",
-    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "url": "https://band21.bandcamp.com/track/song-30004",
+    "coverUrl": "https://f4.bcbits.com/img/a37004_7.jpg",
     "reason": {
-     "kind": "same-artist"
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
     },
     "followed": null
    },
    {
-    "matchKey": "a1070",
-    "title": "Release 70",
-    "artist": "Artist 20",
-    "label": "Label Fifty",
-    "url": "https://band20.bandcamp.com/album/release-70",
-    "coverUrl": "https://f4.bcbits.com/img/a5070_7.jpg",
+    "matchKey": "a1052",
+    "title": "Release 52",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-52",
+    "coverUrl": "https://f4.bcbits.com/img/a5052_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
     },
     "followed": null
    },
    {
-    "matchKey": "a1065",
-    "title": "Release 65",
-    "artist": "Artist 15",
-    "label": "Label Fifty",
-    "url": "https://music.label15.com/album/release-65",
-    "coverUrl": "https://f4.bcbits.com/img/a5065_7.jpg",
+    "matchKey": "a1076",
+    "title": "Release 76",
+    "artist": "Artist 14",
+    "label": null,
+    "url": "https://band14.bandcamp.com/album/release-76",
+    "coverUrl": "https://f4.bcbits.com/img/a5076_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
     },
     "followed": null
    },
    {
-    "matchKey": "a1055",
-    "title": "Release 55",
-    "artist": "Artist 17",
-    "label": "Label Fifty",
-    "url": "https://band17.bandcamp.com/album/release-55",
-    "coverUrl": null,
+    "matchKey": "a1027",
+    "title": "Release 27",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-27",
+    "coverUrl": "https://f4.bcbits.com/img/a5027_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 4,
+     "crateMates": 4
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1056",
+    "title": "Release 56",
+    "artist": "Artist 18",
+    "label": "Label Fifty-One",
+    "url": "https://band18.bandcamp.com/album/release-56",
+    "coverUrl": "https://f4.bcbits.com/img/a5056_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1054",
+    "title": "Release 54",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-54",
+    "coverUrl": "https://f4.bcbits.com/img/a5054_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
     },
     "followed": null
    },
@@ -6903,34 +7646,9 @@
     "url": "https://band19.bandcamp.com/album/release-45",
     "coverUrl": "https://f4.bcbits.com/img/a5045_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1035",
-    "title": "Release 35",
-    "artist": "Artist 21",
-    "label": "Label Fifty",
-    "url": "https://band21.bandcamp.com/album/release-35",
-    "coverUrl": "https://f4.bcbits.com/img/a5035_7.jpg",
-    "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
-    },
-    "followed": null
-   },
-   {
-    "matchKey": "a1075",
-    "title": "Release 75",
-    "artist": "Artist 13",
-    "label": "Label Fifty",
-    "url": "https://band13.bandcamp.com/album/release-75",
-    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
-    "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
     },
     "followed": null
    },
@@ -6942,8 +7660,261 @@
     "url": "https://band10.bandcamp.com/album/release-60",
     "coverUrl": "https://f4.bcbits.com/img/a5060_7.jpg",
     "reason": {
-     "kind": "same-label",
-     "label": "Label Fifty"
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "t30005",
+    "title": "Song t30005",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/track/song-30005",
+    "coverUrl": "https://f4.bcbits.com/img/a37005_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1051",
+    "title": "Release 51",
+    "artist": "Artist 13",
+    "label": null,
+    "url": "https://band13.bandcamp.com/album/release-51",
+    "coverUrl": "https://f4.bcbits.com/img/a5051_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1079",
+    "title": "Release 79",
+    "artist": "Artist 17",
+    "label": null,
+    "url": "https://band17.bandcamp.com/album/release-79",
+    "coverUrl": "https://f4.bcbits.com/img/a5079_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1047",
+    "title": "Release 47",
+    "artist": "Artist 21",
+    "label": null,
+    "url": "https://band21.bandcamp.com/album/release-47",
+    "coverUrl": "https://f4.bcbits.com/img/a5047_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1032",
+    "title": "Release 32",
+    "artist": "Artist 18",
+    "label": null,
+    "url": "https://band18.bandcamp.com/album/release-32",
+    "coverUrl": "https://f4.bcbits.com/img/a5032_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1070",
+    "title": "Release 70",
+    "artist": "Artist 20",
+    "label": "Label Fifty",
+    "url": "https://band20.bandcamp.com/album/release-70",
+    "coverUrl": "https://f4.bcbits.com/img/a5070_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1029",
+    "title": "Release 29",
+    "artist": "Artist 15",
+    "label": null,
+    "url": "https://music.label15.com/album/release-29",
+    "coverUrl": "https://f4.bcbits.com/img/a5029_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 3,
+     "crateMates": 3
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1069",
+    "title": "Release 69",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-69",
+    "coverUrl": "https://f4.bcbits.com/img/a5069_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1077",
+    "title": "Release 77",
+    "artist": "Artist 15",
+    "label": "Label Fifty-One",
+    "url": "https://music.label15.com/album/release-77",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1074",
+    "title": "Release 74",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-74",
+    "coverUrl": "https://f4.bcbits.com/img/a5074_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1058",
+    "title": "Release 58",
+    "artist": "Artist 20",
+    "label": null,
+    "url": "https://band20.bandcamp.com/album/release-58",
+    "coverUrl": "https://f4.bcbits.com/img/a5058_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1075",
+    "title": "Release 75",
+    "artist": "Artist 13",
+    "label": "Label Fifty",
+    "url": "https://band13.bandcamp.com/album/release-75",
+    "coverUrl": "https://f4.bcbits.com/img/a5075_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1038",
+    "title": "Release 38",
+    "artist": "Artist 12",
+    "label": null,
+    "url": "https://band12.bandcamp.com/album/release-38",
+    "coverUrl": "https://f4.bcbits.com/img/a5038_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": "Artist 12"
+   },
+   {
+    "matchKey": "a1078",
+    "title": "Release 78",
+    "artist": "Artist 16",
+    "label": null,
+    "url": "https://band16.bandcamp.com/album/release-78",
+    "coverUrl": "https://f4.bcbits.com/img/a5078_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1048",
+    "title": "Release 48",
+    "artist": "Artist 10",
+    "label": null,
+    "url": "https://band10.bandcamp.com/album/release-48",
+    "coverUrl": "https://f4.bcbits.com/img/a5048_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1049",
+    "title": "Release 49",
+    "artist": "Artist 11",
+    "label": "Label Fifty-One",
+    "url": "https://band11.bandcamp.com/album/release-49",
+    "coverUrl": "https://f4.bcbits.com/img/a5049_7.jpg",
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1055",
+    "title": "Release 55",
+    "artist": "Artist 17",
+    "label": "Label Fifty",
+    "url": "https://band17.bandcamp.com/album/release-55",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
+    },
+    "followed": null
+   },
+   {
+    "matchKey": "a1033",
+    "title": "Release 33",
+    "artist": "Artist 19",
+    "label": null,
+    "url": "https://band19.bandcamp.com/album/release-33",
+    "coverUrl": null,
+    "reason": {
+     "kind": "co-owned",
+     "owners": 2,
+     "crateMates": 2
     },
     "followed": null
    }

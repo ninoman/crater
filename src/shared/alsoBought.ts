@@ -36,7 +36,7 @@ export interface AlsoBoughtWarmup {
 
 export interface AlsoBoughtResult {
   releaseKey: ItemKey;
-  /** During the warm-up, only same-artist and same-label picks. */
+  /** During the warm-up, early picks: co-owned rows so far, then same-artist and same-label ones. */
   rows: AlsoBoughtRow[];
   /** Null once co-owned rows show. */
   warmup: AlsoBoughtWarmup | null;

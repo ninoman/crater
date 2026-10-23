@@ -23,6 +23,7 @@ export { SearchField, type SearchFieldProps } from './SearchField';
 export { SectionHeading } from './SectionHeading';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { SettingRow, type SettingRowIds, type SettingRowProps } from './SettingRow';
+export { SkeletonRows, type SkeletonRowsProps } from './Skeleton';
 export { Stat, type StatProps } from './Stat';
 export { StatusDot, type StatusDotProps } from './StatusDot';
 export { injectStyles, uiStyles } from './styles';

@@ -23,6 +23,7 @@ import row from './Row.css?inline';
 import searchField from './SearchField.css?inline';
 import sectionHeading from './SectionHeading.css?inline';
 import segmented from './Segmented.css?inline';
+import skeleton from './Skeleton.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
 import table from './Table.css?inline';
@@ -59,6 +60,7 @@ export const uiStyles = [
   checkbox,
   tagPicker,
   segmented,
+  skeleton,
   sectionHeading,
   disclosure,
 ].join('\n');

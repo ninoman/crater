@@ -320,14 +320,14 @@ describe('warm-up', () => {
     await fans(range(100, 299), [item('a999', other)]);
   }
 
-  it('holds co-owned rows back until 20 supporters are read, showing the same artist meanwhile', async () => {
+  it('gives early picks until 20 supporters are read, the same artist behind them', async () => {
     await seed(12);
 
     const { rows, warmup } = await computeAlsoBought(db, 'a100', ME);
     expect(warmup).toEqual({ read: 12, readTarget: 20, confident: 5, confidentTarget: 5 });
-    expect(rows.map((row) => [row.matchKey, row.reason])).toEqual([
-      ['a101', { kind: 'same-artist' }],
-    ]);
+    expect(rows.slice(0, -1).every((row) => row.reason.kind === 'co-owned')).toBe(true);
+    expect(rows.map((row) => row.matchKey)).toContain('a300');
+    expect(rows.at(-1)?.reason).toEqual({ kind: 'same-artist' });
   });
 
   it('shows co-owned rows once enough supporters are read and enough rows stand out', async () => {
