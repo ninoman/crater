@@ -1,6 +1,6 @@
 # Chrome Web Store listing: compliance text
 
-*"Dighead" is a placeholder for the final name (ROADMAP 8.1). Facts below were checked against `src/manifest.ts` and the code on 2026-10-20. Re-check them if the manifest changes.*
+*"Dighead" is a placeholder for the final name (ROADMAP 8.1). Facts below were checked against `src/manifest.ts` and the code on 2026-10-24. Re-check them if the manifest changes.*
 
 ## Single purpose
 
@@ -12,11 +12,32 @@ Purchase-based discovery for Bandcamp. Everything stays in your browser.
 
 ## Detailed description (draft)
 
-Dighead adds recommendations to Bandcamp, based on what people actually bought:
+Dighead adds recommendations to Bandcamp, based on what people actually bought.
 
-- **Also bought:** on an album or track page, the releases that other buyers of it also own.
-- **Crate mates:** the fans whose collections overlap yours most, on a tab on your profile and as a rank on other fans' profiles.
-- **For you:** releases your crate mates own that you don't.
+**Find music**
+
+- **Also bought:** on any album or track page, the releases that other buyers of it also own. Early picks appear while the scan runs.
+- **Crate mates:** the fans whose collections overlap yours most, scored out of 100 and weighted toward recent buys. See them on a tab on your profile, and as a rank on other fans' profiles.
+- **For you:** releases your crate mates own that you don't, with a reason on every pick. Switch to *Fresh* for their recent buys or *Deep cuts* for the lesser-known ones.
+- **Crate mates' latest:** a feed of your crate mates' newest buys.
+- **New from your follows:** a tab with new releases from the artists and labels you follow, checked weekly. Turn on an optional desktop notification if you like.
+- **Filters:** narrow For you, Also bought and Crate mates' latest by genre, release year, name your price, physical editions or artists near you.
+
+**Listen and sort**
+
+- Play previews straight from the cover, or play a whole list with next, previous and keyboard shortcuts.
+- Releases you've listened to get a "heard" mark, and you can hide heard ones from any list.
+- Hide a release, or everything by an artist or label, from your recommendations.
+- Badges next to release links across Bandcamp show what you own, what you've wishlisted and how many crate mates own it.
+
+**Organise your wishlist and collection**
+
+- Sort by date added, artist, label, price, how many crate mates own it, or your own "buy next" order.
+- Add tags, private notes and 1 to 5 ratings to releases, and tag the fans, artists and labels you follow.
+- Build a Bandcamp Friday shortlist with totals per currency.
+- Export your wishlist, collection or For you list as CSV, or back up the whole database.
+
+**Private by design**
 
 Dighead reads public Bandcamp pages and your own collection, and keeps everything in your browser. There is no account, no server and no tracking. The popup shows scan progress, lets you pause, tune or reset the scanner, and has a **Clear all data** button.
 
