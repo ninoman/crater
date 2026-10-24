@@ -2,6 +2,15 @@
   padding: var(--dh-space-4) 0 var(--dh-space-6);
 }
 
+/* For you's sub-tabs line up with the lists under them, and leave room above each view. */
+.dh-profile .dh-tabs__list {
+  padding: 0;
+}
+
+.dh-profile .dh-tabs__content {
+  padding-top: var(--dh-space-3);
+}
+
 .dh-profile__toolbar {
   display: flex;
   flex-wrap: wrap;

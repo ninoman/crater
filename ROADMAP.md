@@ -383,6 +383,7 @@ Design: decisions §23.
 7. [x] Notifications: optional `notifications` permission, popup setting (off by default), one grouped notification per round, click opens the tab.
 8. [ ] Try it live: the tab, a first round on a few hundred follows, a notification and its click.
 9. [x] After the merge with *Heard it*: rows use the shared row controls (heard mark, the "Hide from recommendations" menu, play through) and the tab has its own *Hide heard* switch (decisions §23, "With hide and heard").
+10. [x] Fewer profile tabs: For you, Crate mates' latest and New from follows become sub-tabs of *for you*, each keeping its hash (decisions, *Profile tabs*).
 
 **Done when:** a week after following a few active labels, the tab lists their new releases newest first, muting one hides it, and the notification (when on) arrives once.
 

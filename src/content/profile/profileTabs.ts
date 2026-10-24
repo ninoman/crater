@@ -1,21 +1,25 @@
-// Adds our own tabs (Crate mates, For you, later Following) to Bandcamp's tab bar on your profile.
-// The tab handles are plain <li>s in Bandcamp's own markup so its CSS styles them natively; what
-// a tab shows is rendered by React in a shadow root inside `contentSlot`.
+// Adds our own tabs (Crate mates, For you) to Bandcamp's tab bar on your profile. The tab handles
+// are plain <li>s in Bandcamp's own markup so its CSS styles them natively; what a tab shows is
+// rendered by React in a shadow root inside `contentSlot`. A tab can own more than one hash
+// (routes), e.g. For you's sub-tabs, so each keeps its own address.
 
 import { FAN_PAGE_DOM } from '../../bandcamp';
 import { tabFromHash, withoutHash } from './hash';
 
-export interface ProfileTabSpec<Id extends string> {
-  id: Id;
+export interface ProfileTabSpec<Route extends string> {
+  /** The tab's own hash, where its link points. */
+  id: Route;
   /** Lowercase, like Bandcamp's own tab titles. */
   label: string;
+  /** Other hashes that open this tab, e.g. its sub-tabs. */
+  routes?: readonly Route[];
 }
 
-/** Which of our tabs is open, as an external store for useSyncExternalStore. */
-export interface ProfileTabs<Id extends string> {
+/** Which of our routes is open, as an external store for useSyncExternalStore. */
+export interface ProfileTabs<Route extends string> {
   /** Where the open tab's content goes: right under Bandcamp's tab bar. */
   contentSlot: HTMLElement;
-  getActive: () => Id | null;
+  getActive: () => Route | null;
   subscribe: (listener: () => void) => () => void;
 }
 
@@ -73,14 +77,19 @@ function findTabBar(doc: Document): { grids: Element; list: Element; bar: Elemen
   return grids && list && bar ? { grids, list, bar } : null;
 }
 
+/** The routes a tab answers to: its own id, then its other routes. */
+export function routesOf<Route extends string>(spec: ProfileTabSpec<Route>): readonly Route[] {
+  return [spec.id, ...(spec.routes ?? [])];
+}
+
 /**
- * Injects `specs` after Bandcamp's tabs and keeps the open one in sync with the URL hash.
+ * Injects `specs` after Bandcamp's tabs and keeps the open route in sync with the URL hash.
  * Returns null, with a warning, when the fan page's markup isn't what we expect.
  */
-export function injectProfileTabs<Id extends string>(
+export function injectProfileTabs<Route extends string>(
   doc: Document,
-  specs: readonly ProfileTabSpec<Id>[],
-): ProfileTabs<Id> | null {
+  specs: readonly ProfileTabSpec<Route>[],
+): ProfileTabs<Route> | null {
   const page = findTabBar(doc);
   if (!page) {
     console.warn('dighead: fan page tabs not found; Bandcamp may have changed its layout');
@@ -89,9 +98,9 @@ export function injectProfileTabs<Id extends string>(
   const { grids, list, bar } = page;
 
   addPageStyle(doc);
-  const ids = specs.map((spec) => spec.id);
-  const tabs = new Map(specs.map((spec) => [spec.id, createTab(doc, spec)]));
-  list.append(...tabs.values());
+  const ids = specs.flatMap(routesOf);
+  const tabs = specs.map((spec) => ({ routes: routesOf(spec), item: createTab(doc, spec) }));
+  list.append(...tabs.map((tab) => tab.item));
   const contentSlot = doc.createElement('div');
   contentSlot.className = SLOT_CLASS;
   bar.after(contentSlot);
@@ -101,11 +110,11 @@ export function injectProfileTabs<Id extends string>(
 
   const { activeTabClass } = FAN_PAGE_DOM;
   const listeners = new Set<() => void>();
-  let active: Id | null = null;
+  let active: Route | null = null;
   /** Bandcamp's tab that was selected before ours opened, to hand the underline back to. */
   let bandcampTab: Element | null = null;
 
-  function setActive(next: Id | null): void {
+  function setActive(next: Route | null): void {
     if (next === active) return;
     if (active === null) {
       bandcampTab = list.querySelector(`${FAN_PAGE_DOM.tab}.${activeTabClass}`);
@@ -115,8 +124,8 @@ export function injectProfileTabs<Id extends string>(
       bandcampTab = null;
     }
     active = next;
-    for (const [id, item] of tabs) {
-      const open = id === next;
+    for (const { routes, item } of tabs) {
+      const open = next !== null && routes.includes(next);
       item.classList.toggle(activeTabClass, open);
       item.firstElementChild?.toggleAttribute('aria-current', open);
     }
