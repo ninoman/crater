@@ -21,9 +21,16 @@ export const FAN_PAGE_DOM = {
   wishlistGrid: '#wishlist-grid',
   /** Inside it: what holds Bandcamp's paged list of items and its "view all" button. */
   wishlistItems: '#wishlist-items',
-  /** Bandcamp's own list and "view all", both hidden while ours stands in (decisions §14). */
-  wishlistNativeList: 'ol.collection-grid',
-  wishlistExpand: '.expand-container',
+  /**
+   * Bandcamp's collection tab, open when the page loads. Its items holder has the same parts as
+   * the wishlist's, but the first 20 items are already rendered, in an `ol` marked `editable`
+   * followed by a second, empty one (me-fan-page.html, decisions §24).
+   */
+  collectionGrid: '#collection-grid',
+  collectionItems: '#collection-items',
+  /** In either holder: Bandcamp's own lists and "view all", hidden while ours stands in (§14). */
+  itemsNativeList: 'ol.collection-grid',
+  itemsExpand: '.expand-container',
   /** Bandcamp's following tab; it has `active` while open (me-following-tab.html). */
   followingGrid: '#following-grid',
   /** The sub-tabs inside it: artists & labels, fans, genres. `active` marks the open one. */

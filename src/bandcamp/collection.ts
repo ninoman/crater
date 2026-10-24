@@ -2,13 +2,23 @@ import { isCompilation } from './compilation';
 import { itemKey, parseBandcampDate } from './keys';
 import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
-import type { CollectionItem, CollectionList, CollectionPage } from './types';
+import type { CollectionItem, CollectionList, CollectionPage, ItemPrice } from './types';
 import { assertNotApiError, validate } from './validate';
 
 const PURCHASE_KINDS = ['album', 'track', 'package'] as const;
 
 function isPurchaseKind(value: string): value is CollectionItem['purchaseKind'] {
   return (PURCHASE_KINDS as readonly string[]).includes(value);
+}
+
+function toPrice(raw: RawCollectionItem): ItemPrice | null {
+  if (raw.price == null || !raw.currency) return null;
+  return {
+    amount: raw.price,
+    currency: raw.currency,
+    purchasable:
+      raw.is_purchasable === true && raw.is_private !== true && raw.is_subscriber_only !== true,
+  };
 }
 
 /** Maps one raw item. Returns null for item kinds we don't track (e.g. subscriptions). */
@@ -29,6 +39,7 @@ export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null 
     otherOwners: raw.also_collected_count ?? null,
     addedAt: parseBandcampDate(raw.purchased ?? raw.added),
     compilation: isCompilation({ artist: raw.band_name, title: raw.item_title }),
+    price: toPrice(raw),
   };
 }
 

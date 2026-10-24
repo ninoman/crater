@@ -1,6 +1,7 @@
 import { fetchReleasePreview } from '../bandcamp';
 import { db } from '../db';
 import type { MessageHandlers } from '../shared/messages';
+import { loadSettings } from '../shared/settings';
 import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
 import { hideHeardHandlers } from './hideHeardHandlers';
@@ -25,7 +26,7 @@ import {
   requestRelease,
   resumeScanner,
 } from './scanner';
-import { wishlistHandlers } from './wishlistHandlers';
+import { itemListHandlers } from './itemListHandlers';
 
 export const handlers: MessageHandlers = {
   ping: () => ({ version: chrome.runtime.getManifest().version }),
@@ -52,7 +53,7 @@ export const handlers: MessageHandlers = {
   getForYou: ({ mode, hideHeard }) => getForYou(mode, hideHeard),
   getCrateMatesLatest: ({ hideHeard }) => getCrateMatesLatest(hideHeard),
   ...followingHandlers(db),
-  ...wishlistHandlers(db),
+  ...itemListHandlers(db, async () => (await loadSettings()).topCrateMatesK),
   ...backupHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();

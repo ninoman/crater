@@ -140,3 +140,15 @@ body {
   font-size: var(--dh-text-xs);
   color: var(--dh-color-muted);
 }
+
+/* A row with several buttons: the text takes a line, the buttons wrap below it. */
+.dh-danger--wrap {
+  flex-wrap: wrap;
+}
+
+.dh-danger__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-2);
+}

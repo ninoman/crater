@@ -5,13 +5,9 @@ import { DigheadDb } from '../schema';
 import { upsertCollectionItems } from './items';
 import { markUnwishlisted, markWishlisted, putOwnership } from './ownership';
 import { createTag, deleteTag, exportTags, importTags } from './tags';
-import {
-  assignItemTag,
-  getItemTags,
-  listWishlist,
-  removeItemTagsExcept,
-  wishlistedKeys,
-} from './wishlist';
+import { assignItemTag, getItemTags, listedKeys, listOwnedItems, pruneItemData } from './itemLists';
+import { saveItemNote } from './itemNotes';
+import { putItemPrices } from './itemPrices';
 
 const ME = 7;
 
@@ -55,20 +51,45 @@ async function tagId(name: string): Promise<number> {
   return result.tag.id;
 }
 
-describe('listWishlist', () => {
+describe('listOwnedItems', () => {
   it('lists only wishlisted items, newest first, with their tags', async () => {
     const dub = await tagId('dub');
     await assignItemTag(db, dub, ['a1'], 'add');
 
-    const rows = await listWishlist(db, ME);
+    const rows = await listOwnedItems(db, ME, 'wishlist');
 
     expect(rows.map((row) => row.item.itemKey)).toEqual(['a2', 'a1', 't3']);
     expect(rows.map((row) => row.tagIds)).toEqual([[], [dub], []]);
     expect(rows[0]?.addedAt).toBe(300);
   });
 
+  it('lists the collection on its own, with purchase dates', async () => {
+    const rows = await listOwnedItems(db, ME, 'collection');
+
+    expect(rows.map((row) => row.item.itemKey)).toEqual(['a4']);
+    expect(rows[0]?.addedAt).toBe(200);
+  });
+
   it('is empty for someone else', async () => {
-    expect(await listWishlist(db, 99)).toEqual([]);
+    expect(await listOwnedItems(db, 99, 'wishlist')).toEqual([]);
+  });
+
+  it('carries your note and, on the wishlist, the price', async () => {
+    await saveItemNote(db, 'a1', { text: 'for the label night', rating: 4 }, 1);
+    await putItemPrices(db, [
+      { ...item('a1', 100), price: { amount: 9, currency: 'EUR', purchasable: true } },
+    ]);
+    await saveItemNote(db, 'a4', { text: '', rating: 5 }, 1);
+
+    const [, wished] = await listOwnedItems(db, ME, 'wishlist');
+    const [owned] = await listOwnedItems(db, ME, 'collection');
+
+    expect(wished).toMatchObject({
+      note: { text: 'for the label night', rating: 4 },
+      price: { amount: 9, currency: 'EUR', purchasable: true },
+      matchKey: 'a1',
+    });
+    expect(owned).toMatchObject({ note: { text: '', rating: 5 }, price: null });
   });
 });
 
@@ -78,7 +99,7 @@ describe('markWishlisted / markUnwishlisted', () => {
 
     await markWishlisted(db, ME, { itemKey: 'a5', albumKey: null }, 500);
 
-    expect((await listWishlist(db, ME))[0]).toMatchObject({
+    expect((await listOwnedItems(db, ME, 'wishlist'))[0]).toMatchObject({
       item: { itemKey: 'a5' },
       addedAt: 500,
     });
@@ -90,9 +111,9 @@ describe('markWishlisted / markUnwishlisted', () => {
     await markWishlisted(db, ME, { itemKey: 'a1', albumKey: null }, 500);
 
     expect(await getItemTags(db, ME, 'a4')).toBeNull();
-    expect((await listWishlist(db, ME)).find((row) => row.item.itemKey === 'a1')?.addedAt).toBe(
-      100,
-    );
+    expect(
+      (await listOwnedItems(db, ME, 'wishlist')).find((row) => row.item.itemKey === 'a1')?.addedAt,
+    ).toBe(100);
   });
 
   it('keeps the tags of a removed item for a quick re-add', async () => {
@@ -163,39 +184,76 @@ describe('item tags and the rest', () => {
     expect(await getItemTags(db, ME, 'a2')).toEqual([]);
   });
 
-  it('go with items that left the wishlist', async () => {
-    const dub = await tagId('dub');
-    await assignItemTag(db, dub, ['a1', 'a2'], 'add');
-
-    await removeItemTagsExcept(db, new Set(['a2']));
-
-    expect(await db.itemTags.toCollection().primaryKeys()).toEqual(['a2']);
+  it('finds which keys are in either list', async () => {
+    expect(await listedKeys(db, ME, ['a1', 'a4', 'a99'])).toEqual(new Set(['a1', 'a4']));
   });
+});
 
-  it('finds which keys are wishlisted', async () => {
-    expect(await wishlistedKeys(db, ME, ['a1', 'a4', 'a99'])).toEqual(new Set(['a1']));
+describe('pruneItemData', () => {
+  it('drops tags and notes of items in neither list, and prices of items off the wishlist', async () => {
+    const dub = await tagId('dub');
+    await assignItemTag(db, dub, ['a1', 'a2', 'a4', 'a99'], 'add');
+    for (const key of ['a1', 'a4', 'a99'] as const) {
+      await saveItemNote(db, key, { text: key, rating: null }, 1);
+    }
+    await putItemPrices(db, [item('a1', 1), item('a4', 1), item('a99', 1)]);
+    await db.ownership.delete([ME, 'a2']);
+
+    await pruneItemData(db, ME);
+
+    expect((await db.itemTags.toCollection().primaryKeys()).sort()).toEqual(['a1', 'a4']);
+    expect((await db.itemNotes.toCollection().primaryKeys()).sort()).toEqual(['a1', 'a4']);
+    expect(await db.itemPrices.toCollection().primaryKeys()).toEqual(['a1']);
+  });
+});
+
+describe('prices', () => {
+  it('are kept as null when Bandcamp gave none, so the sync does not read them again', async () => {
+    await putItemPrices(db, [item('a1', 1)]);
+
+    expect(await db.itemPrices.get('a1')).toEqual({ itemKey: 'a1', price: null });
   });
 });
 
 describe('tag backup with items', () => {
-  it('exports item assignments and imports them back, skipping items not wishlisted', async () => {
+  it('exports item assignments and imports them back, skipping items in neither list', async () => {
     const dub = await tagId('dub');
     await assignItemTag(db, dub, ['a1', 'a2'], 'add');
     const backup = await exportTags(db);
     expect(backup.tags).toEqual([{ name: 'dub', assignments: [], items: ['a1', 'a2'] }]);
+    expect(backup.notes).toEqual([]);
 
     await deleteTag(db, dub);
     const entry = { name: 'Dub', assignments: [], items: ['a1', 'a4', 'a99'] as ItemKey[] };
-    const summary = await importTags(db, { version: 2, tags: [entry] }, ME);
+    const summary = await importTags(db, { version: 3, tags: [entry], notes: [] }, ME);
 
-    expect(summary).toEqual({ tagsCreated: 1, assigned: 1, skipped: 2 });
+    expect(summary).toEqual({ tagsCreated: 1, assigned: 2, skipped: 1 });
     const [tag] = await db.tags.toArray();
     expect(await getItemTags(db, ME, 'a1')).toEqual([tag?.id]);
   });
 
+  it('round-trips notes, keeps a note you already have, and skips items you no longer have', async () => {
+    await saveItemNote(db, 'a1', { text: 'mine', rating: 5 }, 1);
+    await saveItemNote(db, 'a2', { text: 'old', rating: null }, 1);
+    const backup = await exportTags(db);
+    expect(backup.notes).toEqual([
+      { itemKey: 'a1', text: 'mine', rating: 5 },
+      { itemKey: 'a2', text: 'old', rating: null },
+    ]);
+
+    await db.itemNotes.delete('a2');
+    await saveItemNote(db, 'a1', { text: 'newer', rating: 2 }, 2);
+    const notes = [...backup.notes, { itemKey: 'a99' as ItemKey, text: 'gone', rating: null }];
+    const summary = await importTags(db, { version: 3, tags: [], notes }, ME);
+
+    expect(summary).toEqual({ tagsCreated: 0, assigned: 1, skipped: 1 });
+    expect(await db.itemNotes.get('a1')).toMatchObject({ text: 'newer', rating: 2 });
+    expect(await db.itemNotes.get('a2')).toMatchObject({ text: 'old', rating: null });
+  });
+
   it('skips every item when nobody is logged in', async () => {
     const entry = { name: 'dub', assignments: [], items: ['a1'] as ItemKey[] };
-    expect(await importTags(db, { version: 2, tags: [entry] }, null)).toEqual({
+    expect(await importTags(db, { version: 2, tags: [entry], notes: [] }, null)).toEqual({
       tagsCreated: 1,
       assigned: 0,
       skipped: 1,

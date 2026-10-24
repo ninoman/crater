@@ -23,6 +23,15 @@ export interface ReleasePageItem extends ReleaseInfo {
   compilation: boolean;
 }
 
+/** What a release costs, as Bandcamp's collection and wishlist rows say (decisions §24). */
+export interface ItemPrice {
+  amount: number;
+  /** ISO code, e.g. "USD". Prices in different currencies are never added together. */
+  currency: string;
+  /** Bandcamp will sell it: not private, subscriber-only or withdrawn. */
+  purchasable: boolean;
+}
+
 export interface CollectionItem extends ReleaseInfo {
   purchaseKind: 'album' | 'track' | 'package';
   /**
@@ -37,6 +46,8 @@ export interface CollectionItem extends ReleaseInfo {
   addedAt: number | null;
   /** From the artist and title only: collection pages don't list track artists (§17). */
   compilation: boolean;
+  /** Null when the row has no price or currency. */
+  price?: ItemPrice | null;
 }
 
 export interface Supporter {

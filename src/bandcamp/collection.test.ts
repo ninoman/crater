@@ -87,6 +87,28 @@ describe('toCollectionItem', () => {
     expect(toCollectionItem({ ...rawTrack, album_id: null })?.albumKey).toBeNull();
   });
 
+  it('reads the price, its currency and whether it can be bought', () => {
+    const items = parseCollectionPage(fixtureJson('wishlist_items.json'), 'wishlist_items').items;
+
+    expect(items[0]?.price).toEqual({ amount: 15, currency: 'USD', purchasable: true });
+    expect(items[1]?.price).toEqual({ amount: 16, currency: 'EUR', purchasable: true });
+  });
+
+  it('has no price when the row lacks one, and flags private or subscriber-only items', () => {
+    expect(toCollectionItem(rawTrack)?.price).toBeNull();
+    const priced = { ...rawTrack, price: 7, currency: 'GBP', is_purchasable: true };
+    expect(toCollectionItem(priced)?.price).toEqual({
+      amount: 7,
+      currency: 'GBP',
+      purchasable: true,
+    });
+    expect(toCollectionItem({ ...priced, is_private: true })?.price?.purchasable).toBe(false);
+    expect(toCollectionItem({ ...priced, is_subscriber_only: true })?.price?.purchasable).toBe(
+      false,
+    );
+    expect(toCollectionItem({ ...priced, is_purchasable: false })?.price?.purchasable).toBe(false);
+  });
+
   it('skips item kinds it does not track', () => {
     expect(toCollectionItem({ ...rawTrack, item_type: 'subscription' })).toBeNull();
   });

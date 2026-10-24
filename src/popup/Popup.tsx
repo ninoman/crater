@@ -2,6 +2,7 @@ import { useSyncStatus } from '../hooks/useSyncStatus';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot, Tabs } from '../ui';
 import { ClearData } from './ClearData';
+import { CsvExport } from './CsvExport';
 import { DatabaseBackup } from './DatabaseBackup';
 import { HiddenList } from './HiddenList';
 import { TagBackup } from './TagBackup';
@@ -50,6 +51,7 @@ function SettingsTab() {
     <>
       <SettingsPanel />
       <TagBackup />
+      <CsvExport />
       <DatabaseBackup />
       <ClearData />
     </>

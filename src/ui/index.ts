@@ -12,8 +12,17 @@ export { Disclosure, type DisclosureProps } from './Disclosure';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
 export { InfoHint, type InfoHintProps } from './InfoHint';
-export { ExternalIcon, HideIcon, PauseIcon, PlayIcon, QueueIcon, StopIcon } from './icons';
+export {
+  ExternalIcon,
+  HideIcon,
+  PauseIcon,
+  PlayIcon,
+  QueueIcon,
+  StarIcon,
+  StopIcon,
+} from './icons';
 export { Menu, type MenuItem, type MenuProps } from './Menu';
+export { NotePopover, type NotePopoverProps, type NoteValue } from './NotePopover';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { LoadMore, type LoadMoreProps } from './LoadMore';
 export { NumberField, type NumberFieldProps } from './NumberField';
@@ -22,6 +31,7 @@ export { PlayableCover, type PlayableCoverProps } from './PlayableCover';
 export { PlayQueueBar, type PlayQueueBarProps } from './PlayQueueBar';
 export { PortalContainerProvider, usePortalContainer } from './portal';
 export { Progress, type ProgressProps } from './Progress';
+export { Rating, RatingStars, type RatingProps } from './Rating';
 export {
   type HideScope,
   ReleaseRow,
@@ -32,6 +42,7 @@ export { Row, RowList, type RowProps } from './Row';
 export { SearchField, type SearchFieldProps } from './SearchField';
 export { SectionHeading } from './SectionHeading';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
+export { Select, type SelectOption, type SelectProps } from './Select';
 export { SettingRow, type SettingRowIds, type SettingRowProps } from './SettingRow';
 export { SkeletonRows, type SkeletonRowsProps } from './Skeleton';
 export { Stat, type StatProps } from './Stat';

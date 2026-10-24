@@ -1,0 +1,27 @@
+.dh-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+}
+
+.dh-select__label {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+}
+
+.dh-select__control {
+  height: calc(var(--dh-chip-height) + 8px);
+  padding: 0 var(--dh-space-2);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-sm);
+  background: var(--dh-color-bg);
+  font: inherit;
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-text);
+}
+
+.dh-select__control:focus-visible {
+  border-color: var(--dh-color-accent);
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: 1px;
+}

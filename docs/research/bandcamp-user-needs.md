@@ -256,4 +256,5 @@ Limits: a Chrome MV3 extension with no backend. All data stays local in IndexedD
 - Deep cuts: an early-adopter boost, and β adapted to how mainstream you are.
 - Queue followed fans' collections at seed priority, if they prove good crate mates.
 - Web Store release: name, icon, screenshots, submission.
-- Backlog: CSV / M3U export of picks, and a Firefox port.
+- Backlog: M3U export of picks, and a Firefox port.
+- Built since this research (decisions §24): wishlist sort, notes and buy next (#3), collection tab takeover (#6), Bandcamp Friday shortlist (#8), CSV export (#9).

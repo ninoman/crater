@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import { isCompilation, type ItemKey } from '../bandcamp';
+import { isCompilation, type ItemKey, type ItemPrice } from '../bandcamp';
 import type { HeardSource } from '../shared/heard';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
@@ -273,6 +273,26 @@ export interface ItemTagsRecord {
   tagIds: number[];
 }
 
+/** Your private note and rating on a release you wishlisted or own (decisions §24). */
+export interface ItemNoteRecord {
+  itemKey: ItemKey;
+  /** Trimmed; may be empty when only a rating is set. */
+  text: string;
+  /** 1 to 5, or null for unrated. */
+  rating: number | null;
+  updatedAt: number;
+}
+
+/**
+ * What a wishlisted release costs, as the wishlist sync last read it (decisions §24). Kept off
+ * `items` and `ownership`, which scans and the match index read in bulk. A row exists for every
+ * wishlist item the sync has seen; `price` is null when Bandcamp gave none.
+ */
+export interface ItemPriceRecord {
+  itemKey: ItemKey;
+  price: ItemPrice | null;
+}
+
 export interface TagRecord {
   /** Auto-incremented, so optional only when adding. */
   id: number;
@@ -359,6 +379,8 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   bandReleases: 15,
   bandReads: 15,
   followMutes: 15,
+  itemNotes: 16,
+  itemPrices: 16,
 };
 
 /** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
@@ -390,6 +412,8 @@ export class DigheadDb extends Dexie {
   bandReleases!: Table<BandReleaseRecord, [number, ItemKey]>;
   bandReads!: EntityTable<BandReadRecord, 'bandId'>;
   followMutes!: EntityTable<FollowMuteRecord, 'bandId'>;
+  itemNotes!: EntityTable<ItemNoteRecord, 'itemKey'>;
+  itemPrices!: EntityTable<ItemPriceRecord, 'itemKey'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -508,6 +532,9 @@ export class DigheadDb extends Dexie {
       bandReads: 'bandId',
       followMutes: 'bandId',
     });
+    // v16: your notes and ratings, and wishlist prices (decisions §24). New tables, so nothing to
+    // migrate; prices fill in on the next wishlist sync, which reads wishlist items with none.
+    this.version(16).stores({ itemNotes: 'itemKey', itemPrices: 'itemKey' });
   }
 }
 

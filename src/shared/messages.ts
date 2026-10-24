@@ -25,7 +25,7 @@ import type { ReleaseCrateMatesResult } from './releaseCrateMates';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { CrateMatesResult, CrateMateStanding } from './crateMates';
-import type { WishlistItem } from './wishlist';
+import type { ItemNote, ListedItem, ListSource } from './itemList';
 import type { CrateMatesLatestResult } from './crateMatesLatest';
 import type { FollowsDigestResult, FollowsDigestVisit } from './followsDigest';
 
@@ -115,8 +115,11 @@ export interface MessageMap {
     request: { key: FollowingKey; unfollowed: boolean };
     response: null;
   };
-  /** Your wishlist with your tags, newest first. Empty before your first sync. */
-  listWishlist: { request: NoPayload; response: WishlistItem[] };
+  /**
+   * Your wishlist or collection with your tags, notes and (wishlist) prices, newest first.
+   * Empty before your first sync.
+   */
+  listItems: { request: { source: ListSource }; response: ListedItem[] };
   /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
   getItemTags: { request: { itemKey: ItemKey }; response: number[] | null };
   /** Adds a tag to, or removes it from, many wishlist items at once. Answers with how many changed. */
@@ -133,6 +136,8 @@ export interface MessageMap {
     response: boolean;
   };
   markUnwishlisted: { request: { itemKey: ItemKey }; response: null };
+  /** Saves your note and rating on an item, or deletes them when both are empty. Answers what was kept. */
+  saveItemNote: { request: { itemKey: ItemKey; note: ItemNote }; response: ItemNote | null };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
   /** Writes a full backup to the staging file (shared/backupStaging.ts); the popup saves it. */

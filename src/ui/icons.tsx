@@ -92,3 +92,12 @@ export const PreviousIcon = () => (
     <path d="M4 3.5v9" />
   </Icon>
 );
+
+export const StarIcon = ({ filled = false }: { filled?: boolean }) => (
+  <Icon>
+    <path
+      d="M8 2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.2 4.4 13l.7-4L2.2 6.3l4-.6z"
+      fill={filled ? 'currentColor' : 'none'}
+    />
+  </Icon>
+);

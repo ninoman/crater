@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem } from '../bandcamp';
 import { createTag, DigheadDb, putOwnership, saveViewer, upsertCollectionItems } from '../db';
-import { wishlistHandlers, type WishlistHandlers } from './wishlistHandlers';
+import { itemListHandlers, type ItemListHandlers } from './itemListHandlers';
 
 const sender = {} as chrome.runtime.MessageSender;
 const ME = 5;
@@ -24,12 +24,12 @@ const ITEM: CollectionItem = {
 };
 
 let db: DigheadDb;
-let h: WishlistHandlers;
+let h: ItemListHandlers;
 
 beforeEach(async () => {
   db = new DigheadDb(`test-${crypto.randomUUID()}`);
   await db.open();
-  h = wishlistHandlers(db);
+  h = itemListHandlers(db, async () => 30);
   await upsertCollectionItems(db, [ITEM]);
   await putOwnership(db, ME, [ITEM], 'wishlist');
 });
@@ -38,9 +38,9 @@ afterEach(async () => {
   await db.delete();
 });
 
-describe('wishlist handlers', () => {
+describe('item list handlers', () => {
   it('answers nothing before Dighead has seen you', async () => {
-    expect(await h.listWishlist({}, sender)).toEqual([]);
+    expect(await h.listItems({ source: 'wishlist' }, sender)).toEqual([]);
     expect(await h.getItemTags({ itemKey: 'a1' }, sender)).toBeNull();
   });
 
@@ -53,7 +53,7 @@ describe('wishlist handlers', () => {
       await h.assignItemTag({ tagId: created.tag.id, itemKeys: ['a1'], action: 'add' }, sender),
     ).toBe(1);
 
-    const [row] = await h.listWishlist({}, sender);
+    const [row] = await h.listItems({ source: 'wishlist' }, sender);
     expect(row).toMatchObject({ itemKey: 'a1', title: 'Promises', addedAt: 1000 });
     expect(row?.coverUrl).toBe('https://f4.bcbits.com/img/a123_7.jpg');
     expect(row?.tagIds).toEqual([created.tag.id]);

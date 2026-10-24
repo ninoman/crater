@@ -1,5 +1,5 @@
-// The tags backup file (decisions §8 "Backup", §14). Tags are hand-made, so a re-sync can't
-// rebuild them. Version 1 files (followings only) still import.
+// The tags backup file (decisions §8 "Backup", §14, §24). Tags and notes are hand-made, so a
+// re-sync can't rebuild them. Version 1 files (followings only) and version 2 (no notes) still import.
 
 import { z } from 'zod';
 import type { ItemKey } from '../bandcamp';
@@ -10,16 +10,26 @@ const itemKeySchema = z.custom<ItemKey>(
 );
 
 const tagBackupSchema = z.object({
-  version: z.union([z.literal(1), z.literal(2)]),
+  version: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   tags: z.array(
     z.object({
       name: z.string(),
       /** [kind, id] of each following the tag is on. */
       assignments: z.array(followingKeySchema),
-      /** Wishlist items the tag is on. Missing in version 1. */
+      /** Wishlist and collection items the tag is on. Missing in version 1. */
       items: z.array(itemKeySchema).default([]),
     }),
   ),
+  /** Your notes and ratings. Missing before version 3. */
+  notes: z
+    .array(
+      z.object({
+        itemKey: itemKeySchema,
+        text: z.string(),
+        rating: z.number().int().min(1).max(5).nullable(),
+      }),
+    )
+    .default([]),
 });
 
 export type TagBackup = z.output<typeof tagBackupSchema>;

@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { backupFilename, backupSummaryText } from '../shared/backupFile';
 import { discardStagedFile, readStagedFile, stageFile } from '../shared/backupStaging';
 import { sendMessage } from '../shared/messages';
+import { saveFile } from './saveFile';
 
 export type DatabaseBackupStatus =
   | { state: 'idle' }
@@ -14,16 +15,6 @@ function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-/** Saves the staged file through a blob URL and a temporary link. */
-function download(filename: string, file: Blob): void {
-  const url = URL.createObjectURL(file);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
 /** Export and import of the whole database as one JSON file. */
 export function useDatabaseBackup() {
   const [status, setStatus] = useState<DatabaseBackupStatus>({ state: 'idle' });
@@ -32,7 +23,7 @@ export function useDatabaseBackup() {
     setStatus({ state: 'working', action: 'export' });
     try {
       await sendMessage('exportBackup', {});
-      download(backupFilename(new Date()), await readStagedFile('export'));
+      saveFile(backupFilename(new Date()), await readStagedFile('export'));
       setStatus({ state: 'exported' });
     } catch (error) {
       setStatus({ state: 'error', error: errorText(error) });

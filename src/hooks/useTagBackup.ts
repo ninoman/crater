@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { sendMessage } from '../shared/messages';
+import { saveFile } from './saveFile';
 import { importSummaryText, readTagBackup, tagBackupFilename } from '../shared/tagBackupFile';
 
 export type TagBackupStatus =
@@ -13,16 +14,6 @@ function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-/** Saves the file through a blob URL and a temporary link. */
-function download(filename: string, text: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
 /** Export and import of your tags as a JSON file. */
 export function useTagBackup() {
   const [status, setStatus] = useState<TagBackupStatus>({ state: 'idle' });
@@ -31,7 +22,10 @@ export function useTagBackup() {
     setStatus({ state: 'working' });
     try {
       const backup = await sendMessage('exportTags', {});
-      download(tagBackupFilename(new Date()), JSON.stringify(backup, null, 2));
+      saveFile(
+        tagBackupFilename(new Date()),
+        new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }),
+      );
       setStatus({ state: 'exported' });
     } catch (error) {
       setStatus({ state: 'error', error: errorText(error) });
