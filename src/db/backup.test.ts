@@ -52,6 +52,11 @@ async function seed(target: DigheadDb): Promise<void> {
     tagIds: [7],
     unfollowed: false,
   });
+  await target.itemNotes.put({ itemKey: 'a1', text: 'ask Sam', rating: 4, updatedAt: 3 });
+  await target.itemPrices.put({
+    itemKey: 'a2',
+    price: { amount: 9, currency: 'EUR', purchasable: true },
+  });
   await target.queue.put({
     kind: 'fan',
     target: '1',
@@ -84,7 +89,7 @@ describe('backup round trip', () => {
     await seed(db);
     const before = await snapshot(db);
     const { file, summary } = await exportDatabase(db);
-    expect(summary).toEqual({ tables: db.tables.length, rows: 7 });
+    expect(summary).toEqual({ tables: db.tables.length, rows: 9 });
 
     await clearAllData(db);
     const restored = await importDatabase(db, file, memorySnapshot().store, noPhase);
@@ -235,6 +240,27 @@ describe('older backups', () => {
       ['a1', true],
       ['a2', false],
     ]);
+  });
+});
+
+describe('a v15 backup', () => {
+  it('imports without the notes and prices tables added in v16', async () => {
+    await seed(db);
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await jsonText(file));
+    json.data.databaseVersion = 15;
+    const added = ['itemNotes', 'itemPrices'];
+    json.data.tables = json.data.tables.filter((t: { name: string }) => !added.includes(t.name));
+    json.data.data = json.data.data.filter(
+      (t: { tableName: string }) => !added.includes(t.tableName),
+    );
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.tags.count()).toBe(1);
+    expect(await db.itemNotes.count()).toBe(0);
+    expect(await db.itemPrices.count()).toBe(0);
   });
 });
 

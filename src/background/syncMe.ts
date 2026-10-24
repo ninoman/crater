@@ -10,8 +10,10 @@ import {
 import {
   markSynced,
   ownedItemKeys,
+  pricedItemKeys,
+  pruneItemData,
+  putItemPrices,
   putOwnership,
-  removeItemTagsExcept,
   removeOwnershipExcept,
   upsertCollectionItems,
   type DigheadDb,
@@ -50,6 +52,8 @@ export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Prom
   );
   deps.onStep('collection');
   await syncList(deps, me.fanId, 'collection', mode, fetched);
+  // After both lists: a wishlisted item bought since is in the collection now and keeps its tags.
+  if (mode === 'full') await pruneItemData(deps.db, me.fanId);
   await markSynced(deps.db, deps.now());
   const after = await ownedItemKeys(deps.db, me.fanId, 'collection');
   return [...after].filter((key) => !before.has(key));
@@ -63,7 +67,11 @@ async function syncList(
   fetchedSoFar: number,
 ): Promise<number> {
   const { db } = deps;
-  const known = await ownedItemKeys(db, fanId, list);
+  // A wishlist item whose price was never read counts as new, so one incremental sync fills in
+  // prices for a wishlist synced before they were kept (decisions §22).
+  const owned = await ownedItemKeys(db, fanId, list);
+  const priced = list === 'wishlist' ? await pricedItemKeys(db) : owned;
+  const known = new Set([...owned].filter((key) => priced.has(key)));
   const seen = new Set<ItemKey>();
   let fetched = fetchedSoFar;
   let first = true;
@@ -76,6 +84,7 @@ async function syncList(
       }
       await upsertCollectionItems(db, page.items);
       await putOwnership(db, fanId, page.items, list);
+      if (list === 'wishlist') await putItemPrices(db, page.items);
       for (const key of keys) seen.add(key);
       fetched += page.items.length;
       deps.onProgress(fetched);
@@ -90,8 +99,6 @@ async function syncList(
 
   if (mode === 'full') {
     await removeOwnershipExcept(db, fanId, list, seen);
-    // Items that left the wishlist, bought or removed, take their tags with them (decisions §14).
-    if (list === 'wishlist') await removeItemTagsExcept(db, seen);
   }
   return fetched;
 }

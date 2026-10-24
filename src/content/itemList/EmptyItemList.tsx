@@ -2,14 +2,17 @@ import { useEffect } from 'react';
 import type { SyncStatusView } from '../../hooks/useSyncStatus';
 import { EmptyState } from '../../ui';
 import { emptyReason, showsBandcampList } from '../shared/syncEmpty';
+import type { ListConfig } from './lists';
 
 const BELOW = "Bandcamp's own list is below.";
 
-/** Why the wishlist is empty, from the sync status the view polls while the tab is open. */
-export function EmptyWishlist({
+/** Why a list is empty, from the sync status the view polls while the tab is open. */
+export function EmptyItemList({
+  list,
   view,
   showBandcampList,
 }: {
+  list: ListConfig;
   view: SyncStatusView;
   showBandcampList: (shown: boolean) => void;
 }) {
@@ -29,43 +32,51 @@ export function EmptyWishlist({
       />
     );
   }
-  if (!reason) return <EmptyState title="Loading your wishlist…" />;
+  if (!reason) return <EmptyState title={`Loading your ${list.noun}…`} />;
 
   switch (reason.kind) {
     case 'no-viewer':
       return (
         <EmptyState
           title="Dighead hasn't seen you log in yet"
-          description={`Reload this page so Dighead can pick up your account and sync your wishlist. ${BELOW}`}
+          description={`Reload this page so Dighead can pick up your account and sync your ${list.noun}. ${BELOW}`}
         />
       );
     case 'syncing':
       return (
         <EmptyState
           title="Syncing your collection and wishlist…"
-          description={`${reason.itemsFetched} items so far. Wishlisted releases show up here, ready to tag, as they arrive. ${BELOW}`}
+          description={`${reason.itemsFetched} items so far. Your ${list.noun} shows up here, ready to sort and tag, as it arrives. ${BELOW}`}
         />
       );
     case 'sync-failed':
       return (
         <EmptyState
           tone="error"
-          title="Couldn't sync your wishlist"
+          title={`Couldn't sync your ${list.noun}`}
           description={`${reason.message} Dighead tries again on your next sync. ${BELOW}`}
         />
       );
     case 'unsynced':
       return (
         <EmptyState
-          title="Your wishlist hasn't synced yet"
-          description={`It syncs with your collection, which starts when Dighead sees you on a Bandcamp page. ${BELOW}`}
+          title={`Your ${list.noun} hasn't synced yet`}
+          description={
+            list.source === 'wishlist'
+              ? `It syncs with your collection, which starts when Dighead sees you on a Bandcamp page. ${BELOW}`
+              : `It syncs when Dighead sees you on a Bandcamp page. ${BELOW}`
+          }
         />
       );
     case 'none':
       return (
         <EmptyState
-          title="Your wishlist is empty"
-          description="Wishlist releases on Bandcamp and they show up here, ready to tag. Dighead picks them up on your next sync."
+          title={`Your ${list.noun} is empty`}
+          description={
+            list.source === 'wishlist'
+              ? 'Wishlist releases on Bandcamp and they show up here, ready to tag. Dighead picks them up on your next sync.'
+              : 'Buy something on Bandcamp and it shows up here, ready to tag. Dighead picks it up on your next sync.'
+          }
         />
       );
   }

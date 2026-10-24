@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import { isCompilation, type ItemKey } from '../bandcamp';
+import { isCompilation, type ItemKey, type ItemPrice } from '../bandcamp';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
 
@@ -245,6 +245,26 @@ export interface ItemTagsRecord {
   tagIds: number[];
 }
 
+/** Your private note and rating on a release you wishlisted or own (decisions §22). */
+export interface ItemNoteRecord {
+  itemKey: ItemKey;
+  /** Trimmed; may be empty when only a rating is set. */
+  text: string;
+  /** 1 to 5, or null for unrated. */
+  rating: number | null;
+  updatedAt: number;
+}
+
+/**
+ * What a wishlisted release costs, as the wishlist sync last read it (decisions §22). Kept off
+ * `items` and `ownership`, which scans and the match index read in bulk. A row exists for every
+ * wishlist item the sync has seen; `price` is null when Bandcamp gave none.
+ */
+export interface ItemPriceRecord {
+  itemKey: ItemKey;
+  price: ItemPrice | null;
+}
+
 export interface TagRecord {
   /** Auto-incremented, so optional only when adding. */
   id: number;
@@ -282,6 +302,8 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   latelyCrateMates: 7,
   itemTags: 9,
   bands: 12,
+  itemNotes: 16,
+  itemPrices: 16,
 };
 
 /** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
@@ -307,6 +329,8 @@ export class DigheadDb extends Dexie {
   following!: Table<FollowingRecord, FollowingKey>;
   tags!: EntityTable<TagRecord, 'id'>;
   itemTags!: EntityTable<ItemTagsRecord, 'itemKey'>;
+  itemNotes!: EntityTable<ItemNoteRecord, 'itemKey'>;
+  itemPrices!: EntityTable<ItemPriceRecord, 'itemKey'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -410,6 +434,9 @@ export class DigheadDb extends Dexie {
           await tx.table(to).bulkPut(await tx.table(from).toArray());
         }
       });
+    // v16: your notes and ratings, and wishlist prices (decisions §22). New tables, so nothing to
+    // migrate; prices fill in on the next wishlist sync, which reads wishlist items with none.
+    this.version(16).stores({ itemNotes: 'itemKey', itemPrices: 'itemKey' });
   }
 }
 

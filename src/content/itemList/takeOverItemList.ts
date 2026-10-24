@@ -1,32 +1,31 @@
-// Puts our wishlist in place of Bandcamp's paged one, inside the wishlist tab. Bandcamp's list
-// renders 20 items at a time behind "view all", so a tag filter over it would be wrong
-// (decisions §14). Ours sits before Bandcamp's, all in one shadow root.
+// Puts our list in place of Bandcamp's paged one, inside its wishlist or collection tab.
+// Bandcamp's list renders 20 items at a time behind "view all", so a tag filter over it would be
+// wrong (decisions §14). Ours sits before Bandcamp's, all in one shadow root.
 
 import { FAN_PAGE_DOM } from '../../bandcamp';
 import { createShadowSlot, type ShadowSlot } from '../shared/shadowSlot';
-import { wishlistCss } from './wishlistStyles';
+import { itemListCss } from './itemListStyles';
+import type { ListConfig } from './lists';
 
-/** On Bandcamp's items container while its own list is hidden. */
-export const WISHLIST_TAKEN_CLASS = 'dighead-wishlist-taken';
+const takenClass = (list: ListConfig) => `dighead-${list.noun}-taken`;
+const tagName = (list: ListConfig) => `dighead-${list.noun}`;
 
-const STYLE_ID = 'dighead-wishlist';
-
-function pageCss(): string {
-  const { wishlistNativeList, wishlistExpand } = FAN_PAGE_DOM;
-  return `.${WISHLIST_TAKEN_CLASS} > ${wishlistNativeList},
-.${WISHLIST_TAKEN_CLASS} > ${wishlistExpand} { display: none !important; }
-dighead-wishlist { display: block; }`;
+function pageCss(list: ListConfig): string {
+  const { itemsNativeList, itemsExpand } = FAN_PAGE_DOM;
+  return `.${takenClass(list)} > ${itemsNativeList},
+.${takenClass(list)} > ${itemsExpand} { display: none !important; }
+${tagName(list)} { display: block; }`;
 }
 
-function addPageStyle(doc: Document): void {
-  if (doc.getElementById(STYLE_ID)) return;
+function addPageStyle(doc: Document, list: ListConfig): void {
+  if (doc.getElementById(tagName(list))) return;
   const style = doc.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = pageCss();
+  style.id = tagName(list);
+  style.textContent = pageCss(list);
   doc.head.append(style);
 }
 
-export interface TakenWishlist {
+export interface TakenList {
   /** Our list's shadow root, right above Bandcamp's hidden one. */
   slot: ShadowSlot;
   /** Shows Bandcamp's own list when ours can't stand in for it. */
@@ -34,22 +33,22 @@ export interface TakenWishlist {
 }
 
 /** Null, with a warning, when the items container isn't where we expect. */
-export function takeOverWishlist(doc: Document, grid: Element): TakenWishlist | null {
-  const container = grid.querySelector(FAN_PAGE_DOM.wishlistItems);
+export function takeOverItemList(doc: Document, grid: Element, list: ListConfig): TakenList | null {
+  const container = grid.querySelector(list.items);
   if (!container) {
-    console.warn('dighead: wishlist items not found; Bandcamp may have changed its layout');
+    console.warn(`dighead: ${list.noun} items not found; Bandcamp may have changed its layout`);
     return null;
   }
-  addPageStyle(doc);
+  addPageStyle(doc, list);
 
-  const slot = createShadowSlot(doc, 'dighead-wishlist', wishlistCss);
-  const native = container.querySelector(`:scope > ${FAN_PAGE_DOM.wishlistNativeList}`);
+  const slot = createShadowSlot(doc, tagName(list), itemListCss);
+  const native = container.querySelector(`:scope > ${FAN_PAGE_DOM.itemsNativeList}`);
   if (native) native.before(slot.host);
   else container.prepend(slot.host);
-  container.classList.add(WISHLIST_TAKEN_CLASS);
+  container.classList.add(takenClass(list));
 
   return {
     slot,
-    showBandcampList: (shown) => container.classList.toggle(WISHLIST_TAKEN_CLASS, !shown),
+    showBandcampList: (shown) => container.classList.toggle(takenClass(list), !shown),
   };
 }

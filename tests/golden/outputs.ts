@@ -20,7 +20,7 @@ import {
   getMe,
   getSellerItems,
   knownItemKeys,
-  listWishlist,
+  listOwnedItems,
   ownedItemKeys,
   pageBadges,
   purchasedAt,
@@ -97,7 +97,11 @@ export async function collectOutputs(db: DigheadDb): Promise<unknown> {
     ],
     DEFAULT_SETTINGS.topCrateMatesK,
   );
-  out.wishlist = await listWishlist(db, ME);
+  out.wishlist = (await listOwnedItems(db, ME, 'wishlist')).map(({ item, addedAt, tagIds }) => ({
+    item,
+    addedAt,
+    tagIds,
+  }));
 
   const allKeys = (await db.items.toCollection().primaryKeys()).sort();
   out.items = await getItems(db, allKeys);

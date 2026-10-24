@@ -2,6 +2,19 @@
   display: block;
 }
 
-.dh-wishlist__list {
+.dh-itemlist__list {
   border-top: 1px solid var(--dh-color-border);
+}
+
+.dh-itemlist__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-2) var(--dh-space-3);
+}
+
+.dh-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dh-space-1);
 }

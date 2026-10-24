@@ -10,7 +10,9 @@ function count(n: number, noun: string): string {
 
 export function importSummaryText({ tagsCreated, assigned, skipped }: TagImportSummary): string {
   const text = `${count(tagsCreated, 'tag')} added, ${count(assigned, 'assignment')} applied`;
-  return skipped > 0 ? `${text}, ${skipped} skipped (no longer followed or wishlisted)` : text;
+  return skipped > 0
+    ? `${text}, ${skipped} skipped (no longer followed, wishlisted or owned)`
+    : text;
 }
 
 /** Reads the text of a chosen file. Throws a message fit for the user when it isn't a backup. */

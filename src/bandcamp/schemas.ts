@@ -21,6 +21,12 @@ export const rawCollectionItem = z.object({
   item_url: z.string(),
   purchased: z.string().nullish(),
   added: z.string().nullish(),
+  /** What it costs now, in `currency`. Wishlist rows carry them (decisions §22). */
+  price: z.number().nullish(),
+  currency: z.string().nullish(),
+  is_purchasable: z.boolean().nullish(),
+  is_private: z.boolean().nullish(),
+  is_subscriber_only: z.boolean().nullish(),
   /** This item's position in the list, usable as older_than_token for the next page. */
   token: z.string().nullish(),
 });

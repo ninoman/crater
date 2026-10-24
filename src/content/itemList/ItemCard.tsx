@@ -1,11 +1,17 @@
 import { memo } from 'react';
 import type { ItemKey } from '../../bandcamp';
-import type { WishlistItem } from '../../shared/wishlist';
+import {
+  type ItemNote,
+  type ListedItem,
+  type ListSource,
+  MAX_NOTE_LENGTH,
+} from '../../shared/itemList';
 import {
   Card,
   Checkbox,
   ExternalIcon,
   LinkButton,
+  NotePopover,
   PlayableCover,
   type TagOption,
   Tooltip,
@@ -13,35 +19,41 @@ import {
 import { ReleasePreview } from '../shared/ReleasePreview';
 import { itemTagHandlers, type TagMutations } from '../shared/tagActions';
 import { TagEditor } from '../shared/TagEditor';
-import { addedText } from './wishlistFilter';
+import { cardMeta } from './itemCardText';
 
-export interface WishlistCardProps {
-  item: WishlistItem;
+export interface ItemCardProps {
+  item: ListedItem;
+  source: ListSource;
   tags: readonly TagOption[];
   mutations: TagMutations;
   selected: boolean;
   previewing: boolean;
+  /** The shortlist's cumulative total in this item's currency. */
+  running?: number;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
+  onSaveNote: (itemKey: ItemKey, note: ItemNote) => void;
   onError: (message: string) => void;
 }
 
 /**
- * One wishlisted release as a grid card: playable cover with a select box, title and artist,
- * your tags and "+ tag". Memoised, since a wishlist can hold hundreds and re-renders as a whole.
+ * One release as a grid card: playable cover with a select box, title, artist, date and price,
+ * your tags and your note. Memoised, since a list can hold hundreds and re-renders as a whole.
  */
-export const WishlistCard = memo(function WishlistCard({
+export const ItemCard = memo(function ItemCard({
   item,
+  source,
   tags,
   mutations,
   selected,
   previewing,
+  running,
   onSelect,
   onPreview,
+  onSaveNote,
   onError,
-}: WishlistCardProps) {
+}: ItemCardProps) {
   const name = `${item.artist} – ${item.title}`;
-  const added = addedText(item.addedAt);
   const handlers = itemTagHandlers(mutations, [item.itemKey], item.tagIds, onError);
   return (
     <Card
@@ -81,8 +93,18 @@ export const WishlistCard = memo(function WishlistCard({
           {item.title}
         </a>
       }
-      meta={added ? [item.artist, added] : [item.artist]}
-      badges={<TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />}
+      meta={cardMeta(item, source, running)}
+      badges={
+        <>
+          <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
+          <NotePopover
+            name={name}
+            note={item.note}
+            maxLength={MAX_NOTE_LENGTH}
+            onSave={(note) => onSaveNote(item.itemKey, note)}
+          />
+        </>
+      }
     >
       {previewing && <ReleasePreview url={item.url} name={name} />}
     </Card>

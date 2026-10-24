@@ -1,5 +1,5 @@
-// Your own tags, on followings (decisions §8) and wishlist items (§14). Tag ids live on the
-// following rows and in `itemTags`.
+// Your own tags, on followings (decisions §8) and on wishlist and collection items (§14, §22).
+// Tag ids live on the following rows and in `itemTags`.
 
 import type { ItemKey } from '../../bandcamp';
 import type {
@@ -11,7 +11,8 @@ import type {
 } from '../schema';
 import type { TagBackup } from '../tagBackup';
 import { followingKey } from './following';
-import { wishlistedKeys } from './wishlist';
+import { listedKeys } from './itemLists';
+import { allNotes, importNotes } from './itemNotes';
 
 export type TagResult =
   | { ok: true; tag: TagRecord }
@@ -20,7 +21,7 @@ export type TagResult =
 export interface TagImportSummary {
   tagsCreated: number;
   assigned: number;
-  /** Assignments to accounts you no longer follow, or items no longer in your wishlist. */
+  /** Assignments to accounts you no longer follow, or notes and tags for items you no longer have. */
   skipped: number;
 }
 
@@ -92,9 +93,9 @@ export async function assignTag(
   });
 }
 
-/** Every tag with the followings and items it's on, in the backup file's shape. */
+/** Every tag with the followings and items it's on, and your notes, in the backup file's shape. */
 export async function exportTags(db: DigheadDb): Promise<TagBackup> {
-  return db.transaction('r', [db.tags, db.following, db.itemTags], async () => {
+  return db.transaction('r', [db.tags, db.following, db.itemTags, db.itemNotes], async () => {
     const tags = await listTags(db);
     const assignments = new Map<number, FollowingKey[]>(tags.map((tag) => [tag.id, []]));
     const items = new Map<number, ItemKey[]>(tags.map((tag) => [tag.id, []]));
@@ -105,26 +106,29 @@ export async function exportTags(db: DigheadDb): Promise<TagBackup> {
       for (const tagId of row.tagIds) items.get(tagId)?.push(row.itemKey);
     }
     return {
-      version: 2,
+      version: 3,
       tags: tags.map((tag) => ({
         name: tag.name,
         assignments: assignments.get(tag.id) ?? [],
         items: items.get(tag.id) ?? [],
       })),
+      notes: (await allNotes(db)).map(({ itemKey, text, rating }) => ({ itemKey, text, rating })),
     };
   });
 }
 
 /**
  * Merges a backup in: tags match by name key. Assignments to accounts you no longer follow
- * (gone, or unfollowed on the tab) and to items not in `fanId`'s wishlist are skipped.
+ * (gone, or unfollowed on the tab) and to items in neither of `fanId`'s lists are skipped. Notes
+ * are added only for items that have none yet.
  */
 export async function importTags(
   db: DigheadDb,
   backup: TagBackup,
   fanId: number | null,
 ): Promise<TagImportSummary> {
-  return db.transaction('rw', [db.tags, db.following, db.itemTags, db.ownership], async () => {
+  const tables = [db.tags, db.following, db.itemTags, db.itemNotes, db.ownership];
+  return db.transaction('rw', tables, async () => {
     const summary: TagImportSummary = { tagsCreated: 0, assigned: 0, skipped: 0 };
     for (const entry of backup.tags) {
       if (!tagNameKey(entry.name)) continue;
@@ -141,8 +145,7 @@ export async function importTags(
       await db.following.bulkPut(changed);
       summary.assigned += changed.length;
 
-      const wished =
-        fanId === null ? new Set<ItemKey>() : await wishlistedKeys(db, fanId, entry.items);
+      const wished = fanId === null ? new Set<ItemKey>() : await listedKeys(db, fanId, entry.items);
       const present = await db.itemTags.bulkGet(entry.items);
       const tagged: ItemTagsRecord[] = [];
       entry.items.forEach((itemKey, i) => {
@@ -153,6 +156,11 @@ export async function importTags(
       await db.itemTags.bulkPut(tagged);
       summary.assigned += tagged.length;
     }
+    const noteKeys = backup.notes.map((note) => note.itemKey);
+    const listed = fanId === null ? new Set<ItemKey>() : await listedKeys(db, fanId, noteKeys);
+    const notes = await importNotes(db, backup.notes, listed, Date.now());
+    summary.assigned += notes.added;
+    summary.skipped += notes.skipped;
     return summary;
   });
 }

@@ -16,15 +16,18 @@ import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import infoHint from './InfoHint.css?inline';
 import loadMore from './LoadMore.css?inline';
+import notePopover from './NotePopover.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import playableCover from './PlayableCover.css?inline';
 import progress from './Progress.css?inline';
+import rating from './Rating.css?inline';
 import releaseRow from './ReleaseRow.css?inline';
 import row from './Row.css?inline';
 import searchField from './SearchField.css?inline';
 import sectionHeading from './SectionHeading.css?inline';
 import segmented from './Segmented.css?inline';
+import select from './Select.css?inline';
 import skeleton from './Skeleton.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
@@ -63,6 +66,9 @@ export const uiStyles = [
   checkbox,
   tagPicker,
   segmented,
+  select,
+  rating,
+  notePopover,
   skeleton,
   sectionHeading,
   disclosure,

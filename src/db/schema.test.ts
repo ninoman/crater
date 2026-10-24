@@ -240,4 +240,25 @@ describe('DigheadDb', () => {
     expect([...upgraded.backendDB().objectStoreNames]).not.toContain('latelyTwins');
     await upgraded.delete();
   });
+
+  it('adds notes and prices in v16 and keeps what was there', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(13).stores({
+      itemTags: 'itemKey, *tagIds',
+      crateMates: 'fanId, score',
+      latelyCrateMates: 'fanId, lately',
+    });
+    await old.table('itemTags').add({ itemKey: 'a1', tagIds: [3] });
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+    expect(await upgraded.itemTags.get('a1')).toEqual({ itemKey: 'a1', tagIds: [3] });
+    expect(await upgraded.itemNotes.count()).toBe(0);
+    expect(await upgraded.itemPrices.count()).toBe(0);
+    await upgraded.itemNotes.put({ itemKey: 'a1', text: 'x', rating: 2, updatedAt: 1 });
+    expect(await upgraded.itemNotes.get('a1')).toMatchObject({ rating: 2 });
+    await upgraded.delete();
+  });
 });

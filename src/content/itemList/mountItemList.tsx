@@ -1,18 +1,23 @@
-import { FAN_PAGE_DOM } from '../../bandcamp';
 import { mountShadow } from '../shared/mountShadow';
-import { WishlistApp } from './WishlistApp';
-import { watchWishlistTab } from './wishlistTab';
-import { wishlistCss } from './wishlistStyles';
+import { ItemListApp } from './ItemListApp';
+import { itemListCss } from './itemListStyles';
+import { watchItemListTab } from './itemListTab';
+import type { ListConfig } from './lists';
 
 /**
- * Takes over Bandcamp's wishlist tab on your own page: every release you wishlisted, with
- * tags, a filter bar and bulk tagging (decisions §14). The root itself renders nothing visible.
+ * Takes over Bandcamp's wishlist or collection tab on your own page: every item you have, with
+ * tags, notes, sorting, a filter bar and bulk tagging (decisions §14, §22). The root itself
+ * renders nothing visible.
  */
-export function mountWishlist(doc: Document): void {
-  const grid = doc.querySelector(FAN_PAGE_DOM.wishlistGrid);
+export function mountItemList(doc: Document, list: ListConfig): void {
+  const grid = doc.querySelector(list.grid);
   if (!grid) {
-    console.warn('dighead: wishlist tab not found; Bandcamp may have changed its layout');
+    console.warn(`dighead: ${list.noun} tab not found; Bandcamp may have changed its layout`);
     return;
   }
-  mountShadow(grid, <WishlistApp tab={watchWishlistTab(doc, grid)} />, wishlistCss);
+  mountShadow(
+    grid,
+    <ItemListApp tab={watchItemListTab(doc, grid, list)} list={list} />,
+    itemListCss,
+  );
 }

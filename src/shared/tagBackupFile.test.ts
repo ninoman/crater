@@ -15,7 +15,7 @@ describe('importSummaryText', () => {
       '1 tag added, 2 assignments applied',
     );
     expect(importSummaryText({ tagsCreated: 0, assigned: 1, skipped: 3 })).toBe(
-      '0 tags added, 1 assignment applied, 3 skipped (no longer followed or wishlisted)',
+      '0 tags added, 1 assignment applied, 3 skipped (no longer followed, wishlisted or owned)',
     );
   });
 });
@@ -23,8 +23,9 @@ describe('importSummaryText', () => {
 describe('readTagBackup', () => {
   it('accepts a backup', () => {
     const backup = {
-      version: 2,
+      version: 3,
       tags: [{ name: 'jazz', assignments: [['fan', 1]], items: ['a5'] }],
+      notes: [{ itemKey: 'a5', text: 'ask Sam', rating: 4 }],
     };
     expect(readTagBackup(JSON.stringify(backup))).toEqual(backup);
   });
@@ -34,6 +35,6 @@ describe('readTagBackup', () => {
   });
 
   it('rejects JSON that is not a backup', () => {
-    expect(() => readTagBackup('{"version":3,"tags":[]}')).toThrow('tags backup');
+    expect(() => readTagBackup('{"version":4,"tags":[]}')).toThrow('tags backup');
   });
 });
