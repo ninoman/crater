@@ -1,6 +1,7 @@
 // Shapes of Also-bought results, shared by the worker and the sidebar.
 
 import type { ItemKey } from '../bandcamp';
+import type { AppliedFilters } from './listFilters';
 
 /** Why a release is recommended. The UI turns this into the reason line. */
 export type AlsoBoughtReason =
@@ -40,4 +41,9 @@ export interface AlsoBoughtResult {
   rows: AlsoBoughtRow[];
   /** Null once co-owned rows show. */
   warmup: AlsoBoughtWarmup | null;
+  /**
+   * The filters this list was built with and what they did; absent when none narrowed it
+   * (decisions §22). The worker re-scores on its own, so the sidebar checks these are still its own.
+   */
+  filtered?: AppliedFilters;
 }

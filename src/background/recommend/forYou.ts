@@ -34,6 +34,8 @@ import { freshOwnership, type FreshOwned } from '../../scoring/fresh';
 import { MONTH_MS } from '../../scoring/lately';
 import { supporters } from '../../scoring/weights';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
+import type { ListFilters } from '../../shared/listFilters';
+import { createFilterGate, type FilterGate } from './filterGate';
 import { loadFollowedReleases } from './followSignal';
 import { listsInRankOrder, toRow } from './forYouRow';
 import { crateMatesBasis } from './crateMateRows';
@@ -56,6 +58,9 @@ export interface ForYouInput {
   /** Down-weight compilations among the picks (decisions §17). */
   ignoreCompilations: boolean;
   now: number;
+  /** Narrow the picks (decisions §22), with the place "Near me" matches against. */
+  filters?: ListFilters;
+  homePlace?: string;
 }
 
 export async function computeForYou(
@@ -66,6 +71,7 @@ export async function computeForYou(
   const basis = crateMatesBasis(me);
   if (!me) return { basis, rows: [], crateMatesUsed: 0 };
 
+  const gate = createFilterGate(db, input.filters, input.homePlace ?? '');
   const crateMates = topCrateMates(await boardFor(db, input.mode), input.topCrateMatesK);
   const data = await gatherForYou(
     db,
@@ -77,7 +83,13 @@ export async function computeForYou(
   for (const c of candidates) if ('lastBoughtAt' in c) lastBought.set(c.id, c.lastBoughtAt);
 
   const followed = await loadFollowedReleases(db, input.followingBoost);
-  const { ranked, items } = await scoreTop(db, candidates, followed, input.ignoreCompilations);
+  const { ranked, items } = await scoreTop(
+    db,
+    candidates,
+    followed,
+    input.ignoreCompilations,
+    gate,
+  );
   const supportersOf = new Map(ranked.map((scored) => [scored.id, scored.supporters]));
   const lists = listsInRankOrder(crateMates, data);
   const artists = new Map<number, string>();
@@ -105,7 +117,12 @@ export async function computeForYou(
       }),
     ];
   });
-  return { basis, rows, crateMatesUsed: data.crateMateLists.length };
+  return {
+    basis,
+    rows,
+    crateMatesUsed: data.crateMateLists.length,
+    ...(gate && { filtered: gate.applied() }),
+  };
 }
 
 /** The board a mode draws on, as crate mates scored by it. Lately crate mates without a lately score are out. */
@@ -148,13 +165,15 @@ function candidatesFor(
  * Scores candidates in falling crateMateScore order, a chunk at a time, and stops once none left
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
  * take a place. Ceilings allow for the follow boost, so a followed release is never cut early.
- * Compilations are down-weighted by their shown record's flag (§17).
+ * Compilations are down-weighted by their shown record's flag (§17). Candidates the filter
+ * turns down are dropped before they're looked up or scored, so they take no place (§22).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly CrateMateOwned[],
   followed: ReadonlyMap<number, string>,
   ignoreCompilations: boolean,
+  gate: FilterGate | null,
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemFields>();
@@ -162,14 +181,24 @@ async function scoreTop(
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
     if (!first || !couldRank(ranked, RANKED, first.crateMateScore * factor)) break;
-    const chunk = candidates
+    if (gate?.exhausted) {
+      gate.stoppedAtLimit();
+      break;
+    }
+    const couldRankNow = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldRank(ranked, RANKED, c.crateMateScore * factor));
+    // The gate reads the records it judges, so they aren't read again below.
+    const passing = gate && (await gate.passing(couldRankNow.map((c) => keyFromNumber(c.id))));
+    const chunk = passing
+      ? couldRankNow.filter((c) => passing.has(keyFromNumber(c.id)))
+      : couldRankNow;
     const [display, owners] = await Promise.all([
-      getShownFields(
-        db,
-        chunk.map((c) => keyFromNumber(c.id)),
-      ),
+      passing ??
+        getShownFields(
+          db,
+          chunk.map((c) => keyFromNumber(c.id)),
+        ),
       getOwnerCounts(
         db,
         chunk.map((c) => c.id),

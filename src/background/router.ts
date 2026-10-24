@@ -39,7 +39,7 @@ export const handlers: MessageHandlers = {
   releaseOpened: ({ item }) => openRelease(item),
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
-  getAlsoBought: ({ itemKey }) => getAlsoBought(itemKey),
+  getAlsoBought: ({ itemKey, filters }) => getAlsoBought(itemKey, filters),
   getPreview: ({ url }) => fetchReleasePreview(fetchText, url),
   hideRelease: async ({ matchKey }) => {
     await hideRelease(db, matchKey, Date.now());
@@ -50,8 +50,8 @@ export const handlers: MessageHandlers = {
   getCrateMateStandings: ({ fanIds }) => getCrateMateStandings(db, fanIds),
   getReleaseCrateMates: ({ itemKey }) => getReleaseCrateMates(itemKey),
   getPageBadges: ({ links }) => getPageBadges(db, links),
-  getForYou: ({ mode }) => getForYou(mode),
-  getCrateMatesLatest: () => getCrateMatesLatest(),
+  getForYou: ({ mode, filters }) => getForYou(mode, filters),
+  getCrateMatesLatest: ({ filters }) => getCrateMatesLatest(filters),
   ...followingHandlers(db),
   ...wishlistHandlers(db),
   ...backupHandlers(db),

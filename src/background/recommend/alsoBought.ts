@@ -1,7 +1,7 @@
 // Runs the Also-bought scorer for one release: gather, score with pruning, blend, then dress
 // the picks for display.
 
-import { artUrl, keyToNumber, type ItemKey } from '../../bandcamp';
+import { artUrl, keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
 import {
   gatherAlsoBought,
   getCompilations,
@@ -39,6 +39,8 @@ import { exclusions } from '../../scoring/exclusions';
 import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import { supporters } from '../../scoring/weights';
 import type { AlsoBoughtReason, AlsoBoughtResult, AlsoBoughtRow } from '../../shared/alsoBought';
+import type { ListFilters } from '../../shared/listFilters';
+import { createFilterGate, type FilterGate } from './filterGate';
 import { loadFollowedReleases } from './followSignal';
 
 /** Owner counts are looked up this many candidates at a time. */
@@ -49,14 +51,23 @@ export interface AlsoBoughtOptions {
   followingBoost?: boolean;
   /** Down-weight compilations among the picks (decisions §17). */
   ignoreCompilations?: boolean;
+  /** Narrow the picks (decisions §22), with the place "Near me" matches against. */
+  filters?: ListFilters;
+  homePlace?: string;
 }
 
 export async function computeAlsoBought(
   db: DigheadDb,
   releaseKey: ItemKey,
   meFanId: number | null,
-  { followingBoost = true, ignoreCompilations = true }: AlsoBoughtOptions = {},
+  {
+    followingBoost = true,
+    ignoreCompilations = true,
+    filters,
+    homePlace = '',
+  }: AlsoBoughtOptions = {},
 ): Promise<AlsoBoughtResult> {
+  const gate = createFilterGate(db, filters, homePlace);
   const [data, followed] = await Promise.all([
     gatherAlsoBought(db, releaseKey, meFanId),
     loadFollowedReleases(db, followingBoost),
@@ -72,6 +83,7 @@ export async function computeAlsoBought(
   const scored = await scoreTop(db, candidates, data.supporters, basis, boosts, {
     followed,
     ignoreCompilations,
+    gate,
   });
   const wait = warmup(
     { read: data.supporters.length, allScanned: data.allScanned, listed: data.listed },
@@ -80,7 +92,9 @@ export async function computeAlsoBought(
   // While warming up the co-owned rows are early picks, and same-artist and same-label picks
   // fill in behind them for any release.
   const fallback =
-    wait !== null || isSmallRelease(data.knownOwners) ? await fallbackFor(db, data, excluded) : [];
+    wait !== null || isSmallRelease(data.knownOwners)
+      ? await fallbackFor(db, data, excluded, gate)
+      : [];
   const picks = blendPicks(scored, fallback, ALSO_BOUGHT_LIMIT);
 
   const items = await getDisplayItems(
@@ -94,7 +108,7 @@ export async function computeAlsoBought(
     const follow = pick.kind === 'co-owned' ? followed.get(keyToNumber(pick.matchKey)) : undefined;
     return item ? [toRow(pick, item, reasonFor(pick, item.label ?? label), follow ?? null)] : [];
   });
-  return { releaseKey, rows, warmup: wait };
+  return { releaseKey, rows, warmup: wait, ...(gate && { filtered: gate.applied() }) };
 }
 
 /**
@@ -102,7 +116,8 @@ export async function computeAlsoBought(
  * time, and stops once no remaining candidate can reach the top list (decisions §6). Within a chunk, only
  * candidates whose own crate mate share still lets them in are looked up. Ceilings are linear in co, so
  * scaling co by the follow boost keeps them exact (§16). Compilations are down-weighted (§17),
- * which only lowers scores, so the ceilings still hold.
+ * which only lowers scores, so the ceilings still hold. Candidates the filter turns down are
+ * dropped before they're looked up, so they take no place (§22).
  */
 async function scoreTop(
   db: DigheadDb,
@@ -113,7 +128,12 @@ async function scoreTop(
   {
     followed,
     ignoreCompilations,
-  }: { followed: ReadonlyMap<number, string>; ignoreCompilations: boolean },
+    gate,
+  }: {
+    followed: ReadonlyMap<number, string>;
+    ignoreCompilations: boolean;
+    gate: FilterGate | null;
+  },
 ): Promise<Scored[]> {
   const maxShare = maxCrateMateShare(boosts);
   const factor = maxFollowFactor(followed);
@@ -122,9 +142,17 @@ async function scoreTop(
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
     if (!first || !couldEnter(top, ALSO_BOUGHT_LIMIT, first.co * factor, maxShare)) break;
-    const chunk = candidates
+    if (gate?.exhausted) {
+      gate.stoppedAtLimit();
+      break;
+    }
+    const couldEnterNow = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldEnter(top, ALSO_BOUGHT_LIMIT, c.co * factor, boostOf(c.id).share));
+    const passing = gate && (await gate.passing(couldEnterNow.map((c) => keyFromNumber(c.id))));
+    const chunk = passing
+      ? couldEnterNow.filter((c) => passing.has(keyFromNumber(c.id)))
+      : couldEnterNow;
     const ids = chunk.map((c) => c.id);
     const [owners, compilations] = await Promise.all([
       getOwnerCounts(db, ids),
@@ -149,11 +177,17 @@ async function fallbackFor(
   db: DigheadDb,
   data: AlsoBoughtData,
   excluded: ReadonlySet<number>,
+  gate: FilterGate | null,
 ): Promise<FallbackPick[]> {
   const release = data.album ?? data.release;
   if (!release) return [];
   const seller = { ...release, labelId: data.album?.labelId ?? data.release?.labelId ?? null };
-  const items = await getSellerItems(db, seller.bandId, seller.labelId);
+  // Only items a pick could be made of take the filter's count: not tracks, not excluded ones.
+  const sold = (await getSellerItems(db, seller.bandId, seller.labelId)).filter(
+    (item) => item.albumKey === null && !excluded.has(keyToNumber(item.itemKey)),
+  );
+  const passing = gate && (await gate.passing(sold.map((item) => item.itemKey)));
+  const items = passing ? sold.filter((item) => passing.has(item.itemKey)) : sold;
   const ids = items.map((item) => keyToNumber(item.itemKey));
   const owners = await getOwnerCounts(db, ids);
   return fallbackPicks(
