@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import type { ItemKey } from '../../../bandcamp';
 import { useForYou, type ForYouView } from '../../../hooks/useForYou';
+import { useListFilters } from '../../../hooks/useListFilters';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
-import { Button, EmptyState, LinkButton, Segmented } from '../../../ui';
+import { NO_FILTERS } from '../../../shared/listFilters';
+import { Button, EmptyState, LinkButton, ListFilterBar, Segmented } from '../../../ui';
+import { FILTER_GENRES } from '../../shared/filterGenres';
+import { NoMatches } from '../../shared/NoMatches';
 import { ForYouList } from './ForYouList';
 import { formatForYouSummary } from './forYouText';
 
@@ -25,7 +29,8 @@ const LOADING_TITLES: Record<ForYouMode, string> = {
  */
 export function ForYouTab() {
   const [mode, setMode] = useState<ForYouMode>('all');
-  const { view, reload, hide } = useForYou(mode);
+  const { filters, setFilters, ready, place } = useListFilters('forYou');
+  const { view, reload, hide } = useForYou(mode, filters, ready);
   const picks = view.state === 'ready' ? view.result.rows.length : 0;
 
   return (
@@ -40,7 +45,20 @@ export function ForYouTab() {
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
         </div>
       </div>
-      <ForYouBody view={view} mode={mode} reload={reload} hide={hide} />
+      <ListFilterBar
+        filters={filters}
+        onChange={setFilters}
+        genres={FILTER_GENRES}
+        place={place}
+        summary={view.state === 'ready' ? (view.result.filtered?.summary ?? null) : null}
+      />
+      <ForYouBody
+        view={view}
+        mode={mode}
+        reload={reload}
+        hide={hide}
+        onClearFilters={() => setFilters(NO_FILTERS)}
+      />
     </>
   );
 }
@@ -50,9 +68,10 @@ interface ForYouBodyProps {
   mode: ForYouMode;
   reload: () => void;
   hide: (matchKey: ItemKey) => void;
+  onClearFilters: () => void;
 }
 
-function ForYouBody({ view, mode, reload, hide }: ForYouBodyProps) {
+function ForYouBody({ view, mode, reload, hide, onClearFilters }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title={LOADING_TITLES[mode]} />;
@@ -66,8 +85,11 @@ function ForYouBody({ view, mode, reload, hide }: ForYouBodyProps) {
         />
       );
     case 'ready':
-      return view.result.rows.length > 0 ? (
-        <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} onHide={hide} />
+      if (view.result.rows.length > 0) {
+        return <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} onHide={hide} />;
+      }
+      return view.result.filtered && view.result.filtered.summary.hidden > 0 ? (
+        <NoMatches summary={view.result.filtered.summary} onClear={onClearFilters} />
       ) : (
         <NoPicks result={view.result} mode={mode} />
       );

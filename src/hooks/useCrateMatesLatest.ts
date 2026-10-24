@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ItemKey } from '../bandcamp';
+import type { ListFilters } from '../shared/listFilters';
 import { sendMessage } from '../shared/messages';
 import type { CrateMatesLatestResult } from '../shared/crateMatesLatest';
 
@@ -9,10 +10,14 @@ export type CrateMatesLatestView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches Crate mates' latest once on mount. `hide` drops a row and re-fetches; `reload` asks again,
- * e.g. after an error.
+ * Fetches Crate mates' latest on mount and whenever the filters change, once `enabled` (the saved
+ * filters have been read). `hide` drops a row and re-fetches; `reload` asks again, e.g. after
+ * an error.
  */
-export function useCrateMatesLatest(): {
+export function useCrateMatesLatest(
+  filters: ListFilters,
+  enabled = true,
+): {
   view: CrateMatesLatestView;
   reload: () => void;
   hide: (matchKey: ItemKey) => void;
@@ -21,16 +26,16 @@ export function useCrateMatesLatest(): {
 
   const load = useCallback(
     () =>
-      sendMessage('getCrateMatesLatest', {}).then(
+      sendMessage('getCrateMatesLatest', { filters }).then(
         (result) => setView({ state: 'ready', result }),
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       ),
-    [],
+    [filters],
   );
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (enabled) void load();
+  }, [load, enabled]);
 
   const reload = useCallback(() => {
     setView({ state: 'loading' });

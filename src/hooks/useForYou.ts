@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ItemKey } from '../bandcamp';
 import type { ForYouMode, ForYouResult } from '../shared/forYou';
+import type { ListFilters } from '../shared/listFilters';
 import { sendMessage } from '../shared/messages';
 
 export type ForYouView =
@@ -10,10 +11,15 @@ export type ForYouView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches For you in `mode`, again whenever the mode changes. `hide` drops a row and
- * re-fetches, so the next pick moves up; `reload` asks again, e.g. after an error.
+ * Fetches For you in `mode`, again whenever the mode or the filters change, once `enabled`
+ * (the saved filters have been read). `hide` drops a row and re-fetches, so the next pick
+ * moves up; `reload` asks again, e.g. after an error.
  */
-export function useForYou(mode: ForYouMode): {
+export function useForYou(
+  mode: ForYouMode,
+  filters: ListFilters,
+  enabled = true,
+): {
   view: ForYouView;
   reload: () => void;
   hide: (matchKey: ItemKey) => void;
@@ -27,16 +33,17 @@ export function useForYou(mode: ForYouMode): {
     const settle = (next: ForYouView) => {
       if (request === latest.current) setView(next);
     };
-    sendMessage('getForYou', { mode }).then(
+    sendMessage('getForYou', { mode, filters }).then(
       (result) => settle({ state: 'ready', result, loadedAt: Date.now() }),
       (error: unknown) => settle({ state: 'unreachable', error: String(error) }),
     );
-  }, [mode]);
+  }, [mode, filters]);
 
   useEffect(() => {
+    if (!enabled) return;
     setView({ state: 'loading' });
     load();
-  }, [load]);
+  }, [load, enabled]);
 
   const reload = useCallback(() => {
     setView({ state: 'loading' });

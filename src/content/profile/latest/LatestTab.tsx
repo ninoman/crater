@@ -1,13 +1,45 @@
 import { useCrateMatesLatest } from '../../../hooks/useCrateMatesLatest';
+import { useListFilters } from '../../../hooks/useListFilters';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
-import { Button, EmptyState, LinkButton } from '../../../ui';
+import { NO_FILTERS } from '../../../shared/listFilters';
+import { Button, EmptyState, LinkButton, ListFilterBar } from '../../../ui';
+import { FILTER_GENRES } from '../../shared/filterGenres';
+import { NoMatches } from '../../shared/NoMatches';
 import { formatChecking } from './latestText';
 import { LatestList } from './LatestList';
 
 /** Crate mates' latest on your profile: what your top crate mates just bought, or why there's nothing yet. */
 export function LatestTab() {
-  const { view, reload, hide } = useCrateMatesLatest();
+  const { filters, setFilters, ready, place } = useListFilters('latest');
+  const { view, reload, hide } = useCrateMatesLatest(filters, ready);
 
+  return (
+    <>
+      <ListFilterBar
+        filters={filters}
+        onChange={setFilters}
+        genres={FILTER_GENRES}
+        place={place}
+        summary={view.state === 'ready' ? (view.result.filtered?.summary ?? null) : null}
+      />
+      <LatestBody
+        view={view}
+        reload={reload}
+        hide={hide}
+        onClearFilters={() => setFilters(NO_FILTERS)}
+      />
+    </>
+  );
+}
+
+interface LatestBodyProps {
+  view: ReturnType<typeof useCrateMatesLatest>['view'];
+  reload: () => void;
+  hide: ReturnType<typeof useCrateMatesLatest>['hide'];
+  onClearFilters: () => void;
+}
+
+function LatestBody({ view, reload, hide, onClearFilters }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title="Looking at what your crate mates bought lately…" />;
@@ -21,8 +53,11 @@ export function LatestTab() {
         />
       );
     case 'ready':
-      return view.result.rows.length > 0 ? (
-        <LatestList result={view.result} now={Date.now()} onHide={hide} />
+      if (view.result.rows.length > 0) {
+        return <LatestList result={view.result} now={Date.now()} onHide={hide} />;
+      }
+      return view.result.filtered && view.result.filtered.summary.hidden > 0 ? (
+        <NoMatches summary={view.result.filtered.summary} onClear={onClearFilters} />
       ) : (
         <NoPurchases result={view.result} />
       );

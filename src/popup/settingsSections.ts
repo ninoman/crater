@@ -1,10 +1,11 @@
 // What the Settings tab shows, in plain words. The raw settings live in shared/settings.ts.
 
-import type { BooleanSetting, NumericSetting } from '../shared/settings';
+import type { BooleanSetting, NumericSetting, StringSetting } from '../shared/settings';
 
 export type SettingEntry =
   | { kind: 'number'; key: NumericSetting; label: string; description: string }
   | { kind: 'toggle'; key: BooleanSetting; label: string; description: string }
+  | { kind: 'text'; key: StringSetting; label: string; description: string; placeholder: string }
   /** Pace and daily budget as one Gentle / Normal / Fast choice. */
   | { kind: 'speed' }
   /** Lately re-reads on or off; the count and interval are in Advanced. */
@@ -56,6 +57,14 @@ export const MAIN_SECTIONS: SettingSection[] = [
         key: 'deepCutMaxSupporters',
         label: 'Deep cuts: fewer owners than',
         description: 'A release counts as a deep cut when fewer fans own it on Bandcamp.',
+      },
+      {
+        kind: 'text',
+        key: 'homePlace',
+        label: 'Your place',
+        description:
+          'What the "Near me" filter matches bands against. A city, a country, or several split by commas.',
+        placeholder: 'Berlin, Germany',
       },
     ],
   },

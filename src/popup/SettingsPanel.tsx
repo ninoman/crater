@@ -11,6 +11,7 @@ import {
   type SegmentedOption,
   SettingRow,
   StatusDot,
+  TextField,
   Toggle,
 } from '../ui';
 import {
@@ -66,6 +67,17 @@ function Entry({ entry, view, setDraft }: EntryProps) {
           error={errors[entry.key]}
           min={SETTING_LIMITS[entry.key].min}
           max={SETTING_LIMITS[entry.key].max}
+        />
+      );
+    case 'text':
+      return (
+        <TextField
+          label={entry.label}
+          description={entry.description}
+          placeholder={entry.placeholder}
+          value={draft[entry.key]}
+          onChange={(value) => set(entry.key, value)}
+          error={errors[entry.key]}
         />
       );
     case 'toggle':
