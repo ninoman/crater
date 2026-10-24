@@ -9,6 +9,7 @@ import type { ReleaseCrateMatesResult } from '../../shared/releaseCrateMates';
 import type { CrateMatesResult } from '../../shared/crateMates';
 import type { CrateMatesLatestResult } from '../../shared/crateMatesLatest';
 import { broadcastToTabs } from '../../shared/messages';
+import type { ListFilters } from '../../shared/listFilters';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { computeAlsoBought } from './alsoBought';
@@ -27,6 +28,11 @@ export const CRATE_MATES_EVERY_FANS = 25;
 
 /** Supporters scanned since each release was last scored. Lost with the worker, which is fine. */
 const fansSinceScore = new Map<ItemKey, number>();
+/**
+ * The filters each watched release was last asked for, so its re-scores keep them. Lost with the
+ * worker, which is fine: the sidebar sees a result built with other filters and asks again.
+ */
+const filtersOfRelease = new Map<ItemKey, ListFilters>();
 let fansSinceCrateMates = 0;
 let crateMatesRun: Promise<void> | null = null;
 let crateMatesAgain = false;
@@ -38,24 +44,35 @@ let crateMatesAgain = false;
 export async function getAlsoBought(
   releaseKey: ItemKey,
   hideHeard = false,
+  filters?: ListFilters,
 ): Promise<AlsoBoughtResult> {
   fansSinceScore.set(releaseKey, 0);
+  if (filters) filtersOfRelease.set(releaseKey, filters);
+  else filtersOfRelease.delete(releaseKey);
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   return computeAlsoBought(db, releaseKey, me?.fanId ?? null, {
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
     hideHeard,
+    filters,
+    homePlace: settings.homePlace,
   });
 }
 
 /** For you on your profile, from the stored crate mates leaderboard, or the lately one for Fresh. */
-export async function getForYou(mode: ForYouMode, hideHeard: boolean): Promise<ForYouResult> {
+export async function getForYou(
+  mode: ForYouMode,
+  hideHeard: boolean,
+  filters?: ListFilters,
+): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   if (mode === 'deep') {
     return computeDeepCuts(db, me, {
       maxSupporters: settings.deepCutMaxSupporters,
       ignoreCompilations: settings.ignoreCompilations,
       hideHeard,
+      filters,
+      homePlace: settings.homePlace,
     });
   }
   return computeForYou(db, me, {
@@ -66,16 +83,23 @@ export async function getForYou(mode: ForYouMode, hideHeard: boolean): Promise<F
     ignoreCompilations: settings.ignoreCompilations,
     hideHeard,
     now: Date.now(),
+    filters,
+    homePlace: settings.homePlace,
   });
 }
 
 /** Crate mates' latest on your profile: what your top crate mates bought lately. */
-export async function getCrateMatesLatest(hideHeard: boolean): Promise<CrateMatesLatestResult> {
+export async function getCrateMatesLatest(
+  hideHeard: boolean,
+  filters?: ListFilters,
+): Promise<CrateMatesLatestResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   return computeCrateMatesLatest(db, me, {
     topCrateMatesK: settings.topCrateMatesK,
     hideHeard,
     now: Date.now(),
+    filters,
+    homePlace: settings.homePlace,
   });
 }
 
@@ -99,7 +123,12 @@ export async function onScanStep(
     fansSinceScore.set(releaseKey, since);
     return;
   }
-  await broadcastToTabs(RELEASE_PAGE_PATTERNS, 'alsoBought', await getAlsoBought(releaseKey));
+  await broadcastToTabs(
+    RELEASE_PAGE_PATTERNS,
+    'alsoBought',
+    // Pushes keep heard releases in; a sidebar hiding them asks again (useAlsoBought).
+    await getAlsoBought(releaseKey, false, filtersOfRelease.get(releaseKey)),
+  );
   await broadcastToTabs(
     RELEASE_PAGE_PATTERNS,
     'releaseCrateMates',

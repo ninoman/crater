@@ -17,10 +17,31 @@ export interface ReleaseInfo {
   artId: number | null;
 }
 
+/** What list filters judge a release by. Null: the page or row didn't say (decisions §25). */
+export interface ReleaseFacts {
+  /** Release year. Only release pages carry a date; collection rows don't. */
+  year: number | null;
+  /** The artist lets fans pay what they like, at least the price or more; false is a fixed price. */
+  nameYourPrice: boolean | null;
+  /** A physical edition is for sale: a package with stock left. */
+  physical: boolean | null;
+}
+
+/** What list filters judge the selling account by. Null: not stated. */
+export interface BandFacts {
+  /** Bandcamp's genre id (genres.ts). */
+  genre: number | null;
+  /** As the band writes it, e.g. "Leipzig, Germany". */
+  location: string | null;
+}
+
 export interface ReleasePageItem extends ReleaseInfo {
   tags: string[];
   /** From the artist, title and track artists (decisions §17). */
   compilation: boolean;
+  /** Absent: nothing is known. The parsers always set both. */
+  facts?: ReleaseFacts;
+  band?: BandFacts;
 }
 
 /** What a release costs, as Bandcamp's collection and wishlist rows say (decisions §24). */
@@ -48,6 +69,9 @@ export interface CollectionItem extends ReleaseInfo {
   compilation: boolean;
   /** Null when the row has no price or currency. */
   price?: ItemPrice | null;
+  /** Absent: nothing is known. The parsers always set both. */
+  facts?: ReleaseFacts;
+  band?: BandFacts;
 }
 
 export interface Supporter {

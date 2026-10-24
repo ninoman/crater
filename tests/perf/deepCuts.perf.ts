@@ -26,6 +26,7 @@ import { rankDeepCuts } from '../../src/scoring/deepCuts';
 import { exclusions } from '../../src/scoring/exclusions';
 import { topCrateMates, crateMateOwnership } from '../../src/scoring/forYou';
 import { DEEP_CUT_CRATE_MATES_K } from '../../src/scoring/weights';
+import { type ListFilters, NO_FILTERS } from '../../src/shared/listFilters';
 import { DEFAULT_SETTINGS } from '../../src/shared/settings';
 
 const CRATE_MATES = 200;
@@ -38,6 +39,7 @@ const BUDGET_MS = 200;
 /** A recompute runs in the background after scans, not while you wait, so it gets more room. */
 const CRATE_MATES_BUDGET_MS = 2000;
 const SEED_CHUNK = 5_000;
+const PLACES = Array.from({ length: 40 }, (_, i) => `City ${i}, Country ${i % 8}`);
 
 /** Deterministic PRNG (mulberry32), so every run seeds the same data. */
 function random(seed: number): () => number {
@@ -89,6 +91,13 @@ beforeAll(async () => {
     tags: [],
     supporterCount: i % 10 === 0 ? null : Math.round(1 + 5000 / (1 + i / 50)),
     compilation: false,
+    // Facts for the filter checks: a fifth sell a physical edition, a quarter let fans name a
+    // price, years run over 25, and one release in twenty has no year (decisions §25).
+    facts: {
+      year: i % 20 === 0 ? null : 2000 + (i % 25),
+      nameYourPrice: i % 4 === 0,
+      physical: i % 5 === 0,
+    },
   }));
 
   const crateMates = Array.from(
@@ -114,7 +123,15 @@ beforeAll(async () => {
     [db.fanMatches, index.fanMatches],
     [db.matchOwners, index.matchOwners],
     [db.items, stored.items],
-    [db.bands, stored.bands],
+    // Each band gets one of 27 genres and one of 40 places.
+    [
+      db.bands,
+      stored.bands.map((band) => ({
+        ...band,
+        genre: 1 + (band.bandId % 27),
+        location: PLACES[band.bandId % PLACES.length],
+      })),
+    ],
     [db.crateMates, crateMates],
   ] as const) {
     for (let start = 0; start < records.length; start += SEED_CHUNK) {
@@ -205,6 +222,58 @@ it(`scores For you over the top ${DEFAULT_SETTINGS.topCrateMatesK} crate mates i
   const ms = await median(() => computeForYou(db, me, input));
   console.log(`for you: median ${ms.toFixed(1)} ms`);
   expect((await computeForYou(db, me, input)).rows).toHaveLength(30);
+  expect(ms).toBeLessThan(BUDGET_MS);
+});
+
+// With filters, pruning stops working as well, so these time the cost of looking further (§25).
+/** About a third of the bands: nine of 27 genres. */
+const BROAD = { ...NO_FILTERS, genres: [1, 2, 3, 4, 5, 6, 7, 9, 10] };
+/** Almost nothing passes: one genre, a physical edition, name your price and a short run of years. */
+const NARROW = {
+  ...NO_FILTERS,
+  genres: [1],
+  physical: true,
+  nameYourPrice: true,
+  yearFrom: 2010,
+  yearTo: 2012,
+};
+
+const forYouInput = (filters?: ListFilters) => ({
+  mode: 'all' as const,
+  topCrateMatesK: DEFAULT_SETTINGS.topCrateMatesK,
+  latelyHalfLifeMonths: DEFAULT_SETTINGS.latelyHalfLifeMonths,
+  followingBoost: true,
+  ignoreCompilations: true,
+  hideHeard: false,
+  now: 0,
+  filters,
+});
+
+it(`scores For you with a broad filter in under ${BUDGET_MS} ms`, async () => {
+  const ms = await median(() => computeForYou(db, me, forYouInput(BROAD)));
+  const result = await computeForYou(db, me, forYouInput(BROAD));
+  console.log(
+    `for you, broad filter: median ${ms.toFixed(1)} ms, hidden ${result.filtered?.summary.hidden}`,
+  );
+  expect(result.rows).toHaveLength(30);
+  expect(ms).toBeLessThan(BUDGET_MS);
+});
+
+it(`scores For you with a filter almost nothing passes in under ${BUDGET_MS} ms`, async () => {
+  const ms = await median(() => computeForYou(db, me, forYouInput(NARROW)));
+  const result = await computeForYou(db, me, forYouInput(NARROW));
+  console.log(
+    `for you, narrow filter: median ${ms.toFixed(1)} ms, ${result.rows.length} rows, ` +
+      `hidden ${result.filtered?.summary.hidden}, limited ${result.filtered?.summary.limited}`,
+  );
+  expect(result.filtered?.summary.limited).toBe(true);
+  expect(ms).toBeLessThan(BUDGET_MS);
+});
+
+it(`scores Deep cuts with a broad filter in under ${BUDGET_MS} ms`, async () => {
+  const input = { maxSupporters: CAP, ignoreCompilations: true, hideHeard: false, filters: BROAD };
+  const ms = await median(() => computeDeepCuts(db, me, input));
+  console.log(`deep cuts, broad filter: median ${ms.toFixed(1)} ms`);
   expect(ms).toBeLessThan(BUDGET_MS);
 });
 

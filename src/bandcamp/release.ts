@@ -1,4 +1,11 @@
 import { isCompilation } from './compilation';
+import {
+  cleanLocation,
+  genreOfDiscoverUrl,
+  nameYourPriceOf,
+  physicalFromPackages,
+  yearOf,
+} from './facts';
 import { ParserError } from './errors';
 import { readBlobById, readDataAttribute, readLdJson } from './html';
 import { itemKey } from './keys';
@@ -7,11 +14,16 @@ import { rawCollectorsBlob, rawLdJson, rawTralbum } from './schemas';
 import { toSupporter } from './supporters';
 import type { ReleasePage } from './types';
 import { validate } from './validate';
+import type { z } from 'zod';
 
-function readTags(html: string): string[] {
+type LdJson = z.infer<typeof rawLdJson>;
+
+function readLd(html: string): LdJson {
   const ld = readLdJson(html);
-  if (ld === null) return [];
-  const { keywords } = validate(rawLdJson, ld, 'ld+json');
+  return ld === null ? {} : validate(rawLdJson, ld, 'ld+json');
+}
+
+function readTags({ keywords }: LdJson): string[] {
   const list = typeof keywords === 'string' ? keywords.split(',') : (keywords ?? []);
   return [...new Set(list.map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
 }
@@ -31,6 +43,7 @@ export function parseReleasePage(html: string): ReleasePage {
       ? null
       : validate(rawCollectorsBlob, collectorsJson, '#collectors-data');
 
+  const ld = readLd(html);
   return {
     item: {
       itemKey: itemKey(type, tralbum.id),
@@ -40,12 +53,21 @@ export function parseReleasePage(html: string): ReleasePage {
       bandId: tralbum.current.band_id,
       url: tralbum.url,
       artId: tralbum.art_id ?? null,
-      tags: readTags(html),
+      tags: readTags(ld),
       compilation: isCompilation({
         artist: tralbum.artist,
         title: tralbum.current.title,
         trackArtists: (tralbum.trackinfo ?? []).map((track) => track.artist ?? null),
       }),
+      facts: {
+        year: yearOf(tralbum.current.release_date ?? ld.datePublished),
+        nameYourPrice: nameYourPriceOf(tralbum.current.is_set_price ?? false),
+        physical: physicalFromPackages(tralbum.packages ?? []),
+      },
+      band: {
+        genre: genreOfDiscoverUrl(ld.publisher?.genre),
+        location: cleanLocation(ld.publisher?.foundingLocation?.name),
+      },
     },
     supporters: collectors
       ? [

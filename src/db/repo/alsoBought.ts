@@ -142,7 +142,7 @@ export async function getSellerItems(
  * The stored row to show for each matchKey: the release itself, or one of its tracks when only
  * tracks of an album have turned up so far. Call inside a transaction with `items`.
  */
-async function shownRows(
+export async function shownRows(
   db: DigheadDb,
   matchKeys: readonly ItemKey[],
 ): Promise<Map<ItemKey, StoredItem>> {

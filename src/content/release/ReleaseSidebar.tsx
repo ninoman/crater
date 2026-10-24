@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { type ReleasePageItem, readBandHeader } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
+import { useListFilters } from '../../hooks/useListFilters';
 import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useScanProgress } from '../../hooks/useScanProgress';
@@ -9,7 +10,7 @@ import { useTimePassed } from '../../hooks/useTimePassed';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
-import { AlsoBoughtList } from './AlsoBoughtList';
+import { AlsoBoughtTab } from './AlsoBoughtTab';
 import { ReleaseCrateMatesList } from './ReleaseCrateMatesList';
 import { ScanHeader } from './ScanHeader';
 import { useCurrentRelease } from './useCurrentRelease';
@@ -48,7 +49,13 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
-  const { view, ...actions } = useAlsoBought(item.itemKey, releaseSaved, hideHeard);
+  const filters = useListFilters('alsoBought');
+  const { view, ...actions } = useAlsoBought(
+    item.itemKey,
+    releaseSaved && filters.ready,
+    hideHeard,
+    filters.filters,
+  );
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const showEarly = useTimePassed(EARLY_PICKS_AFTER_MS);
 
@@ -68,8 +75,9 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
             value: 'also-bought',
             label: 'Also bought',
             content: (
-              <AlsoBoughtList
+              <AlsoBoughtTab
                 view={view}
+                filters={filters}
                 progress={progress}
                 scanStopped={notices.length > 0}
                 showEarly={showEarly}

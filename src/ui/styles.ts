@@ -16,6 +16,7 @@ import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import heardBadge from './HeardBadge.css?inline';
 import infoHint from './InfoHint.css?inline';
+import listFilterBar from './ListFilterBar.css?inline';
 import loadMore from './LoadMore.css?inline';
 import menu from './Menu.css?inline';
 import notePopover from './NotePopover.css?inline';
@@ -81,6 +82,7 @@ export const uiStyles = [
   heardBadge,
   playQueueBar,
   toolbar,
+  listFilterBar,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

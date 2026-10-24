@@ -14,6 +14,7 @@ export * from './itemLists';
 export * from './itemNotes';
 export * from './itemPrices';
 export * from './items';
+export * from './listFacts';
 export * from './matchIndex';
 export * from './me';
 export * from './ownership';

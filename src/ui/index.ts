@@ -10,6 +10,7 @@ export { Cover } from './Cover';
 export { cx } from './cx';
 export { Disclosure, type DisclosureProps } from './Disclosure';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
+export { formatFilterSummary } from './filterSummaryText';
 export { Identity, type IdentityProps } from './Identity';
 export { InfoHint, type InfoHintProps } from './InfoHint';
 export {
@@ -24,6 +25,11 @@ export {
 export { Menu, type MenuItem, type MenuProps } from './Menu';
 export { NotePopover, type NotePopoverProps, type NoteValue } from './NotePopover';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
+export {
+  type FilterGenre,
+  ListFilterBar,
+  type ListFilterBarProps,
+} from './ListFilterBar';
 export { LoadMore, type LoadMoreProps } from './LoadMore';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';
@@ -58,6 +64,7 @@ export {
 } from './TagPicker';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { type PageColors, type ThemeVariables, themeVariables } from './theme';
+export { TextField, type TextFieldProps } from './TextField';
 export { Toggle, type ToggleProps } from './Toggle';
 export { Toolbar } from './Toolbar';
 export { Tooltip, type TooltipProps } from './Tooltip';

@@ -128,7 +128,10 @@ describe('the CSV export in the popup', () => {
 
     await press('For you');
 
-    expect(requests.find((r) => r.type === 'getForYou')?.payload).toEqual({ mode: 'fresh', hideHeard: false });
+    expect(requests.find((r) => r.type === 'getForYou')?.payload).toEqual({
+      mode: 'fresh',
+      hideHeard: false,
+    });
     expect(saved[0]?.name).toMatch(/^dighead-for-you-/);
     expect(await saved[0]?.text).toContain('1,Floating Points,Promises');
   });

@@ -1,9 +1,13 @@
 import { useCrateMatesLatest, type CrateMatesLatestView } from '../../../hooks/useCrateMatesLatest';
 import type { RowActions } from '../../../hooks/rowActions';
+import { useListFilters } from '../../../hooks/useListFilters';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
-import { Button, EmptyState, LinkButton, StatusDot } from '../../../ui';
+import { NO_FILTERS } from '../../../shared/listFilters';
+import { Button, EmptyState, LinkButton, ListFilterBar, StatusDot } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
+import { FILTER_GENRES } from '../../shared/filterGenres';
+import { NoMatches } from '../../shared/NoMatches';
 import { HideHeardToggle } from '../../shared/RowControls';
 import { formatChecking, formatLatestSummary } from './latestText';
 import { LatestList } from './LatestList';
@@ -11,7 +15,8 @@ import { LatestList } from './LatestList';
 /** Crate mates' latest on your profile: what your top crate mates just bought, or why there's nothing yet. */
 export function LatestTab() {
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.latest', false);
-  const { view, reload, ...actions } = useCrateMatesLatest(hideHeard);
+  const { filters, setFilters, ready, place } = useListFilters('latest');
+  const { view, reload, ...actions } = useCrateMatesLatest(hideHeard, filters, ready);
 
   return (
     <>
@@ -32,11 +37,19 @@ export function LatestTab() {
           <HideHeardToggle checked={hideHeard} onChange={setHideHeard} />
         </div>
       </div>
+      <ListFilterBar
+        filters={filters}
+        onChange={setFilters}
+        genres={FILTER_GENRES}
+        place={place}
+        summary={view.state === 'ready' ? (view.result.filtered?.summary ?? null) : null}
+      />
       <LatestBody
         view={view}
         reload={reload}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
+        onClearFilters={() => setFilters(NO_FILTERS)}
       />
     </>
   );
@@ -48,9 +61,10 @@ interface LatestBodyProps {
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
+  onClearFilters: () => void;
 }
 
-function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
+function LatestBody({ view, reload, actions, onShowHeard, onClearFilters }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title="Looking at what your crate mates bought lately…" />;
@@ -66,6 +80,9 @@ function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
     case 'ready':
       if (view.result.rows.length > 0) {
         return <LatestList result={view.result} now={Date.now()} actions={actions} />;
+      }
+      if (view.result.filtered && view.result.filtered.summary.hidden > 0) {
+        return <NoMatches summary={view.result.filtered.summary} onClear={onClearFilters} />;
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;

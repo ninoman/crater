@@ -24,6 +24,8 @@ import { type Exclusions, exclusions } from '../../scoring/exclusions';
 import { diversify, FOR_YOU_LIMIT, topCrateMates, crateMateOwnership } from '../../scoring/forYou';
 import { DEEP_CUT_CRATE_MATES_K } from '../../scoring/weights';
 import type { ForYouResult } from '../../shared/forYou';
+import type { ListFilters } from '../../shared/listFilters';
+import { createFilterGate, type FilterGate } from './filterGate';
 import { listsInRankOrder, toRow } from './forYouRow';
 import { loadHideScopes } from './hideScopes';
 import { crateMatesBasis } from './crateMateRows';
@@ -40,6 +42,9 @@ export interface DeepCutsInput {
   ignoreCompilations: boolean;
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
+  /** Narrow the picks (decisions §25), with the place "Near me" matches against. */
+  filters?: ListFilters;
+  homePlace?: string;
 }
 
 export async function computeDeepCuts(
@@ -50,6 +55,7 @@ export async function computeDeepCuts(
   const basis = crateMatesBasis(me);
   if (!me) return { basis, rows: [], crateMatesUsed: 0 };
 
+  const gate = createFilterGate(db, input.filters, input.homePlace ?? '');
   const crateMates = topCrateMates(await getCrateMates(db), DEEP_CUT_CRATE_MATES_K);
   const data = await gatherForYou(
     db,
@@ -68,7 +74,14 @@ export async function computeDeepCuts(
     excluded.ids,
   );
   const options = { maxSupporters: input.maxSupporters, limit: RANKED };
-  const { ranked, items } = await scoreTop(db, deepCutCandidates(owned), options, input, excluded);
+  const { ranked, items } = await scoreTop(
+    db,
+    deepCutCandidates(owned),
+    options,
+    input,
+    excluded,
+    gate,
+  );
 
   const artists = new Map<number, string>();
   for (const scored of ranked) {
@@ -98,13 +111,19 @@ export async function computeDeepCuts(
       }),
     ];
   });
-  return { basis, rows, crateMatesUsed: data.crateMateLists.length };
+  return {
+    basis,
+    rows,
+    crateMatesUsed: data.crateMateLists.length,
+    ...(gate && { filtered: gate.applied() }),
+  };
 }
 
 /**
  * Looks up item records a chunk at a time, in falling ceiling order, and stops once no ceiling
- * left can reach the ranked list. Only candidates that could still rank are looked up. Those
- * from a hidden artist or label count as having no record (§22).
+ * left can reach the ranked list. Only candidates that could still rank are looked up, and those
+ * the filter turns down are dropped first (decisions §25). Those from a hidden artist or label
+ * count as having no record (§22).
  */
 async function scoreTop(
   db: DigheadDb,
@@ -112,18 +131,31 @@ async function scoreTop(
   options: DeepCutOptions & { limit: number },
   input: DeepCutsInput,
   excluded: Exclusions,
+  gate: FilterGate | null,
 ): Promise<{ ranked: DeepCutScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: DeepCutScored[] = [];
   const items = new Map<ItemKey, ItemFields>();
   for (let start = 0; start < candidates.length; start += CHUNK) {
-    const chunk = candidates
+    if (gate?.exhausted) {
+      gate.stoppedAtLimit();
+      break;
+    }
+    const couldRankNow = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldRankDeepCut(ranked, options.limit, c.ceiling));
-    if (chunk.length === 0) break;
-    const display = await getShownFields(
-      db,
-      chunk.map((c) => keyFromNumber(c.id)),
-    );
+    if (couldRankNow.length === 0) break;
+    // The gate reads the records it judges, so they aren't read again below.
+    const passing = gate && (await gate.passing(couldRankNow.map((c) => keyFromNumber(c.id))));
+    const chunk = passing
+      ? couldRankNow.filter((c) => passing.has(keyFromNumber(c.id)))
+      : couldRankNow;
+    if (chunk.length === 0) continue;
+    const display =
+      passing ??
+      (await getShownFields(
+        db,
+        chunk.map((c) => keyFromNumber(c.id)),
+      ));
     for (const [key, item] of display) items.set(key, item);
     const step = extendDeepCuts(
       ranked,

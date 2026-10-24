@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import type { RowActions } from '../../../hooks/rowActions';
 import { useForYou, type ForYouView } from '../../../hooks/useForYou';
+import { useListFilters } from '../../../hooks/useListFilters';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
-import { Button, EmptyState, LinkButton, Segmented } from '../../../ui';
+import { NO_FILTERS } from '../../../shared/listFilters';
+import { Button, EmptyState, LinkButton, ListFilterBar, Segmented } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
+import { FILTER_GENRES } from '../../shared/filterGenres';
+import { NoMatches } from '../../shared/NoMatches';
 import { HideHeardToggle } from '../../shared/RowControls';
 import { ForYouList } from './ForYouList';
 import { formatForYouSummary } from './forYouText';
@@ -29,7 +33,8 @@ const LOADING_TITLES: Record<ForYouMode, string> = {
 export function ForYouTab() {
   const [mode, setMode] = useState<ForYouMode>('all');
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.forYou', false);
-  const { view, reload, ...actions } = useForYou(mode, hideHeard);
+  const { filters, setFilters, ready, place } = useListFilters('forYou');
+  const { view, reload, ...actions } = useForYou(mode, hideHeard, filters, ready);
   const picks = view.state === 'ready' ? view.result.rows.length : 0;
 
   return (
@@ -45,12 +50,20 @@ export function ForYouTab() {
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
         </div>
       </div>
+      <ListFilterBar
+        filters={filters}
+        onChange={setFilters}
+        genres={FILTER_GENRES}
+        place={place}
+        summary={view.state === 'ready' ? (view.result.filtered?.summary ?? null) : null}
+      />
       <ForYouBody
         view={view}
         mode={mode}
         reload={reload}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
+        onClearFilters={() => setFilters(NO_FILTERS)}
       />
     </>
   );
@@ -63,9 +76,10 @@ interface ForYouBodyProps {
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
+  onClearFilters: () => void;
 }
 
-function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProps) {
+function ForYouBody({ view, mode, reload, actions, onShowHeard, onClearFilters }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title={LOADING_TITLES[mode]} />;
@@ -83,6 +97,9 @@ function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProp
         return (
           <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} actions={actions} />
         );
+      }
+      if (view.result.filtered && view.result.filtered.summary.hidden > 0) {
+        return <NoMatches summary={view.result.filtered.summary} onClear={onClearFilters} />;
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;
