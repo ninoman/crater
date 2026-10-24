@@ -53,6 +53,11 @@
   padding: var(--dh-space-2) var(--dh-space-4) 0;
 }
 
+/* The panel body has no padding of its own, so the list's toolbar gets the rows' inset. */
+.dh-sidebar .dh-toolbar {
+  padding: var(--dh-space-2) var(--dh-space-4) 0;
+}
+
 .dh-warmup {
   display: flex;
   flex-direction: column;
