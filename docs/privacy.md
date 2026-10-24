@@ -29,7 +29,8 @@ Dighead does not read your payment details, email address, messages or anything 
 Everything below is stored locally on your device:
 
 - Scanned fans and their collections, release and supporter lists, the recommendation index and the crate-mate leaderboard.
-- Your own synced collection and wishlist, your Bandcamp fan id and username, and the time of your last sync.
+- Your own synced collection and wishlist (including the prices Bandcamp lists on wishlist items), your Bandcamp fan id and username, and the time of your last sync.
+- Your tags, and the private notes and ratings you write on releases. They never leave the device; exporting them or a CSV is a file you save yourself.
 - Releases you hid, and the scan queue.
 - Your settings, plus the scanner's pacing state (back-off, daily request count) and small interface preferences, in `chrome.storage.local`.
 - A short-lived list of release pages open in tabs, in `chrome.storage.session` (cleared when the browser closes).

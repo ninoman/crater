@@ -534,7 +534,7 @@ Built 2026-10-21. Code: `src/scoring/alsoBought.ts` (`wilsonLower`, `voteWeight`
 
 ## 14. Wishlist tags
 
-Decided and built 2026-10-22. Roadmap: *Wishlist tags*. Code: `src/content/wishlist/`, `db/repo/wishlist.ts`, `background/wishlistHandlers.ts`, `src/content/release/WishlistItemTags.tsx`. Tested on the fixtures (jsdom); not yet tried on the live wishlist tab.
+Decided and built 2026-10-22. Roadmap: *Wishlist tags*. Code (renamed and generalised by §22): `src/content/itemList/`, `db/repo/itemLists.ts`, `background/itemListHandlers.ts`, `src/content/release/WishlistItemTags.tsx`. Tested on the fixtures (jsdom); not yet tried on the live wishlist tab.
 
 The same tags as §8, on the releases in your wishlist, with the same filter (all / any, plus a search over artist and title), bulk tagging and backup.
 
@@ -542,7 +542,7 @@ The same tags as §8, on the releases in your wishlist, with the same filter (al
 
 - **One tag pool.** Followings and wishlist items share the `tags` table, so "dub" on an artist and on a release is one tag, with one colour. Deleting a tag takes it off both, in one transaction.
 - **Schema v9 (additive):** `itemTags: 'itemKey, *tagIds'`, one `{ itemKey, tagIds }` row per tagged item. Not on `items`, which every scan rewrites, and not on `ownership`, whose wishlist row is overwritten when you buy the item. `TABLES_ADDED` lists it at 9, so a v8 full backup still restores.
-- **What's in your wishlist** is your `ownership` rows with `source: 'wishlist'` (§4). `listWishlist` joins them with `items` for the release and `itemTags` for the tags, newest wishlisted first. `getItemTags` answers null for an item that isn't in your wishlist, so a release page you haven't wishlisted shows nothing.
+- **What's in your wishlist** is your `ownership` rows with `source: 'wishlist'` (§4). `listOwnedItems` (was `listWishlist`) joins them with `items` for the release and `itemTags` for the tags, newest wishlisted first. `getItemTags` answers null for an item that isn't in your wishlist, so a release page you haven't wishlisted shows nothing.
 - **Sync keeps tags.** A sync rewriting an item or its ownership row leaves `itemTags` alone. A **full** wishlist sync deletes the tags of items that left the wishlist, removed or bought, like unfollowed accounts losing theirs (§8). A hidden wishlist answers an error and returns early, so it keeps them. Until the next full sync, a bought item's tags just sit unused.
 - **Backup:** the tags file is version 2, with an `items` list next to `assignments` in every tag. Version 1 files still import (no items). Import skips items not in your wishlist, as it skips accounts you no longer follow.
 
@@ -846,3 +846,48 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 - On release pages the prompts mount in a shadow root of their own, since the sidebar renders nothing inside while collapsed.
 - **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
 - **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.
+
+## 22. Wishlist and collection tools
+
+Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Research: `docs/research/bandcamp-user-needs.md`, ideas 3, 6, 8 and 9. Code: `src/content/itemList/` (the takeover, generalised from §14), `src/shared/itemSort.ts`, `shortlist.ts`, `csv.ts`, `exportCsv.ts`, `src/scoring/wishlistCrateMates.ts`, `db/repo/itemLists.ts`, `itemNotes.ts`, `itemPrices.ts`, `src/popup/CsvExport.tsx`. Tested on the fixtures (jsdom); **not yet tried on the live tabs** with Bandcamp's own JS running.
+
+### One takeover for both tabs
+
+- **Generalised, not copied.** `content/wishlist/` became `content/itemList/`. A `ListConfig` (`lists.ts`: `WISHLIST`, `COLLECTION`) holds what differs: Bandcamp's grid and items selectors, the noun in our text, the sync step and count that say the list is complete. Takeover, lazy opening, `showBandcampList` fallback, `syncEmpty.ts`, grid, card, filter bar, tags and bulk bar are the same code. `listWishlist` became `listItems { source }`, `WishlistItem` became `ListedItem`.
+- **The collection tab's DOM differs a little, and `me-fan-page.html` already shows it** (no new fixture; the page is the logged-in capture, and a fresh one would need a login). `#collection-grid` is `active` when the page loads, so the takeover happens at once, not on a click. `#collection-items` holds the first 20 items already rendered in `ol.collection-grid.editable`, then a second, empty `ol.collection-grid`, then `.expand-container`. All are direct children, so the same rule hides them (`FAN_PAGE_DOM.itemsNativeList`, `itemsExpand`), and our slot goes before the first `ol`. Bandcamp's own collection search box is left alone and searches its list, not ours (as on the wishlist, §14).
+- **Same fallbacks as the wishlist:** Bandcamp's list comes back while the worker is unreachable or while our list is empty and the sync hasn't finished, failed, or hasn't seen you log in.
+- **Big collections:** 120 cards at a time with "Show more", filters and sort over the whole list. A heavy user's collection is thousands of rows over the message bus (about 400 bytes each); not measured on a real account yet.
+- **Tags apply to collection items too**, the same pool (§14). `getItemTags` still answers only for wishlisted items, so a release page shows tags only while it is in your wishlist: a gap.
+- **Tags, notes and ratings now survive a purchase.** Before, the wishlist sync dropped the tags of anything that left the wishlist (§14). A full sync now prunes at its end (`pruneItemData`), after both lists: tags and notes of items in neither list go, prices of items off the wishlist go. A bought item keeps its tags and note. A hidden wishlist leaves its rows, so it keeps them as before.
+
+### Sort
+
+- **Keys.** Wishlist: date added, artist, label, price, crate mates who own it, buy next. Collection: date purchased, artist, label. A direction button flips the order; choosing a key starts in its natural direction (names and prices low to high, the rest high to low).
+- **Pure and shared:** `shared/itemSort.ts`, used by the cards, the shortlist and the tests. Ties keep the order the worker sent (newest first). Items with nothing to sort by (no label, no price, no date) go last in either direction.
+- **Label** is the label name Bandcamp gives when a release is on a label but sold from the artist's account. When the seller is the label, `artist` already holds its name and `label` is null (§3.3), so those sort last under Label.
+- **Price sorts within a currency, and currencies stay together** (ordered by code). Dighead has no exchange rates and won't fetch any (no new host, no backend), so it never compares or adds amounts across currencies.
+- **Crate mates who own it** is `scoring/wishlistCrateMates.ts`: for each wishlist item's matchKey, how many of your top K crate mates (`topCrateMatesK`, same as For you) hold it in their collection, plus their summed score for ties. Pure over the crate mates' `fanMatches` lists; the worker gathers them (`getPurchaseLists`). Wishlist only: you own what's in your collection.
+- **Buy next** is a sort, not a stored order: your rating first (unrated below a 1), then crate mates who own it, then newest added. It needs no state of its own, so it can't go stale.
+- **Remembered per tab** in `chrome.storage.local` (`sort:wishlist`, `sort:collection`; `useStoredSort`), as the other small UI preferences are. A saved key the list doesn't offer falls back to the default.
+- The search also looks in the label and in your notes.
+
+### Notes and ratings
+
+- **Schema v16:** `itemNotes: 'itemKey'` with `{ itemKey, text, rating (1–5 or null), updatedAt }`. Keyed apart from `items` and `ownership`, like `itemTags`. `normaliseNote` trims, cuts at 2,000 characters, turns anything but an integer 1–5 into unrated, and an empty note deletes the row. Message `saveItemNote`.
+- **On the card:** "+ note" opens a popover with five stars and a text box. Once there's a note, the button shows its stars and text. Escape or a click outside drops the draft; Save keeps it.
+- **Tags backup file is version 3**, with a top-level `notes` list. Versions 1 and 2 still import (no notes), and a file from a newer version is refused as before. Import adds a note only for an item that has none: a file never overwrites what you wrote since. Notes and tags for items in neither of your lists are skipped and counted. Tag assignments to collection items import now too.
+- **Full backup:** `itemNotes` and `itemPrices` are tables, so they're in it. `TABLES_ADDED` lists both at 16, so a v15 backup still restores (without them), and `schema.test.ts` upgrades a v13 database to v16.
+
+### Prices and the Friday shortlist
+
+- **Where prices come from.** Wishlist rows already carry `price`, `currency`, `is_purchasable`, `is_private` and `is_subscriber_only` (`wishlist_items.json`); the parser now keeps them (`ItemPrice` on `CollectionItem`). `purchasable` = purchasable, not private, not subscriber-only. `is_set_price` is not used: its meaning (fixed price or name-your-price) isn't certain, so a price is shown as Bandcamp lists it, and name-your-price items just show their listed amount.
+- **Where they're stored:** `itemPrices: 'itemKey'` (v16), written by the wishlist sync, one row per item with `price` null when Bandcamp gave none. Not on `items` or `ownership`, which scans and the match index read in bulk.
+- **Existing wishlists fill in on the next sync, once.** An incremental sync treats a wishlist item with no price row as new, so it reads the wishlist again until every item has a row, then stops as before. Prices change on Bandcamp, though; only a full sync (Re-sync) refreshes ones already stored.
+- **The shortlist** is a switch on the wishlist toolbar, "All / Bandcamp Friday shortlist": items with `price.purchasable`, in buy next order (the sort menu hides, the order is fixed). The filter bar still works inside it. Above the cards: "N releases you can buy: $84.99 + €19.00", one total per currency. Each card adds "running $45.00", the cumulative total in its own currency, in list order. Read-only: nothing writes to the cart, and the text says so.
+- **States:** nothing purchasable says why (prices not read yet, or everything is private or withdrawn) and offers the whole wishlist.
+
+### CSV export
+
+- **Pure serializer** in `shared/csv.ts`: UTF-8 with a byte order mark (so Excel opens accents right), CRLF, RFC 4180 quoting. Text that starts with `=`, `+`, `-`, `@`, tab or carriage return gets a leading apostrophe, so a hostile title can't run as a formula; numbers aren't touched.
+- **Row shapes** in `shared/exportCsv.ts`. Wishlist: artist, title, label, URL, added (ISO date), price, currency, for sale, crate mates who own it, tags, rating, note. Collection: the same without the price columns, with the purchase date. For you: rank, artist, title, label, URL, owned by your top crate mates, owners on Bandcamp, best crate mate rank, newest crate mate purchase, who you follow behind it. Tags are names, joined with "; ".
+- **From the popup's Settings tab** ("CSV export"): Wishlist, Collection, For you, with a menu for which For you picks (All time, Fresh, Deep cuts). The popup can't see the profile tab's current mode, so it asks. It reads through the existing `listItems`, `listTags` and `getForYou` messages (no new one) and saves through a blob URL (`hooks/saveFile.ts`, now shared with the two backups). An empty list says so instead of saving an empty file. M3U export from the backlog is still open.

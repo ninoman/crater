@@ -201,7 +201,7 @@ It isn't part of the MVP. Design and data source: decisions §8.
 Design: decisions §14.
 
 1. [x] Schema v9: `itemTags`, keyed by item, so scans and syncs never wipe them. A full wishlist sync drops the tags of items that left it.
-2. [x] Repo, messages and hooks: `listWishlist`, `getItemTags`, `assignItemTag`; deleting a tag takes it off items too.
+2. [x] Repo, messages and hooks: `listWishlist` (now `listItems`, §22), `getItemTags`, `assignItemTag`; deleting a tag takes it off items too.
 3. [x] Share the tag filter, editor, filter bar and bulk bar between the following and wishlist tabs.
 4. [x] Take over the wishlist tab: every release as a grid card with a playable cover, tags, "+ tag", a select box, the filter bar, bulk tagging and all view states.
 5. [x] Tags on a wishlisted release's own page, in the sidebar.
@@ -209,6 +209,23 @@ Design: decisions §14.
 7. [ ] Try the takeover on the live wishlist tab, with Bandcamp's own JS running.
 
 **Done when:** the wishlist tab lists every wishlisted release, tags survive a full re-sync, filtering by two tags in AND and OR mode gives the right rows, bulk tagging 10 rows takes one action, and a wishlisted release's page shows its tags.
+
+---
+
+## Wishlist and collection tools (not MVP)
+
+**Goal:** sort, annotate and plan purchases from your wishlist, get the same tools on the collection tab, and take your lists into a spreadsheet. Research ideas 3, 6, 8 and 9; design: decisions §22.
+
+1. [x] Schema v16: `itemNotes` (text and a 1–5 rating) and `itemPrices`. The wishlist parser keeps price, currency and whether it can be bought; an incremental sync reads unpriced wishlist items once.
+2. [x] `scoring/wishlistCrateMates.ts`: how many top crate mates own each release. Pure, with a synthetic test.
+3. [x] `shared/itemSort.ts`: added, artist, label, price, crate mates, buy next. Remembered per tab.
+4. [x] Notes and ratings on the card (`NotePopover`, `Rating`), the tags backup file version 3 (older files still import) and the full backup.
+5. [x] Generalise the wishlist takeover into `content/itemList/` and take over the collection tab with it (sort by purchase date, artist or label; tags, filter and bulk bar). Tags and notes now survive a purchase.
+6. [x] Bandcamp Friday shortlist: purchasable wishlist items in buy next order, with totals per currency. Read-only.
+7. [x] CSV export of the wishlist, the collection and a For you list, from the popup (`shared/csv.ts`, `exportCsv.ts`).
+8. [ ] Try both tabs on live pages with Bandcamp's own JS running, and a collection of thousands (check the first render and the message size).
+
+**Done when:** each tab sorts by every key it offers and remembers it, a note and rating survive a re-sync and a purchase and come back from a tags backup, the shortlist adds up per currency, and a CSV opens in a spreadsheet with its accents intact.
 
 ---
 
@@ -358,7 +375,7 @@ Also added: full database export and import on the popup's Settings tab (backup,
 
 ## Post-MVP backlog (roughly by value)
 
-- Export picks as CSV or M3U-style text for DJ library tools
+- Export picks as M3U-style text for DJ library tools (CSV is done: *Wishlist and collection tools*)
 - Firefox port (MV3 in Firefox, with `browser.*` polyfill)
 
 ---
