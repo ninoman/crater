@@ -25,6 +25,7 @@ import type { SyncStatus } from './sync';
 import type { CrateMatesResult, CrateMateStanding } from './crateMates';
 import type { WishlistItem } from './wishlist';
 import type { CrateMatesLatestResult } from './crateMatesLatest';
+import type { FollowsDigestResult, FollowsDigestVisit } from './followsDigest';
 
 type NoPayload = Record<string, never>;
 
@@ -133,6 +134,16 @@ export interface MessageMap {
   resumeScanner: { request: NoPayload; response: null };
   /** Deletes everything Dighead has stored except settings. Your collection re-syncs on the next Bandcamp page. */
   clearAllData: { request: NoPayload; response: null };
+  // New from your follows (decisions §22).
+  /** The digest, with rows found after `previousVisitAt` marked new. */
+  getFollowsDigest: {
+    request: { previousVisitAt: number | null };
+    response: FollowsDigestResult;
+  };
+  /** The tab opened: records the visit, and reads your follows' releases next. */
+  followsDigestOpened: { request: NoPayload; response: FollowsDigestVisit };
+  /** Hides an account's releases from the digest and notifications, or brings them back. */
+  setFollowMute: { request: { bandId: number; muted: boolean }; response: null };
 }
 
 export type MessageType = keyof MessageMap;

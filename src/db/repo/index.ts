@@ -1,10 +1,12 @@
 // Typed read/write helpers. Code outside src/db goes through these, never the raw tables.
 export * from './alsoBought';
+export * from './bandReleases';
 export * from './clear';
 export * from './fanRows';
 export * from './fans';
 export * from './following';
 export * from './followSignal';
+export * from './followsDigest';
 export * from './forYou';
 export * from './hidden';
 export * from './items';

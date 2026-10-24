@@ -1,5 +1,6 @@
 import { mountFollowing } from '../following/mountFollowing';
 import { mountShadow } from '../shared/mountShadow';
+import { tagBarStyles } from '../shared/tagStyles';
 import { mountWishlist } from '../wishlist/mountWishlist';
 import profileCss from './Profile.css?inline';
 import { PROFILE_TABS, ProfileApp } from './ProfileApp';
@@ -9,7 +10,7 @@ import { injectProfileTabs } from './profileTabs';
  * over Bandcamp's following and wishlist tabs. */
 export function mountProfile(doc: Document): void {
   const tabs = injectProfileTabs(doc, PROFILE_TABS);
-  if (tabs) mountShadow(tabs.contentSlot, <ProfileApp tabs={tabs} />, profileCss);
+  if (tabs) mountShadow(tabs.contentSlot, <ProfileApp tabs={tabs} />, profileCss + tagBarStyles);
   mountFollowing(doc);
   mountWishlist(doc);
 }

@@ -30,3 +30,10 @@ export function profiledRank(similarity: number, ahead: boolean): number {
   const order = 1 / (1 + similarity);
   return ahead ? order : DEFERRED_RANK + order;
 }
+
+/**
+ * Weekly reads of the accounts you follow (decisions §22): after the lately re-reads, before the
+ * seed backlog. Behind that backlog a read could wait for weeks, which would defeat a digest of
+ * what's new; a round is about one request per account, a sliver of a week's budget.
+ */
+export const FOLLOW_RELEASES = 2.75;

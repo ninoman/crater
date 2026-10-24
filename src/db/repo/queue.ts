@@ -1,10 +1,11 @@
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanJob, QueueJob, ReleaseJob } from '../schema';
+import type { DigheadDb, FanJob, FollowReleasesJob, QueueJob, ReleaseJob } from '../schema';
 
 /** What to scan. A job is unique per kind and target. */
 export type JobSpec =
   | Pick<ReleaseJob, 'kind' | 'target' | 'url'>
-  | Pick<FanJob, 'kind' | 'target' | 'via'>;
+  | Pick<FanJob, 'kind' | 'target' | 'via'>
+  | Pick<FollowReleasesJob, 'kind' | 'target'>;
 
 /** A fan's scan, queued from `via`'s supporter list (null when no release queued it). */
 export function fanJob(fanId: number, via: ItemKey | null = null): JobSpec {
@@ -153,12 +154,17 @@ export async function focusRelease(
   });
 }
 
+function jobsOfKind(db: DigheadDb, kind: QueueJob['kind']) {
+  return db.queue.where('[kind+target]').between([kind, ''], [kind, '￿']);
+}
+
 export async function countJobs(db: DigheadDb): Promise<Record<QueueJob['kind'], number>> {
-  const [release, fan] = await Promise.all([
-    db.queue.where('[kind+target]').between(['release', ''], ['release', '￿']).count(),
-    db.queue.where('[kind+target]').between(['fan', ''], ['fan', '￿']).count(),
+  const [release, fan, followReleases] = await Promise.all([
+    jobsOfKind(db, 'release').count(),
+    jobsOfKind(db, 'fan').count(),
+    jobsOfKind(db, 'followReleases').count(),
   ]);
-  return { release, fan };
+  return { release, fan, followReleases };
 }
 
 /** Of these fans, the ones with a scan of any kind waiting in the queue. */
@@ -211,4 +217,20 @@ export async function enqueueLatestReads(
     await db.queue.bulkAdd(jobs);
     return jobs.length;
   });
+}
+
+/** Moves every queued job of a kind up to `priority`. Jobs already more urgent stay put. */
+export async function raiseJobs(
+  db: DigheadDb,
+  kind: QueueJob['kind'],
+  priority: number,
+): Promise<void> {
+  await jobsOfKind(db, kind)
+    .filter((job) => job.priority > priority)
+    .modify({ priority });
+}
+
+/** The targets of every queued job of a kind. */
+export async function queuedTargets(db: DigheadDb, kind: QueueJob['kind']): Promise<Set<string>> {
+  return new Set((await jobsOfKind(db, kind).toArray()).map((job) => job.target));
 }

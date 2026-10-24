@@ -216,7 +216,18 @@ export interface FanJob extends JobBase {
   cursor: FanCursor | null;
 }
 
-export type QueueJob = ReleaseJob | FanJob;
+/**
+ * Reads one followed band's releases (decisions §22). `details`: the releases whose URL is
+ * still to be read, one request each, in order.
+ */
+export interface FollowReleasesJob extends JobBase {
+  kind: 'followReleases';
+  /** The band_id, as a string like a fan job's target. */
+  target: `${number}`;
+  cursor: { stage: 'details'; pending: ItemKey[] } | null;
+}
+
+export type QueueJob = ReleaseJob | FanJob | FollowReleasesJob;
 export type JobKind = QueueJob['kind'];
 
 /** Bandcamp has no label flag: artists and labels are both band accounts (decisions §8). */
@@ -253,6 +264,42 @@ export interface TagRecord {
   nameKey: string;
 }
 
+/**
+ * A release of a band account you follow (decisions §22). The same release can be listed under
+ * two accounts you follow, an artist and their label, so it's keyed by both.
+ */
+export interface BandReleaseRecord {
+  /** The followed account whose discography lists it. */
+  bandId: number;
+  itemKey: ItemKey;
+  /** The account selling it: `bandId` itself, or one of a label's artists. */
+  sellerId: number;
+  title: string;
+  artist: string;
+  artId: number | null;
+  releasedAt: number | null;
+  /** When a read of the band first listed it. */
+  firstSeenAt: number;
+  /** Listed by the band's first read, so it's back catalogue rather than news. */
+  baseline: boolean;
+  /** From the release's details; null until they're read. */
+  url: string | null;
+  albumKey: ItemKey | null;
+  preorder: boolean;
+}
+
+/** When a followed band's releases were last read. */
+export interface BandReadRecord {
+  bandId: number;
+  readAt: number;
+}
+
+/** A followed account whose releases you don't want in the digest or notifications. */
+export interface FollowMuteRecord {
+  bandId: number;
+  mutedAt: number;
+}
+
 /** Blanks the v7 fields on a crate mate stored before them, until the next recompute fills them. */
 export function blankLately(crateMate: CrateMateRecord): void {
   crateMate.lately ??= null;
@@ -282,6 +329,9 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   latelyCrateMates: 7,
   itemTags: 9,
   bands: 12,
+  bandReleases: 15,
+  bandReads: 15,
+  followMutes: 15,
 };
 
 /** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
@@ -307,6 +357,9 @@ export class DigheadDb extends Dexie {
   following!: Table<FollowingRecord, FollowingKey>;
   tags!: EntityTable<TagRecord, 'id'>;
   itemTags!: EntityTable<ItemTagsRecord, 'itemKey'>;
+  bandReleases!: Table<BandReleaseRecord, [number, ItemKey]>;
+  bandReads!: EntityTable<BandReadRecord, 'bandId'>;
+  followMutes!: EntityTable<FollowMuteRecord, 'bandId'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -410,6 +463,13 @@ export class DigheadDb extends Dexie {
           await tx.table(to).bulkPut(await tx.table(from).toArray());
         }
       });
+    // v15: releases of the bands you follow, when each was read, and your mutes (decisions §22).
+    // New tables, so nothing to migrate.
+    this.version(15).stores({
+      bandReleases: '[bandId+itemKey], bandId, releasedAt, firstSeenAt',
+      bandReads: 'bandId',
+      followMutes: 'bandId',
+    });
   }
 }
 

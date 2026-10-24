@@ -333,6 +333,26 @@ Design: decisions §16. Uses the following sync from *Following tags*; no new re
 
 ---
 
+## New from your follows (not MVP)
+
+**Goal:** see what the artists and labels you follow released lately, in one list, with your own mutes, and optionally a notification when there's something new. Research #1 and #10.
+
+Design: decisions §22.
+
+1. [x] Recon: the mobile API's `band_details` (discography with release dates) and `tralbum_details` (URL), chosen over `/music` (no dates, custom-domain redirects) and the logged-in feed. Fixtures and refresh specs.
+2. [x] Parser `bandcamp/discography.ts` with fixture tests and `ParserError` / `BandcampApiError`.
+3. [x] Schema v15: `bandReleases`, `bandReads`, `followMutes`. In backups and Clear all data.
+4. [x] Job kind `followReleases`: weekly reads at priority 2.75, inside the daily budget; opening the tab moves them up.
+5. [x] `scoring/followsDigest.ts`: news time, window, exclusions, newest day first with crate-mate interest. Synthetic tests.
+6. [x] Profile tab `#follows`: rows with preview, "New since your last visit", follow tags as filters, per-account mute, every view state.
+7. [x] Notifications: optional `notifications` permission, popup setting (off by default), one grouped notification per round, click opens the tab.
+8. [ ] Try it live: the tab, a first round on a few hundred follows, a notification and its click.
+9. [ ] After the merge with *Heard it*: mark heard rows, and maybe "hide heard" here.
+
+**Done when:** a week after following a few active labels, the tab lists their new releases newest first, muting one hides it, and the notification (when on) arrives once.
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".

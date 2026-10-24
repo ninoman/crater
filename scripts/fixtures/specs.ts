@@ -2,12 +2,15 @@
 // Requests come from src/bandcamp/requests.ts so the script can't drift from the scanner.
 
 import {
+  bandDetailsRequest,
   collectionListRequest,
   fanPageUrl,
   firstPageToken,
   FOLLOWING_FIRST_TOKEN,
   followingRequest,
   parseBandId,
+  parseDiscography,
+  parseReleaseDetails,
   parseCollectionPage,
   parseFanPage,
   parseFollowingPage,
@@ -15,6 +18,7 @@ import {
   parseSupportersPage,
   releasePageRequest,
   supportersRequest,
+  tralbumDetailsRequest,
   type BandcampRequest,
 } from '../../src/bandcamp';
 
@@ -37,6 +41,9 @@ const PAGE_SIZE = 40;
 // A public fan who follows 7 fans and enough artists for two small pages (decisions §8).
 const FOLLOWING_FAN_ID = 7027105;
 const FOLLOWING_PAGE_SIZE = 5;
+// Floating Points (an artist) and Peacefrog (a label selling its artists' releases), §22.
+const ARTIST_BAND_ID = 2009518365;
+const LABEL_BAND_ID = 3648395603;
 
 const html = (parse: (html: string) => unknown) => (body: string) => void parse(body);
 const json = (parse: (json: unknown) => unknown) => (body: string) =>
@@ -189,6 +196,32 @@ export const SPECS: Spec[] = [
     file: 'following_fans-unknown-fan.json',
     request: () => followingRequest('fan', 1, FOLLOWING_FIRST_TOKEN, 20),
     parse: json((data) => parseFollowingPage(data, 'fan')),
+  },
+  {
+    file: 'band_details.json',
+    request: () => bandDetailsRequest(ARTIST_BAND_ID),
+    parse: json(parseDiscography),
+  },
+  {
+    file: 'band_details-label.json',
+    request: () => bandDetailsRequest(LABEL_BAND_ID),
+    parse: json(parseDiscography),
+  },
+  {
+    file: 'band_details-unknown.json',
+    request: () => bandDetailsRequest(99999999999),
+    parse: json(parseDiscography),
+    expectApiError: true,
+  },
+  {
+    file: 'tralbum_details.json',
+    request: () => tralbumDetailsRequest(ARTIST_BAND_ID, 'a', 533227808),
+    parse: json(parseReleaseDetails),
+  },
+  {
+    file: 'tralbum_details-track.json',
+    request: () => tralbumDetailsRequest(LABEL_BAND_ID, 't', 1640082601),
+    parse: json(parseReleaseDetails),
   },
 ];
 

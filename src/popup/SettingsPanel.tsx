@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNotificationPermission } from '../hooks/useNotificationPermission';
 import { useSettings } from '../hooks/useSettings';
 import { DEFAULT_SETTINGS, SETTING_LIMITS, type Settings } from '../shared/settings';
 import { applySpeedPreset, type SpeedPreset, speedPresetOf } from '../shared/settingsPresets';
@@ -100,6 +101,13 @@ function Entry({ entry, view, setDraft }: EntryProps) {
         </SettingRow>
       );
     }
+    case 'follow-notifications':
+      return (
+        <FollowNotificationsToggle
+          checked={draft.followNotifications}
+          onChange={(checked) => set('followNotifications', checked)}
+        />
+      );
     case 'lately-rescan':
       return (
         <Toggle
@@ -112,6 +120,33 @@ function Entry({ entry, view, setDraft }: EntryProps) {
         />
       );
   }
+}
+
+/** Turning it on asks Chrome for the notifications permission first; it stays off if that's refused. */
+function FollowNotificationsToggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  const { granted, request } = useNotificationPermission();
+  const blocked = checked && granted === false;
+  return (
+    <Toggle
+      label="Notify me about new releases"
+      description={
+        blocked
+          ? 'Chrome isn’t letting Dighead show notifications. Turn this off and on to ask again.'
+          : 'One notification when Dighead’s weekly check finds new releases from artists and labels you follow.'
+      }
+      checked={checked}
+      onChange={(next) => {
+        if (!next) onChange(false);
+        else void request().then((ok) => ok && onChange(true));
+      }}
+    />
+  );
 }
 
 function Section({ section, ...props }: { section: SettingSection } & Omit<EntryProps, 'entry'>) {

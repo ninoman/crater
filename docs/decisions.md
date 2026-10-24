@@ -846,3 +846,82 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 - On release pages the prompts mount in a shadow root of their own, since the sidebar renders nothing inside while collapsed.
 - **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
 - **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.
+
+## 22. New from your follows, and notifications
+
+Recon 2026-10-24, logged out, with curl against live bandcamp.com. Built the same day. Research: [bandcamp-user-needs.md](research/bandcamp-user-needs.md) #1 and #10. Code: `src/bandcamp/discography.ts` (parser), `src/db/repo/bandReleases.ts` and `followsDigest.ts`, `src/background/scanner/followReleases*.ts`, `src/scoring/followsDigest.ts` (pure), `src/background/follows/` (digest, visits, notifications, handlers), `src/content/profile/follows/`. Roadmap: *New from your follows*.
+
+### Data source: the mobile API, not `/music` or the fan feed
+
+Three candidates were tried:
+
+- **(a) The band's `/music` page** (`band-page.html`): its grid has every release (16 rendered `li.music-grid-item[data-item-id]`, the rest in `ol#music-grid[data-client-items]`, 28 in all for Floating Points), with `page_url` and art. But it has **no release dates**, so only "first seen" could order it. It also lives on the band's own host: a band with a custom domain **301s** `<sub>.bandcamp.com/music` to it (`pearsonsound` → `music.pearsonsound.com`), which the worker has no host permission for, so the fetch fails as a network error and would pause the whole queue (§5). And a band with one release 303s `/music` to that release.
+- **(b) The logged-in fan feed** (`POST /fan_dash_feed_updates`): logged out it answers `oops`. It needs your session, mixes in followed fans' purchases, and the built-in browser had no Bandcamp login to check it with, so nothing about it is confirmed. Not used.
+- **(c) The mobile app's public API (chosen).** On `bandcamp.com`, logged out, JSON:
+  ```
+  POST https://bandcamp.com/api/mobile/24/band_details  {"band_id": 2009518365}
+  → {id, name, bandcamp_url, discography: [{item_id, item_type, title, artist_name, band_name, band_id, art_id, release_date: "28 Aug 2026 00:00:00 GMT", is_purchasable}], ...}
+  POST https://bandcamp.com/api/mobile/24/tralbum_details  {"band_id", "tralbum_type": "a"|"t", "tralbum_id"}
+  → {id, type, bandcamp_url, album_id, release_date: <unix s>, is_preorder, label, ...}
+  ```
+  `band_details` lists the account's **whole discography with release dates** (28 for Floating Points, 127 for the Peacefrog label). For a label, entries sold from its artists' own accounts carry the artist's `band_id` and `artist_name`. It has **no release URL**; `tralbum_details` has it (`bandcamp_url`), taking the selling account's `band_id`. Errors are HTTP 200 `{"error": true, "error_message": "..."}` (unknown band, unknown release), so `BandcampApiError`. Fixtures: `band_details.json`, `band_details-label.json`, `band_details-unknown.json`, `tralbum_details.json`, `tralbum_details-track.json`, refreshed by `pnpm fixtures:refresh`.
+
+Chosen because it gives real release dates, one request per account whatever its size, and never leaves `bandcamp.com`, so custom domains just work. The cost: one more request per release whose URL we need, which is only news in the digest's window (below), a handful a week. Risk: it's the mobile app's API, unofficial like every endpoint we use; a shape change is a `ParserError` like any other.
+
+### Storage (schema v15)
+
+```
+bandReleases: '[bandId+itemKey], bandId, releasedAt, firstSeenAt'
+bandReads:    'bandId'
+followMutes:  'bandId'
+```
+
+- **`bandReleases`**: one row per followed account and release (a release listed by an artist and their label you both follow has two). It keeps the seller's `band_id`, title, artist line, art, release date, `firstSeenAt`, `baseline`, and once its details are read `url`, `albumKey` (for an album track) and `preorder`. A read deletes rows the discography no longer lists.
+- **`baseline`**: set on everything the account's **first** read finds. That's back catalogue, not news, even when it's dated recently: it's how a new follow doesn't flood notifications.
+- **`bandReads`**: when each account was last read, so accounts with no releases are still known to be read.
+- **`followMutes`**: see *Mute*. Kept when you unfollow, so a re-follow stays muted.
+- All three are in backups (`TABLES_ADDED` at 15) and cleared by Clear all data. When the daily pass finds an account with a read but no `following` row (a full sync deleted it), its releases and read are dropped; mutes stay.
+- **Your last visit and last notification** are in `chrome.storage.local` (`followsDigest`), not IndexedDB: clearing or importing the data shouldn't make everything new again.
+
+### Scanning
+
+- **Job kind `followReleases`**, target the `band_id`. One request per run, as every job (§5): the first run reads `band_details`; then one run per release that needs details: news (below) in the window with no URL yet, newest first, at most 20 a read so a big label's first read can't flood the queue (the rest follow on later reads). A release whose details answer `{"error": true}` is skipped; the next read drops it.
+- **Weekly:** the daily maintenance pass (§9), and every finished sync of your own (which may bring new follows), queue every account you follow (not unfollowed on the tab) whose last read is 7 days old or more, never-read first, then the longest unread. So each account is read every 7 to 8 days.
+- **Priority 2.75** (`FOLLOW_RELEASES`): after releases you opened and the lately re-reads, **before the seed backlog**. That's not the "lowest priority" the research row sketched: behind a large seed backlog a read could wait weeks, which defeats a digest. A round costs about one request per account plus a few details, e.g. ~250 requests a week for 200 follows, about 0.4% of a week's budget at the default 10,000 a day. It runs through the same loop, so pace, back-off and the daily budget apply.
+- **Opening the tab** queues whatever is due and moves every waiting read up to BACKGROUND (2), behind only the release page you have open.
+- First install: the first sync queues every follow, so the first round runs right after it, ahead of the seed backlog (for 500 follows, about 500 requests, ~20 minutes at the default pace).
+
+### What's news, and the order (`scoring/followsDigest.ts`)
+
+- **News time** (`newsAt`): the release date, except when a release was first seen more than 14 days after its date (`LATE_UPLOAD_MS`; reads are weekly, so a new release is seen at most ~8 days late). Then it's an old release newly put up, news from when we saw it. Back catalogue (`baseline`) only counts by its date; without one it's never news. Pre-orders have future dates and sort first.
+- **Window**: news of the last 60 days (`DIGEST_WINDOW_DAYS`, as Crate mates' latest).
+- **Left out**: accounts you no longer follow, releases whose URL isn't read yet (they show up within the round), and owned, wishlisted and hidden releases through `scoring/exclusions.ts` as it is (its `exclusions(mine, hidden)` match ids; an album track goes by its album).
+- **One entry per release**, listing each followed account that has it, the seller first.
+- **Order**: newest **day** first (Bandcamp dates are days, and releases bunch on Fridays), then **crate-mate interest**: how many of your top `topCrateMatesK` all-time crate mates own any release in that account's discography (our stored `bandReleases`, matched against their `fanMatches` lists). Then time and title. Interest also shows in the row: "3 of your top crate mates buy from them".
+
+### The tab
+
+- A fifth profile tab, `#follows` ("new from follows"), after Crate mates' latest. Rows reuse `ReleaseRow` (preview, open, hide), with the followed account in the label slot when it isn't the artist ("Michael J. Blood · Peacefrog Records"), and a **Mute** action.
+- **"New since your last visit"** splits the list in two. The tab records the visit when it opens (`followsDigestOpened`) and answers with the visit before it; rows first seen after that are new. A new follow's back catalogue only counts if it also came out since then. Once per page load, so switching tabs and back keeps the split. No per-release seen state: the *heard* store from research #2 will replace it after the merge.
+- **Filters**: the follow tags (§8) as chips with all/any, and a search over title, artist and account names (the shared `FilterControls`). A release's tags are its accounts' tags.
+- **States**: loading; not logged in; following no one (or follows still syncing); the first round under way, with a progress bar of accounts read; nothing new; nothing matching the filters, with "Clear filters"; worker unreachable, with "Try again"; results. While reads are queued the list re-fetches every 10 s and shows "Checked N of M accounts".
+
+### Mute: a set of its own, not a tag
+
+A per-account mute is a separate `followMutes` set rather than a reserved tag or a flag on `following`:
+
+- **Tags are yours to name and mean "show me these"**. A built-in "muted" tag would show up in every tag picker and filter (following tab, wishlist, page tags) and could be renamed or deleted, or be exported and imported with your tags.
+- **A flag on `following` would be the sync's to keep**: `putFollowing` merges and `replaceFollowing` deletes rows, so the merge would have to learn one more field, and an unfollow then re-follow would lose it. A set keyed by `band_id` is untouched by the sync.
+- Muted accounts' rows stay in the answer, flagged, so muting and unmuting is instant; the tab hides them and lists the muted accounts under "Muted accounts (N)" with Unmute. A release listed by two accounts is only hidden when both are muted.
+
+### Notifications (#10)
+
+- **Setting `followNotifications`**, default off, in the popup's new *New from your follows* section.
+- **`notifications` is an optional permission** (`optional_permissions`), asked for when you turn the setting on (Chrome only prompts from a click). A required one would show a new permission warning on update and disable the extension until it's accepted, for a feature that's off by default. Refused, the toggle stays off; revoked later, the popup says so.
+- **One grouped notification per round**: when a `followReleases` job ends and none are left queued, the worker builds the digest and announces releases found since the later of your last visit and the last notification, leaving out back catalogue and muted accounts. "5 new releases from your follows", naming the first three in digest order. Nothing new, no notification. Clicking it opens your profile at `#follows`.
+
+### Not checked live yet
+
+- The tab, the toggle and a notification in a real browser (all tested on fixtures and in jsdom).
+- `chrome.notifications` after granting the optional permission without a worker restart (the click listener is registered on `permissions.onAdded` too).
+- How a big label (hundreds of releases) reads, and whether ~20 details per read is enough for one's first round.

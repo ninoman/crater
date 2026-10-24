@@ -17,6 +17,8 @@ export default defineManifest({
     128: 'icons/icon-128.png',
   },
   permissions: ['storage', 'alarms'],
+  // Asked for from the popup when you turn on notifications for your follows (decisions §22).
+  optional_permissions: ['notifications'],
   host_permissions: BANDCAMP_MATCHES,
   background: {
     service_worker: 'src/background/index.ts',

@@ -15,6 +15,7 @@ import { jobRetryAt, nextBackoff } from './backoff';
 import { spend } from './budget';
 import type { StepContext, StepEvent, StepResult } from './context';
 import { abandonFan, runFanStep } from './fanJob';
+import { runFollowReleasesStep } from './followReleasesJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
 import { paceWaitMs } from './pace';
@@ -83,6 +84,7 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
 
 async function runStep(job: QueueJob, ctx: StepContext): Promise<StepResult> {
   if (job.kind === 'fan') return runFanStep(ctx, job);
+  if (job.kind === 'followReleases') return runFollowReleasesStep(ctx, job);
   const cursor = await runReleaseStep(ctx, job);
   return cursor
     ? { next: { cursor }, event: 'continued', parsed: 'release' }
