@@ -1,13 +1,56 @@
-import { useCrateMatesLatest } from '../../../hooks/useCrateMatesLatest';
+import { useCrateMatesLatest, type CrateMatesLatestView } from '../../../hooks/useCrateMatesLatest';
+import type { RowActions } from '../../../hooks/rowActions';
+import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
-import { Button, EmptyState, LinkButton } from '../../../ui';
-import { formatChecking } from './latestText';
+import { Button, EmptyState, LinkButton, StatusDot } from '../../../ui';
+import { AllHeard } from '../../shared/AllHeard';
+import { HideHeardToggle } from '../../shared/RowControls';
+import { formatChecking, formatLatestSummary } from './latestText';
 import { LatestList } from './LatestList';
 
 /** Crate mates' latest on your profile: what your top crate mates just bought, or why there's nothing yet. */
 export function LatestTab() {
-  const { view, reload, hide } = useCrateMatesLatest();
+  const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.latest', false);
+  const { view, reload, ...actions } = useCrateMatesLatest(hideHeard);
 
+  return (
+    <>
+      <div className="dh-profile__toolbar">
+        <p className="dh-profile__summary">
+          {view.state === 'ready' &&
+            view.result.rows.length > 0 &&
+            formatLatestSummary(
+              view.result.rows.length,
+              view.result.crateMatesUsed,
+              view.result.windowDays,
+            )}
+        </p>
+        <div className="dh-profile__controls">
+          {view.state === 'ready' && view.result.checking > 0 && (
+            <StatusDot tone="neutral">{formatChecking(view.result.checking)}</StatusDot>
+          )}
+          <HideHeardToggle checked={hideHeard} onChange={setHideHeard} />
+        </div>
+      </div>
+      <LatestBody
+        view={view}
+        reload={reload}
+        actions={actions}
+        onShowHeard={hideHeard ? () => setHideHeard(false) : null}
+      />
+    </>
+  );
+}
+
+interface LatestBodyProps {
+  view: CrateMatesLatestView;
+  reload: () => void;
+  actions: RowActions;
+  /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
+  onShowHeard: (() => void) | null;
+}
+
+function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title="Looking at what your crate mates bought lately…" />;
@@ -21,11 +64,13 @@ export function LatestTab() {
         />
       );
     case 'ready':
-      return view.result.rows.length > 0 ? (
-        <LatestList result={view.result} now={Date.now()} onHide={hide} />
-      ) : (
-        <NoPurchases result={view.result} />
-      );
+      if (view.result.rows.length > 0) {
+        return <LatestList result={view.result} now={Date.now()} actions={actions} />;
+      }
+      if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
+        return <AllHeard onShowHeard={onShowHeard} />;
+      }
+      return <NoPurchases result={view.result} />;
   }
 }
 

@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import type { ItemKey } from '../../../bandcamp';
+import type { RowActions } from '../../../hooks/rowActions';
+import { useListPlayer } from '../../../hooks/useListPlayer';
 import type { ForYouMode, ForYouRow } from '../../../shared/forYou';
-import { ReleaseRow, RowList } from '../../../ui';
+import { ReleaseRow, RowList, Toolbar } from '../../../ui';
 import { withFollowed } from '../../shared/followedText';
-import { ReleasePreview } from '../../shared/ReleasePreview';
+import { PlayThrough, rowControls } from '../../shared/RowControls';
 import { formatDeepCutReason, formatPickReason } from './forYouText';
 
 export interface ForYouListProps {
@@ -11,7 +11,7 @@ export interface ForYouListProps {
   mode: ForYouMode;
   /** When the list was loaded, for "latest 3 days ago". */
   now: number;
-  onHide: (matchKey: ItemKey) => void;
+  actions: RowActions;
 }
 
 const LIST_LABELS: Record<ForYouMode, string> = {
@@ -31,12 +31,15 @@ function reasonFor(row: ForYouRow, mode: ForYouMode, now: number): string {
   return mode === 'deep' ? formatDeepCutReason(row) : formatPickReason(row, now);
 }
 
-/** The ranked picks, one preview open at a time. */
-export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
-  const [previewing, setPreviewing] = useState<ItemKey | null>(null);
+/** The ranked picks, played one at a time or through in order. */
+export function ForYouList({ rows, mode, now, actions }: ForYouListProps) {
+  const player = useListPlayer(rows, (matchKey) => actions.setHeard(matchKey, true, false));
 
   return (
     <>
+      <Toolbar>
+        <PlayThrough player={player} />
+      </Toolbar>
       <div className="dh-profile__list">
         <RowList label={LIST_LABELS[mode]}>
           {rows.map((row, i) => (
@@ -45,10 +48,7 @@ export function ForYouList({ rows, mode, now, onHide }: ForYouListProps) {
               release={row}
               rank={i + 1}
               reason={withFollowed(reasonFor(row, mode, now), row.followed)}
-              previewing={previewing === row.matchKey}
-              preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
-              onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
-              onHide={() => onHide(row.matchKey)}
+              {...rowControls(row, player, actions)}
             />
           ))}
         </RowList>

@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Button, LinkButton } from './Button';
-import { ExternalIcon, HideIcon } from './icons';
+import { HeardBadge } from './HeardBadge';
+import { ExternalIcon, HeardIcon, HideIcon } from './icons';
+import { Menu, type MenuItem } from './Menu';
 import { PlayableCover } from './PlayableCover';
 import { Row } from './Row';
 import { Tooltip } from './Tooltip';
@@ -13,6 +15,9 @@ export interface ReleaseRowRelease {
   url: string;
   coverUrl: string | null;
 }
+
+/** How much a hide takes out: this release, everything by its artist, or on its label. */
+export type HideScope = 'release' | 'band' | 'label';
 
 export interface ReleaseRowProps {
   release: ReleaseRowRelease;
@@ -28,10 +33,15 @@ export interface ReleaseRowProps {
   /** The player, shown under the row while previewing. */
   preview: ReactNode;
   onPreview: (open: boolean) => void;
-  onHide: () => void;
+  /** You've heard it: a badge and a dimmed cover. */
+  heard: boolean;
+  onHeardChange: (heard: boolean) => void;
+  /** Names for the wider hides on offer, e.g. the artist's; null leaves that one out. */
+  hideScopes: { band: string | null; label: string | null };
+  onHide: (scope: HideScope) => void;
 }
 
-/** A recommended release: playable cover, artist and label, reason, and open / hide. */
+/** A recommended release: playable cover, artist and label, reason, and open / heard / hide. */
 export function ReleaseRow({
   release,
   reason,
@@ -41,6 +51,9 @@ export function ReleaseRow({
   previewing,
   preview,
   onPreview,
+  heard,
+  onHeardChange,
+  hideScopes,
   onHide,
 }: ReleaseRowProps) {
   const name = `${release.artist} – ${release.title}`;
@@ -52,6 +65,7 @@ export function ReleaseRow({
           <PlayableCover
             src={release.coverUrl}
             playing={previewing}
+            dimmed={heard}
             label={name}
             onToggle={() => onPreview(!previewing)}
           />
@@ -67,6 +81,7 @@ export function ReleaseRow({
         reason,
         ...(status ? [status] : []),
       ]}
+      badges={heard && <HeardBadge />}
       actions={
         <>
           <Tooltip content="Open in a new tab">
@@ -82,15 +97,46 @@ export function ReleaseRow({
             </LinkButton>
           </Tooltip>
           {extraActions}
-          <Tooltip content="Hide: never recommend this">
-            <Button variant="ghost" icon aria-label={`Hide ${name}`} onClick={onHide}>
-              <HideIcon />
+          <Tooltip content={heard ? 'Mark as not heard' : 'Mark as heard'}>
+            <Button
+              variant="ghost"
+              icon
+              aria-label={`Heard ${name}`}
+              aria-pressed={heard}
+              onClick={() => onHeardChange(!heard)}
+            >
+              <HeardIcon />
             </Button>
           </Tooltip>
+          <Menu
+            title="Hide from recommendations"
+            hint="Hide from recommendations"
+            items={hideItems(hideScopes, onHide)}
+            trigger={
+              <Button variant="ghost" icon aria-label={`Hide ${name} from recommendations`}>
+                <HideIcon />
+              </Button>
+            }
+          />
         </>
       }
     >
       {previewing && preview}
     </Row>
   );
+}
+
+function hideItems(
+  scopes: ReleaseRowProps['hideScopes'],
+  onHide: (scope: HideScope) => void,
+): MenuItem[] {
+  return [
+    { label: 'This release', onSelect: () => onHide('release') },
+    ...(scopes.band === null
+      ? []
+      : [{ label: `Everything by ${scopes.band}`, onSelect: () => onHide('band') }]),
+    ...(scopes.label === null
+      ? []
+      : [{ label: `Everything on ${scopes.label}`, onSelect: () => onHide('label') }]),
+  ];
 }

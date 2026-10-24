@@ -1,8 +1,9 @@
 import { fetchReleasePreview } from '../bandcamp';
-import { db, hideRelease } from '../db';
+import { db } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
+import { hideHeardHandlers } from './hideHeardHandlers';
 import { fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import { getPageBadges } from './pageBadges';
@@ -39,19 +40,16 @@ export const handlers: MessageHandlers = {
   releaseOpened: ({ item }) => openRelease(item),
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
-  getAlsoBought: ({ itemKey }) => getAlsoBought(itemKey),
+  getAlsoBought: ({ itemKey, hideHeard }) => getAlsoBought(itemKey, hideHeard),
   getPreview: ({ url }) => fetchReleasePreview(fetchText, url),
-  hideRelease: async ({ matchKey }) => {
-    await hideRelease(db, matchKey, Date.now());
-    return null;
-  },
+  ...hideHeardHandlers(db),
   getCrateMates: () => getCrateMatesResult(),
   getCrateMateStanding: ({ fanId }) => getCrateMateStanding(db, fanId),
   getCrateMateStandings: ({ fanIds }) => getCrateMateStandings(db, fanIds),
   getReleaseCrateMates: ({ itemKey }) => getReleaseCrateMates(itemKey),
   getPageBadges: ({ links }) => getPageBadges(db, links),
-  getForYou: ({ mode }) => getForYou(mode),
-  getCrateMatesLatest: () => getCrateMatesLatest(),
+  getForYou: ({ mode, hideHeard }) => getForYou(mode, hideHeard),
+  getCrateMatesLatest: ({ hideHeard }) => getCrateMatesLatest(hideHeard),
   ...followingHandlers(db),
   ...wishlistHandlers(db),
   ...backupHandlers(db),

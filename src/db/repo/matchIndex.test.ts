@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { keyFromNumber, type CollectionItem, type ItemKey, type Supporter } from '../../bandcamp';
 import { buildMatchIndex, fanMatchLists } from '../matchIndex';
 import { DigheadDb, type OwnershipRecord } from '../schema';
-import { hiddenMatchKeys, hideRelease } from './hidden';
+import { hiddenSets, hide } from './hidden';
 import { getItem } from './items';
 import { getOwnerCounts } from './matchIndex';
 import { addSupporterOwnership, putOwnership, removeOwnershipExcept } from './ownership';
@@ -149,11 +149,15 @@ describe('match index upkeep', () => {
 
 describe('hidden', () => {
   it('keeps the first hide time', async () => {
-    await hideRelease(db, 'a1', 10);
-    await hideRelease(db, 'a1', 20);
+    await hide(db, { kind: 'release', matchKey: 'a1' }, 10);
+    await hide(db, { kind: 'release', matchKey: 'a1' }, 20);
 
-    expect(await hiddenMatchKeys(db)).toEqual(new Set(['a1']));
-    expect(await db.hidden.get('a1')).toEqual({ matchKey: 'a1', hiddenAt: 10 });
+    expect((await hiddenSets(db)).releases).toEqual(new Set(['a1']));
+    expect(await db.hides.get(['release', 'a1'])).toEqual({
+      kind: 'release',
+      key: 'a1',
+      hiddenAt: 10,
+    });
   });
 });
 

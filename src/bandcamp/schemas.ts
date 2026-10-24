@@ -73,6 +73,9 @@ export const rawTralbum = z.object({
 
 /** The tracks a release page can stream. `file` is null for tracks Bandcamp won't play. */
 export const rawTralbumTracks = z.object({
+  id: z.number().nullish(),
+  item_type: z.enum(['album', 'track']).nullish(),
+  current: z.object({ album_id: z.number().nullish() }).nullish(),
   featured_track_id: z.number().nullish(),
   trackinfo: z.array(
     z.object({

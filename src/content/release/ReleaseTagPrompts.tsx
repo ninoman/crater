@@ -1,10 +1,12 @@
 import { readBandHeader } from '../../bandcamp';
 import { FollowRecorder, WishlistTagPrompt } from '../shared/TagPrompt';
+import { BandcampPlays } from './BandcampPlays';
 import { useCurrentRelease } from './useCurrentRelease';
 
 /**
  * What you can add from a release page: the release, with the heart, which opens the tag
- * picker, and the account selling it, with Follow, which is saved (decisions §21).
+ * picker, and the account selling it, with Follow, which is saved (decisions §21). Plays in
+ * Bandcamp's player are recorded here too (§22), since this part never collapses.
  */
 export function ReleaseTagPrompts() {
   const release = useCurrentRelease();
@@ -25,6 +27,7 @@ export function ReleaseTagPrompts() {
     <>
       <WishlistTagPrompt release={item} name={`${item.artist} – ${item.title}`} />
       <FollowRecorder account={account} />
+      <BandcampPlays itemKey={item.itemKey} />
     </>
   );
 }

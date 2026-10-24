@@ -240,7 +240,7 @@ async function candidatesByK(
         score: scoreOf.get(list.fanId) ?? 0,
         matches: list.matchIds,
       })),
-      exclusions(data.mine, data.hidden),
+      exclusions(data.mine, data.hidden).ids,
     );
     result.set(
       k,

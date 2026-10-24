@@ -24,6 +24,8 @@ function row(matchKey: `a${number}`, reason: AlsoBoughtRow['reason']): AlsoBough
     coverUrl: null,
     reason,
     followed: null,
+    heard: false,
+    hide: { band: null, label: null },
   };
 }
 
@@ -56,7 +58,9 @@ function render(
         progress={progress}
         scanStopped={stopped}
         showEarly={showEarly}
-        onHide={() => {}}
+        actions={{ hide: () => {}, setHeard: () => {} }}
+        hideHeard={false}
+        onHideHeardChange={() => {}}
       />,
     ),
   );
@@ -114,7 +118,9 @@ describe('AlsoBoughtList', () => {
           progress={listed}
           scanStopped={false}
           showEarly={false}
-          onHide={() => {}}
+          actions={{ hide: () => {}, setHeard: () => {} }}
+          hideHeard={false}
+          onHideHeardChange={() => {}}
         />,
       ),
     );

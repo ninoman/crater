@@ -20,11 +20,12 @@ import {
   type DeepCutOptions,
   type DeepCutScored,
 } from '../../scoring/deepCuts';
-import { exclusions } from '../../scoring/exclusions';
+import { type Exclusions, exclusions } from '../../scoring/exclusions';
 import { diversify, FOR_YOU_LIMIT, topCrateMates, crateMateOwnership } from '../../scoring/forYou';
 import { DEEP_CUT_CRATE_MATES_K } from '../../scoring/weights';
 import type { ForYouResult } from '../../shared/forYou';
 import { listsInRankOrder, toRow } from './forYouRow';
+import { loadHideScopes } from './hideScopes';
 import { crateMatesBasis } from './crateMateRows';
 
 /** Ranked before diversifying, so artists' moved-down extras leave room for others. */
@@ -37,6 +38,8 @@ export interface DeepCutsInput {
   maxSupporters: number;
   /** Down-weight compilations among the picks (decisions §17). */
   ignoreCompilations: boolean;
+  /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
+  hideHeard: boolean;
 }
 
 export async function computeDeepCuts(
@@ -54,15 +57,18 @@ export async function computeDeepCuts(
     me.fanId,
   );
   const scoreOf = new Map(crateMates.map((crateMate) => [crateMate.fanId, crateMate.score]));
+  const excluded = exclusions(data.mine, data.hidden, {
+    heard: input.hideHeard ? data.heard : undefined,
+  });
   const owned = crateMateOwnership(
     data.crateMateLists.map((list) => ({
       score: scoreOf.get(list.fanId) ?? 0,
       matches: list.matchIds,
     })),
-    exclusions(data.mine, data.hidden),
+    excluded.ids,
   );
   const options = { maxSupporters: input.maxSupporters, limit: RANKED };
-  const { ranked, items } = await scoreTop(db, deepCutCandidates(owned), options, input);
+  const { ranked, items } = await scoreTop(db, deepCutCandidates(owned), options, input, excluded);
 
   const artists = new Map<number, string>();
   for (const scored of ranked) {
@@ -76,15 +82,19 @@ export async function computeDeepCuts(
     db,
     picks.map((scored) => keyFromNumber(scored.id)),
   );
+  const scopes = await loadHideScopes(db, display);
   const rows = picks.flatMap((scored) => {
     const matchKey = keyFromNumber(scored.id);
     const item = display.get(matchKey);
-    if (!item) return [];
+    const hide = scopes.get(matchKey);
+    if (!item || !hide) return [];
     return [
       toRow(matchKey, item, {
         ...deepCutReason(scored, lists),
         lastBoughtAt: null,
         followed: null,
+        heard: data.heard.has(matchKey),
+        hide,
       }),
     ];
   });
@@ -93,13 +103,15 @@ export async function computeDeepCuts(
 
 /**
  * Looks up item records a chunk at a time, in falling ceiling order, and stops once no ceiling
- * left can reach the ranked list. Only candidates that could still rank are looked up.
+ * left can reach the ranked list. Only candidates that could still rank are looked up. Those
+ * from a hidden artist or label count as having no record (§22).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly DeepCutCandidate[],
   options: DeepCutOptions & { limit: number },
   input: DeepCutsInput,
+  excluded: Exclusions,
 ): Promise<{ ranked: DeepCutScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: DeepCutScored[] = [];
   const items = new Map<ItemKey, ItemFields>();
@@ -118,12 +130,11 @@ async function scoreTop(
       chunk,
       (id) => {
         const item = display.get(keyFromNumber(id));
-        return (
-          item && {
-            supporterCount: item.supporterCount,
-            compilation: input.ignoreCompilations && item.compilation,
-          }
-        );
+        if (!item || !excluded.allows(item)) return undefined;
+        return {
+          supporterCount: item.supporterCount,
+          compilation: input.ignoreCompilations && item.compilation,
+        };
       },
       options,
     );

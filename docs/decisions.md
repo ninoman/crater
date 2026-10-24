@@ -203,7 +203,7 @@ Code: `crateMateBoosts` in `src/scoring/alsoBought.ts`; `gatherAlsoBought` reads
 
 - The worker scores on request (`getAlsoBought`, when the sidebar opens or after a hide). It also re-scores **watched releases** (the ones open in tabs, §5) after every 5 supporters scanned, after the last supporter, and when the supporter list is complete. Results go out as the `alsoBought` event. The 5-fan counter lives in memory, so a killed worker restarts it from zero.
 - `releaseOpened` now carries the page's parsed `ReleasePageItem`, and the worker saves it. Scoring and the fallback therefore know the release before its scan job runs, even while the queue is paused.
-- **Hidden releases** live in the `hidden` store, keyed by matchKey (so hiding an album hides its tracks too). Every scorer must respect them. There's no "unhide" yet; that's Phase 7 (popup).
+- **Hidden releases** live in the `hidden` store, keyed by matchKey (so hiding an album hides its tracks too). Every scorer must respect them. There's no "unhide" yet; that's Phase 7 (popup). *Changed 2026-10-24: artists and labels can be hidden too, and the popup can unhide (§22).*
 - **Parser broken:** the scanner records the last `ParserError` as `parserError` in its state. It's cleared when a job of the same kind succeeds, so one odd page doesn't look like a broken parser for good. The sidebar shows "Parser broken" in place of an empty list, or as a notice above existing rows. The popup shows it too.
 
 ### Gaps
@@ -846,3 +846,57 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 - On release pages the prompts mount in a shadow root of their own, since the sidebar renders nothing inside while collapsed.
 - **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
 - **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.
+
+## 22. Hide, heard and play-through
+
+Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Research: ideas #4, #2 and #7, and "How #2 and #4 fit together", in `docs/research/bandcamp-user-needs.md`, which this follows. Code: `scoring/exclusions.ts`, `db/repo/hidden.ts`, `heard.ts`, `sellers.ts`, `background/hideHeardHandlers.ts`, `background/recommend/hideScopes.ts`, `shared/heard.ts`, `shared/playQueue.ts`, `hooks/useListPlayer.ts`, `useBandcampPlays.ts`, `rowActions.ts`, `src/ui/Menu`, `HeardBadge`, `PlayQueueBar`, `popup/HiddenList.tsx`. Tested on synthetic data and the fixtures (jsdom); not yet tried live.
+
+### Hide and heard stay apart
+
+- **Hide is a verdict, heard a state.** A hide takes a release, an artist or a label out of every recommender for good, until unhidden in the popup. Heard only marks a release you've listened to: it stays in with a badge and a dimmed cover, unless that list's *Hide heard* is on.
+- **Hide wins.** A hidden release never shows, heard or not. Unhiding leaves its heard mark as it was.
+- **Both filter in the worker, before the list is cut to length**, so *Hide heard* still returns a full list. `exclusions(mine, hidden, { release, heard })` takes the heard set only when the request asks (`getForYou { mode, hideHeard }`, likewise `getAlsoBought` and `getCrateMatesLatest`).
+- **Heard is not a scoring signal.** "Heard but never wishlisted" might be a soft negative later, only if the eval shows it helps.
+
+### Storage (schema v14)
+
+- **`hides: '[kind+key]'`** replaces `hidden`. Releases are keyed by matchKey, artists and labels by their band account id, with the name they had when hidden, for the Hidden list. Dexie can't change a primary key in place, so v14 copies `hidden` into `hides` and drops it, like the v13 rename (§20).
+- **Older backups.** `TABLES_RENAMED` maps `hidden` to `hides` as of v14, and `replaceAll` reshapes those rows as it imports them (`upgradeHide`, the same function the Dexie upgrade uses). `migrateRows` runs after writing, which is too late: an old row has no `[kind+key]`, so it can't be written at all. Import accepts the changed primary key the file names. The v11 golden backup has a hidden release, so the golden tests cover both the upgrade and the import.
+- **`heard: 'matchKey'`**: `{ matchKey, heardAt, source }`, source `preview`, `bandcamp` or `manual`. A track of an album marks the album, from its stored record or, for previews, from the page (`current.album_id`). Marking again keeps the first time and source. Added in v14 (`TABLES_ADDED`), so older backups restore without it.
+- Clear data and the full backup include both. Nothing is pruned: a hide or heard row is ~50 bytes.
+
+### Artists and labels
+
+- **The menu:** *This release*, *Everything by &lt;artist&gt;*, *Everything on &lt;label&gt;*, each only where the account is known (`hideScopes`, pure):
+  - With a `labelId` the release is sold from the artist's own account (§1, §3.3), so `bandId` is the artist and `labelId` the label.
+  - Without one, the seller is the artist's account unless its stored items name other artists (compilations aside). Then it's a label's own account: there's no artist option, since hiding "everything by" that account would hide the whole label, and the label option names its host (`hyperdub`), since its name isn't known.
+  - That check reads at most 25 items per seller (`multiArtistSellers`). Reading whole catalogs took Also bought's re-score from 62 to 217 ms in `pnpm perf`; with the sample it's 67 ms.
+- **The check is per item, not ids:** an artist or label hide must catch releases scanned after it, so `exclusions` returns `allows(item)` beside the ids. A hidden artist matches `bandId`; a hidden label matches `labelId` or `bandId`, since a label sells either way.
+  - For you and Deep cuts check the record they already read per chunk. Crate mates' latest checks the shown records, and now reads more until its 50 rows are full.
+  - Also bought's co-owned scoring reads no records, so it reads the chunk's (`getShownFields`) only when an artist or label is hidden (`checksSellers`). Its same-artist and same-label picks are filtered too.
+- **Gap:** a label account whose first 25 stored items are one artist is offered as that artist. Hiding it hides the label's account.
+
+### When a play counts as heard
+
+- **30 seconds of listening to a release**, summed over its tracks while playing. Seeks don't count: a step between time updates over 2 s, or after a pause or `seeking`, is skipped. A track that ends after at least half of it was heard also counts, for releases of short tracks.
+- **Why 30 s:** it's the threshold streaming services count a play at, long enough that a mis-click or a quick skim doesn't count, short enough that sampling a release does. A 10-second preview proves little either way, which is why heard is a state and not a verdict.
+- **Our preview player** (`usePreviewPlayer`) sends `markHeard` itself, so every preview counts, wishlist cards included; lists also flag the row at once.
+- **Bandcamp's player** on release pages: `useBandcampPlays` listens on `document` in the capture phase, since media events don't bubble. Our own preview's audio element isn't in the page and our shadow roots' events aren't composed, so only Bandcamp's player reaches it. Mounted with the tag prompts, which never collapse.
+- **Gap, untested live:** if Bandcamp's player keeps its `<audio>` out of the document, no events reach us. Then we'd need a main-world script hooking `HTMLMediaElement.prototype.play`.
+
+### Play through a list
+
+- **One player per list** (`useListPlayer`): the pure queue (`shared/playQueue.ts`) over the visible rows, and one `usePreviewPlayer` whose URL is the current row's. A cover starts the queue at that row; a release's last track ending moves on to the next row, and the last row stops it. *Play all* starts at the top.
+- **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is.
+- **Keys while playing:** K play / pause, N next, P previous, Esc stop, on `document`, left alone while typing or with a modifier held. Space stays Bandcamp's.
+- **Autoplay:** moving on starts the next release without a click. Chrome allows it because the page has had a user gesture (the first play).
+- Lists: For you (every mode), Also bought and Crate mates' latest. The wishlist and the follows digest belong to other branches; `HeardBadge` and `Cover`'s `dimmed` are there for the wishlist grid after the merge.
+
+### UI
+
+- **`Menu`** wraps Radix's dropdown and portals into the shadow root, like `Tooltip`. Arrow keys move, Enter picks, Escape closes and refocuses the trigger.
+- *Hide heard* is a checkbox in each list's toolbar, kept per list in `chrome.storage.local` and shown in every state. An empty list with it on says so and offers *Show heard releases*.
+- Rows: a heard button (`aria-pressed`) next to the hide menu, and `HeardBadge` under the meta lines.
+- **Popup:** a *Hidden* tab lists every hide, newest first, release names looked up from `items`, with Unhide.
+- **Also bought's pushed re-scores** keep heard releases in. With *Hide heard* on, the sidebar asks again instead of showing the push.
+

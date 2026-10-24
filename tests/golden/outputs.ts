@@ -66,19 +66,20 @@ export async function collectOutputs(db: DigheadDb): Promise<unknown> {
       latelyHalfLifeMonths: DEFAULT_SETTINGS.latelyHalfLifeMonths,
       followingBoost: true,
       ignoreCompilations: true,
+      hideHeard: false,
       now: NOW,
     });
   }
   out.deepCuts = await computeDeepCuts(db, me, {
     maxSupporters: DEFAULT_SETTINGS.deepCutMaxSupporters,
     ignoreCompilations: true,
+    hideHeard: false,
   });
-  out.crateMatesLatest = await computeCrateMatesLatest(
-    db,
-    me,
-    DEFAULT_SETTINGS.topCrateMatesK,
-    NOW,
-  );
+  out.crateMatesLatest = await computeCrateMatesLatest(db, me, {
+    topCrateMatesK: DEFAULT_SETTINGS.topCrateMatesK,
+    hideHeard: false,
+    now: NOW,
+  });
   out.pageBadges = await pageBadges(
     db,
     [

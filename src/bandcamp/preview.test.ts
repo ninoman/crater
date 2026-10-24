@@ -9,6 +9,7 @@ describe('parseReleasePreview', () => {
 
     expect(preview.tracks.length).toBeGreaterThan(1);
     expect(preview.startIndex).toBe(0);
+    expect(preview.matchKey).toMatch(/^a\d+$/);
     expect(preview.tracks[0]).toEqual({
       title: 'Movement 1',
       duration: 384.152,
@@ -26,7 +27,10 @@ describe('parseReleasePreview', () => {
 
   it('reads the single track of a track page', () => {
     const preview = parseReleasePreview(fixtureText('track-page.html'));
+    const album = parseReleasePreview(fixtureText('album-page.html'));
     expect(preview.tracks).toHaveLength(1);
+    // The fixture's track is on the album fixture, so a play of it marks the album heard.
+    expect(preview.matchKey).toBe(album.matchKey);
     expect(preview.tracks[0]?.title).toBe('Movement 1');
   });
 
@@ -45,6 +49,7 @@ describe('parseReleasePreview', () => {
 
     expect(preview.tracks.map((t) => t.title)).toEqual(['One', 'Three']);
     expect(preview.startIndex).toBe(1);
+    expect(preview.matchKey).toBeNull();
   });
 
   it('throws a ParserError without data-tralbum', () => {

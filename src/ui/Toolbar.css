@@ -1,0 +1,14 @@
+.dh-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dh-space-2);
+  margin-bottom: var(--dh-space-2);
+}
+
+/* Filters sit at the end, even when nothing comes before them. */
+.dh-toolbar > :last-child:not(:first-child),
+.dh-toolbar > :only-child {
+  margin-left: auto;
+}

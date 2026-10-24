@@ -3,7 +3,8 @@
 import type { ItemKey } from '../../bandcamp';
 import type { DigheadDb, FanMatchesRecord, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
-import { hiddenMatchKeys } from './hidden';
+import { heardKeys } from './heard';
+import { type HiddenSets, hiddenSets } from './hidden';
 import { queuedFans } from './queue';
 
 export interface CrateMatesLatestData {
@@ -11,7 +12,9 @@ export interface CrateMatesLatestData {
   crateMateLists: Pick<FanMatchesRecord, 'fanId' | 'matchIds' | 'matchTimes'>[];
   /** Your own ownership rows, collection and wishlist. */
   mine: OwnershipRecord[];
-  hidden: Set<ItemKey>;
+  hidden: HiddenSets;
+  /** matchKeys you've heard: for the rows' badge, and for "Hide heard". */
+  heard: Set<ItemKey>;
   /** Crate mates with a scan waiting. */
   queued: Set<number>;
 }
@@ -21,11 +24,13 @@ export async function gatherCrateMatesLatest(
   crateMateFanIds: readonly number[],
   meFanId: number,
 ): Promise<CrateMatesLatestData> {
-  return db.transaction('r', [db.fanMatches, db.ownership, db.hidden, db.queue], async () => {
-    const [lists, mine, hidden, queued] = await Promise.all([
+  const tables = [db.fanMatches, db.ownership, db.hides, db.heard, db.queue];
+  return db.transaction('r', tables, async () => {
+    const [lists, mine, hidden, heard, queued] = await Promise.all([
       db.fanMatches.bulkGet([...crateMateFanIds]),
       fanRows(db, meFanId),
-      hiddenMatchKeys(db),
+      hiddenSets(db),
+      heardKeys(db),
       queuedFans(db, crateMateFanIds),
     ]);
     const crateMateLists = lists.flatMap((record) =>
@@ -33,6 +38,6 @@ export async function gatherCrateMatesLatest(
         ? [{ fanId: record.fanId, matchIds: record.matchIds, matchTimes: record.matchTimes }]
         : [],
     );
-    return { crateMateLists, mine, hidden, queued };
+    return { crateMateLists, mine, hidden, heard, queued };
   });
 }

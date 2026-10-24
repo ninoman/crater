@@ -1,6 +1,7 @@
 // Shapes of For-you results, shared by the worker and the profile page.
 
 import type { ItemKey } from '../bandcamp';
+import type { HideScopes } from './hide';
 import type { CrateMatesBasis } from './crateMates';
 
 /**
@@ -31,6 +32,10 @@ export interface ForYouRow {
   lastBoughtAt: number | null;
   /** The artist or label you follow behind it, when that lifted it (decisions §16). */
   followed: string | null;
+  /** You've heard it: badged and dimmed, or left out with "Hide heard" (decisions §22). */
+  heard: boolean;
+  /** The artist and label its hide menu offers. */
+  hide: HideScopes;
 }
 
 export interface ForYouResult {

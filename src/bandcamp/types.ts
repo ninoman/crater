@@ -159,6 +159,8 @@ export interface PreviewTrack {
 }
 
 export interface ReleasePreview {
+  /** What a play of it marks heard: the album for an album's track (decisions §3.8, §22). */
+  matchKey: ItemKey | null;
   tracks: PreviewTrack[];
   /** The track Bandcamp features on the page, where playback starts. */
   startIndex: number;

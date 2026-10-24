@@ -131,7 +131,7 @@ afterAll(async () => {
 });
 
 it(`scores Deep cuts over a ${DEEP_CUT_CRATE_MATES_K}-crate-mate board in under ${BUDGET_MS} ms`, async () => {
-  const input = { maxSupporters: CAP, ignoreCompilations: true };
+  const input = { maxSupporters: CAP, ignoreCompilations: true, hideHeard: false };
   await computeDeepCuts(db, me, input); // warm-up
 
   const times: number[] = [];
@@ -158,7 +158,7 @@ it(`scores Deep cuts over a ${DEEP_CUT_CRATE_MATES_K}-crate-mate board in under 
   const scoreOf = new Map(board.map((t) => [t.fanId, t.score]));
   const owned = crateMateOwnership(
     data.crateMateLists.map((l) => ({ score: scoreOf.get(l.fanId) ?? 0, matches: l.matchIds })),
-    exclusions(data.mine, data.hidden),
+    exclusions(data.mine, data.hidden).ids,
   );
   const counts = new Map(
     (await db.items.toArray()).map((item) => [keyToNumber(item.itemKey), item.supporterCount]),
@@ -199,6 +199,7 @@ it(`scores For you over the top ${DEFAULT_SETTINGS.topCrateMatesK} crate mates i
     latelyHalfLifeMonths: DEFAULT_SETTINGS.latelyHalfLifeMonths,
     followingBoost: true,
     ignoreCompilations: true,
+    hideHeard: false,
     now: 0,
   };
   const ms = await median(() => computeForYou(db, me, input));

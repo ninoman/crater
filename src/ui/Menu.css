@@ -1,0 +1,38 @@
+.dh-menu {
+  z-index: var(--dh-z-popover);
+  min-width: var(--dh-menu-width);
+  padding: var(--dh-space-1);
+  border: 1px solid var(--dh-color-border);
+  border-radius: var(--dh-radius-md);
+  background: var(--dh-color-bg);
+  box-shadow: var(--dh-shadow-panel);
+  font-family: var(--dh-font);
+  font-size: var(--dh-text-sm);
+  line-height: var(--dh-leading);
+  color: var(--dh-color-text);
+}
+
+.dh-menu__title {
+  padding: var(--dh-space-1) var(--dh-space-2);
+  font-size: var(--dh-text-xs);
+  font-weight: var(--dh-weight-bold);
+  color: var(--dh-color-muted);
+}
+
+.dh-menu__item {
+  padding: var(--dh-space-1) var(--dh-space-2);
+  border-radius: var(--dh-radius-sm);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+/* Radix moves focus between items and marks the current one, by mouse or keyboard alike. */
+.dh-menu__item[data-highlighted] {
+  background: var(--dh-color-bg-hover);
+}
+
+.dh-menu__item:focus-visible {
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: -2px;
+}

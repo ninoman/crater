@@ -1,0 +1,10 @@
+.dh-heard-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dh-heard-badge .dh-icon {
+  width: var(--dh-text-xs);
+  height: var(--dh-text-xs);
+}

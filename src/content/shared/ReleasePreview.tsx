@@ -10,11 +10,15 @@ export interface ReleasePreviewProps {
 /** An open preview under a release row. Mount it only while previewing: it plays on mount. */
 export function ReleasePreview({ url, name }: ReleasePreviewProps) {
   const { view, toggle, seek } = usePreviewPlayer(url);
-  return <AudioPlayer state={playerState(view)} label={name} onToggle={toggle} onSeek={seek} />;
+  return (
+    <AudioPlayer state={previewPlayerState(view)} label={name} onToggle={toggle} onSeek={seek} />
+  );
 }
 
-function playerState(view: PreviewPlayerView): AudioPlayerState {
+/** The player's view as AudioPlayer draws it. Idle shows as loading: it's about to start. */
+export function previewPlayerState(view: PreviewPlayerView): AudioPlayerState {
   switch (view.state) {
+    case 'idle':
     case 'loading':
       return { kind: 'loading' };
     case 'error':

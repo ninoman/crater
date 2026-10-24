@@ -149,7 +149,11 @@ describe('DigheadDb', () => {
     old.close();
 
     const upgraded = new DigheadDb(name);
-    expect(await upgraded.hidden.get('a1')).toEqual({ matchKey: 'a1', hiddenAt: 5 });
+    expect(await upgraded.hides.get(['release', 'a1'])).toEqual({
+      kind: 'release',
+      key: 'a1',
+      hiddenAt: 5,
+    });
     expect(await upgraded.following.count()).toBe(0);
     expect(await upgraded.tags.count()).toBe(0);
     await upgraded.delete();
@@ -238,6 +242,33 @@ describe('DigheadDb', () => {
     expect(await upgraded.latelyCrateMates.toArray()).toEqual([{ fanId: 2, lately: 0.5 }]);
     expect(upgraded.tables.map((table) => table.name)).not.toContain('twins');
     expect([...upgraded.backendDB().objectStoreNames]).not.toContain('latelyTwins');
+    await upgraded.delete();
+  });
+
+  it('moves v13 hidden releases into hides as release hides in v14, next to an empty heard', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(13).stores({ hidden: 'matchKey' });
+    await old.table('hidden').bulkAdd([
+      { matchKey: 'a1', hiddenAt: 5 },
+      { matchKey: 't2', hiddenAt: 7 },
+    ]);
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+    expect(await upgraded.hides.toArray()).toEqual([
+      { kind: 'release', key: 'a1', hiddenAt: 5 },
+      { kind: 'release', key: 't2', hiddenAt: 7 },
+    ]);
+    expect(await upgraded.heard.count()).toBe(0);
+    expect([...upgraded.backendDB().objectStoreNames]).not.toContain('hidden');
+    // Artists and labels share the store, keyed apart by kind.
+    await upgraded.hides.bulkAdd([
+      { kind: 'band', key: 1, name: 'Artist', hiddenAt: 9 },
+      { kind: 'label', key: 1, name: 'Label', hiddenAt: 9 },
+    ]);
+    expect(await upgraded.hides.count()).toBe(4);
     await upgraded.delete();
   });
 });

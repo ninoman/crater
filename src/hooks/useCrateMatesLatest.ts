@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ItemKey } from '../bandcamp';
-import { sendMessage } from '../shared/messages';
 import type { CrateMatesLatestResult } from '../shared/crateMatesLatest';
+import { sendMessage } from '../shared/messages';
+import { type RowActions, useRowActions } from './rowActions';
 
 export type CrateMatesLatestView =
   | { state: 'loading' }
@@ -9,23 +9,21 @@ export type CrateMatesLatestView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches Crate mates' latest once on mount. `hide` drops a row and re-fetches; `reload` asks again,
- * e.g. after an error.
+ * Fetches Crate mates' latest on mount and whenever `hideHeard` changes. `hide` drops the rows
+ * it covers and re-fetches; `reload` asks again, e.g. after an error.
  */
-export function useCrateMatesLatest(): {
-  view: CrateMatesLatestView;
-  reload: () => void;
-  hide: (matchKey: ItemKey) => void;
-} {
+export function useCrateMatesLatest(
+  hideHeard: boolean,
+): RowActions & { view: CrateMatesLatestView; reload: () => void } {
   const [view, setView] = useState<CrateMatesLatestView>({ state: 'loading' });
 
   const load = useCallback(
     () =>
-      sendMessage('getCrateMatesLatest', {}).then(
+      sendMessage('getCrateMatesLatest', { hideHeard }).then(
         (result) => setView({ state: 'ready', result }),
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       ),
-    [],
+    [hideHeard],
   );
 
   useEffect(() => {
@@ -37,25 +35,11 @@ export function useCrateMatesLatest(): {
     void load();
   }, [load]);
 
-  const hide = useCallback(
-    (matchKey: ItemKey) => {
-      setView((current) =>
-        current.state === 'ready'
-          ? {
-              state: 'ready',
-              result: {
-                ...current.result,
-                rows: current.result.rows.filter((row) => row.matchKey !== matchKey),
-              },
-            }
-          : current,
-      );
-      sendMessage('hideRelease', { matchKey }).then(load, (error: unknown) =>
-        setView({ state: 'unreachable', error: String(error) }),
-      );
-    },
-    [load],
+  const fail = useCallback(
+    (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
+    [],
   );
+  const actions = useRowActions(setView, load, fail);
 
-  return { view, reload, hide };
+  return { view, reload, ...actions };
 }

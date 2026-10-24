@@ -1,6 +1,7 @@
 // Shapes of the Crate mates' latest feed, shared by the worker and the profile page.
 
 import type { ItemKey } from '../bandcamp';
+import type { HideScopes } from './hide';
 import type { CrateMatesBasis } from './crateMates';
 
 /** A crate mate who bought a release in the feed. */
@@ -23,6 +24,10 @@ export interface CrateMatesLatestRow {
   boughtAt: number;
   /** Who bought it in the window, lately board first. */
   buyers: LatestBuyer[];
+  /** You've heard it: badged and dimmed, or left out with "Hide heard" (decisions §22). */
+  heard: boolean;
+  /** The artist and label its hide menu offers. */
+  hide: HideScopes;
 }
 
 export interface CrateMatesLatestResult {

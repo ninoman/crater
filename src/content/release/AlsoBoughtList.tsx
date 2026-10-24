@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import type { ItemKey } from '../../bandcamp';
+import type { ReactNode } from 'react';
+import type { RowActions } from '../../hooks/rowActions';
 import type { AlsoBoughtView } from '../../hooks/useAlsoBought';
+import { useListPlayer } from '../../hooks/useListPlayer';
 import type { ScanProgressView } from '../../hooks/useScanProgress';
-import { EmptyState, RowList } from '../../ui';
+import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
+import { EmptyState, RowList, Toolbar } from '../../ui';
+import { HideHeardToggle, PlayThrough, rowControls } from '../shared/RowControls';
 import { AlsoBoughtRow } from './AlsoBoughtRow';
 import { Gathering } from './Gathering';
 import { WarmupProgress } from './WarmupProgress';
@@ -14,19 +17,69 @@ export interface AlsoBoughtListProps {
   scanStopped: boolean;
   /** The first wait is over: during the warm-up, show the picks so far instead of the loader. */
   showEarly: boolean;
-  onHide: (matchKey: ItemKey) => void;
+  actions: RowActions;
+  /** Heard releases are left out (decisions §22). The switch shows in every state. */
+  hideHeard: boolean;
+  onHideHeardChange: (hideHeard: boolean) => void;
 }
 
-/** The recommendations, or why there aren't any yet. */
+const NO_ROWS: readonly RowData[] = [];
+
+/** The recommendations, played one at a time or through in order, or why there aren't any yet. */
 export function AlsoBoughtList({
   view,
   progress,
   scanStopped,
   showEarly,
-  onHide,
+  actions,
+  hideHeard,
+  onHideHeardChange,
 }: AlsoBoughtListProps) {
-  const [previewing, setPreviewing] = useState<ItemKey | null>(null);
+  const shown = shownRows(view, showEarly);
+  const player = useListPlayer(shown?.rows ?? NO_ROWS, (matchKey) =>
+    actions.setHeard(matchKey, true, false),
+  );
 
+  return (
+    <>
+      <Toolbar>
+        {shown && <PlayThrough player={player} />}
+        <HideHeardToggle checked={hideHeard} onChange={onHideHeardChange} />
+      </Toolbar>
+      <Body view={view} progress={progress} scanStopped={scanStopped} showEarly={showEarly}>
+        {shown && (
+          <RowList label={shown.label}>
+            {shown.rows.map((row) => (
+              <AlsoBoughtRow key={row.matchKey} row={row} {...rowControls(row, player, actions)} />
+            ))}
+          </RowList>
+        )}
+      </Body>
+    </>
+  );
+}
+
+/** The rows on show and the list's name, or null while none are. */
+function shownRows(
+  view: AlsoBoughtView,
+  showEarly: boolean,
+): { rows: readonly RowData[]; label: string } | null {
+  if (view.state !== 'ready' || view.result.rows.length === 0) return null;
+  const { rows, warmup } = view.result;
+  if (!warmup) return { rows, label: 'Also bought' };
+  return showEarly ? { rows, label: 'Early picks' } : null;
+}
+
+interface BodyProps {
+  view: AlsoBoughtView;
+  progress: ScanProgressView;
+  scanStopped: boolean;
+  showEarly: boolean;
+  /** The list, when there are rows to show. */
+  children: ReactNode;
+}
+
+function Body({ view, progress, scanStopped, showEarly, children }: BodyProps) {
   if (view.state === 'loading') return <Gathering title="Loading recommendations…" />;
   if (view.state === 'unreachable') {
     return (
@@ -38,20 +91,6 @@ export function AlsoBoughtList({
     );
   }
   const { rows, warmup } = view.result;
-  const list = (label: string) => (
-    <RowList label={label}>
-      {rows.map((row) => (
-        <AlsoBoughtRow
-          key={row.matchKey}
-          row={row}
-          previewing={previewing === row.matchKey}
-          onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
-          onHide={() => onHide(row.matchKey)}
-        />
-      ))}
-    </RowList>
-  );
-
   if (warmup) {
     const early = showEarly && rows.length > 0;
     // Before the supporter list is in there's nothing to warm up yet: say what we're waiting for.
@@ -60,12 +99,12 @@ export function AlsoBoughtList({
     return (
       <>
         <WarmupProgress warmup={warmup} scanStopped={scanStopped} early={early} />
-        {early && list('Early picks')}
+        {early && children}
       </>
     );
   }
   if (rows.length === 0) return <Waiting progress={progress} scanStopped={scanStopped} />;
-  return list('Also bought');
+  return children;
 }
 
 /** A wait the scan will end, or a final answer that it won't change. */

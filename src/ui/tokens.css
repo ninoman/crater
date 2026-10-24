@@ -72,6 +72,8 @@
   --dh-chip-height: 20px;
   --dh-picker-width: 220px;
   --dh-picker-list-height: 200px;
+  --dh-menu-width: 200px;
+  --dh-heard-opacity: 0.45;
   --dh-duration: 120ms;
   --dh-duration-reveal: 180ms;
   --dh-duration-shimmer: 1400ms;

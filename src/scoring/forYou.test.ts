@@ -36,7 +36,11 @@ describe('For-you scoring', () => {
     { itemKey: 'a11', matchKey: 'a11', source: 'wishlist' },
     { itemKey: 't41', matchKey: 'a4', source: 'wishlist' },
   ];
-  const excluded = exclusions(mine, new Set<ItemKey>(['a20']));
+  const excluded = exclusions(mine, {
+    releases: new Set<ItemKey>(['a20']),
+    bands: new Set(),
+    labels: new Set(),
+  }).ids;
   const crateMates: CrateMateMatches[] = [
     { score: 3, matches: list('a1', 'a2', 'a10', 't7', 'a20') },
     { score: 2, matches: list('a1', 'a3', 'a10', 'a11') },

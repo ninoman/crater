@@ -14,10 +14,13 @@ import disclosure from './Disclosure.css?inline';
 import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
 import identity from './Identity.css?inline';
+import heardBadge from './HeardBadge.css?inline';
 import infoHint from './InfoHint.css?inline';
 import loadMore from './LoadMore.css?inline';
+import menu from './Menu.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
+import playQueueBar from './PlayQueueBar.css?inline';
 import playableCover from './PlayableCover.css?inline';
 import progress from './Progress.css?inline';
 import releaseRow from './ReleaseRow.css?inline';
@@ -32,6 +35,7 @@ import table from './Table.css?inline';
 import tagPicker from './TagPicker.css?inline';
 import tabs from './Tabs.css?inline';
 import tokens from './tokens.css?inline';
+import toolbar from './Toolbar.css?inline';
 import tooltip from './Tooltip.css?inline';
 
 export const uiStyles = [
@@ -67,6 +71,10 @@ export const uiStyles = [
   sectionHeading,
   disclosure,
   loadMore,
+  menu,
+  heardBadge,
+  playQueueBar,
+  toolbar,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

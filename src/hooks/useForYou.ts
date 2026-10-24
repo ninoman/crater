@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ItemKey } from '../bandcamp';
 import type { ForYouMode, ForYouResult } from '../shared/forYou';
 import { sendMessage } from '../shared/messages';
+import { type RowActions, useRowActions } from './rowActions';
 
 export type ForYouView =
   | { state: 'loading' }
@@ -10,14 +10,14 @@ export type ForYouView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches For you in `mode`, again whenever the mode changes. `hide` drops a row and
- * re-fetches, so the next pick moves up; `reload` asks again, e.g. after an error.
+ * Fetches For you in `mode`, again whenever the mode or `hideHeard` changes. `hide` drops the
+ * rows it covers and re-fetches, so the next picks move up; `reload` asks again, e.g. after an
+ * error.
  */
-export function useForYou(mode: ForYouMode): {
-  view: ForYouView;
-  reload: () => void;
-  hide: (matchKey: ItemKey) => void;
-} {
+export function useForYou(
+  mode: ForYouMode,
+  hideHeard: boolean,
+): RowActions & { view: ForYouView; reload: () => void } {
   const [view, setView] = useState<ForYouView>({ state: 'loading' });
   // Only the newest request may set the view, so a slow answer for the old mode can't win.
   const latest = useRef(0);
@@ -27,11 +27,11 @@ export function useForYou(mode: ForYouMode): {
     const settle = (next: ForYouView) => {
       if (request === latest.current) setView(next);
     };
-    sendMessage('getForYou', { mode }).then(
+    sendMessage('getForYou', { mode, hideHeard }).then(
       (result) => settle({ state: 'ready', result, loadedAt: Date.now() }),
       (error: unknown) => settle({ state: 'unreachable', error: String(error) }),
     );
-  }, [mode]);
+  }, [mode, hideHeard]);
 
   useEffect(() => {
     setView({ state: 'loading' });
@@ -43,25 +43,11 @@ export function useForYou(mode: ForYouMode): {
     load();
   }, [load]);
 
-  const hide = useCallback(
-    (matchKey: ItemKey) => {
-      setView((current) =>
-        current.state === 'ready'
-          ? {
-              ...current,
-              result: {
-                ...current.result,
-                rows: current.result.rows.filter((row) => row.matchKey !== matchKey),
-              },
-            }
-          : current,
-      );
-      sendMessage('hideRelease', { matchKey }).then(load, (error: unknown) =>
-        setView({ state: 'unreachable', error: String(error) }),
-      );
-    },
-    [load],
+  const fail = useCallback(
+    (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
+    [],
   );
+  const actions = useRowActions(setView, load, fail);
 
-  return { view, reload, hide };
+  return { view, reload, ...actions };
 }

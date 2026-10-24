@@ -11,7 +11,7 @@ import {
   fanJob,
   finishFanScan,
   forgetFansNotSeenSince,
-  hideRelease,
+  hide,
   markQuickRead,
   markSynced,
   putFollowing,
@@ -222,7 +222,7 @@ export async function buildScenario(db: DigheadDb): Promise<void> {
       followedAt: NOW,
     },
   ]);
-  await hideRelease(db, albumKey(30), NOW);
+  await hide(db, { kind: 'release', matchKey: albumKey(30) }, NOW);
   await enqueueAt(
     db,
     a0Fans

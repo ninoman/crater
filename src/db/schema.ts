@@ -2,6 +2,7 @@
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
 import { isCompilation, type ItemKey } from '../bandcamp';
+import type { HeardSource } from '../shared/heard';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
 
@@ -129,10 +130,26 @@ export interface MatchOwnersRecord {
   owners: number;
 }
 
-/** A release you hid from recommendations. Keyed by matchKey, so it hides tracks of it too. */
-export interface HiddenRecord {
+/**
+ * Something you hid from recommendations (decisions §22), keyed by `[kind+key]`. A release is
+ * keyed by matchKey, so it hides tracks of it too. An artist or a label by its band account id,
+ * with the name it had when hidden, for the Hidden list.
+ */
+export type HideRecord =
+  | { kind: 'release'; key: ItemKey; hiddenAt: number }
+  | { kind: 'band' | 'label'; key: number; name: string; hiddenAt: number };
+
+/** A hidden release as stored up to v13, keyed by matchKey alone. */
+export interface HiddenV13 {
   matchKey: ItemKey;
   hiddenAt: number;
+}
+
+/** A release you've heard (decisions §22). Keyed by matchKey, like hides. */
+export interface HeardRecord {
+  matchKey: ItemKey;
+  heardAt: number;
+  source: HeardSource;
 }
 
 export interface ReleaseSupportersRecord {
@@ -277,17 +294,29 @@ export function flagCompilation(item: StoredItem): void {
   item.compilation ??= isCompilation(item);
 }
 
+/**
+ * A hide row in the v14 shape. Rows from before it were releases keyed by matchKey; the Dexie
+ * upgrade and importing an older backup both bring them through here.
+ */
+export function upgradeHide(row: HideRecord | HiddenV13): HideRecord {
+  if ('kind' in row) return row;
+  return { kind: 'release', key: row.matchKey, hiddenAt: row.hiddenAt };
+}
+
 /** Tables newer than the oldest restorable backup, by the version that added them. */
 export const TABLES_ADDED: Readonly<Record<string, number>> = {
   latelyCrateMates: 7,
   itemTags: 9,
   bands: 12,
+  heard: 14,
 };
 
 /** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
 export const TABLES_RENAMED: Readonly<Record<string, { to: string; version: number }>> = {
   twins: { to: 'crateMates', version: 13 },
   latelyTwins: { to: 'latelyCrateMates', version: 13 },
+  // A new primary key, which Dexie can't change in place; rows go through upgradeHide.
+  hidden: { to: 'hides', version: 14 },
 };
 
 export class DigheadDb extends Dexie {
@@ -303,7 +332,8 @@ export class DigheadDb extends Dexie {
   queue!: EntityTable<QueueJob, 'id'>;
   fanMatches!: EntityTable<FanMatchesRecord, 'fanId'>;
   matchOwners!: EntityTable<MatchOwnersRecord, 'matchId'>;
-  hidden!: EntityTable<HiddenRecord, 'matchKey'>;
+  hides!: Table<HideRecord, [HideRecord['kind'], HideRecord['key']]>;
+  heard!: EntityTable<HeardRecord, 'matchKey'>;
   following!: Table<FollowingRecord, FollowingKey>;
   tags!: EntityTable<TagRecord, 'id'>;
   itemTags!: EntityTable<ItemTagsRecord, 'itemKey'>;
@@ -406,9 +436,17 @@ export class DigheadDb extends Dexie {
         latelyTwins: null,
       })
       .upgrade(async (tx) => {
-        for (const [from, { to }] of Object.entries(TABLES_RENAMED)) {
-          await tx.table(to).bulkPut(await tx.table(from).toArray());
+        for (const [from, { to, version }] of Object.entries(TABLES_RENAMED)) {
+          if (version === 13) await tx.table(to).bulkPut(await tx.table(from).toArray());
         }
+      });
+    // v14: hides of whole artists and labels next to releases, and heard releases (§22). The
+    // primary key changes, so `hidden` is copied into `hides` and dropped, as in v13.
+    this.version(14)
+      .stores({ hides: '[kind+key]', heard: 'matchKey', hidden: null })
+      .upgrade(async (tx) => {
+        const old = await tx.table<HiddenV13>('hidden').toArray();
+        await tx.table('hides').bulkPut(old.map(upgradeHide));
       });
   }
 }

@@ -16,3 +16,9 @@
   height: auto;
   aspect-ratio: 1;
 }
+
+/* A heard release stays in the list but steps back (decisions §22). */
+.dh-cover--dimmed {
+  opacity: var(--dh-heard-opacity);
+  transition: opacity var(--dh-duration);
+}

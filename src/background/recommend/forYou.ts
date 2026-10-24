@@ -15,7 +15,7 @@ import {
   type MeRecord,
 } from '../../db';
 import { discountCompilations } from '../../scoring/compilations';
-import { exclusions } from '../../scoring/exclusions';
+import { type Exclusions, exclusions } from '../../scoring/exclusions';
 import { boostFollowed, maxFollowFactor } from '../../scoring/following';
 import {
   bestCrateMateRank,
@@ -36,6 +36,7 @@ import { supporters } from '../../scoring/weights';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
 import { loadFollowedReleases } from './followSignal';
 import { listsInRankOrder, toRow } from './forYouRow';
+import { loadHideScopes } from './hideScopes';
 import { crateMatesBasis } from './crateMateRows';
 
 /** Ranked before diversifying, so artists' moved-down extras leave room for others. */
@@ -55,6 +56,8 @@ export interface ForYouInput {
   followingBoost: boolean;
   /** Down-weight compilations among the picks (decisions §17). */
   ignoreCompilations: boolean;
+  /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
+  hideHeard: boolean;
   now: number;
 }
 
@@ -72,12 +75,18 @@ export async function computeForYou(
     crateMates.map((crateMate) => crateMate.fanId),
     me.fanId,
   );
-  const candidates = candidatesFor(input, crateMates, data);
+  const excluded = exclusions(data.mine, data.hidden, {
+    heard: input.hideHeard ? data.heard : undefined,
+  });
+  const candidates = candidatesFor(input, crateMates, data, excluded.ids);
   const lastBought = new Map<number, number>();
   for (const c of candidates) if ('lastBoughtAt' in c) lastBought.set(c.id, c.lastBoughtAt);
 
   const followed = await loadFollowedReleases(db, input.followingBoost);
-  const { ranked, items } = await scoreTop(db, candidates, followed, input.ignoreCompilations);
+  const { ranked, items } = await scoreTop(db, candidates, followed, {
+    ignoreCompilations: input.ignoreCompilations,
+    excluded,
+  });
   const supportersOf = new Map(ranked.map((scored) => [scored.id, scored.supporters]));
   const lists = listsInRankOrder(crateMates, data);
   const artists = new Map<number, string>();
@@ -91,9 +100,11 @@ export async function computeForYou(
     db,
     picks.map((pick) => pick.matchKey),
   );
+  const scopes = await loadHideScopes(db, display);
   const rows = picks.flatMap((pick) => {
     const item = display.get(pick.matchKey);
-    if (!item) return [];
+    const hide = scopes.get(pick.matchKey);
+    if (!item || !hide) return [];
     const id = keyToNumber(pick.matchKey);
     return [
       toRow(pick.matchKey, item, {
@@ -102,6 +113,8 @@ export async function computeForYou(
         bestCrateMateRank: bestCrateMateRank(id, lists),
         lastBoughtAt: lastBought.get(id) ?? null,
         followed: followed.get(id) ?? null,
+        heard: data.heard.has(pick.matchKey),
+        hide,
       }),
     ];
   });
@@ -120,9 +133,9 @@ function candidatesFor(
   input: ForYouInput,
   crateMates: readonly CrateMate[],
   data: ForYouData,
+  excluded: ReadonlySet<number>,
 ): readonly (CrateMateOwned | FreshOwned)[] {
   const scoreOf = new Map(crateMates.map((crateMate) => [crateMate.fanId, crateMate.score]));
-  const excluded = exclusions(data.mine, data.hidden);
   if (input.mode === 'all') {
     return crateMateOwnership(
       data.crateMateLists.map((list) => ({
@@ -147,14 +160,15 @@ function candidatesFor(
 /**
  * Scores candidates in falling crateMateScore order, a chunk at a time, and stops once none left
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
- * take a place. Ceilings allow for the follow boost, so a followed release is never cut early.
- * Compilations are down-weighted by their shown record's flag (§17).
+ * take a place, and neither do those from a hidden artist or label (§22). Ceilings allow for the
+ * follow boost, so a followed release is never cut early. Compilations are down-weighted by
+ * their shown record's flag (§17).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly CrateMateOwned[],
   followed: ReadonlyMap<number, string>,
-  ignoreCompilations: boolean,
+  { ignoreCompilations, excluded }: { ignoreCompilations: boolean; excluded: Exclusions },
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemFields>();
@@ -178,7 +192,7 @@ async function scoreTop(
     const compilations = new Set<number>();
     const scored = chunk.flatMap((c) => {
       const item = display.get(keyFromNumber(c.id));
-      if (!item) return [];
+      if (!item || !excluded.allows(item)) return [];
       items.set(keyFromNumber(c.id), item);
       if (ignoreCompilations && item.compilation) compilations.add(c.id);
       return [scoreForYou(c, supporters([item.supporterCount], owners.get(c.id) ?? c.crateMates))];

@@ -1,6 +1,7 @@
 // Shapes of Also-bought results, shared by the worker and the sidebar.
 
 import type { ItemKey } from '../bandcamp';
+import type { HideScopes } from './hide';
 
 /** Why a release is recommended. The UI turns this into the reason line. */
 export type AlsoBoughtReason =
@@ -22,6 +23,10 @@ export interface AlsoBoughtRow {
   reason: AlsoBoughtReason;
   /** The artist or label you follow behind it, when that lifted it (decisions §16). */
   followed: string | null;
+  /** You've heard it: badged and dimmed, or left out with "Hide heard" (decisions §22). */
+  heard: boolean;
+  /** The artist and label its hide menu offers. */
+  hide: HideScopes;
 }
 
 /** How far the wait for trustworthy co-owned rows has got (decisions §12). */

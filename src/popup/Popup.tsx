@@ -3,6 +3,7 @@ import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot, Tabs } from '../ui';
 import { ClearData } from './ClearData';
 import { DatabaseBackup } from './DatabaseBackup';
+import { HiddenList } from './HiddenList';
 import { TagBackup } from './TagBackup';
 import { ScannerSummary } from './ScannerSummary';
 import { SettingsPanel } from './SettingsPanel';
@@ -77,6 +78,8 @@ export function Popup() {
             content: <StatusTab connected={worker.state === 'connected'} />,
           },
           { value: 'settings', label: 'Settings', content: <SettingsTab /> },
+          // What you hid from recommendations, to unhide (decisions §22).
+          { value: 'hidden', label: 'Hidden', content: <HiddenList /> },
         ]}
       />
     </div>

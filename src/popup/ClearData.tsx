@@ -24,7 +24,7 @@ export function ClearData() {
         open={open}
         onOpenChange={setOpen}
         title="Clear all data?"
-        description="This deletes every scanned fan and collection, your synced collection, crate mates, hidden releases and the scan queue. Settings are kept. Your collection syncs again on your next Bandcamp page, but scans start from scratch."
+        description="This deletes every scanned fan and collection, your synced collection, crate mates, what you hid or heard, and the scan queue. Settings are kept. Your collection syncs again on your next Bandcamp page, but scans start from scratch."
         confirmLabel="Clear everything"
         busy={status.state === 'clearing'}
         onConfirm={() => void clear().finally(() => setOpen(false))}

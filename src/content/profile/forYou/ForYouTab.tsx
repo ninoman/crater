@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import type { ItemKey } from '../../../bandcamp';
+import type { RowActions } from '../../../hooks/rowActions';
 import { useForYou, type ForYouView } from '../../../hooks/useForYou';
+import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
 import { Button, EmptyState, LinkButton, Segmented } from '../../../ui';
+import { AllHeard } from '../../shared/AllHeard';
+import { HideHeardToggle } from '../../shared/RowControls';
 import { ForYouList } from './ForYouList';
 import { formatForYouSummary } from './forYouText';
 
@@ -25,7 +28,8 @@ const LOADING_TITLES: Record<ForYouMode, string> = {
  */
 export function ForYouTab() {
   const [mode, setMode] = useState<ForYouMode>('all');
-  const { view, reload, hide } = useForYou(mode);
+  const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.forYou', false);
+  const { view, reload, ...actions } = useForYou(mode, hideHeard);
   const picks = view.state === 'ready' ? view.result.rows.length : 0;
 
   return (
@@ -37,10 +41,17 @@ export function ForYouTab() {
             formatForYouSummary(picks, view.result.crateMatesUsed, mode)}
         </p>
         <div className="dh-profile__controls">
+          <HideHeardToggle checked={hideHeard} onChange={setHideHeard} />
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
         </div>
       </div>
-      <ForYouBody view={view} mode={mode} reload={reload} hide={hide} />
+      <ForYouBody
+        view={view}
+        mode={mode}
+        reload={reload}
+        actions={actions}
+        onShowHeard={hideHeard ? () => setHideHeard(false) : null}
+      />
     </>
   );
 }
@@ -49,10 +60,12 @@ interface ForYouBodyProps {
   view: ForYouView;
   mode: ForYouMode;
   reload: () => void;
-  hide: (matchKey: ItemKey) => void;
+  actions: RowActions;
+  /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
+  onShowHeard: (() => void) | null;
 }
 
-function ForYouBody({ view, mode, reload, hide }: ForYouBodyProps) {
+function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
       return <EmptyState title={LOADING_TITLES[mode]} />;
@@ -66,11 +79,15 @@ function ForYouBody({ view, mode, reload, hide }: ForYouBodyProps) {
         />
       );
     case 'ready':
-      return view.result.rows.length > 0 ? (
-        <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} onHide={hide} />
-      ) : (
-        <NoPicks result={view.result} mode={mode} />
-      );
+      if (view.result.rows.length > 0) {
+        return (
+          <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} actions={actions} />
+        );
+      }
+      if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
+        return <AllHeard onShowHeard={onShowHeard} />;
+      }
+      return <NoPicks result={view.result} mode={mode} />;
   }
 }
 

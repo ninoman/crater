@@ -4,6 +4,8 @@ import type { CollectionItem, ItemKey } from '../../bandcamp';
 import {
   DigheadDb,
   getMe,
+  hide,
+  markHeard,
   markSynced,
   putOwnership,
   replaceCrateMates,
@@ -13,7 +15,7 @@ import {
 import { computeDeepCuts, type DeepCutsInput } from './deepCuts';
 
 const ME = 1;
-const INPUT: DeepCutsInput = { maxSupporters: 50, ignoreCompilations: true };
+const INPUT: DeepCutsInput = { maxSupporters: 50, ignoreCompilations: true, hideHeard: false };
 
 let db: DigheadDb;
 
@@ -111,6 +113,23 @@ describe('computeDeepCuts', () => {
       lastBoughtAt: null,
       followed: null,
     });
+  });
+
+  it('leaves out heard releases when asked, and hidden artists always', async () => {
+    await seed();
+    await markHeard(db, 'a2', 'preview', 0);
+    await upsertCollectionItems(db, [{ ...item('a3', 25), bandId: 5 }]);
+    await hide(db, { kind: 'band', bandId: 5, name: 'Artist a3' }, 0);
+
+    const shown = await computeDeepCuts(db, await me(), INPUT);
+    const left = await computeDeepCuts(db, await me(), { ...INPUT, hideHeard: true });
+
+    expect(shown.rows.map((row) => [row.matchKey, row.heard])).toEqual([
+      ['a2', true],
+      ['a1', false],
+      ['a5', false],
+    ]);
+    expect(left.rows.map((row) => row.matchKey)).toEqual(['a1', 'a5']);
   });
 
   it('follows the cap setting', async () => {

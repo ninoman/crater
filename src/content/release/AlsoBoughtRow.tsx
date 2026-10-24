@@ -1,18 +1,15 @@
 import { useQueueRelease } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
-import { Button, QueueIcon, ReleaseRow, Tooltip } from '../../ui';
+import { Button, QueueIcon, ReleaseRow, type ReleaseRowProps, Tooltip } from '../../ui';
 import { withFollowed } from '../shared/followedText';
-import { ReleasePreview } from '../shared/ReleasePreview';
 import { formatQueueOutcome, formatReason } from './formatReason';
 
-export interface AlsoBoughtRowProps {
-  row: RowData;
-  previewing: boolean;
-  onPreview: (open: boolean) => void;
-  onHide: () => void;
-}
+export type AlsoBoughtRowProps = { row: RowData } & Pick<
+  ReleaseRowProps,
+  'previewing' | 'preview' | 'onPreview' | 'heard' | 'onHeardChange' | 'hideScopes' | 'onHide'
+>;
 
-export function AlsoBoughtRow({ row, ...actions }: AlsoBoughtRowProps) {
+export function AlsoBoughtRow({ row, ...controls }: AlsoBoughtRowProps) {
   const name = `${row.artist} – ${row.title}`;
   const { queue, queueRelease } = useQueueRelease(row.matchKey, row.url);
   return (
@@ -20,7 +17,6 @@ export function AlsoBoughtRow({ row, ...actions }: AlsoBoughtRowProps) {
       release={row}
       reason={withFollowed(formatReason(row.reason), row.followed)}
       status={formatQueueOutcome(queue)}
-      preview={<ReleasePreview url={row.url} name={name} />}
       extraActions={
         <Tooltip content="Scan this release's supporters">
           <Button
@@ -34,7 +30,7 @@ export function AlsoBoughtRow({ row, ...actions }: AlsoBoughtRowProps) {
           </Button>
         </Tooltip>
       }
-      {...actions}
+      {...controls}
     />
   );
 }

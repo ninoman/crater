@@ -13,6 +13,7 @@ export interface PlayableCoverProps {
   /** Tooltip while stopped, e.g. what it is when no title is shown next to it. */
   hint?: ReactNode;
   size?: CoverProps['size'];
+  dimmed?: CoverProps['dimmed'];
 }
 
 /** Artwork that is also the play / stop button. The icon shows on hover, focus or while playing. */
@@ -23,6 +24,7 @@ export function PlayableCover({
   onToggle,
   hint = 'Preview',
   size = 'sm',
+  dimmed = false,
 }: PlayableCoverProps) {
   return (
     <Tooltip content={playing ? 'Stop preview' : hint}>
@@ -37,7 +39,7 @@ export function PlayableCover({
         aria-pressed={playing}
         onClick={onToggle}
       >
-        <Cover src={src} size={size} />
+        <Cover src={src} size={size} dimmed={dimmed} />
         <span className="dh-playable-cover__icon" aria-hidden="true">
           {playing ? <StopIcon /> : <PlayIcon />}
         </span>

@@ -31,22 +31,31 @@ let fansSinceCrateMates = 0;
 let crateMatesRun: Promise<void> | null = null;
 let crateMatesAgain = false;
 
-export async function getAlsoBought(releaseKey: ItemKey): Promise<AlsoBoughtResult> {
+/**
+ * `hideHeard` leaves out releases you've heard (decisions §22). Re-scores pushed to tabs keep
+ * them in; a sidebar hiding them asks again.
+ */
+export async function getAlsoBought(
+  releaseKey: ItemKey,
+  hideHeard = false,
+): Promise<AlsoBoughtResult> {
   fansSinceScore.set(releaseKey, 0);
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   return computeAlsoBought(db, releaseKey, me?.fanId ?? null, {
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
+    hideHeard,
   });
 }
 
 /** For you on your profile, from the stored crate mates leaderboard, or the lately one for Fresh. */
-export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
+export async function getForYou(mode: ForYouMode, hideHeard: boolean): Promise<ForYouResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
   if (mode === 'deep') {
     return computeDeepCuts(db, me, {
       maxSupporters: settings.deepCutMaxSupporters,
       ignoreCompilations: settings.ignoreCompilations,
+      hideHeard,
     });
   }
   return computeForYou(db, me, {
@@ -55,14 +64,19 @@ export async function getForYou(mode: ForYouMode): Promise<ForYouResult> {
     latelyHalfLifeMonths: settings.latelyHalfLifeMonths,
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
+    hideHeard,
     now: Date.now(),
   });
 }
 
 /** Crate mates' latest on your profile: what your top crate mates bought lately. */
-export async function getCrateMatesLatest(): Promise<CrateMatesLatestResult> {
+export async function getCrateMatesLatest(hideHeard: boolean): Promise<CrateMatesLatestResult> {
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
-  return computeCrateMatesLatest(db, me, settings.topCrateMatesK, Date.now());
+  return computeCrateMatesLatest(db, me, {
+    topCrateMatesK: settings.topCrateMatesK,
+    hideHeard,
+    now: Date.now(),
+  });
 }
 
 /** Both crate mates leaderboards for the Crate mates tab on your profile. */

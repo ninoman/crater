@@ -13,7 +13,8 @@ import { readItemFields, readOwnership } from '../storage';
 import { fanRows } from './fanRows';
 import { collectionRead } from './fans';
 import { getItemFields, itemFieldsWhere, readItems } from './items';
-import { hiddenMatchKeys } from './hidden';
+import { heardKeys } from './heard';
+import { type HiddenSets, hiddenSets } from './hidden';
 
 export interface AlsoBoughtData {
   /** albumKey ?? itemKey of the release (decisions §3.8). */
@@ -37,7 +38,9 @@ export interface AlsoBoughtData {
   population: number;
   /** Your own ownership rows, collection and wishlist. Empty when nobody is logged in. */
   mine: OwnershipRecord[];
-  hidden: Set<ItemKey>;
+  hidden: HiddenSets;
+  /** matchKeys you've heard: for the rows' badge, and for "Hide heard". */
+  heard: Set<ItemKey>;
 }
 
 export async function gatherAlsoBought(
@@ -52,7 +55,8 @@ export async function gatherAlsoBought(
       db.ownership,
       db.fans,
       db.fanMatches,
-      db.hidden,
+      db.hides,
+      db.heard,
       db.crateMates,
       db.releaseSupporters,
     ],
@@ -74,16 +78,18 @@ export async function gatherAlsoBought(
       );
       const readIds = readFans.map((fan) => fan.fanId);
 
-      const [lists, crateMates, best, population, myList, mine, hidden, list] = await Promise.all([
-        db.fanMatches.bulkGet(readIds),
-        db.crateMates.bulkGet(readIds),
-        db.crateMates.orderBy('score').last(),
-        db.fanMatches.count(),
-        meFanId === null ? undefined : db.fanMatches.get(meFanId),
-        meFanId === null ? [] : fanRows(db, meFanId),
-        hiddenMatchKeys(db),
-        db.releaseSupporters.get(releaseKey),
-      ]);
+      const [lists, crateMates, best, population, myList, mine, hidden, heard, list] =
+        await Promise.all([
+          db.fanMatches.bulkGet(readIds),
+          db.crateMates.bulkGet(readIds),
+          db.crateMates.orderBy('score').last(),
+          db.fanMatches.count(),
+          meFanId === null ? undefined : db.fanMatches.get(meFanId),
+          meFanId === null ? [] : fanRows(db, meFanId),
+          hiddenSets(db),
+          heardKeys(db),
+          db.releaseSupporters.get(releaseKey),
+        ]);
       const listedFans = list ? await db.fans.bulkGet(list.fanIds) : [];
 
       const crateMateSupporters = lists.flatMap((record, i) => {
@@ -112,6 +118,7 @@ export async function gatherAlsoBought(
         population: population - (myList ? 1 : 0),
         mine,
         hidden,
+        heard,
       };
     },
   );

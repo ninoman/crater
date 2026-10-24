@@ -70,3 +70,25 @@ export const CheckIcon = () => (
     <path d="M3.5 8.5l3 3 6-7" />
   </Icon>
 );
+
+export const HeardIcon = () => (
+  <Icon>
+    <path d="M3 10V8a5 5 0 0 1 10 0v2" />
+    <rect x="2.5" y="9.5" width="3" height="4" rx="1" />
+    <rect x="10.5" y="9.5" width="3" height="4" rx="1" />
+  </Icon>
+);
+
+export const NextIcon = () => (
+  <Icon>
+    <path d="M4 3.5v9l6-4.5z" fill="currentColor" />
+    <path d="M12 3.5v9" />
+  </Icon>
+);
+
+export const PreviousIcon = () => (
+  <Icon>
+    <path d="M12 3.5v9l-6-4.5z" fill="currentColor" />
+    <path d="M4 3.5v9" />
+  </Icon>
+);

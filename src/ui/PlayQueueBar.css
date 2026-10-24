@@ -1,0 +1,13 @@
+.dh-play-queue {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dh-play-queue__position {
+  margin-left: var(--dh-space-1);
+  font-size: var(--dh-text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--dh-color-muted);
+  white-space: nowrap;
+}

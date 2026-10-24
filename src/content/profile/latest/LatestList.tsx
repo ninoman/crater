@@ -1,31 +1,26 @@
-import { useState } from 'react';
-import type { ItemKey } from '../../../bandcamp';
+import type { RowActions } from '../../../hooks/rowActions';
+import { useListPlayer } from '../../../hooks/useListPlayer';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
-import { ReleaseRow, RowList, StatusDot } from '../../../ui';
-import { ReleasePreview } from '../../shared/ReleasePreview';
-import { formatChecking, formatLatestReason, formatLatestSummary } from './latestText';
+import { ReleaseRow, RowList, Toolbar } from '../../../ui';
+import { PlayThrough, rowControls } from '../../shared/RowControls';
+import { formatLatestReason } from './latestText';
 
 export interface LatestListProps {
   result: CrateMatesLatestResult;
   /** For "3 days ago". */
   now: number;
-  onHide: (matchKey: ItemKey) => void;
+  actions: RowActions;
 }
 
-/** Your crate mates' recent buys, newest first, one preview open at a time. */
-export function LatestList({ result, now, onHide }: LatestListProps) {
-  const [previewing, setPreviewing] = useState<ItemKey | null>(null);
+/** Your crate mates' recent buys, newest first, played one at a time or through in order. */
+export function LatestList({ result, now, actions }: LatestListProps) {
+  const player = useListPlayer(result.rows, (matchKey) => actions.setHeard(matchKey, true, false));
 
   return (
     <>
-      <div className="dh-profile__toolbar">
-        <p className="dh-profile__summary">
-          {formatLatestSummary(result.rows.length, result.crateMatesUsed, result.windowDays)}
-        </p>
-        {result.checking > 0 && (
-          <StatusDot tone="neutral">{formatChecking(result.checking)}</StatusDot>
-        )}
-      </div>
+      <Toolbar>
+        <PlayThrough player={player} />
+      </Toolbar>
       <div className="dh-profile__list">
         <RowList label="Crate mates' latest">
           {result.rows.map((row) => (
@@ -33,10 +28,7 @@ export function LatestList({ result, now, onHide }: LatestListProps) {
               key={row.matchKey}
               release={row}
               reason={formatLatestReason(row, now)}
-              previewing={previewing === row.matchKey}
-              preview={<ReleasePreview url={row.url} name={`${row.artist} – ${row.title}`} />}
-              onPreview={(open) => setPreviewing(open ? row.matchKey : null)}
-              onHide={() => onHide(row.matchKey)}
+              {...rowControls(row, player, actions)}
             />
           ))}
         </RowList>

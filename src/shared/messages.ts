@@ -6,6 +6,8 @@ import type { ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandca
 import type { AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouMode, ForYouResult } from './forYou';
+import type { HeardSource } from './heard';
+import type { HiddenEntry, HideTarget } from './hide';
 import type {
   Following,
   FollowingKey,
@@ -50,17 +52,28 @@ export interface MessageMap {
   };
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Scores Also bought for a release from what's in the database now. */
-  getAlsoBought: { request: { itemKey: ItemKey }; response: AlsoBoughtResult };
+  getAlsoBought: {
+    request: { itemKey: ItemKey; hideHeard: boolean };
+    response: AlsoBoughtResult;
+  };
   /** A release's streamable tracks, read fresh from its page because stream URLs expire. */
   getPreview: { request: { url: string }; response: ReleasePreview };
-  /** Never recommend this release again, in any list. */
-  hideRelease: { request: { matchKey: ItemKey }; response: null };
+  // Hide from recommendations and heard it (decisions §22).
+  /** Never recommend this release, artist or label again, in any list. */
+  hide: { request: { target: HideTarget }; response: null };
+  /** Undoes a hide, from the popup's Hidden list. */
+  unhide: { request: { target: HideTarget }; response: null };
+  /** Everything hidden, newest first. */
+  listHidden: { request: NoPayload; response: HiddenEntry[] };
+  /** A play past the threshold, or a manual mark. A track of an album marks the album. */
+  markHeard: { request: { itemKey: ItemKey; source: HeardSource }; response: null };
+  unmarkHeard: { request: { matchKey: ItemKey }; response: null };
   /** The crate-mates leaderboard as last computed, with the fans' names and avatars. */
   getCrateMates: { request: NoPayload; response: CrateMatesResult };
   /** Releases your top crate mates own and you don't, for the For you tab on your profile. */
-  getForYou: { request: { mode: ForYouMode }; response: ForYouResult };
+  getForYou: { request: { mode: ForYouMode; hideHeard: boolean }; response: ForYouResult };
   /** What your top crate mates bought lately that you don't own, for Crate mates' latest on your profile. */
-  getCrateMatesLatest: { request: NoPayload; response: CrateMatesLatestResult };
+  getCrateMatesLatest: { request: { hideHeard: boolean }; response: CrateMatesLatestResult };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
   getCrateMateStanding: { request: { fanId: number }; response: CrateMateStanding | null };
   /** `getCrateMateStanding` for many fans in one board read. Fans not on the board are left out. */

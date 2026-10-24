@@ -47,7 +47,8 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const progress = useScanProgress(item);
   const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
-  const { view, hide } = useAlsoBought(item.itemKey, releaseSaved);
+  const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
+  const { view, ...actions } = useAlsoBought(item.itemKey, releaseSaved, hideHeard);
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const showEarly = useTimePassed(EARLY_PICKS_AFTER_MS);
 
@@ -72,7 +73,9 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 progress={progress}
                 scanStopped={notices.length > 0}
                 showEarly={showEarly}
-                onHide={hide}
+                actions={actions}
+                hideHeard={hideHeard}
+                onHideHeardChange={setHideHeard}
               />
             ),
           },

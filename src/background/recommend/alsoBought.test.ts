@@ -5,7 +5,8 @@ import {
   DigheadDb,
   finishFanScan,
   markQuickRead,
-  hideRelease,
+  hide,
+  markHeard,
   putFollowing,
   putOwnership,
   replaceCrateMates,
@@ -110,7 +111,7 @@ async function seedBigRelease() {
 
   await putOwnership(db, ME, [item('a500'), track('t951', 'a950')], 'collection');
   await putOwnership(db, ME, [item('a600')], 'wishlist');
-  await hideRelease(db, 'a700', 0);
+  await hide(db, { kind: 'release', matchKey: 'a700' }, 0);
 
   // A private fan and a queued one own the release but tell us nothing more. Fan 41 turned
   // up elsewhere, so the listed supporters are all scanned and the warm-up is over.
@@ -168,8 +169,33 @@ describe('computeAlsoBought', () => {
       coverUrl: 'https://f4.bcbits.com/img/a7_7.jpg',
       reason: { kind: 'co-owned', owners: 5, crateMates: 0 },
       followed: null,
+      heard: false,
+      hide: { band: { kind: 'band', bandId: 1, name: 'Artist' }, label: null },
     });
     expect(rows.map((row) => row.matchKey)).not.toContain('a950');
+  });
+
+  it('leaves out co-owned picks from a hidden artist or label', async () => {
+    await seedBigRelease();
+    const before = await ranking('a100');
+    await upsertCollectionItems(db, [item('a300', { bandId: 5 }), item('a900', { labelId: 6 })]);
+    await hide(db, { kind: 'band', bandId: 5, name: 'Artist' }, 0);
+    await hide(db, { kind: 'label', labelId: 6, name: 'Label' }, 0);
+
+    expect(before).toEqual(expect.arrayContaining(['a300', 'a900']));
+    expect(await ranking('a100')).toEqual(before.filter((key) => key !== 'a300' && key !== 'a900'));
+  });
+
+  it('flags heard picks, and leaves them out when asked', async () => {
+    await seedBigRelease();
+    const before = await ranking('a100');
+    await markHeard(db, 'a300', 'preview', 0);
+
+    const shown = await computeAlsoBought(db, 'a100', ME);
+    const left = await computeAlsoBought(db, 'a100', ME, { hideHeard: true });
+
+    expect(shown.rows.find((row) => row.matchKey === 'a300')?.heard).toBe(true);
+    expect(left.rows.map((row) => row.matchKey)).toEqual(before.filter((key) => key !== 'a300'));
   });
 
   it('shows a track when only tracks of the album are known', async () => {
@@ -357,7 +383,7 @@ describe('small-release fallback', () => {
     await fans([10, 11], [release, item('a2000')]);
     await listSupporters('a1000', [10, 11]);
     await putOwnership(db, ME, [item('a1005', solo)], 'collection');
-    await hideRelease(db, 'a1006', 0);
+    await hide(db, { kind: 'release', matchKey: 'a1006' }, 0);
   }
 
   it('blends in the same artist and label, labelled as such', async () => {
@@ -371,6 +397,14 @@ describe('small-release fallback', () => {
       ['a1002', { kind: 'same-label', label: 'Tiny Label' }],
       ['a1003', { kind: 'same-label', label: 'Tiny Label' }],
     ]);
+  });
+
+  it('leaves out picks from a hidden artist or label', async () => {
+    await seedSmallRelease();
+    await hide(db, { kind: 'band', bandId: 5, name: 'Solo' }, 0);
+    await hide(db, { kind: 'label', labelId: 77, name: 'Tiny Label' }, 0);
+
+    expect(await ranking('a1000')).toEqual(['a2000']);
   });
 
   it('leaves big releases alone', async () => {

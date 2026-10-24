@@ -32,3 +32,10 @@
   display: block;
   width: 100%;
 }
+
+/* A dimmed cover comes back to full while it's pointed at, focused or playing. */
+.dh-playable-cover--playing .dh-cover--dimmed,
+.dh-playable-cover:hover .dh-cover--dimmed,
+.dh-playable-cover:focus-visible .dh-cover--dimmed {
+  opacity: 1;
+}

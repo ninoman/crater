@@ -7,7 +7,7 @@ import type { ForYouRow } from '../../shared/forYou';
 
 export type PickFacts = Pick<
   ForYouRow,
-  'crateMates' | 'supporters' | 'bestCrateMateRank' | 'lastBoughtAt' | 'followed'
+  'crateMates' | 'supporters' | 'bestCrateMateRank' | 'lastBoughtAt' | 'followed' | 'heard' | 'hide'
 >;
 
 export function toRow(matchKey: ItemKey, item: ItemRecord, facts: PickFacts): ForYouRow {

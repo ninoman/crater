@@ -6,7 +6,8 @@ import {
   enqueue,
   fanJob,
   getMe,
-  hideRelease,
+  hide,
+  markHeard,
   markSynced,
   putOwnership,
   replaceCrateMates,
@@ -121,10 +122,14 @@ describe('computeCrateMatesLatest', () => {
     // An album you own a track of is left out (decisions §3.8).
     await own(ME, [item('t70', 400, 'a7')]);
     await own(11, [item('t71', 4, 'a7')]);
-    await hideRelease(db, 'a2', 0);
+    await hide(db, { kind: 'release', matchKey: 'a2' }, 0);
     await enqueue(db, [fanJob(11)], 2, 0);
 
-    const result = await computeCrateMatesLatest(db, await me(), 1, NOW);
+    const result = await computeCrateMatesLatest(db, await me(), {
+      topCrateMatesK: 1,
+      hideHeard: false,
+      now: NOW,
+    });
 
     expect(result).toMatchObject({
       basis: 'ready',
@@ -142,8 +147,31 @@ describe('computeCrateMatesLatest', () => {
     expect(result.rows[0]?.buyers[0]?.url).toBe('https://bandcamp.com/fan10');
   });
 
+  it('flags heard purchases, and leaves them and hidden artists out before cutting the list', async () => {
+    await fans([10]);
+    await replaceCrateMates(db, [crateMate(10, 2)], [crateMate(10, 2)]);
+    await own(10, [item('a2', 1), item('a3', 2), { ...item('a4', 3), bandId: 5 }]);
+    await markHeard(db, 'a2', 'bandcamp', 0);
+    await hide(db, { kind: 'band', bandId: 5, name: 'Artist a4' }, 0);
+    const viewer = await me();
+    const latest = (hideHeard: boolean) =>
+      computeCrateMatesLatest(db, viewer, { topCrateMatesK: 1, hideHeard, now: NOW });
+
+    expect((await latest(false)).rows.map((row) => [row.matchKey, row.heard])).toEqual([
+      ['a2', true],
+      ['a3', false],
+    ]);
+    expect((await latest(true)).rows.map((row) => row.matchKey)).toEqual(['a3']);
+  });
+
   it('says why when there is no viewer', async () => {
-    expect(await computeCrateMatesLatest(db, undefined, 30, NOW)).toMatchObject({
+    expect(
+      await computeCrateMatesLatest(db, undefined, {
+        topCrateMatesK: 30,
+        hideHeard: false,
+        now: NOW,
+      }),
+    ).toMatchObject({
       basis: 'no-viewer',
       rows: [],
       crateMatesUsed: 0,

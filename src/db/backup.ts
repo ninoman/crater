@@ -20,6 +20,7 @@ import {
   slimToV12,
   TABLES_ADDED,
   TABLES_RENAMED,
+  upgradeHide,
   upgradeJobToV8,
 } from './schema';
 
@@ -79,7 +80,24 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
 // The version is checked by assertRestorableVersion, and older rows migrated after writing.
-const READ_ONLY = { acceptNameDiff: true, acceptVersionDiff: true, noTransaction: true } as const;
+// `hides` took over `hidden` with a new primary key in v14 (readJson renames it, upgradeRows
+// reshapes its rows), so the key the file names may differ.
+const READ_ONLY = {
+  acceptNameDiff: true,
+  acceptVersionDiff: true,
+  acceptChangedPrimaryKey: true,
+  noTransaction: true,
+} as const;
+
+/**
+ * Rows that can't be written in their old shape, brought up to date as they're read. Only hides
+ * so far (v14): their old rows lack the new primary key, so migrateRows would be too late.
+ */
+function upgradeRows(table: string, value: unknown): { value: unknown } {
+  return {
+    value: table === 'hides' ? upgradeHide(value as Parameters<typeof upgradeHide>[0]) : value,
+  };
+}
 
 /** Brings rows written by an older schema up to this one, as its Dexie upgrades would have. */
 async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
@@ -122,7 +140,7 @@ export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
   ensureFileReader();
   const json = await readJson(file);
   await Promise.all(db.tables.map((table) => table.clear()));
-  await importInto(db, json, READ_ONLY);
+  await importInto(db, json, { ...READ_ONLY, transform: upgradeRows });
 }
 
 /**

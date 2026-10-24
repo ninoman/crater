@@ -4,7 +4,8 @@ import type { CollectionItem, ItemKey } from '../../bandcamp';
 import {
   DigheadDb,
   getMe,
-  hideRelease,
+  hide,
+  markHeard,
   markSynced,
   putFollowing,
   putOwnership,
@@ -98,6 +99,7 @@ const allTime = (topCrateMatesK: number): ForYouInput => ({
   latelyHalfLifeMonths: 6,
   followingBoost: true,
   ignoreCompilations: true,
+  hideHeard: false,
   now: 0,
 });
 
@@ -127,7 +129,7 @@ async function seed() {
   await own(13, [item('a30')], 'collection');
   await own(ME, [a10, item('t42', {}, 'a4')], 'collection');
   await own(ME, [a11], 'wishlist');
-  await hideRelease(db, 'a20', 0);
+  await hide(db, { kind: 'release', matchKey: 'a20' }, 0);
   await crateMates([
     [10, 3],
     [11, 2],
@@ -186,8 +188,43 @@ describe('computeForYou', () => {
       bestCrateMateRank: 1,
       lastBoughtAt: null,
       followed: null,
+      heard: false,
+      // Every seed item is sold by account 1 under a different artist: a label's account.
+      hide: { band: null, label: { kind: 'label', labelId: 1, name: 'artist' } },
     });
     expect(rows.find((row) => row.matchKey === 'a5')?.title).toBe('Title t51');
+  });
+
+  it('leaves out a hidden artist and a hidden label, and fills the list from below', async () => {
+    await seed();
+    await upsertCollectionItems(db, [
+      item('a2', { otherOwners: 1, bandId: 5 }),
+      item('t51', { otherOwners: 3, labelId: 6 }, 'a5'),
+    ]);
+    await hide(db, { kind: 'band', bandId: 5, name: 'Artist a2' }, 0);
+    await hide(db, { kind: 'label', labelId: 6, name: 'Label' }, 0);
+
+    const { rows } = await computeForYou(db, await me(), allTime(3));
+
+    expect(rows.map((row) => row.matchKey)).toEqual(['a3', 'a1']);
+  });
+
+  it('flags heard rows, and leaves them out only when asked', async () => {
+    await seed();
+    await markHeard(db, 'a2', 'preview', 0);
+    await markHeard(db, 'a20', 'manual', 0);
+
+    const shown = await computeForYou(db, await me(), allTime(3));
+    const left = await computeForYou(db, await me(), { ...allTime(3), hideHeard: true });
+
+    expect(shown.rows.map((row) => [row.matchKey, row.heard])).toEqual([
+      ['a2', true],
+      ['a3', false],
+      ['a5', false],
+      ['a1', false],
+    ]);
+    // a20 is hidden and heard: out either way.
+    expect(left.rows.map((row) => row.matchKey)).toEqual(['a3', 'a5', 'a1']);
   });
 
   it('names a followed label behind a track-only release, nudging without reordering', async () => {
@@ -257,6 +294,7 @@ describe('computeForYou, Fresh', () => {
     latelyHalfLifeMonths: 6,
     followingBoost: true,
     ignoreCompilations: true,
+    hideHeard: false,
     now: NOW,
   });
   const bought = (key: ItemKey, daysAgo: number | null) =>
@@ -286,6 +324,21 @@ describe('computeForYou, Fresh', () => {
       ['a2', 2, NOW - 200 * DAY],
     ]);
     expect(result.crateMatesUsed).toBe(2);
+  });
+
+  it('leaves out heard releases and hidden artists in Fresh too', async () => {
+    await own(
+      20,
+      [bought('a1', 10), bought('a2', 30), item('a3', { bandId: 5, addedAt: NOW - DAY })],
+      'collection',
+    );
+    await crateMates([], [latelyCrateMate(20, 2)]);
+    await markHeard(db, 'a1', 'bandcamp', 0);
+    await hide(db, { kind: 'band', bandId: 5, name: 'Artist a3' }, 0);
+
+    const { rows } = await computeForYou(db, await me(), { ...fresh(), hideHeard: true });
+
+    expect(rows.map((row) => row.matchKey)).toEqual(['a2']);
   });
 
   it('says there are no lately crate mates yet', async () => {
