@@ -9,8 +9,8 @@ export type ListItemsView = QueryView<readonly ListedItem[]>;
 const byKey = (item: ListedItem) => item.itemKey;
 
 /**
- * Your wishlist or collection with your tags and notes, newest first. Refetches after any tag
- * or note change. Items that didn't change keep their object, so a refetch re-renders only the
+ * Your wishlist or collection with your tags, newest first. Refetches after any tag
+ * change. Items that didn't change keep their object, so a refetch re-renders only the
  * cards that did.
  */
 export function useListItems(source: ListSource): ListItemsView {

@@ -8,20 +8,10 @@ export interface CheckboxProps {
   onChange: (checked: boolean) => void;
   /** Keeps the label for screen readers only, e.g. a row's select box. */
   hideLabel?: boolean;
-  disabled?: boolean;
-  /** Id of text that explains the box, e.g. why it's disabled. */
-  describedBy?: string;
 }
 
 /** A labelled checkbox (Radix), styled with our tokens. */
-export function Checkbox({
-  label,
-  checked,
-  onChange,
-  hideLabel = false,
-  disabled = false,
-  describedBy,
-}: CheckboxProps) {
+export function Checkbox({ label, checked, onChange, hideLabel = false }: CheckboxProps) {
   const id = useId();
   return (
     <div className="dh-checkbox">
@@ -31,8 +21,6 @@ export function Checkbox({
         checked={checked}
         onCheckedChange={(next) => onChange(next === true)}
         aria-label={hideLabel ? label : undefined}
-        aria-describedby={describedBy}
-        disabled={disabled}
       >
         {/* Always mounted: an empty box takes its baseline from its bottom edge, so mounting the
             icon on check would shift a baseline-aligned row (Bandcamp's follow cards). */}

@@ -3,7 +3,6 @@
 import type { ItemKey } from '../bandcamp';
 import type { HideScopes } from './hide';
 import type { CrateMatesBasis } from './crateMates';
-import type { AppliedFilters } from './listFilters';
 
 /** A crate mate who bought a release in the feed. */
 export interface LatestBuyer {
@@ -41,6 +40,4 @@ export interface CrateMatesLatestResult {
   windowDays: number;
   /** Of those crate mates, how many have a scan waiting, so the feed may grow shortly. */
   checking: number;
-  /** The request's filters and what they did; absent when none narrowed the feed (decisions §25). */
-  filtered?: AppliedFilters;
 }

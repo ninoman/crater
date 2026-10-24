@@ -21,9 +21,8 @@ Dighead adds recommendations to Bandcamp, based on what people actually bought.
 - **For you:** releases your crate mates own that you don't, with a reason on every pick. Switch to *Fresh* for their recent buys or *Deep cuts* for the lesser-known ones.
 - **Crate mates' latest:** a feed of your crate mates' newest buys.
 - **New from your follows:** a tab with new releases from the artists and labels you follow, checked weekly. Turn on an optional desktop notification if you like.
-- **Filters:** narrow For you, Also bought and Crate mates' latest by genre, release year, name your price, physical editions or artists near you.
 
-**Listen and sort**
+**Listen**
 
 - Play previews straight from the cover, or play a whole list with next, previous and keyboard shortcuts.
 - Releases you've listened to get a "heard" mark, and you can hide heard ones from any list.
@@ -32,9 +31,7 @@ Dighead adds recommendations to Bandcamp, based on what people actually bought.
 
 **Organise your wishlist and collection**
 
-- Sort by date added, artist, label, price, how many crate mates own it, or your own "buy next" order.
-- Add tags, private notes and 1 to 5 ratings to releases, and tag the fans, artists and labels you follow.
-- Build a Bandcamp Friday shortlist with totals per currency.
+- Add tags to releases, and tag the fans, artists and labels you follow.
 - Export your wishlist, collection or For you list as CSV, or back up the whole database.
 
 **Private by design**

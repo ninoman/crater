@@ -26,21 +26,6 @@ describe('validateSettings', () => {
   });
 });
 
-describe('homePlace', () => {
-  it('is empty by default, and accepts text up to a limit', () => {
-    expect(DEFAULT_SETTINGS.homePlace).toBe('');
-    expect(validateSettings({ ...DEFAULT_SETTINGS, homePlace: 'Berlin, Germany' })).toEqual({});
-    expect(validateSettings({ ...DEFAULT_SETTINGS, homePlace: 'x'.repeat(101) })).toEqual({
-      homePlace: 'At most 100 characters',
-    });
-  });
-
-  it('is read back from storage as text only', () => {
-    expect(sanitizeSettings({ homePlace: 'Leipzig' }).homePlace).toBe('Leipzig');
-    expect(sanitizeSettings({ homePlace: 5 }).homePlace).toBe('');
-  });
-});
-
 describe('sanitizeSettings', () => {
   it('fills in defaults for anything missing', () => {
     expect(sanitizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);

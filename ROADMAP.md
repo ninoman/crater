@@ -214,18 +214,18 @@ Design: decisions §14.
 
 ## Wishlist and collection tools (not MVP)
 
-**Goal:** sort, annotate and plan purchases from your wishlist, get the same tools on the collection tab, and take your lists into a spreadsheet. Research ideas 3, 6, 8 and 9; design: decisions §24.
+**Goal:** get the wishlist tools on the collection tab, and take your lists into a spreadsheet. Design: decisions §24.
 
-1. [x] Schema v16: `itemNotes` (text and a 1–5 rating) and `itemPrices`. The wishlist parser keeps price, currency and whether it can be bought; an incremental sync reads unpriced wishlist items once.
+1. [x] ~~Schema v16: notes, ratings and wishlist prices.~~ Removed the same day; v18 drops the tables (decisions §24).
 2. [x] `scoring/wishlistCrateMates.ts`: how many top crate mates own each release. Pure, with a synthetic test.
-3. [x] `shared/itemSort.ts`: added, artist, label, price, crate mates, buy next. Remembered per tab.
-4. [x] Notes and ratings on the card (`NotePopover`, `Rating`), the tags backup file version 3 (older files still import) and the full backup.
-5. [x] Generalise the wishlist takeover into `content/itemList/` and take over the collection tab with it (sort by purchase date, artist or label; tags, filter and bulk bar). Tags and notes now survive a purchase.
-6. [x] Bandcamp Friday shortlist: purchasable wishlist items in buy next order, with totals per currency. Read-only.
+3. [x] ~~`shared/itemSort.ts`: sort by added, artist, label, price, crate mates, buy next.~~ Removed the same day (decisions §24).
+4. [x] ~~Notes and ratings on the card.~~ Removed the same day (decisions §24).
+5. [x] Generalise the wishlist takeover into `content/itemList/` and take over the collection tab with it (tags, filter and bulk bar). Tags now survive a purchase.
+6. [x] ~~Bandcamp Friday shortlist~~. Removed the same day (decisions §24).
 7. [x] CSV export of the wishlist, the collection and a For you list, from the popup (`shared/csv.ts`, `exportCsv.ts`).
 8. [ ] Try both tabs on live pages with Bandcamp's own JS running, and a collection of thousands (check the first render and the message size).
 
-**Done when:** each tab sorts by every key it offers and remembers it, a note and rating survive a re-sync and a purchase and come back from a tags backup, the shortlist adds up per currency, and a CSV opens in a spreadsheet with its accents intact.
+**Done when:** tags survive a re-sync and a purchase, and a CSV opens in a spreadsheet with its accents intact.
 
 ---
 
@@ -352,7 +352,7 @@ Design: decisions §16. Uses the following sync from *Following tags*; no new re
 
 ## Hide, heard and play-through (not MVP)
 
-**Goal:** take whole artists and labels out of recommendations and undo it, see and filter what you've already listened to, and play a list through. Research ideas #4, #2 and #7 (`docs/research/bandcamp-user-needs.md`).
+**Goal:** take whole artists and labels out of recommendations and undo it, see and filter what you've already listened to, and play a list through.
 
 Design: decisions §22. Schema v14; no new requests.
 
@@ -386,23 +386,9 @@ Design: decisions §23.
 
 **Done when:** a week after following a few active labels, the tab lists their new releases newest first, muting one hides it, and the notification (when on) arrives once.
 
-## List filters (not MVP)
+## List filters (removed)
 
-**Goal:** narrow For you, Also bought and Crate mates' latest by genre, location, name your price, physical edition and release year, so a fan can dig locally or by format.
-
-Design: decisions §25. Research: feature #5 in `docs/research/bandcamp-user-needs.md`. No new requests.
-
-1. [x] Genre table from `bandcamp.com/discover` (fixture), and `bandcamp/facts.ts`: genre, location, name your price, physical and year read from collection rows and release pages, with fixture tests.
-2. [x] Schema v17: facts on `items` and `bands` (nothing to rewrite), `fillBandLocations` from the following list, `migrateRows` for older backups. Storage cost measured against the real backup.
-3. [x] `scoring/listFilters.ts` (pure `judge` and `locationMatches`) with synthetic tests; unknown facts hide the release and are counted.
-4. [x] `filters` on `getForYou`, `getAlsoBought` and `getCrateMatesLatest`, applied in the worker before each list is cut, with a search limit; Also bought keeps its filters through its own re-scores.
-5. [x] "Your place" setting for Near me (text match, no geocoding).
-6. [x] `ListFilterBar` in `src/ui/`, remembered per list, with the "N hidden by filters" line and the empty state.
-7. [x] `pnpm perf`: filters stay within budget (decisions §25).
-8. [ ] Try it on real data: do the filters leave enough on a database that hasn't been rescanned? If not, re-read the top crate mates' collections once (decisions §25, *Older rows*).
-9. [ ] Check `band_location` on collection rows logged in.
-
-**Done when:** on fixtures and synthetic data each filter narrows each list, a filter few releases pass still returns what matches, and the bar says how many it hid and how many it couldn't judge.
+Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate mates' latest, and the "Your place" setting. See decisions §25.
 
 ---
 

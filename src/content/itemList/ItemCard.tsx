@@ -1,18 +1,12 @@
 import { memo } from 'react';
 import type { ItemKey } from '../../bandcamp';
-import {
-  type ItemNote,
-  type ListedItem,
-  type ListSource,
-  MAX_NOTE_LENGTH,
-} from '../../shared/itemList';
+import type { ListedItem, ListSource } from '../../shared/itemList';
 import {
   Card,
   Checkbox,
   ExternalIcon,
   HeardBadge,
   LinkButton,
-  NotePopover,
   PlayableCover,
   type TagOption,
   Tooltip,
@@ -29,20 +23,17 @@ export interface ItemCardProps {
   mutations: TagMutations;
   selected: boolean;
   previewing: boolean;
-  /** The shortlist's cumulative total in this item's currency. */
-  running?: number;
   /** Heard, by the worker's last read or a preview since. */
   heard: boolean;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
-  onSaveNote: (itemKey: ItemKey, note: ItemNote) => void;
   onHeard: (itemKey: ItemKey) => void;
   onError: (message: string) => void;
 }
 
 /**
- * One release as a grid card: playable cover with a select box, title, artist, date and price,
- * your tags and your note. Memoised, since a list can hold hundreds and re-renders as a whole.
+ * One release as a grid card: playable cover with a select box, title, artist, date, and your
+ * tags. Memoised, since a list can hold hundreds and re-renders as a whole.
  */
 export const ItemCard = memo(function ItemCard({
   item,
@@ -51,11 +42,9 @@ export const ItemCard = memo(function ItemCard({
   mutations,
   selected,
   previewing,
-  running,
   heard,
   onSelect,
   onPreview,
-  onSaveNote,
   onHeard,
   onError,
 }: ItemCardProps) {
@@ -100,17 +89,11 @@ export const ItemCard = memo(function ItemCard({
           {item.title}
         </a>
       }
-      meta={cardMeta(item, source, running)}
+      meta={cardMeta(item, source)}
       badges={
         <>
           {heard && <HeardBadge />}
           <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
-          <NotePopover
-            name={name}
-            note={item.note}
-            maxLength={MAX_NOTE_LENGTH}
-            onSave={(note) => onSaveNote(item.itemKey, note)}
-          />
         </>
       }
     >

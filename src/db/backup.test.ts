@@ -52,11 +52,6 @@ async function seed(target: DigheadDb): Promise<void> {
     tagIds: [7],
     unfollowed: false,
   });
-  await target.itemNotes.put({ itemKey: 'a1', text: 'ask Sam', rating: 4, updatedAt: 3 });
-  await target.itemPrices.put({
-    itemKey: 'a2',
-    price: { amount: 9, currency: 'EUR', purchasable: true },
-  });
   await target.queue.put({
     kind: 'fan',
     target: '1',
@@ -89,7 +84,7 @@ describe('backup round trip', () => {
     await seed(db);
     const before = await snapshot(db);
     const { file, summary } = await exportDatabase(db);
-    expect(summary).toEqual({ tables: db.tables.length, rows: 9 });
+    expect(summary).toEqual({ tables: db.tables.length, rows: 7 });
 
     await clearAllData(db);
     const restored = await importDatabase(db, file, memorySnapshot().store, noPhase);
@@ -243,40 +238,24 @@ describe('older backups', () => {
   });
 });
 
-describe('a v15 backup', () => {
-  it('imports without the notes and prices tables added in v16', async () => {
+describe('a v17 backup', () => {
+  it('imports, skipping the notes and prices tables v18 dropped', async () => {
     await seed(db);
     const { file } = await exportDatabase(db);
     const json = JSON.parse(await jsonText(file));
-    json.data.databaseVersion = 15;
-    const added = ['itemNotes', 'itemPrices'];
-    json.data.tables = json.data.tables.filter((t: { name: string }) => !added.includes(t.name));
-    json.data.data = json.data.data.filter(
-      (t: { tableName: string }) => !added.includes(t.tableName),
-    );
+    json.data.databaseVersion = 17;
+    json.data.tables.push({ name: 'itemNotes', schema: 'itemKey', rowCount: 1 });
+    json.data.data.push({
+      tableName: 'itemNotes',
+      inbound: true,
+      rows: [{ itemKey: 'a1', text: 'ask Sam', rating: 4, updatedAt: 3 }],
+    });
     await clearAllData(db);
 
     await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
 
     expect(await db.tags.count()).toBe(1);
-    expect(await db.itemNotes.count()).toBe(0);
-    expect(await db.itemPrices.count()).toBe(0);
-  });
-});
-
-describe('a backup from before filter facts', () => {
-  it('imports a v16 file, giving followed bands their location', async () => {
-    await seed(db);
-    await db.bands.put({ bandId: 9, hosts: ['b'] });
-    await db.following.update(['band', 9], { location: 'Berlin, Germany' });
-    const { file } = await exportDatabase(db);
-    const json = JSON.parse(await jsonText(file));
-    json.data.databaseVersion = 16;
-    await clearAllData(db);
-
-    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
-
-    expect(await db.bands.get(9)).toEqual({ bandId: 9, hosts: ['b'], location: 'Berlin, Germany' });
+    expect(db.tables.map((table) => table.name)).not.toContain('itemNotes');
   });
 });
 

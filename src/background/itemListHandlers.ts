@@ -1,5 +1,5 @@
-// Message handlers for your wishlist and collection lists, and the tags, notes and prices on
-// their items. The rules live in the repos.
+// Message handlers for your wishlist and collection lists and the tags on their items. The
+// rules live in the repos.
 
 import { artUrl, keyToNumber } from '../bandcamp';
 import {
@@ -12,7 +12,6 @@ import {
   listOwnedItems,
   markUnwishlisted,
   markWishlisted,
-  saveItemNote,
   type DigheadDb,
   type OwnedRow,
 } from '../db';
@@ -23,12 +22,7 @@ import type { MessageHandlers } from '../shared/messages';
 
 export type ItemListHandlers = Pick<
   MessageHandlers,
-  | 'listItems'
-  | 'getItemTags'
-  | 'assignItemTag'
-  | 'markWishlisted'
-  | 'markUnwishlisted'
-  | 'saveItemNote'
+  'listItems' | 'getItemTags' | 'assignItemTag' | 'markWishlisted' | 'markUnwishlisted'
 >;
 
 /** How many of your top crate mates own each row's release, in row order. */
@@ -38,14 +32,9 @@ async function crateMateOwners(db: DigheadDb, rows: readonly OwnedRow[], k: numb
     db,
     top.map((crateMate) => crateMate.fanId),
   );
-  const scoreOf = new Map(top.map((crateMate) => [crateMate.fanId, crateMate.score]));
-  const matches = lists.map(({ fanId, matchIds }) => ({
-    score: scoreOf.get(fanId) ?? 0,
-    matches: matchIds,
-  }));
   return crateMateOwnerCounts(
     rows.map((row) => keyToNumber(row.matchKey)),
-    matches,
+    lists.map((list) => list.matchIds),
   );
 }
 
@@ -62,10 +51,10 @@ export function itemListHandlers(
         listOwnedItems(db, me.fanId, source),
         heardKeys(db),
       ]);
-      // Crate mates who own it only ranks what you might still buy.
+      // Crate mates who own it only matters for what you might still buy.
       const owners =
         source === 'wishlist' ? await crateMateOwners(db, rows, await topCrateMatesK()) : [];
-      return rows.map(({ item, addedAt, tagIds, note, price }, i): ListedItem => {
+      return rows.map(({ item, addedAt, tagIds }, i): ListedItem => {
         return {
           itemKey: item.itemKey,
           title: item.title,
@@ -75,10 +64,7 @@ export function itemListHandlers(
           coverUrl: item.artId === null ? null : artUrl(item.artId),
           addedAt,
           tagIds,
-          note,
-          price,
-          crateMateOwners: owners[i]?.owners ?? 0,
-          crateMateScore: owners[i]?.score ?? 0,
+          crateMateOwners: owners[i] ?? 0,
           heard: heard.has(item.albumKey ?? item.itemKey),
         };
       });
@@ -99,6 +85,5 @@ export function itemListHandlers(
       if (me) await markUnwishlisted(db, me.fanId, itemKey);
       return null;
     },
-    saveItemNote: ({ itemKey, note }) => saveItemNote(db, itemKey, note, Date.now()),
   };
 }

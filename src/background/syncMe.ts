@@ -10,9 +10,7 @@ import {
 import {
   markSynced,
   ownedItemKeys,
-  pricedItemKeys,
   pruneItemData,
-  putItemPrices,
   putOwnership,
   removeOwnershipExcept,
   upsertCollectionItems,
@@ -67,11 +65,7 @@ async function syncList(
   fetchedSoFar: number,
 ): Promise<number> {
   const { db } = deps;
-  // A wishlist item whose price was never read counts as new, so one incremental sync fills in
-  // prices for a wishlist synced before they were kept (decisions §24).
-  const owned = await ownedItemKeys(db, fanId, list);
-  const priced = list === 'wishlist' ? await pricedItemKeys(db) : owned;
-  const known = new Set([...owned].filter((key) => priced.has(key)));
+  const known = await ownedItemKeys(db, fanId, list);
   const seen = new Set<ItemKey>();
   let fetched = fetchedSoFar;
   let first = true;
@@ -84,7 +78,6 @@ async function syncList(
       }
       await upsertCollectionItems(db, page.items);
       await putOwnership(db, fanId, page.items, list);
-      if (list === 'wishlist') await putItemPrices(db, page.items);
       for (const key of keys) seen.add(key);
       fetched += page.items.length;
       deps.onProgress(fetched);

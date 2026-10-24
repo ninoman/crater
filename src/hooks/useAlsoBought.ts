@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ItemKey } from '../bandcamp';
 import type { AlsoBoughtResult } from '../shared/alsoBought';
-import { type ListFilters, NO_FILTERS, sameFilters } from '../shared/listFilters';
 import { onWorkerEvent, sendMessage } from '../shared/messages';
 import { type RowActions, useRowActions } from './rowActions';
 
@@ -13,24 +12,22 @@ export type AlsoBoughtView =
 /**
  * Fetches the Also-bought list for a release and follows the worker's re-scores. Waits for
  * `enabled`, so the worker has saved the open release before the first score. Re-scores pushed
- * to tabs keep heard releases in, and a re-score built with other filters than ours (the worker
- * forgot them) isn't ours either: in both cases the list is asked for again.
+ * to tabs keep heard releases in, so while those are hidden the list is asked for again.
  */
 export function useAlsoBought(
   releaseKey: ItemKey,
   enabled: boolean,
   hideHeard: boolean,
-  filters: ListFilters,
 ): RowActions & { view: AlsoBoughtView } {
   const [view, setView] = useState<AlsoBoughtView>({ state: 'loading' });
 
   const refresh = useCallback(
     () =>
-      sendMessage('getAlsoBought', { itemKey: releaseKey, hideHeard, filters }).then(
+      sendMessage('getAlsoBought', { itemKey: releaseKey, hideHeard }).then(
         (result) => setView({ state: 'ready', result }),
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       ),
-    [releaseKey, hideHeard, filters],
+    [releaseKey, hideHeard],
   );
 
   useEffect(() => {
@@ -38,16 +35,15 @@ export function useAlsoBought(
     let cancelled = false;
     const unsubscribe = onWorkerEvent('alsoBought', (result) => {
       if (cancelled || result.releaseKey !== releaseKey) return;
-      if (!hideHeard && sameFilters(result.filtered?.filters ?? NO_FILTERS, filters)) {
-        setView({ state: 'ready', result });
-      } else void refresh();
+      if (!hideHeard) setView({ state: 'ready', result });
+      else void refresh();
     });
     void refresh();
     return () => {
       cancelled = true;
       unsubscribe();
     };
-  }, [releaseKey, enabled, hideHeard, refresh, filters]);
+  }, [releaseKey, enabled, hideHeard, refresh]);
 
   const fail = useCallback(
     (error: unknown) => setView({ state: 'unreachable', error: String(error) }),

@@ -6,7 +6,7 @@ import type { ListConfig } from './lists';
 
 /**
  * Takes over Bandcamp's wishlist or collection tab on your own page: every item you have, with
- * tags, notes, sorting, a filter bar and bulk tagging (decisions §14, §24). The root itself
+ * tags, a filter bar and bulk tagging (decisions §14, §24). The root itself
  * renders nothing visible.
  */
 export function mountItemList(doc: Document, list: ListConfig): void {

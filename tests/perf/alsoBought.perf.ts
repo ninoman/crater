@@ -15,7 +15,6 @@ import {
   type OwnershipRecord,
   type CrateMateRecord,
 } from '../../src/db';
-import { NO_FILTERS } from '../../src/shared/listFilters';
 import { storedRows } from './stored';
 
 const SUPPORTERS = 300;
@@ -99,8 +98,6 @@ beforeAll(async () => {
     tags: [],
     supporterCount: 10,
     compilation: false,
-    // Facts for the filter check: a fifth sell a physical edition (decisions §25).
-    facts: { year: null, nameYourPrice: i % 4 === 0, physical: i % 5 === 0 },
   }));
 
   const crateMateIds = [
@@ -130,8 +127,7 @@ beforeAll(async () => {
     [db.matchOwners, index.matchOwners],
     [db.fans, fans],
     [db.items, stored.items],
-    // Each band gets one of 27 genres.
-    [db.bands, stored.bands.map((band) => ({ ...band, genre: 1 + (band.bandId % 27) }))],
+    [db.bands, stored.bands],
     [db.crateMates, crateMates],
     // Every supporter listed and scanned, so the warm-up is over and co-owned rows show.
     [
@@ -171,28 +167,5 @@ it(`re-scores a release with ${SUPPORTERS} scanned supporters in under ${BUDGET_
 
   expect(rows).toBe(30);
   expect(coOwned).toBe(30);
-  expect(median).toBeLessThan(BUDGET_MS);
-});
-
-// A filter keeps pruning from stopping early, so this times the cost of looking further (§25).
-it(`re-scores with a filter on genre and physical edition in under ${BUDGET_MS} ms`, async () => {
-  const filters = { ...NO_FILTERS, genres: [1, 2, 3, 4, 5, 6, 7, 9, 10], physical: true };
-  const options = { filters };
-  await computeAlsoBought(db, RELEASE, ME, options); // warm-up
-
-  const times: number[] = [];
-  let result = await computeAlsoBought(db, RELEASE, ME, options);
-  for (let run = 0; run < 5; run++) {
-    const started = performance.now();
-    result = await computeAlsoBought(db, RELEASE, ME, options);
-    times.push(performance.now() - started);
-  }
-  const median = times.sort((a, b) => a - b)[2] ?? Infinity;
-  console.log(
-    `re-score, filtered: median ${median.toFixed(1)} ms, ${result.rows.length} rows, ` +
-      `hidden ${result.filtered?.summary.hidden}, limited ${result.filtered?.summary.limited}`,
-  );
-
-  expect(result.rows.length).toBeGreaterThan(0);
   expect(median).toBeLessThan(BUDGET_MS);
 });

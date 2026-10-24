@@ -272,60 +272,23 @@ describe('DigheadDb', () => {
     await upgraded.delete();
   });
 
-  it('adds notes and prices in v16 and keeps what was there', async () => {
+  it('drops notes and prices in v18 and keeps your tags', async () => {
     const name = `test-${crypto.randomUUID()}`;
     const old = new Dexie(name);
-    old.version(13).stores({
+    old.version(17).stores({
       itemTags: 'itemKey, *tagIds',
-      crateMates: 'fanId, score',
-      latelyCrateMates: 'fanId, lately',
+      itemNotes: 'itemKey',
+      itemPrices: 'itemKey',
     });
     await old.table('itemTags').add({ itemKey: 'a1', tagIds: [3] });
+    await old.table('itemNotes').add({ itemKey: 'a1', text: 'x', rating: 2, updatedAt: 1 });
     old.close();
 
     const upgraded = new DigheadDb(name);
     await upgraded.open();
     expect(await upgraded.itemTags.get('a1')).toEqual({ itemKey: 'a1', tagIds: [3] });
-    expect(await upgraded.itemNotes.count()).toBe(0);
-    expect(await upgraded.itemPrices.count()).toBe(0);
-    await upgraded.itemNotes.put({ itemKey: 'a1', text: 'x', rating: 2, updatedAt: 1 });
-    expect(await upgraded.itemNotes.get('a1')).toMatchObject({ rating: 2 });
-    await upgraded.delete();
-  });
-
-  it('gives followed bands their location on the band record in v17', async () => {
-    const name = `test-${crypto.randomUUID()}`;
-    const old = new Dexie(name);
-    old.version(13).stores({
-      bands: 'bandId, *hosts',
-      following: '[kind+id], kind, *tagIds',
-    });
-    await old.table('bands').bulkAdd([
-      { bandId: 1, hosts: ['one'] },
-      { bandId: 2, hosts: ['two'], location: 'Kept' },
-      { bandId: 3, hosts: ['three'] },
-    ]);
-    const followed = { name: 'n', url: 'u', imageId: null, followedAt: 1, tagIds: [] };
-    await old.table('following').bulkAdd([
-      { kind: 'band', id: 1, location: 'Berlin, Germany', ...followed },
-      { kind: 'band', id: 2, location: 'Overwritten', ...followed },
-      // A fan, not a band: ids of the two kinds overlap.
-      { kind: 'fan', id: 3, location: 'Elsewhere', ...followed },
-      // No band record to put it on, and no location to give.
-      { kind: 'band', id: 4, location: 'Nowhere', ...followed },
-      { kind: 'band', id: 5, location: null, ...followed },
-    ]);
-    old.close();
-
-    const upgraded = new DigheadDb(name);
-    await upgraded.open();
-    expect(
-      (await upgraded.bands.orderBy('bandId').toArray()).map((b) => [b.bandId, b.location]),
-    ).toEqual([
-      [1, 'Berlin, Germany'],
-      [2, 'Kept'],
-      [3, undefined],
-    ]);
+    expect([...upgraded.backendDB().objectStoreNames]).not.toContain('itemNotes');
+    expect([...upgraded.backendDB().objectStoreNames]).not.toContain('itemPrices');
     await upgraded.delete();
   });
 });

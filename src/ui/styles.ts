@@ -16,16 +16,13 @@ import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import heardBadge from './HeardBadge.css?inline';
 import infoHint from './InfoHint.css?inline';
-import listFilterBar from './ListFilterBar.css?inline';
 import loadMore from './LoadMore.css?inline';
 import menu from './Menu.css?inline';
-import notePopover from './NotePopover.css?inline';
 import notice from './Notice.css?inline';
 import panel from './Panel.css?inline';
 import playQueueBar from './PlayQueueBar.css?inline';
 import playableCover from './PlayableCover.css?inline';
 import progress from './Progress.css?inline';
-import rating from './Rating.css?inline';
 import releaseRow from './ReleaseRow.css?inline';
 import row from './Row.css?inline';
 import searchField from './SearchField.css?inline';
@@ -72,8 +69,6 @@ export const uiStyles = [
   tagPicker,
   segmented,
   select,
-  rating,
-  notePopover,
   skeleton,
   sectionHeading,
   disclosure,
@@ -82,7 +77,6 @@ export const uiStyles = [
   heardBadge,
   playQueueBar,
   toolbar,
-  listFilterBar,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */

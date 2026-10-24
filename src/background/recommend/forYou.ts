@@ -34,8 +34,6 @@ import { freshOwnership, type FreshOwned } from '../../scoring/fresh';
 import { MONTH_MS } from '../../scoring/lately';
 import { supporters } from '../../scoring/weights';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
-import type { ListFilters } from '../../shared/listFilters';
-import { createFilterGate, type FilterGate } from './filterGate';
 import { loadFollowedReleases } from './followSignal';
 import { listsInRankOrder, toRow } from './forYouRow';
 import { loadHideScopes } from './hideScopes';
@@ -61,9 +59,6 @@ export interface ForYouInput {
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
   now: number;
-  /** Narrow the picks (decisions §25), with the place "Near me" matches against. */
-  filters?: ListFilters;
-  homePlace?: string;
 }
 
 export async function computeForYou(
@@ -74,7 +69,6 @@ export async function computeForYou(
   const basis = crateMatesBasis(me);
   if (!me) return { basis, rows: [], crateMatesUsed: 0 };
 
-  const gate = createFilterGate(db, input.filters, input.homePlace ?? '');
   const crateMates = topCrateMates(await boardFor(db, input.mode), input.topCrateMatesK);
   const data = await gatherForYou(
     db,
@@ -92,7 +86,6 @@ export async function computeForYou(
   const { ranked, items } = await scoreTop(db, candidates, followed, {
     ignoreCompilations: input.ignoreCompilations,
     excluded,
-    gate,
   });
   const supportersOf = new Map(ranked.map((scored) => [scored.id, scored.supporters]));
   const lists = listsInRankOrder(crateMates, data);
@@ -129,7 +122,6 @@ export async function computeForYou(
     basis,
     rows,
     crateMatesUsed: data.crateMateLists.length,
-    ...(gate && { filtered: gate.applied() }),
   };
 }
 
@@ -174,18 +166,13 @@ function candidatesFor(
  * can reach the ranked list. Candidates with no item record can't be shown, so they don't
  * take a place, and neither do those from a hidden artist or label (§22). Ceilings allow for the
  * follow boost, so a followed release is never cut early. Compilations are down-weighted by
- * their shown record's flag (§17). Candidates the filter turns down are dropped before they're
- * looked up or scored, so they take no place (§25).
+ * their shown record's flag (§17).
  */
 async function scoreTop(
   db: DigheadDb,
   candidates: readonly CrateMateOwned[],
   followed: ReadonlyMap<number, string>,
-  {
-    ignoreCompilations,
-    excluded,
-    gate,
-  }: { ignoreCompilations: boolean; excluded: Exclusions; gate: FilterGate | null },
+  { ignoreCompilations, excluded }: { ignoreCompilations: boolean; excluded: Exclusions },
 ): Promise<{ ranked: ForYouScored[]; items: Map<ItemKey, ItemFields> }> {
   let ranked: ForYouScored[] = [];
   const items = new Map<ItemKey, ItemFields>();
@@ -193,24 +180,14 @@ async function scoreTop(
   for (let start = 0; start < candidates.length; start += CHUNK) {
     const first = candidates[start];
     if (!first || !couldRank(ranked, RANKED, first.crateMateScore * factor)) break;
-    if (gate?.exhausted) {
-      gate.stoppedAtLimit();
-      break;
-    }
-    const couldRankNow = candidates
+    const chunk = candidates
       .slice(start, start + CHUNK)
       .filter((c) => couldRank(ranked, RANKED, c.crateMateScore * factor));
-    // The gate reads the records it judges, so they aren't read again below.
-    const passing = gate && (await gate.passing(couldRankNow.map((c) => keyFromNumber(c.id))));
-    const chunk = passing
-      ? couldRankNow.filter((c) => passing.has(keyFromNumber(c.id)))
-      : couldRankNow;
     const [display, owners] = await Promise.all([
-      passing ??
-        getShownFields(
-          db,
-          chunk.map((c) => keyFromNumber(c.id)),
-        ),
+      getShownFields(
+        db,
+        chunk.map((c) => keyFromNumber(c.id)),
+      ),
       getOwnerCounts(
         db,
         chunk.map((c) => c.id),

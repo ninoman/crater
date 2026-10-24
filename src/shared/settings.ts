@@ -37,8 +37,6 @@ export interface Settings {
   deepCutMaxSupporters: number;
   /** A desktop notification when a read of your follows finds new releases (decisions §23). */
   followNotifications: boolean;
-  /** Where you are, as "Berlin" or "Berlin, Germany": what the "Near me" list filter matches bands against (decisions §25). */
-  homePlace: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -65,18 +63,11 @@ export const DEFAULT_SETTINGS: Settings = {
   deepCutMaxSupporters: 50,
   // Needs an optional permission, asked for when it's turned on.
   followNotifications: false,
-  homePlace: '',
 };
 
 export type NumericSetting = {
   [K in keyof Settings]: Settings[K] extends number ? K : never;
 }[keyof Settings];
-
-export type StringSetting = {
-  [K in keyof Settings]: Settings[K] extends string ? K : never;
-}[keyof Settings];
-
-export const HOME_PLACE_MAX_LENGTH = 100;
 
 export type BooleanSetting = {
   [K in keyof Settings]: Settings[K] extends boolean ? K : never;
@@ -115,9 +106,6 @@ export function validateSettings(settings: Settings): SettingsErrors {
     const value = settings[key];
     if (!Number.isInteger(value)) errors[key] = 'Enter a whole number';
     else if (value < min || value > max) errors[key] = `Between ${min} and ${max}`;
-  }
-  if (settings.homePlace.length > HOME_PLACE_MAX_LENGTH) {
-    errors.homePlace = `At most ${HOME_PLACE_MAX_LENGTH} characters`;
   }
   if (!errors.paceMaxMs && settings.paceMaxMs < settings.paceMinMs) {
     errors.paceMaxMs = 'At least the minimum pace';

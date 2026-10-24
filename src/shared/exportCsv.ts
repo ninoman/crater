@@ -1,5 +1,5 @@
-// The CSV files the popup exports: your wishlist, your collection with your tags, notes and
-// ratings, and a For you list (decisions §24). Pure; the popup fetches the data.
+// The CSV files the popup exports: your wishlist and collection with your tags, and a For you
+// list (decisions §24). Pure; the popup fetches the data.
 
 import { type CsvColumn, toCsv } from './csv';
 import type { ForYouRow } from './forYou';
@@ -28,27 +28,17 @@ function itemColumns(source: ListSource, tags: readonly Tag[]): CsvColumn<Listed
     { header: source === 'wishlist' ? 'Added' : 'Purchased', cell: (item) => day(item.addedAt) },
   ];
   const wishlistOnly: CsvColumn<ListedItem>[] = [
-    { header: 'Price', cell: (item) => item.price?.amount ?? null },
-    { header: 'Currency', cell: (item) => item.price?.currency ?? null },
-    {
-      header: 'For sale',
-      cell: (item) => (item.price === null ? null : item.price.purchasable ? 'yes' : 'no'),
-    },
     { header: 'Crate mates who own it', cell: (item) => item.crateMateOwners },
   ];
-  const yours: CsvColumn<ListedItem>[] = [
-    {
-      header: 'Tags',
-      cell: (item) =>
-        item.tagIds
-          .flatMap((id) => names.get(id) ?? [])
-          .sort((a, b) => a.localeCompare(b))
-          .join('; '),
-    },
-    { header: 'Rating', cell: (item) => item.note?.rating ?? null },
-    { header: 'Note', cell: (item) => item.note?.text ?? null },
-  ];
-  return source === 'wishlist' ? [...common, ...wishlistOnly, ...yours] : [...common, ...yours];
+  const tagsColumn: CsvColumn<ListedItem> = {
+    header: 'Tags',
+    cell: (item) =>
+      item.tagIds
+        .flatMap((id) => names.get(id) ?? [])
+        .sort((a, b) => a.localeCompare(b))
+        .join('; '),
+  };
+  return source === 'wishlist' ? [...common, ...wishlistOnly, tagsColumn] : [...common, tagsColumn];
 }
 
 /** Your wishlist or collection as CSV, in the order given, with the names of your tags. */

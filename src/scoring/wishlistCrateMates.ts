@@ -1,15 +1,6 @@
 // "Crate mates who own it" for a list of releases you don't (yet) own, such as your wishlist:
-// how many of your top crate mates hold each one, and how alike those crate mates are. Pure;
-// src/background gathers the lists (decisions §24).
-
-import type { CrateMateMatches } from './forYou';
-
-export interface OwnedByCrateMates {
-  /** How many of the crate mates own it. */
-  owners: number;
-  /** Σ score of those crate mates, to break ties between equal counts. */
-  score: number;
-}
+// how many of your top crate mates hold each one. Pure; src/background gathers the lists
+// (decisions §24).
 
 /** Whether a sorted list holds `id`. */
 function includes(sorted: Float64Array, id: number): boolean {
@@ -26,15 +17,12 @@ function includes(sorted: Float64Array, id: number): boolean {
 }
 
 /**
- * For each match id, in order: the crate mates whose collection holds it. `matches` must be
- * sorted ascending, as `fanMatches.matchIds` is.
+ * For each match id, in order: how many of the crate mates' collections hold it. Each list must
+ * be sorted ascending, as `fanMatches.matchIds` is.
  */
 export function crateMateOwnerCounts(
   matchIds: readonly number[],
-  crateMates: readonly CrateMateMatches[],
-): OwnedByCrateMates[] {
-  return matchIds.map((id) => {
-    const owners = crateMates.filter((crateMate) => includes(crateMate.matches, id));
-    return { owners: owners.length, score: owners.reduce((sum, c) => sum + c.score, 0) };
-  });
+  crateMateMatches: readonly Float64Array[],
+): number[] {
+  return matchIds.map((id) => crateMateMatches.filter((matches) => includes(matches, id)).length);
 }

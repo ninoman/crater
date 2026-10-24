@@ -20,10 +20,7 @@ function wish(
     label: null,
     addedAt: null,
     tagIds,
-    note: null,
-    price: null,
     crateMateOwners: 0,
-    crateMateScore: 0,
     heard: false,
     ...extra,
   };
@@ -35,7 +32,6 @@ const ITEMS = [
   wish('t3', 'Pearson Sound', 'Blue Cloud', [2]),
   wish('a4', 'Nobody', 'Untagged', [], {
     label: 'Hessle Audio',
-    note: { text: 'ask Sam', rating: 3 },
   }),
 ];
 const keys = (set: Set<ItemKey>) => [...set].sort();
@@ -61,9 +57,8 @@ describe('visibleItemKeys', () => {
 });
 
 describe('visibleItemKeys search', () => {
-  it('also finds a release by its label or by your note on it', () => {
+  it('also finds a release by its label', () => {
     expect(keys(visibleItemKeys(ITEMS, { ...NO_FILTER, query: 'hessle' }))).toEqual(['a4']);
-    expect(keys(visibleItemKeys(ITEMS, { ...NO_FILTER, query: 'ask sam' }))).toEqual(['a4']);
   });
 });
 

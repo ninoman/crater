@@ -10,6 +10,8 @@ export interface ListConfig {
   /** Bandcamp's tab and the holder of its items, as selectors (FAN_PAGE_DOM). */
   grid: string;
   items: string;
+  /** Bandcamp's search box for the list, hidden while ours stands in. */
+  search: string;
   /** The word the list goes by in our text. */
   noun: string;
   /** The sync step that fetches this list. */
@@ -24,6 +26,7 @@ export const WISHLIST: ListConfig = {
   source: 'wishlist',
   grid: FAN_PAGE_DOM.wishlistGrid,
   items: FAN_PAGE_DOM.wishlistItems,
+  search: FAN_PAGE_DOM.wishlistSearch,
   noun: 'wishlist',
   step: 'wishlist',
   countOf: (status) => status.wishlisted,
@@ -34,6 +37,7 @@ export const COLLECTION: ListConfig = {
   source: 'collection',
   grid: FAN_PAGE_DOM.collectionGrid,
   items: FAN_PAGE_DOM.collectionItems,
+  search: FAN_PAGE_DOM.collectionSearch,
   noun: 'collection',
   step: 'collection',
   countOf: (status) => status.owned,

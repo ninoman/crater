@@ -3,7 +3,6 @@
 import type { ItemKey } from '../bandcamp';
 import type { HideScopes } from './hide';
 import type { CrateMatesBasis } from './crateMates';
-import type { AppliedFilters } from './listFilters';
 
 /**
  * All time draws on the crate mates leaderboard; Fresh on lately crate mates' buys of the last year (§11);
@@ -46,6 +45,4 @@ export interface ForYouResult {
   rows: ForYouRow[];
   /** Top crate mates the picks came from: up to settings.topCrateMatesK. 0 means no crate mates yet (on that board). */
   crateMatesUsed: number;
-  /** The request's filters and what they did; absent when none narrowed the list (decisions §25). */
-  filtered?: AppliedFilters;
 }

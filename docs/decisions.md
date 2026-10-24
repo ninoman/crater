@@ -849,7 +849,7 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 
 ## 22. Hide, heard and play-through
 
-Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Research: ideas #4, #2 and #7, and "How #2 and #4 fit together", in `docs/research/bandcamp-user-needs.md`, which this follows. Code: `scoring/exclusions.ts`, `db/repo/hidden.ts`, `heard.ts`, `sellers.ts`, `background/hideHeardHandlers.ts`, `background/recommend/hideScopes.ts`, `shared/heard.ts`, `shared/playQueue.ts`, `hooks/useListPlayer.ts`, `useBandcampPlays.ts`, `rowActions.ts`, `src/ui/Menu`, `HeardBadge`, `PlayQueueBar`, `popup/HiddenList.tsx`. Tested on synthetic data and the fixtures (jsdom); not yet tried live.
+Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `scoring/exclusions.ts`, `db/repo/hidden.ts`, `heard.ts`, `sellers.ts`, `background/hideHeardHandlers.ts`, `background/recommend/hideScopes.ts`, `shared/heard.ts`, `shared/playQueue.ts`, `hooks/useListPlayer.ts`, `useBandcampPlays.ts`, `rowActions.ts`, `src/ui/Menu`, `HeardBadge`, `PlayQueueBar`, `popup/HiddenList.tsx`. Tested on synthetic data and the fixtures (jsdom); not yet tried live.
 
 ### Hide and heard stay apart
 
@@ -902,7 +902,7 @@ Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Research:
 
 ## 23. New from your follows, and notifications
 
-Recon 2026-10-24, logged out, with curl against live bandcamp.com. Built the same day. Research: [bandcamp-user-needs.md](research/bandcamp-user-needs.md) #1 and #10. Code: `src/bandcamp/discography.ts` (parser), `src/db/repo/bandReleases.ts` and `followsDigest.ts`, `src/background/scanner/followReleases*.ts`, `src/scoring/followsDigest.ts` (pure), `src/background/follows/` (digest, visits, notifications, handlers), `src/content/profile/follows/`. Roadmap: *New from your follows*.
+Recon 2026-10-24, logged out, with curl against live bandcamp.com. Built the same day. Code: `src/bandcamp/discography.ts` (parser), `src/db/repo/bandReleases.ts` and `followsDigest.ts`, `src/background/scanner/followReleases*.ts`, `src/scoring/followsDigest.ts` (pure), `src/background/follows/` (digest, visits, notifications, handlers), `src/content/profile/follows/`. Roadmap: *New from your follows*.
 
 ### Data source: the mobile API, not `/music` or the fan feed
 
@@ -988,47 +988,33 @@ A per-account mute is a separate `followMutes` set rather than a reserved tag or
 
 ## 24. Wishlist and collection tools
 
-Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Research: `docs/research/bandcamp-user-needs.md`, ideas 3, 6, 8 and 9. Code: `src/content/itemList/` (the takeover, generalised from §14), `src/shared/itemSort.ts`, `shortlist.ts`, `csv.ts`, `exportCsv.ts`, `src/scoring/wishlistCrateMates.ts`, `db/repo/itemLists.ts`, `itemNotes.ts`, `itemPrices.ts`, `src/popup/CsvExport.tsx`. Tested on the fixtures (jsdom); **not yet tried on the live tabs** with Bandcamp's own JS running.
+Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Code: `src/content/itemList/` (the takeover, generalised from §14), `src/shared/csv.ts`, `exportCsv.ts`, `src/scoring/wishlistCrateMates.ts`, `db/repo/itemLists.ts`, `src/popup/CsvExport.tsx`. Tested on the fixtures (jsdom); **not yet tried on the live tabs** with Bandcamp's own JS running.
 
 ### One takeover for both tabs
 
 - **Generalised, not copied.** `content/wishlist/` became `content/itemList/`. A `ListConfig` (`lists.ts`: `WISHLIST`, `COLLECTION`) holds what differs: Bandcamp's grid and items selectors, the noun in our text, the sync step and count that say the list is complete. Takeover, lazy opening, `showBandcampList` fallback, `syncEmpty.ts`, grid, card, filter bar, tags and bulk bar are the same code. `listWishlist` became `listItems { source }`, `WishlistItem` became `ListedItem`.
-- **The collection tab's DOM differs a little, and `me-fan-page.html` already shows it** (no new fixture; the page is the logged-in capture, and a fresh one would need a login). `#collection-grid` is `active` when the page loads, so the takeover happens at once, not on a click. `#collection-items` holds the first 20 items already rendered in `ol.collection-grid.editable`, then a second, empty `ol.collection-grid`, then `.expand-container`. All are direct children, so the same rule hides them (`FAN_PAGE_DOM.itemsNativeList`, `itemsExpand`), and our slot goes before the first `ol`. Bandcamp's own collection search box is left alone and searches its list, not ours (as on the wishlist, §14).
+- **The collection tab's DOM differs a little, and `me-fan-page.html` already shows it** (no new fixture; the page is the logged-in capture, and a fresh one would need a login). `#collection-grid` is `active` when the page loads, so the takeover happens at once, not on a click. `#collection-items` holds the first 20 items already rendered in `ol.collection-grid.editable`, then a second, empty `ol.collection-grid`, then `.expand-container`. All are direct children, so the same rule hides them (`FAN_PAGE_DOM.itemsNativeList`, `itemsExpand`), and our slot goes before the first `ol`. Bandcamp's own search box is hidden while ours stands in (see *No sort*).
 - **Same fallbacks as the wishlist:** Bandcamp's list comes back while the worker is unreachable or while our list is empty and the sync hasn't finished, failed, or hasn't seen you log in.
-- **Big collections:** 120 cards at a time with "Show more", filters and sort over the whole list. A heavy user's collection is thousands of rows over the message bus (about 400 bytes each); not measured on a real account yet.
+- **Big collections:** 120 cards at a time with "Show more", filters over the whole list. A heavy user's collection is thousands of rows over the message bus (about 400 bytes each); not measured on a real account yet.
 - **Tags apply to collection items too**, the same pool (§14). `getItemTags` still answers only for wishlisted items, so a release page shows tags only while it is in your wishlist: a gap.
 - **Tags, notes and ratings now survive a purchase.** Before, the wishlist sync dropped the tags of anything that left the wishlist (§14). A full sync now prunes at its end (`pruneItemData`), after both lists: tags and notes of items in neither list go, prices of items off the wishlist go. A bought item keeps its tags and note. A hidden wishlist leaves its rows, so it keeps them as before.
 
-### Sort
+### No sort (removed 2026-10-24)
 
-- **Keys.** Wishlist: date added, artist, label, price, crate mates who own it, buy next. Collection: date purchased, artist, label. A direction button flips the order; choosing a key starts in its natural direction (names and prices low to high, the rest high to low).
-- **Pure and shared:** `shared/itemSort.ts`, used by the cards, the shortlist and the tests. Ties keep the order the worker sent (newest first). Items with nothing to sort by (no label, no price, no date) go last in either direction.
-- **Label** is the label name Bandcamp gives when a release is on a label but sold from the artist's account. When the seller is the label, `artist` already holds its name and `label` is null (§3.3), so those sort last under Label.
-- **Price sorts within a currency, and currencies stay together** (ordered by code). Dighead has no exchange rates and won't fetch any (no new host, no backend), so it never compares or adds amounts across currencies.
-- **Crate mates who own it** is `scoring/wishlistCrateMates.ts`: for each wishlist item's matchKey, how many of your top K crate mates (`topCrateMatesK`, same as For you) hold it in their collection, plus their summed score for ties. Pure over the crate mates' `fanMatches` lists; the worker gathers them (`getPurchaseLists`). Wishlist only: you own what's in your collection.
-- **Buy next** is a sort, not a stored order: your rating first (unrated below a 1), then crate mates who own it, then newest added. It needs no state of its own, so it can't go stale.
-- **Remembered per tab** in `chrome.storage.local` (`sort:wishlist`, `sort:collection`; `useStoredSort`), as the other small UI preferences are. A saved key the list doesn't offer falls back to the default.
-- The search also looks in the label and in your notes.
+- A sort menu (added, artist, label, price, crate mates who own it, buy next) shipped and came out the same day: it crowded the toolbar for little use. Cards are newest first, as the worker sends them.
+- **Crate mates who own it** stays as a line on wishlist cards and a CSV column: `scoring/wishlistCrateMates.ts` counts how many of your top K crate mates (`topCrateMatesK`, same as For you) hold each wishlist item's matchKey, over their `fanMatches` lists (`getPurchaseLists`). Wishlist only: you own what's in your collection.
+- The search also looks in the label. It's the only search on the tab: Bandcamp's own box (`#wishlist-search`, `#collection-search`) only searches its hidden pages, so the takeover hides it too.
 
-### Notes and ratings
+### No notes, ratings or prices (removed 2026-10-24)
 
-- **Schema v16:** `itemNotes: 'itemKey'` with `{ itemKey, text, rating (1–5 or null), updatedAt }`. Keyed apart from `items` and `ownership`, like `itemTags`. `normaliseNote` trims, cuts at 2,000 characters, turns anything but an integer 1–5 into unrated, and an empty note deletes the row. Message `saveItemNote`.
-- **On the card:** "+ note" opens a popover with five stars and a text box. Once there's a note, the button shows its stars and text. Escape or a click outside drops the draft; Save keeps it.
-- **Tags backup file is version 3**, with a top-level `notes` list. Versions 1 and 2 still import (no notes), and a file from a newer version is refused as before. Import adds a note only for an item that has none: a file never overwrites what you wrote since. Notes and tags for items in neither of your lists are skipped and counted. Tag assignments to collection items import now too.
-- **Full backup:** `itemNotes` and `itemPrices` are tables, so they're in it. `TABLES_ADDED` lists both at 16, so a v15 backup still restores (without them), and `schema.test.ts` upgrades a v13 database to v16.
-
-### Prices and the Friday shortlist
-
-- **Where prices come from.** Wishlist rows already carry `price`, `currency`, `is_purchasable`, `is_private` and `is_subscriber_only` (`wishlist_items.json`); the parser now keeps them (`ItemPrice` on `CollectionItem`). `purchasable` = purchasable, not private, not subscriber-only. `is_set_price` is not used: its meaning (fixed price or name-your-price) isn't certain, so a price is shown as Bandcamp lists it, and name-your-price items just show their listed amount.
-- **Where they're stored:** `itemPrices: 'itemKey'` (v16), written by the wishlist sync, one row per item with `price` null when Bandcamp gave none. Not on `items` or `ownership`, which scans and the match index read in bulk.
-- **Existing wishlists fill in on the next sync, once.** An incremental sync treats a wishlist item with no price row as new, so it reads the wishlist again until every item has a row, then stops as before. Prices change on Bandcamp, though; only a full sync (Re-sync) refreshes ones already stored.
-- **The shortlist** is a switch on the wishlist toolbar, "All / Bandcamp Friday shortlist": items with `price.purchasable`, in buy next order (the sort menu hides, the order is fixed). The filter bar still works inside it. Above the cards: "N releases you can buy: $84.99 + €19.00", one total per currency. Each card adds "running $45.00", the cumulative total in its own currency, in list order. Read-only: nothing writes to the cart, and the text says so.
-- **States:** nothing purchasable says why (prices not read yet, or everything is private or withdrawn) and offers the whole wishlist.
+- Private notes with 1–5 ratings on cards, and wishlist prices read by the sync, shipped and came out the same day. Schema v18 drops their tables (`itemNotes`, `itemPrices`, added in v16). A full backup from v16 or v17 still restores: `TABLES_DROPPED` names the two, and the import skips them unread (`skipTables`).
+- **Tags backup file:** written as version 2 again. Version 3 files, which carried a `notes` list, still import; the notes are ignored.
+- **Tags survive a purchase**, which came with this work and stays: a full sync prunes at its end (`pruneItemData`), after both lists, so only tags of items in neither list go.
 
 ### CSV export
 
 - **Pure serializer** in `shared/csv.ts`: UTF-8 with a byte order mark (so Excel opens accents right), CRLF, RFC 4180 quoting. Text that starts with `=`, `+`, `-`, `@`, tab or carriage return gets a leading apostrophe, so a hostile title can't run as a formula; numbers aren't touched.
-- **Row shapes** in `shared/exportCsv.ts`. Wishlist: artist, title, label, URL, added (ISO date), price, currency, for sale, crate mates who own it, tags, rating, note. Collection: the same without the price columns, with the purchase date. For you: rank, artist, title, label, URL, owned by your top crate mates, owners on Bandcamp, best crate mate rank, newest crate mate purchase, who you follow behind it. Tags are names, joined with "; ".
+- **Row shapes** in `shared/exportCsv.ts`. Wishlist: artist, title, label, URL, added (ISO date), crate mates who own it, tags. Collection: the same without crate mates, with the purchase date. For you: rank, artist, title, label, URL, owned by your top crate mates, owners on Bandcamp, best crate mate rank, newest crate mate purchase, who you follow behind it. Tags are names, joined with "; ".
 - **From the popup's Settings tab** ("CSV export"): Wishlist, Collection, For you, with a menu for which For you picks (All time, Fresh, Deep cuts). The popup can't see the profile tab's current mode, so it asks. It reads through the existing `listItems`, `listTags` and `getForYou` messages (no new one) and saves through a blob URL (`hooks/saveFile.ts`, now shared with the two backups). An empty list says so instead of saving an empty file. M3U export from the backlog is still open.
 
 ### Heard on cards (merged 2026-10-24)
@@ -1037,102 +1023,10 @@ Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Research
 - A card's preview marks the release heard in the worker after 30 s, as every preview does. The grid also flags the card at once (`onHeard` from `ReleasePreview`), instead of waiting for the next read of the list.
 - The cards have no Hide heard switch and no manual mark: the wishlist doubles as a to-listen list, and the badge is what that needs. Add either if it turns out to be missed.
 
-## 25. Filters on recommendation lists
+## 25. Filters on recommendation lists (removed)
 
-Decided and built 2026-10-24. Roadmap: *List filters*. Code: `bandcamp/facts.ts` and `genres.ts`, `fillBandLocations` and v17 in `src/db/schema.ts`, `db/repo/listFacts.ts`, `scoring/listFilters.ts` (pure), `shared/listFilters.ts`, `background/recommend/filterGate.ts`, `ui/ListFilterBar.tsx`, `hooks/useListFilters.ts`. Research: [docs/research/bandcamp-user-needs.md](research/bandcamp-user-needs.md), feature #5.
+Built and removed on 2026-10-24. A filter bar (genre, release year, name your price, physical edition, near me) on For you, Also bought and Crate mates' latest, with a "Your place" setting, facts read from collection rows and release pages, and a v17 upgrade that filled in followed bands' locations. It took a row on lists meant for browsing, and filled the parsers and the schema with facts nothing else used.
 
-Fans ask to filter by genre, region, price, format and date ([R2][R27][R30][R34]). The filters narrow **our own lists**: For you (All, Fresh and Deep cuts), Also bought and Crate mates' latest. They don't search Bandcamp.
+- v17 stays declared, as released versions must, but no longer fills anything in. Facts already written to `items` (`year`, `nyp`, `physical`) and `bands` (`genre`, `location`) are left as unread fields: rewriting every item would make the upgrade take minutes (§19), and a rescan writes each row afresh.
+- If filters come back, start from the commits of that day (`feat(filters)`), and from the notes there on what Bandcamp sends: `band_location` is null logged out, and "name your price" isn't "free".
 
-### Facts, and where they come from
-
-Collection rows and release pages already carry most of what a filter needs. Facts about the **selling account** (genre, location) live on `bands`, once per band. Facts about the **release** live on `items`.
-
-| Fact | Collection row | Release page | Stored |
-| --- | --- | --- | --- |
-| Genre | `genre_id`. The same for every row of a band (55 bands in the fixtures, none with two) | ld+json `publisher.genre`, a `bandcamp.com/discover/<slug>` link | `bands.genre`, a genre id |
-| Location | `band_location`. **`null` in all 89 fixture rows**, which were fetched logged out. Not checked logged in | ld+json `publisher.foundingLocation.name`, the same text as the page header ("UK", "Istanbul, Türkiye") | `bands.location` |
-| Name your price | `is_set_price`, inverted: true is a fixed price | `current.is_set_price`, inverted | `items.nyp` |
-| Physical edition | `merch_ids` non-empty and `merch_sold_out` not true. No `merch_ids` means none, which is known | any public, non-ticket package with `quantity_available` not 0 | `items.physical` |
-| Release year | none: rows only have the buyer's date | `current.release_date`, else ld+json `datePublished` (track pages) | `items.year` |
-
-- **Genre names.** Collection rows give a number. Bandcamp's own list is in `#pagedata` of `bandcamp.com/discover` (`genres`: 27 ids from 1 to 28, no 8, each with a slug). It's saved as `tests/fixtures/discover-genres.json` (2026-10-24), and a test checks `GENRES` in `bandcamp/genres.ts` against it. The ids match what we had seen (`band-page.html` has `genre_id` 10, the electronic floatingpoints). Release pages give the slug, which the same table turns into the id. A slug that isn't one of the 27 leaves the genre unknown. These are Bandcamp's top-level genres, not its free-form tags (`items.tags`).
-- **"Name your price" means the artist lets fans pay the asking price *or more*** (`is_set_price` false, the default on Bandcamp: 36 of 40 fixture rows). It does **not** mean free. A release with a minimum of 0 is also `false`, and the collection row can't tell the two apart: it holds `price` (the suggested price) and not the minimum. Release pages do have `minimum_price`, but one rule for both sources beats a sharper one for few. A "free or pay what you want" filter would need the minimum on every row, which Bandcamp doesn't send.
-- **Physical** is stock at the time of the last sighting. It goes stale as editions sell out, until the release is seen again.
-- **Year is only known from release pages**, so it's mostly unknown in lists built from other fans' collections. See *Older rows* below.
-- **Not kept: price and currency.** No filter uses them, and prices come in many currencies with no rate to compare them by. Keeping them would have cost 14.8 MB of JSON more (table below). `nyp` answers the question the filter asks. Also not kept: license ids (null on all 89 fixture rows), `merch_ids` (only whether there are any matters), preorder and subscriber flags.
-
-### Stored
-
-`StoredItem` gets `year`, `nyp` and `physical`, each left out while unknown (as §19 does for defaults). `BandRecord` gets `genre` and `location`. Parsers fill `CollectionItem` and `ReleasePageItem` with `facts` and `band`; both are optional on the parsed types, so a record with none means "nothing known". The repo merges, never erases: a newer sighting's known fact replaces the old one, and a fact a sighting lacks stays (a collection row has no year, so it keeps the year a release page found; a null location keeps the known one). Reading `ItemFields` gives `facts` only when the row has one, so nothing that compared records before changes.
-
-**Cost.** Measured on the 2026-10-22 backup (v12 shape: 543,157 items, 57,547 bands, 275 MB of JSON, 77.6 MB gzipped) by adding the new fields to every item and band with the fixtures' mix (90% name your price, 40% physical, year on 2% of items, locations from the 576 you follow, avg 14.5 characters) and re-serializing the two tables:
-
-| Added to every row | JSON | gzipped (`gzip -6`) |
-| --- | --- | --- |
-| `items`: `nyp` and `physical`, `year` on 2% | **+15.2 MB** | +1.0 MB |
-| `bands`: genre and location (all bands) | **+2.3 MB** | +0.3 MB |
-| Together (worst case: every row seen again after v17) | **+17.5 MB (6.4% of the file)** | **+1.3 MB (1.7%)** |
-| *Rejected:* `items` also with `price` and `currency` | +30.0 MB (14.8 MB more) | +2.4 MB |
-| Bands with genre only | +0.6 MB | +0.07 MB |
-
-There's no new index, so the disk cost is the values only. LevelDB's Snappy squeezes repeated keys, as the gzip numbers suggest; the disk figure wasn't measured. §19 saved about 160 MB on disk, so this takes back a small part. Packing the three item fields into one number would save roughly 10 MB of JSON, at the price of readable rows. Left for if disk size ever matters.
-
-### Schema v17, older rows
-
-- **Nothing to rewrite.** Absent means unknown, and there's no index, so `this.version(17).stores({})` needs no pass over 543,000 items. The upgrade's only work is `fillBandLocations`: followed bands' `following.location` goes onto their `bands` record when it has none. `migrateRows` runs the same function for a backup made before v17.
-- **Rows get their facts when they're seen again:** your own sync (every item of your collection, each time), a release page you open or the scanner reads, and a fan's collection page when they're scanned or re-read. **Old scanned rows stay unknown until then**, and a crate mate's older purchases are only re-read by a full rescan. Until a fan is rescanned their releases can't pass a genre, price, physical or year filter. The bar says so (below). A one-off re-read of the top crate mates' collections after the upgrade would close the gap quickly (~20 requests each at batch 100); it isn't built, since it spends Bandcamp requests the task didn't ask for.
-- **Followed bands' locations** reach `bands` only through that upgrade. `syncFollowing` doesn't write them on later syncs.
-
-### Unknown facts fail the filter
-
-A release whose fact a filter needs isn't known is **hidden**, not shown. Every filter is "show only": "near me" shouldn't list bands whose location we don't know, and "physical" shouldn't list releases we know nothing about. The alternative, letting unknowns through, makes every filter look broken on a database that hasn't been rescanned. The cost is that an unknown hides things that might match, so the bar says how many: `judge()` returns `pass`, `fail` or `unknown`, and an `unknown` counts in `hidden` and in `unjudged` ("N of them couldn't be judged: Dighead hasn't seen that detail yet"). A definite fail on one filter wins over an unknown on another. A filter that is off needs no fact.
-
-### Applying them
-
-- **In the worker, before the list is cut.** `filterGate.ts` wraps `getShownFacts` (the facts of the record each match would show, plus its band) and `judge`. Each recommender asks it which candidates of the chunk it is about to look up pass, and drops the rest *before* looking up their items or scoring them, so a rejected release never takes a place:
-  - **For you (All, Fresh) and Also bought:** in each chunk of 200, after the pruning check.
-  - **Deep cuts:** the same; a chunk the filter empties moves on to the next, where the unfiltered loop would stop.
-  - **Also bought's same-artist and same-label picks:** the seller's items, only those a pick could be made of.
-  - **Crate mates' latest:** `firstPassing` walks the feed newest first until it has the 100 spare rows the unfiltered feed looks up, so a narrow filter still fills the list.
-- **Requests.** `getForYou`, `getAlsoBought` and `getCrateMatesLatest` take an optional `filters`. Without it, or with nothing on, no gate is made and nothing else changes. Results carry `filtered?: { filters, summary }`, absent when no filter narrowed the list.
-- **Also bought re-scores itself** as supporters are scanned. The worker keeps the filters each watched release was last asked for (`filtersOfRelease`, in memory), and results say which filters they were built with. If the worker forgot (it was suspended), the sidebar sees a result for other filters and asks again instead of showing it.
-- **The search limit.** Pruning works by stopping once no remaining candidate can reach the list. A filter that few candidates pass never fills the list, so the loop would read all of them (78,000 in the Deep cuts perf data). It stops after **4,000 candidates** (`FILTER_SEARCH_LIMIT`) and sets `limited`, which the bar reports ("only the best 4,000 candidates were checked"). Candidates come best first, so what's missed ranks lowest.
-- **What "N hidden by filters" counts:** candidates the filter turned down among those the scorer was about to look up. The scorer stops once nothing left can rank, so these are the ones that could have made the list, not every release in the database. For Also bought's fallback and the latest feed it's every candidate looked at.
-
-### Near me
-
-`filters.nearMe` matches a band's location against `settings.homePlace`, a line in the popup's Recommendations section ("Berlin, Germany"; up to 100 characters). **No geocoding.** The match is text:
-
-- The place is split at commas into alternatives ("Berlin, Germany" is Berlin *or* Germany), so a country or region catches the cities in it. Type just a city to stay local.
-- Each alternative must match whole words, ignoring case and accents: "turkiye" matches "Istanbul, Türkiye", "Niger" doesn't match "Lagos, Nigeria". It's escaped, never a pattern.
-- **No aliases.** "UK" doesn't match "United Kingdom" or the other way round; Bandcamp shows whatever the band typed. Put both in the place ("UK, United Kingdom").
-- With no place set the switch is disabled in the bar (with the reason) and the worker ignores it. The hook sends `nearMe: false` then, so the bar, the request and the sidebar's check agree.
-
-### The bar
-
-One `ListFilterBar` (`src/ui/`) on For you (all modes share one set), Also bought and Crate mates' latest: a **Filters** button (Radix Popover, portalled into the shadow root like the tag picker) with a genre check list, Near me, Name your price, Physical edition available and a year range; **Clear filters**; and the summary line under it, shown while a filter is on.
-
-- **Remembered per list** in `chrome.storage.local` (`listFilters.forYou`, `.alsoBought`, `.latest`). The list isn't fetched until the saved filters are read, so there's no unfiltered flash. Stored values are checked on the way in (`sanitizeFilters`).
-- **States.** Loading and unreachable are the list's own, with the bar above. A filtered list with nothing left says "Nothing matches these filters" with the summary and a **Clear filters** button (`NoMatches`), except during Also bought's warm-up, where an empty list still means "still gathering". A list that was already empty shows its usual reasons.
-- Year boxes keep what you type and report it once it's four digits, or empty for no limit.
-
-### Checked
-
-- Fixture tests for every parser: `collection_items-p1.json` (facts per row, band genre), `album-page.html` (year 2021, name your price, physical, genre 10, "UK"), `album-page-small.html` (Istanbul, Türkiye; free), `album-page-compilation.html` (both packages sold out), `track-page.html` (year from `datePublished`).
-- Synthetic tests: `judge` and `locationMatches` (`scoring/listFilters.test.ts`); each recommender with filters (`recommend/listFilters.test.ts`), including a list that only fills because the filter runs before the cut, and the 4,000 limit; the v17 upgrade and a v16 backup; storage round trips; the bar and the empty state.
-- **Perf** (`pnpm perf`; the filter checks are in `tests/perf/deepCuts.perf.ts`, on the same 200-crate-mate, 100,000-release seed with genres on bands and facts on items):
-
-  | Check | Budget | Before (§19) | Unfiltered now | With filters |
-  | --- | --- | --- | --- | --- |
-  | Also bought re-score | 200 ms | 61 ms | 65 ms | **141 ms**: genre in 9 of 27 and a physical edition; 3,063 candidates hidden |
-  | For you, All | 200 ms | 107 ms | 115 ms | **127 ms** broad (a third of the genres); **101 ms** narrow (nothing passes, so it stops at the 4,000 limit) |
-  | Deep cuts | 200 ms | 132 ms | 139 ms | **133 ms** broad |
-  | Crate mates recompute | 2 s | 482 ms | 489 ms | not filtered |
-
-  Medians of five runs on 2026-10-24, on a machine other sessions were also loading (load average 30 to 60), so the "unfiltered now" column moves by a few ms between runs, and one Deep cuts run came out at 780 ms and didn't repeat in three more. Two things keep filtered runs cheap: records come from the gate's one read instead of a second one, and each band is read once per request (`BandFactsCache`). The perf seed has 500 bands, so a real database with 57,000 will read more of them; the limit bounds that to 4,000 candidates' worth.
-
-### Not done
-
-- Re-reading crate mates after the upgrade so old rows get facts (above).
-- A price filter (needs a minimum on every row), a license filter (ids are null in every sample) and filtering the wishlist or collection tabs (other sessions own those).
-- Writing followed bands' locations on each following sync.

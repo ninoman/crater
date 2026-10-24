@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 // The whole wishlist and collection tabs against a fake worker: takeover on first open, cards
-// with their tags, sorting, notes, the Friday shortlist, filtering, bulk tagging and the empty state.
+// with their tags, filtering, bulk tagging and the empty state.
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
@@ -21,7 +21,6 @@ let collection: ListedItem[];
 let status: SyncStatus;
 let stored: Record<string, unknown>;
 const assigned: unknown[] = [];
-const saved: unknown[] = [];
 
 function wish(n: number, tagIds: number[], extra: Partial<ListedItem> = {}): ListedItem {
   return {
@@ -33,10 +32,7 @@ function wish(n: number, tagIds: number[], extra: Partial<ListedItem> = {}): Lis
     coverUrl: null,
     addedAt: n * 1000,
     tagIds,
-    note: null,
-    price: null,
     crateMateOwners: 0,
-    crateMateScore: 0,
     heard: false,
     ...extra,
   };
@@ -57,9 +53,6 @@ function answer(message: { type: string; payload: Record<string, unknown> }): un
   switch (message.type) {
     case 'listItems':
       return message.payload.source === 'wishlist' ? items : collection;
-    case 'saveItemNote':
-      saved.push(message.payload);
-      return message.payload.note;
     case 'listTags':
       return TAGS;
     case 'getSyncStatus':
@@ -79,7 +72,6 @@ beforeEach(() => {
   collection = [];
   stored = {};
   assigned.length = 0;
-  saved.length = 0;
   vi.stubGlobal('chrome', {
     storage: {
       local: {
@@ -122,8 +114,6 @@ const grid = (doc: Document) => doc.getElementById('wishlist-grid') as HTMLEleme
 const root = (doc: Document) => doc.querySelector('#wishlist-items dighead-wishlist')?.shadowRoot;
 const collectionRoot = (doc: Document) =>
   doc.querySelector('#collection-items dighead-collection')?.shadowRoot;
-const titles = (doc: Document) =>
-  cards(doc).map((row) => row.querySelector('.dh-card__title')?.textContent);
 const cards = (doc: Document) => [...(root(doc)?.querySelectorAll('li.dh-card') ?? [])];
 const buttonNamed = (doc: Document, text: string) =>
   [...(root(doc)?.querySelectorAll('button') ?? [])].find(
@@ -176,6 +166,9 @@ describe('the wishlist tab', () => {
     await openTab(doc);
 
     expect(doc.getElementById('wishlist-items')?.classList).toContain('dighead-wishlist-taken');
+    // Ours is the only search: Bandcamp's covers just its hidden pages.
+    const search = doc.getElementById('wishlist-search') as HTMLElement;
+    expect(getComputedStyle(search).display).toBe('none');
     expect(cards(doc).map((row) => row.querySelector('.dh-card__title')?.textContent)).toEqual([
       'Title 3',
       'Title 2',
@@ -295,64 +288,6 @@ describe('the wishlist tab', () => {
     expect(cards(doc)).toHaveLength(240);
   });
 
-  describe('sorting', () => {
-    const select = (doc: Document) =>
-      root(doc)?.querySelector('select.dh-select__control') as HTMLSelectElement;
-
-    async function choose(doc: Document, value: string): Promise<void> {
-      await act(async () => {
-        select(doc).value = value;
-        select(doc).dispatchEvent(new Event('change', { bubbles: true }));
-      });
-    }
-
-    it('starts newest first and sorts by artist, then flips the direction', async () => {
-      const doc = fanPage();
-      await openTab(doc);
-      expect(titles(doc)).toEqual(['Title 3', 'Title 2', 'Title 1']);
-
-      await choose(doc, 'artist');
-      expect(titles(doc)).toEqual(['Title 1', 'Title 2', 'Title 3']);
-
-      const flip = root(doc)?.querySelector('.dh-sort button') as HTMLButtonElement;
-      await act(async () => flip.click());
-      expect(titles(doc)).toEqual(['Title 3', 'Title 2', 'Title 1']);
-    });
-
-    it('offers crate mates and buy next on the wishlist, and remembers the choice', async () => {
-      items = [
-        wish(1, [], { crateMateOwners: 1 }),
-        wish(2, [], { crateMateOwners: 5 }),
-        wish(3, []),
-      ];
-      const doc = fanPage();
-      await openTab(doc);
-      const options = [...select(doc).options].map((option) => option.textContent);
-      expect(options).toEqual([
-        'Date added',
-        'Artist',
-        'Label',
-        'Price',
-        'Crate mates who own it',
-        'Buy next',
-      ]);
-
-      await choose(doc, 'crateMates');
-
-      expect(titles(doc)).toEqual(['Title 2', 'Title 1', 'Title 3']);
-      expect(stored['sort:wishlist']).toEqual({ key: 'crateMates', direction: 'desc' });
-    });
-
-    it('starts from the saved sort', async () => {
-      stored['sort:wishlist'] = { key: 'artist', direction: 'asc' };
-      const doc = fanPage();
-      await openTab(doc);
-      await settle();
-
-      expect(titles(doc)).toEqual(['Title 1', 'Title 2', 'Title 3']);
-    });
-  });
-
   it('marks heard releases with a badge and a dimmed cover', async () => {
     items = [wish(1, [], { heard: true }), wish(2, [])];
     const doc = fanPage();
@@ -364,95 +299,6 @@ describe('the wishlist tab', () => {
     expect(heard?.querySelector('.dh-heard-badge')).not.toBeNull();
     expect(heard?.querySelector('.dh-cover--dimmed')).not.toBeNull();
     expect(fresh?.querySelector('.dh-heard-badge')).toBeNull();
-  });
-
-  describe('notes', () => {
-    it('shows a saved note and rating on its card', async () => {
-      items = [wish(1, [], { note: { text: 'ask Sam about the pressing', rating: 4 } })];
-      const doc = fanPage();
-      await openTab(doc);
-
-      const trigger = cards(doc)[0]?.querySelector('.dh-note__trigger');
-      expect(trigger?.textContent).toContain('ask Sam about the pressing');
-      expect(trigger?.querySelector('[aria-label="Rated 4 of 5"]')).not.toBeNull();
-    });
-
-    it('saves what you write with a rating', async () => {
-      items = [wish(1, [])];
-      const doc = fanPage();
-      await openTab(doc);
-
-      const trigger = cards(doc)[0]?.querySelector('.dh-note__trigger') as HTMLButtonElement;
-      expect(trigger.textContent).toBe('+ note');
-      await act(async () => trigger.click());
-      const textarea = root(doc)?.querySelector('textarea') as HTMLTextAreaElement;
-      await act(async () => {
-        const setValue = Object.getOwnPropertyDescriptor(
-          HTMLTextAreaElement.prototype,
-          'value',
-        )?.set;
-        setValue?.call(textarea, 'for Friday');
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-      });
-      const star = root(doc)?.querySelector('input[type="radio"][value="5"]') as HTMLInputElement;
-      await act(async () => star.click());
-      await act(async () => buttonNamed(doc, 'Save')?.click());
-
-      expect(saved).toEqual([{ itemKey: 'a1', note: { text: 'for Friday', rating: 5 } }]);
-    });
-  });
-
-  describe('the Bandcamp Friday shortlist', () => {
-    const usd = (amount: number, purchasable = true) => ({ amount, currency: 'USD', purchasable });
-    const showShortlist = async (doc: Document) => {
-      const radio = [...(root(doc)?.querySelectorAll('input[type="radio"]') ?? [])].find(
-        (input) => input.closest('label')?.textContent === 'Bandcamp Friday shortlist',
-      ) as HTMLInputElement;
-      await act(async () => radio.click());
-    };
-
-    it('lists what you can buy in buy next order with totals per currency', async () => {
-      items = [
-        wish(1, [], { price: usd(10) }),
-        wish(2, [], { price: usd(8), note: { text: '', rating: 5 } }),
-        wish(3, [], { price: usd(99, false) }),
-        wish(4, [], { price: { amount: 12, currency: 'EUR', purchasable: true } }),
-        wish(5, []),
-      ];
-      const doc = fanPage();
-      await openTab(doc);
-
-      await showShortlist(doc);
-
-      expect(titles(doc)).toEqual(['Title 2', 'Title 4', 'Title 1']);
-      const text = root(doc)?.textContent ?? '';
-      expect(text).toContain('3 releases you can buy');
-      expect(text).toContain('$18.00');
-      expect(text).toContain('€12.00');
-      expect(cards(doc)[2]?.textContent).toContain('$10.00 · running $18.00');
-    });
-
-    it('says what to do when nothing can be bought, and lets you leave', async () => {
-      items = [wish(1, [])];
-      const doc = fanPage();
-      await openTab(doc);
-
-      await showShortlist(doc);
-
-      expect(cards(doc)).toHaveLength(0);
-      expect(root(doc)?.textContent).toContain('Dighead reads prices on your next sync');
-      await act(async () => buttonNamed(doc, 'Show the whole wishlist')?.click());
-      expect(cards(doc)).toHaveLength(1);
-    });
-
-    it('is only on the wishlist', async () => {
-      collection = [wish(1, [])];
-      const doc = fanPage();
-      await act(async () => mountItemList(doc, COLLECTION));
-      await settle();
-
-      expect(collectionRoot(doc)?.textContent).not.toContain('Bandcamp Friday shortlist');
-    });
   });
 });
 
@@ -479,29 +325,13 @@ describe('the collection tab', () => {
     ).not.toBeNull();
   });
 
-  it('says bought, sorts by purchase date, artist and label only, and remembers it apart from the wishlist', async () => {
-    collection = [wish(1, [], { label: 'Hessle' }), wish(2, [], { label: null })];
+  it('says bought on its cards', async () => {
+    collection = [wish(1, [], { label: 'Hessle' })];
     const doc = fanPage();
     await act(async () => mountItemList(doc, COLLECTION));
     await settle();
 
     expect(colCards(doc)[0]?.textContent).toContain('bought 1 Jan 1970');
-    const select = collectionRoot(doc)?.querySelector('select') as HTMLSelectElement;
-    expect([...select.options].map((option) => option.textContent)).toEqual([
-      'Date purchased',
-      'Artist',
-      'Label',
-    ]);
-    await act(async () => {
-      select.value = 'label';
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-    expect(stored['sort:collection']).toEqual({ key: 'label', direction: 'asc' });
-    expect(stored['sort:wishlist']).toBeUndefined();
-    expect(colCards(doc).map((row) => row.querySelector('.dh-card__title')?.textContent)).toEqual([
-      'Title 1',
-      'Title 2',
-    ]);
   });
 
   it('shows Bandcamp’s collection again when your sync has not finished', async () => {

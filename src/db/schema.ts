@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import { isCompilation, type ItemKey, type ItemPrice, type ReleaseFacts } from '../bandcamp';
+import { isCompilation, type ItemKey } from '../bandcamp';
 import type { HeardSource } from '../shared/heard';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
@@ -24,8 +24,6 @@ export interface ItemRecord {
   supporterCount: number | null;
   /** A compilation: scorers ignore or down-weight it (decisions §17). */
   compilation: boolean;
-  /** What list filters judge it by (decisions §25). Absent until a collection row or page says. */
-  facts?: ReleaseFacts;
 }
 
 /** Everything about an item but its URL: what scoring reads, without looking up its band. */
@@ -54,10 +52,6 @@ export interface StoredItem {
   supporterCount?: number | null;
   tags?: string[];
   compilation?: boolean;
-  /** `facts`, flattened and left out while unknown (decisions §25). */
-  year?: number;
-  nyp?: boolean;
-  physical?: boolean;
 }
 
 /**
@@ -67,9 +61,6 @@ export interface StoredItem {
 export interface BandRecord {
   bandId: number;
   hosts: string[];
-  /** Bandcamp's genre id and the band's own location line, once a row or page has said (decisions §25). */
-  genre?: number;
-  location?: string;
 }
 
 /**
@@ -282,26 +273,6 @@ export interface ItemTagsRecord {
   tagIds: number[];
 }
 
-/** Your private note and rating on a release you wishlisted or own (decisions §24). */
-export interface ItemNoteRecord {
-  itemKey: ItemKey;
-  /** Trimmed; may be empty when only a rating is set. */
-  text: string;
-  /** 1 to 5, or null for unrated. */
-  rating: number | null;
-  updatedAt: number;
-}
-
-/**
- * What a wishlisted release costs, as the wishlist sync last read it (decisions §24). Kept off
- * `items` and `ownership`, which scans and the match index read in bulk. A row exists for every
- * wishlist item the sync has seen; `price` is null when Bandcamp gave none.
- */
-export interface ItemPriceRecord {
-  itemKey: ItemKey;
-  price: ItemPrice | null;
-}
-
 export interface TagRecord {
   /** Auto-incremented, so optional only when adding. */
   id: number;
@@ -388,8 +359,15 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   bandReleases: 15,
   bandReads: 15,
   followMutes: 15,
-  itemNotes: 16,
-  itemPrices: 16,
+};
+
+/**
+ * Tables a later version dropped, by that version. A backup made before it still has them; their
+ * rows are skipped on import.
+ */
+export const TABLES_DROPPED: Readonly<Record<string, number>> = {
+  itemNotes: 18,
+  itemPrices: 18,
 };
 
 /** Tables renamed since the oldest restorable backup: old name to new, as of `version`. */
@@ -421,8 +399,6 @@ export class DigheadDb extends Dexie {
   bandReleases!: Table<BandReleaseRecord, [number, ItemKey]>;
   bandReads!: EntityTable<BandReadRecord, 'bandId'>;
   followMutes!: EntityTable<FollowMuteRecord, 'bandId'>;
-  itemNotes!: EntityTable<ItemNoteRecord, 'itemKey'>;
-  itemPrices!: EntityTable<ItemPriceRecord, 'itemKey'>;
 
   constructor(name = 'dighead') {
     super(name);
@@ -544,30 +520,14 @@ export class DigheadDb extends Dexie {
     // v16: your notes and ratings, and wishlist prices (decisions §24). New tables, so nothing to
     // migrate; prices fill in on the next wishlist sync, which reads wishlist items with none.
     this.version(16).stores({ itemNotes: 'itemKey', itemPrices: 'itemKey' });
-    // v17: facts for list filters (decisions §25): genre and location on bands, year, name your
-    // price and physical on items. No index and nothing to rewrite, since absent means unknown.
-    // The only facts already in the database are followed bands' locations.
-    this.version(17)
-      .stores({})
-      .upgrade((tx) => fillBandLocations(tx.table('bands'), tx.table('following')));
+    // v17 held facts for list filters, filled in by an upgrade. The filters were removed the day
+    // they shipped (decisions §25), so it no longer fills anything in.
+    this.version(17).stores({});
+    // v18: notes, ratings and wishlist prices removed (decisions §24). Facts already on `items`
+    // and `bands` stay as unread fields: rewriting every item would make the upgrade take minutes
+    // (§19), and a rescan writes each row afresh.
+    this.version(18).stores({ itemNotes: null, itemPrices: null });
   }
-}
-
-/**
- * Gives bands you follow the location the following list already holds, for the bands that have
- * a record. The v17 upgrade and importing an older backup (migrateRows) run it.
- */
-export async function fillBandLocations(
-  bands: EntityTable<BandRecord, 'bandId'>,
-  following: Table<FollowingRecord, FollowingKey>,
-): Promise<void> {
-  const followed = await following.where('kind').equals('band').toArray();
-  const found = await bands.bulkGet(followed.map((row) => row.id));
-  const updated = followed.flatMap((row, i) => {
-    const band = found[i];
-    return band && row.location && !band.location ? [{ ...band, location: row.location }] : [];
-  });
-  await bands.bulkPut(updated);
 }
 
 /**

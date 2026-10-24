@@ -19,22 +19,8 @@ export const rawCollectionItem = z.object({
   also_collected_count: z.number().nullish(),
   item_art_id: z.number().nullish(),
   item_url: z.string(),
-  /** The selling account's genre (decisions §25). */
-  genre_id: z.number().nullish(),
-  band_location: z.string().nullish(),
-  /** True: a fixed price. False: pay the price or more. */
-  is_set_price: z.boolean().nullish(),
-  /** Package ids on sale; null when the release has no physical edition. */
-  merch_ids: z.array(z.unknown()).nullish(),
-  merch_sold_out: z.boolean().nullish(),
   purchased: z.string().nullish(),
   added: z.string().nullish(),
-  /** What it costs now, in `currency`. Wishlist rows carry them (decisions §24). */
-  price: z.number().nullish(),
-  currency: z.string().nullish(),
-  is_purchasable: z.boolean().nullish(),
-  is_private: z.boolean().nullish(),
-  is_subscriber_only: z.boolean().nullish(),
   /** This item's position in the list, usable as older_than_token for the next page. */
   token: z.string().nullish(),
 });
@@ -80,22 +66,9 @@ export const rawTralbum = z.object({
     title: z.string(),
     band_id: z.number(),
     album_id: z.number().nullish(),
-    /** "26 Mar 2021 00:00:00 GMT"; missing on a track that is part of an album. */
-    release_date: z.string().nullish(),
-    is_set_price: z.boolean().nullish(),
   }),
   /** A track's own artist line: null on a normal album, set per track on a compilation. */
   trackinfo: z.array(z.object({ artist: z.string().nullish() })).nullish(),
-  /** Physical editions. `quantity_available` is null when stock isn't counted, 0 when sold out. */
-  packages: z
-    .array(
-      z.object({
-        quantity_available: z.number().nullish(),
-        is_live_ticket: z.boolean().nullish(),
-        private: z.boolean().nullish(),
-      }),
-    )
-    .nullish(),
 });
 
 /** The tracks a release page can stream. `file` is null for tracks Bandcamp won't play. */
@@ -116,15 +89,6 @@ export const rawTralbumTracks = z.object({
 
 export const rawLdJson = z.object({
   keywords: z.union([z.array(z.string()), z.string()]).nullish(),
-  /** "26 Mar 2021 00:00:00 GMT". Album and track pages both have it. */
-  datePublished: z.string().nullish(),
-  /** The selling account: its genre as a discover URL, and where it's based. */
-  publisher: z
-    .object({
-      genre: z.string().nullish(),
-      foundingLocation: z.object({ name: z.string().nullish() }).nullish(),
-    })
-    .nullish(),
 });
 
 const rawViewer = z.object({ id: z.number(), username: z.string() });

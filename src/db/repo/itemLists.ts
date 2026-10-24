@@ -1,12 +1,11 @@
-// Your wishlist and collection as lists, with your tags, notes and prices on their items
-// (decisions §14, §24). All three live apart from `items` and `ownership`, keyed by item, so a
-// scan rewriting `items` or a sync rewriting `ownership` keeps them.
+// Your wishlist and collection as lists, with your tags on their items (decisions §14, §24).
+// Tags live apart from `items` and `ownership`, keyed by item, so a scan rewriting `items` or a
+// sync rewriting `ownership` keeps them.
 
-import type { ItemKey, ItemPrice } from '../../bandcamp';
+import type { ItemKey } from '../../bandcamp';
 import type { DigheadDb, ItemRecord, ItemTagsRecord, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
 import { getItemList } from './items';
-import { type ItemNote, noteOf } from './itemNotes';
 
 type Source = OwnershipRecord['source'];
 
@@ -18,9 +17,6 @@ export interface OwnedRow {
   /** When you wishlisted or bought it; null when Bandcamp didn't say. */
   addedAt: number | null;
   tagIds: number[];
-  note: ItemNote | null;
-  /** Wishlist only, and only once a sync has read it. */
-  price: ItemPrice | null;
 }
 
 /** Your wishlist or collection, newest first. Items whose metadata we lack are left out. */
@@ -29,35 +25,19 @@ export async function listOwnedItems(
   fanId: number,
   source: Source,
 ): Promise<OwnedRow[]> {
-  return db.transaction(
-    'r',
-    [db.ownership, db.items, db.bands, db.itemTags, db.itemNotes, db.itemPrices],
-    async () => {
-      const owned = (await fanRows(db, fanId)).filter((row) => row.source === source);
-      const keys = owned.map((row) => row.itemKey);
-      const [items, tags, notes, prices] = await Promise.all([
-        getItemList(db, keys),
-        db.itemTags.bulkGet(keys),
-        db.itemNotes.bulkGet(keys),
-        source === 'wishlist' ? db.itemPrices.bulkGet(keys) : Promise.resolve([]),
-      ]);
-      const rows = owned.flatMap((row, i): OwnedRow[] => {
-        const item = items[i];
-        if (!item) return [];
-        return [
-          {
-            item,
-            matchKey: row.matchKey,
-            addedAt: row.addedAt,
-            tagIds: tags[i]?.tagIds ?? [],
-            note: noteOf(notes[i]),
-            price: prices[i]?.price ?? null,
-          },
-        ];
-      });
-      return rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
-    },
-  );
+  return db.transaction('r', [db.ownership, db.items, db.bands, db.itemTags], async () => {
+    const owned = (await fanRows(db, fanId)).filter((row) => row.source === source);
+    const keys = owned.map((row) => row.itemKey);
+    const [items, tags] = await Promise.all([getItemList(db, keys), db.itemTags.bulkGet(keys)]);
+    const rows = owned.flatMap((row, i): OwnedRow[] => {
+      const item = items[i];
+      if (!item) return [];
+      return [
+        { item, matchKey: row.matchKey, addedAt: row.addedAt, tagIds: tags[i]?.tagIds ?? [] },
+      ];
+    });
+    return rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
+  });
 }
 
 /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
@@ -99,19 +79,13 @@ export async function assignItemTag(
 }
 
 /**
- * After a full sync: drops tags and notes of items that are in neither list any more, and
- * prices of items off the wishlist. A bought item keeps its tags and note (decisions §24).
+ * After a full sync: drops tags of items that are in neither list any more. A bought item keeps
+ * its tags (decisions §24).
  */
 export async function pruneItemData(db: DigheadDb, fanId: number): Promise<void> {
-  await db.transaction('rw', [db.ownership, db.itemTags, db.itemNotes, db.itemPrices], async () => {
-    const rows = await fanRows(db, fanId);
-    const listed = new Set(rows.map((row) => row.itemKey));
-    const wished = new Set(
-      rows.filter((row) => row.source === 'wishlist').map((row) => row.itemKey),
-    );
+  await db.transaction('rw', [db.ownership, db.itemTags], async () => {
+    const listed = new Set((await fanRows(db, fanId)).map((row) => row.itemKey));
     await db.itemTags.filter((row) => !listed.has(row.itemKey)).delete();
-    await db.itemNotes.filter((row) => !listed.has(row.itemKey)).delete();
-    await db.itemPrices.filter((row) => !wished.has(row.itemKey)).delete();
   });
 }
 

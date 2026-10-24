@@ -9,7 +9,6 @@ import {
   getItemTags,
   getMe,
   ownedItemKeys,
-  saveItemNote,
   saveViewer,
   type MeRecord,
 } from '../db';
@@ -31,9 +30,6 @@ function rawAlbum(id: number, position: number) {
     item_art_id: null,
     item_url: `https://artist.bandcamp.com/album/${id}`,
     purchased: '19 Oct 2026 17:18:45 GMT',
-    price: 5 + id,
-    currency: 'USD',
-    is_purchasable: true,
   };
 }
 
@@ -171,46 +167,16 @@ describe('syncMe', () => {
     expect(added).toEqual(['a10']);
   });
 
-  it('keeps the tags and note of a wishlist item once you own it', async () => {
+  it('keeps the tags of a wishlist item once you own it', async () => {
     await syncMe(deps(fakeBandcamp({ collection: [], wishlist: [10, 11] }).fetchJson), me, 'full');
     const created = await createTag(db, 'dub');
     if (!created.ok) throw new Error(created.reason);
     await assignItemTag(db, created.tag.id, ['a10', 'a11'], 'add');
-    await saveItemNote(db, 'a10', { text: 'worth it', rating: 5 }, 1);
-    await saveItemNote(db, 'a11', { text: 'dropped', rating: null }, 1);
 
     // a10 was bought, a11 was taken off the wishlist.
     await syncMe(deps(fakeBandcamp({ collection: [10], wishlist: [] }).fetchJson), me, 'full');
 
     expect(await db.itemTags.toCollection().primaryKeys()).toEqual(['a10']);
-    expect(await db.itemNotes.toCollection().primaryKeys()).toEqual(['a10']);
-    expect(await db.itemPrices.count()).toBe(0);
-  });
-
-  it('saves the price of each wishlist item, and none for the collection', async () => {
-    await syncMe(deps(fakeBandcamp({ collection: [1], wishlist: [10] }).fetchJson), me, 'full');
-
-    expect(await db.itemPrices.toArray()).toEqual([
-      { itemKey: 'a10', price: { amount: 15, currency: 'USD', purchasable: true } },
-    ]);
-  });
-
-  it('reads a wishlist saved before prices again, once, on an incremental sync', async () => {
-    await syncMe(
-      deps(fakeBandcamp({ collection: [], wishlist: [10, 11, 12] }).fetchJson),
-      me,
-      'full',
-    );
-    await db.itemPrices.clear();
-
-    const first = fakeBandcamp({ collection: [], wishlist: [10, 11, 12] });
-    await syncMe(deps(first.fetchJson), me, 'incremental');
-    const second = fakeBandcamp({ collection: [], wishlist: [10, 11, 12] });
-    await syncMe(deps(second.fetchJson), me, 'incremental');
-
-    expect(await db.itemPrices.count()).toBe(3);
-    expect(first.requests.filter((r) => r.startsWith('wishlist'))).toHaveLength(2);
-    expect(second.requests.filter((r) => r.startsWith('wishlist'))).toHaveLength(1);
   });
 
   it('still syncs the collection when the wishlist is hidden', async () => {

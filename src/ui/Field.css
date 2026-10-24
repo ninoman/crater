@@ -50,12 +50,6 @@ label.dh-setting__label {
   color: var(--dh-color-text);
 }
 
-.dh-field__input--text {
-  width: var(--dh-text-field-width);
-  text-align: left;
-  font-variant-numeric: normal;
-}
-
 .dh-field__input[aria-invalid='true'] {
   border-color: var(--dh-color-danger);
 }

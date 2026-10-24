@@ -8,7 +8,6 @@ import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouMode, ForYouResult } from './forYou';
 import type { HeardSource } from './heard';
 import type { HiddenEntry, HideTarget } from './hide';
-import type { ListFilters } from './listFilters';
 import type {
   Following,
   FollowingKey,
@@ -26,7 +25,7 @@ import type { ReleaseCrateMatesResult } from './releaseCrateMates';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { CrateMatesResult, CrateMateStanding } from './crateMates';
-import type { ItemNote, ListedItem, ListSource } from './itemList';
+import type { ListedItem, ListSource } from './itemList';
 import type { CrateMatesLatestResult } from './crateMatesLatest';
 import type { FollowsDigestResult, FollowsDigestVisit } from './followsDigest';
 
@@ -55,7 +54,7 @@ export interface MessageMap {
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Scores Also bought for a release from what's in the database now. */
   getAlsoBought: {
-    request: { itemKey: ItemKey; hideHeard: boolean; filters?: ListFilters };
+    request: { itemKey: ItemKey; hideHeard: boolean };
     response: AlsoBoughtResult;
   };
   /** A release's streamable tracks, read fresh from its page because stream URLs expire. */
@@ -74,12 +73,12 @@ export interface MessageMap {
   getCrateMates: { request: NoPayload; response: CrateMatesResult };
   /** Releases your top crate mates own and you don't, for the For you tab on your profile. */
   getForYou: {
-    request: { mode: ForYouMode; hideHeard: boolean; filters?: ListFilters };
+    request: { mode: ForYouMode; hideHeard: boolean };
     response: ForYouResult;
   };
   /** What your top crate mates bought lately that you don't own, for Crate mates' latest on your profile. */
   getCrateMatesLatest: {
-    request: { hideHeard: boolean; filters?: ListFilters };
+    request: { hideHeard: boolean };
     response: CrateMatesLatestResult;
   };
   /** Where a fan stands on your leaderboard, or null if they aren't on it. */
@@ -122,10 +121,7 @@ export interface MessageMap {
     request: { key: FollowingKey; unfollowed: boolean };
     response: null;
   };
-  /**
-   * Your wishlist or collection with your tags, notes and (wishlist) prices, newest first.
-   * Empty before your first sync.
-   */
+  /** Your wishlist or collection with your tags, newest first. Empty before your first sync. */
   listItems: { request: { source: ListSource }; response: ListedItem[] };
   /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
   getItemTags: { request: { itemKey: ItemKey }; response: number[] | null };
@@ -143,8 +139,6 @@ export interface MessageMap {
     response: boolean;
   };
   markUnwishlisted: { request: { itemKey: ItemKey }; response: null };
-  /** Saves your note and rating on an item, or deletes them when both are empty. Answers what was kept. */
-  saveItemNote: { request: { itemKey: ItemKey; note: ItemNote }; response: ItemNote | null };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
   /** Writes a full backup to the staging file (shared/backupStaging.ts); the popup saves it. */

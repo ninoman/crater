@@ -20,8 +20,6 @@ import type {
 } from '../../shared/crateMatesLatest';
 import { crateMatesBasis } from './crateMateRows';
 import { loadHideScopes } from './hideScopes';
-import type { ListFilters } from '../../shared/listFilters';
-import { createFilterGate } from './filterGate';
 
 /** Purchases this recent count: about two rounds of the 30-day re-scan. */
 export const LATEST_WINDOW_DAYS = 60;
@@ -33,15 +31,12 @@ export interface CrateMatesLatestInput {
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
   now: number;
-  /** Narrow the feed (decisions §25), with the place "Near me" matches against. */
-  filters?: ListFilters;
-  homePlace?: string;
 }
 
 export async function computeCrateMatesLatest(
   db: DigheadDb,
   me: MeRecord | undefined,
-  { topCrateMatesK, hideHeard, now, filters, homePlace = '' }: CrateMatesLatestInput,
+  { topCrateMatesK, hideHeard, now }: CrateMatesLatestInput,
 ): Promise<CrateMatesLatestResult> {
   const empty = { rows: [], crateMatesUsed: 0, windowDays: LATEST_WINDOW_DAYS, checking: 0 };
   if (!me) return { basis: crateMatesBasis(me), ...empty };
@@ -62,8 +57,6 @@ export async function computeCrateMatesLatest(
   );
 
   const fans = await getFans(db, crateMateIds);
-  // The filter picks from the whole feed, so a narrow one still fills the list (§25).
-  const gate = createFilterGate(db, filters, homePlace);
   const buyers = new Map<number, LatestBuyer>();
   for (const fan of fans) {
     if (fan) {
@@ -75,23 +68,15 @@ export async function computeCrateMatesLatest(
     }
   }
 
-  // Picks with no item record, from a hidden artist or label, or turned down by the filter can't
-  // be shown, so records are looked up a few spare at a time until the list is full.
+  // Picks with no item record or from a hidden artist or label can't be shown, so records are
+  // looked up a few spare at a time until the list is full.
   const rows: CrateMatesLatestRow[] = [];
   for (
     let start = 0;
     start < picks.length && rows.length < LATEST_LIMIT;
     start += LATEST_LIMIT * 2
   ) {
-    if (gate?.exhausted) {
-      gate.stoppedAtLimit();
-      break;
-    }
-    const window = picks.slice(start, start + LATEST_LIMIT * 2);
-    const passing = gate && (await gate.passing(window.map((pick) => keyFromNumber(pick.id))));
-    const shortlist = passing
-      ? window.filter((pick) => passing.has(keyFromNumber(pick.id)))
-      : window;
+    const shortlist = picks.slice(start, start + LATEST_LIMIT * 2);
     const items = await getDisplayItems(
       db,
       shortlist.map((pick) => keyFromNumber(pick.id)),
@@ -122,6 +107,5 @@ export async function computeCrateMatesLatest(
     crateMatesUsed: data.crateMateLists.length,
     windowDays: LATEST_WINDOW_DAYS,
     checking: data.queued.size,
-    ...(gate && { filtered: gate.applied() }),
   };
 }

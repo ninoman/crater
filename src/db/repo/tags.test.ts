@@ -182,8 +182,7 @@ describe('tag backup', () => {
     );
 
     expect(await exportTags(db)).toEqual({
-      version: 3,
-      notes: [],
+      version: 2,
       tags: [
         {
           name: 'Ambient',
@@ -204,7 +203,6 @@ describe('tag backup', () => {
     await setUnfollowed(db, ['band', 3], true);
     const backup: TagBackup = {
       version: 1,
-      notes: [],
       tags: [
         {
           name: 'ambient',
@@ -243,26 +241,21 @@ describe('tag backup', () => {
     ).toEqual({
       version: 1,
       tags: [{ name: 'x', assignments: [['band', 1]], items: [] }],
-      notes: [],
     });
   });
 
-  it('reads a version 2 file, from before notes', () => {
+  it('reads a version 3 file, ignoring the notes it had', () => {
+    const note = { itemKey: 'a5', text: 'ask Sam', rating: 4 };
     expect(
       parseTagBackup({
-        version: 2,
+        version: 3,
         tags: [{ name: 'x', assignments: [], items: ['a5'] }],
+        notes: [note],
       }),
     ).toEqual({
-      version: 2,
+      version: 3,
       tags: [{ name: 'x', assignments: [], items: ['a5'] }],
-      notes: [],
     });
-  });
-
-  it('rejects a note with a rating outside 1 to 5', () => {
-    const note = { itemKey: 'a5', text: '', rating: 6 };
-    expect(parseTagBackup({ version: 3, tags: [], notes: [note] })).toBeNull();
   });
 
   it('rejects a file that is not a tags backup', () => {

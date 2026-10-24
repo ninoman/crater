@@ -13,7 +13,7 @@ export interface SelectProps<Value extends string> {
   onChange: (value: Value) => void;
 }
 
-/** A labelled menu of a few choices, e.g. what to sort by. A native select, so it just works. */
+/** A labelled menu of a few choices, e.g. which For you picks to export. A native select, so it just works. */
 export function Select<Value extends string>({
   label,
   options,

@@ -10,10 +10,13 @@ import type { ListConfig } from './lists';
 const takenClass = (list: ListConfig) => `dighead-${list.noun}-taken`;
 const tagName = (list: ListConfig) => `dighead-${list.noun}`;
 
+// Bandcamp's search box sits in the tab bar, away from the items, so `:has` ties it to them.
+// Ours searches the whole list; theirs only its own hidden pages.
 function pageCss(list: ListConfig): string {
   const { itemsNativeList, itemsExpand } = FAN_PAGE_DOM;
   return `.${takenClass(list)} > ${itemsNativeList},
-.${takenClass(list)} > ${itemsExpand} { display: none !important; }
+.${takenClass(list)} > ${itemsExpand},
+body:has(.${takenClass(list)}) ${list.search} { display: none !important; }
 ${tagName(list)} { display: block; }`;
 }
 

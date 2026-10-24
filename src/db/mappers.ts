@@ -25,15 +25,13 @@ export function itemFromCollection(item: CollectionItem): ItemRecord {
     tags: [],
     supporterCount: item.otherOwners === null ? null : item.otherOwners + 1,
     compilation: item.compilation,
-    ...(item.facts && { facts: item.facts }),
   };
 }
 
 export function itemFromReleasePage(
   item: ReleasePageItem,
 ): Omit<ItemRecord, 'supporterCount' | 'label' | 'labelId'> {
-  const { band: _, ...record } = item;
-  return record;
+  return { ...item };
 }
 
 export function ownershipFromCollection(

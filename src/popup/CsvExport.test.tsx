@@ -15,10 +15,7 @@ const item: ListedItem = {
   coverUrl: null,
   addedAt: Date.UTC(2026, 9, 3),
   tagIds: [1],
-  note: { text: 'loud', rating: 4 },
-  price: { amount: 9, currency: 'USD', purchasable: true },
   crateMateOwners: 2,
-  crateMateScore: 1,
   heard: false,
 };
 const pick: ForYouRow = {
@@ -97,16 +94,14 @@ async function press(label: string): Promise<void> {
 }
 
 describe('the CSV export in the popup', () => {
-  it('downloads the wishlist with your tag names, rating and note', async () => {
+  it('downloads the wishlist with your tag names', async () => {
     await render();
 
     await press('Wishlist');
 
     expect(saved[0]?.name).toMatch(/^dighead-wishlist-\d{4}-\d{2}-\d{2}\.csv$/);
     const text = await saved[0]?.text;
-    expect(text).toContain(
-      'Burial,Untrue,,https://x.bandcamp.com/album/untrue,2026-10-03,9,USD,yes,2,dub,4,loud',
-    );
+    expect(text).toContain('Burial,Untrue,,https://x.bandcamp.com/album/untrue,2026-10-03,2,dub');
     expect(host.textContent).toContain('Exported 1 row from your wishlist');
   });
 

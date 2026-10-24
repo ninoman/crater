@@ -15,11 +15,11 @@ import { renameTables } from './renameTables';
 import {
   blankLately,
   type DigheadDb,
-  fillBandLocations,
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
   TABLES_ADDED,
+  TABLES_DROPPED,
   TABLES_RENAMED,
   upgradeHide,
   upgradeJobToV8,
@@ -74,7 +74,9 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
   } catch {
     throw new Error(DAMAGED);
   }
-  if (meta.data.tables.some((table) => (seen.get(table.name) ?? 0) !== table.rowCount)) {
+  // Dropped tables are skipped unread, so their rows aren't counted.
+  const kept = meta.data.tables.filter((table) => !(table.name in TABLES_DROPPED));
+  if (kept.some((table) => (seen.get(table.name) ?? 0) !== table.rowCount)) {
     throw new Error(DAMAGED);
   }
 }
@@ -82,8 +84,10 @@ async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<
 const DAMAGED = 'That backup file is damaged. Nothing was changed.';
 // The version is checked by assertRestorableVersion, and older rows migrated after writing.
 // `hides` took over `hidden` with a new primary key in v14 (readJson renames it, upgradeRows
-// reshapes its rows), so the key the file names may differ.
+// reshapes its rows), so the key the file names may differ. Tables a later version dropped are
+// skipped unread.
 const READ_ONLY = {
+  skipTables: Object.keys(TABLES_DROPPED),
   acceptNameDiff: true,
   acceptVersionDiff: true,
   acceptChangedPrimaryKey: true,
@@ -116,12 +120,6 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   // v12 slimmed items and ownership rows (decisions §19).
   if (fromVersion < 12) {
     await db.transaction('rw', [db.items, db.bands], () => slimToV12(db.items, db.bands));
-  }
-  // v17 added filter facts (decisions §25); only followed bands' locations are already known.
-  if (fromVersion < 17) {
-    await db.transaction('rw', [db.bands, db.following], () =>
-      fillBandLocations(db.bands, db.following),
-    );
   }
 }
 

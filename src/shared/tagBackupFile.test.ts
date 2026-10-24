@@ -23,9 +23,8 @@ describe('importSummaryText', () => {
 describe('readTagBackup', () => {
   it('accepts a backup', () => {
     const backup = {
-      version: 3,
+      version: 2,
       tags: [{ name: 'jazz', assignments: [['fan', 1]], items: ['a5'] }],
-      notes: [{ itemKey: 'a5', text: 'ask Sam', rating: 4 }],
     };
     expect(readTagBackup(JSON.stringify(backup))).toEqual(backup);
   });

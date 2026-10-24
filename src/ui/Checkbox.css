@@ -55,14 +55,3 @@
   font-size: var(--dh-text-sm);
   cursor: pointer;
 }
-
-.dh-checkbox__box:disabled {
-  border-color: var(--dh-color-border);
-  background: var(--dh-color-bg-subtle);
-  cursor: not-allowed;
-}
-
-.dh-checkbox__box:disabled ~ .dh-checkbox__label {
-  color: var(--dh-color-subtle);
-  cursor: not-allowed;
-}

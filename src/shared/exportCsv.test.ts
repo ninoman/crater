@@ -18,10 +18,7 @@ function item(over: Partial<ListedItem> = {}): ListedItem {
     coverUrl: null,
     addedAt: Date.UTC(2026, 9, 3, 12),
     tagIds: [1, 2],
-    note: { text: 'play at "dusk", loud', rating: 5 },
-    price: { amount: 9.5, currency: 'GBP', purchasable: true },
     crateMateOwners: 3,
-    crateMateScore: 7,
     heard: false,
     ...over,
   };
@@ -30,21 +27,21 @@ function item(over: Partial<ListedItem> = {}): ListedItem {
 const lines = (csv: string) => csv.replace('﻿', '').trimEnd().split('\r\n');
 
 describe('itemsCsv', () => {
-  it('writes the wishlist with price, tags, rating and note', () => {
+  it('writes the wishlist with crate mates who own it and tags', () => {
     const csv = itemsCsv('wishlist', [item()], tags);
 
     expect(lines(csv)).toEqual([
-      'Artist,Title,Label,URL,Added,Price,Currency,For sale,Crate mates who own it,Tags,Rating,Note',
-      'Burial,Untrue,Hyperdub,https://hyperdub.bandcamp.com/album/untrue,2026-10-03,9.5,GBP,yes,3,Ambient; dub,5,"play at ""dusk"", loud"',
+      'Artist,Title,Label,URL,Added,Crate mates who own it,Tags',
+      'Burial,Untrue,Hyperdub,https://hyperdub.bandcamp.com/album/untrue,2026-10-03,3,Ambient; dub',
     ]);
   });
 
-  it('writes the collection without prices, dated by purchase', () => {
+  it('writes the collection dated by purchase', () => {
     const csv = itemsCsv('collection', [item()], tags);
 
-    expect(lines(csv)[0]).toBe('Artist,Title,Label,URL,Purchased,Tags,Rating,Note');
+    expect(lines(csv)[0]).toBe('Artist,Title,Label,URL,Purchased,Tags');
     expect(lines(csv)[1]).toBe(
-      'Burial,Untrue,Hyperdub,https://hyperdub.bandcamp.com/album/untrue,2026-10-03,Ambient; dub,5,"play at ""dusk"", loud"',
+      'Burial,Untrue,Hyperdub,https://hyperdub.bandcamp.com/album/untrue,2026-10-03,Ambient; dub',
     );
   });
 
@@ -53,19 +50,12 @@ describe('itemsCsv', () => {
       label: null,
       addedAt: null,
       tagIds: [99],
-      note: null,
-      price: null,
       crateMateOwners: 0,
     });
 
     expect(lines(itemsCsv('wishlist', [bare], tags))[1]).toBe(
-      'Burial,Untrue,,https://hyperdub.bandcamp.com/album/untrue,,,,,0,,,',
+      'Burial,Untrue,,https://hyperdub.bandcamp.com/album/untrue,,0,',
     );
-  });
-
-  it('marks an unavailable release', () => {
-    const gone = item({ price: { amount: 5, currency: 'USD', purchasable: false } });
-    expect(lines(itemsCsv('wishlist', [gone], tags))[1]).toContain(',5,USD,no,');
   });
 
   it('is just the header for an empty list', () => {

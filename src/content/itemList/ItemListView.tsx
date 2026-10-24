@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ItemKey } from '../../bandcamp';
 import { notifyFollowingChanged } from '../../hooks/followingChanges';
-import { useItemNotes } from '../../hooks/useItemNotes';
 import { useListItems } from '../../hooks/useListItems';
-import { useStoredSort } from '../../hooks/useStoredSort';
 import { useSyncReload } from '../../hooks/useSyncReload';
 import { useTags } from '../../hooks/useTags';
 import type { Tag } from '../../shared/following';
-import type { ItemNote, ListedItem } from '../../shared/itemList';
-import { sortItems } from '../../shared/itemSort';
-import { runningTotals, shortlist, totalsByCurrency } from '../../shared/shortlist';
-import { Button, CardGrid, EmptyState, LoadMore, Notice, Segmented } from '../../ui';
+import type { ListedItem } from '../../shared/itemList';
+import { Button, CardGrid, EmptyState, LoadMore, Notice } from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { FilterControls } from '../shared/FilterControls';
 import { syncingStep } from '../shared/syncEmpty';
@@ -20,19 +16,11 @@ import { EmptyItemList } from './EmptyItemList';
 import { ItemCard } from './ItemCard';
 import { commonItemTagIds, visibleItemKeys } from './itemListFilter';
 import type { ListConfig } from './lists';
-import { ShortlistSummary } from './ShortlistSummary';
-import { SortControls } from './SortControls';
 
 const NO_ITEMS: readonly ListedItem[] = [];
 const NO_TAGS: Tag[] = [];
 /** Cards rendered at a time. A 2,000-item list all at once is ~60k elements. */
 const PAGE_SIZE = 120;
-
-const VIEWS = [
-  { value: 'all', label: 'All' },
-  { value: 'shortlist', label: 'Bandcamp Friday shortlist' },
-] as const;
-type ViewMode = (typeof VIEWS)[number]['value'];
 
 export interface ItemListViewProps {
   list: ListConfig;
@@ -42,10 +30,9 @@ export interface ItemListViewProps {
 }
 
 /**
- * Your whole wishlist or collection in place of Bandcamp's paged one: a sort and filter bar,
- * then every release as a grid card with its tags and note, one preview open at a time, and
- * bulk tagging of the checked ones (decisions §14, §24). The wishlist can also show the Bandcamp
- * Friday shortlist.
+ * Your whole wishlist or collection in place of Bandcamp's paged one: a filter bar, then every
+ * release as a grid card with its tags, one preview open at a time, and bulk tagging
+ * of the checked ones (decisions §14, §24).
  */
 export function ItemListView({ list, open, showBandcampList }: ItemListViewProps) {
   const { source, noun } = list;
@@ -53,19 +40,10 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
   const tagsQuery = useTags();
   const { create, assign, assignItems } = tagsQuery;
   const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
-  const saveNote = useItemNotes();
   const items = view.state === 'ready' ? view.data : NO_ITEMS;
   const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
   const sync = useSyncReload(open, list.countOf);
   const stillSyncing = sync.state === 'ready' && syncingStep(sync.status, list.step);
-
-  const [sort, setSort] = useStoredSort(source);
-  const [mode, setMode] = useState<ViewMode>('all');
-  const shortlisted = source === 'wishlist' && mode === 'shortlist';
-  const ordered = useMemo(
-    () => (shortlisted ? shortlist(items) : sortItems(items, sort)),
-    [items, sort, shortlisted],
-  );
 
   const [rawFilter, setFilter] = useState(NO_FILTER);
   const filter = useMemo(
@@ -73,17 +51,11 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
     [rawFilter, tags],
   );
   const visible = useMemo(() => visibleItemKeys(items, filter), [items, filter]);
-  const shown = useMemo(
-    () => ordered.filter((item) => visible.has(item.itemKey)),
-    [ordered, visible],
-  );
-  const totals = useMemo(() => (shortlisted ? totalsByCurrency(shown) : []), [shortlisted, shown]);
-  const running = useMemo(() => (shortlisted ? runningTotals(shown) : null), [shortlisted, shown]);
+  const shown = useMemo(() => items.filter((item) => visible.has(item.itemKey)), [items, visible]);
   const [limit, setLimit] = useState(PAGE_SIZE);
-  // A new filter, sort or view starts from the top. Keyed on the raw filter: tag refetches
-  // rebuild `filter`.
+  // A new filter starts from the top. Keyed on the raw filter: tag refetches rebuild `filter`.
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset when what's shown changes
-  useEffect(() => setLimit(PAGE_SIZE), [rawFilter, sort, shortlisted]);
+  useEffect(() => setLimit(PAGE_SIZE), [rawFilter]);
   const rendered = useMemo(() => shown.slice(0, limit), [shown, limit]);
   const [selected, setSelected] = useState<ReadonlySet<ItemKey>>(new Set());
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
@@ -109,33 +81,11 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
     (itemKey: ItemKey) => setHeardNow((keys) => toggled(keys, itemKey, true)),
     [],
   );
-  const onSaveNote = useCallback(
-    (itemKey: ItemKey, note: ItemNote) => {
-      saveNote(itemKey, note).catch((cause: unknown) =>
-        setError(cause instanceof Error ? cause.message : String(cause)),
-      );
-    },
-    [saveNote],
-  );
 
   const picked = actionable(selected, visible);
   const common = commonItemTagIds(items, picked);
-  const unpriced = items.length > 0 && items.every((item) => item.price === null);
 
   function emptyShown() {
-    if (shortlisted && items.length > 0 && ordered.length === 0) {
-      return (
-        <EmptyState
-          title="Nothing on your wishlist to buy right now"
-          description={
-            unpriced
-              ? 'Dighead reads prices on your next sync, then the releases you can buy show up here.'
-              : 'Everything on it is private, subscriber-only or withdrawn.'
-          }
-          action={<Button onClick={() => setMode('all')}>Show the whole wishlist</Button>}
-        />
-      );
-    }
     if (shown.length === 0) {
       return (
         <EmptyState
@@ -146,7 +96,7 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
     }
     return isFiltering(filter) ? (
       <p className="dh-tag-bar__note" aria-live="polite">
-        Showing {shown.length} of {ordered.length}
+        Showing {shown.length} of {items.length}
       </p>
     ) : null;
   }
@@ -172,32 +122,18 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
         }
         return (
           <>
-            <div className="dh-itemlist__toolbar">
-              {source === 'wishlist' && (
-                <Segmented
-                  label="View"
-                  options={VIEWS}
-                  value={mode}
-                  onChange={(next) => setMode(next)}
-                />
-              )}
-              {!shortlisted && <SortControls source={source} sort={sort} onChange={setSort} />}
-            </div>
             <FilterControls
               tags={tags}
               filter={filter}
               onChange={setFilter}
               modeLabel="Show releases with"
-              searchLabel="Search artists, titles and notes"
+              searchLabel="Search artists, titles and labels"
             />
             {stillSyncing && (
               <p className="dh-tag-bar__note" aria-live="polite">
                 Still syncing your {noun}: {items.length} releases so far. The rest show up here as
                 they arrive.
               </p>
-            )}
-            {shortlisted && shown.length > 0 && (
-              <ShortlistSummary count={shown.length} totals={totals} />
             )}
             {tags.length === 0 && (
               <p className="dh-tag-bar__note">
@@ -243,11 +179,9 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
                 mutations={mutations}
                 selected={selected.has(item.itemKey)}
                 previewing={previewing === item.itemKey}
-                running={running?.get(item.itemKey)}
                 heard={item.heard || heardNow.has(item.itemKey)}
                 onSelect={onSelect}
                 onPreview={onPreview}
-                onSaveNote={onSaveNote}
                 onHeard={onHeard}
                 onError={setError}
               />

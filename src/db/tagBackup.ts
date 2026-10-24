@@ -1,5 +1,6 @@
-// The tags backup file (decisions §8 "Backup", §14, §24). Tags and notes are hand-made, so a
-// re-sync can't rebuild them. Version 1 files (followings only) and version 2 (no notes) still import.
+// The tags backup file (decisions §8 "Backup", §14, §24). Tags are hand-made, so a re-sync can't
+// rebuild them. Version 1 files (followings only) still import, and so do version 3 files, whose
+// notes are ignored since notes were removed.
 
 import { z } from 'zod';
 import type { ItemKey } from '../bandcamp';
@@ -20,16 +21,6 @@ const tagBackupSchema = z.object({
       items: z.array(itemKeySchema).default([]),
     }),
   ),
-  /** Your notes and ratings. Missing before version 3. */
-  notes: z
-    .array(
-      z.object({
-        itemKey: itemKeySchema,
-        text: z.string(),
-        rating: z.number().int().min(1).max(5).nullable(),
-      }),
-    )
-    .default([]),
 });
 
 export type TagBackup = z.output<typeof tagBackupSchema>;

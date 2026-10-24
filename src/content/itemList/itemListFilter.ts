@@ -7,8 +7,8 @@ import { commonTagIds, type TaggedRows, type TagFilter, visibleKeys } from '../s
 const ITEMS: TaggedRows<ListedItem, ItemKey> = {
   keyOf: (item) => item.itemKey,
   tagIdsOf: (item) => item.tagIds,
-  // The search finds a release by its artist, title or label, or by what you wrote about it.
-  textOf: (item) => `${item.artist} ${item.title} ${item.label ?? ''} ${item.note?.text ?? ''}`,
+  // The search finds a release by its artist, title or label.
+  textOf: (item) => `${item.artist} ${item.title} ${item.label ?? ''}`,
 };
 
 /** Keys of the items passing the tag filter and the search. */

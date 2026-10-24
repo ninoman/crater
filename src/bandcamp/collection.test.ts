@@ -43,43 +43,6 @@ describe('parseCollectionPage', () => {
     expect(castrovalva).toMatchObject({ label: null, labelId: null });
   });
 
-  it('reads filter facts from the fixture rows', () => {
-    const items = parseCollectionPage(fixtureJson('collection_items-p1.json')).items;
-    const [denali] = items;
-
-    // Denali: is_set_price false, no merch, genre 2 (alternative), band_location null logged out.
-    expect(denali?.facts).toEqual({ year: null, nameYourPrice: true, physical: false });
-    expect(denali?.band).toEqual({ genre: 2, location: null });
-    // 4 of the 40 rows are fixed-price, 21 list merch and 5 of those are sold out.
-    expect(items.filter((item) => item.facts?.nameYourPrice === false)).toHaveLength(4);
-    expect(items.filter((item) => item.facts?.physical)).toHaveLength(16);
-    // One row has no genre_id.
-    expect(items.filter((item) => item.band?.genre === null)).toHaveLength(1);
-  });
-
-  it('reads a band location when a row has one', () => {
-    const item = toCollectionItem({
-      ...rawTrack,
-      genre_id: 10,
-      band_location: ' Leipzig, Germany ',
-      is_set_price: true,
-      merch_ids: [4, 5],
-      merch_sold_out: true,
-    });
-
-    expect(item?.band).toEqual({ genre: 10, location: 'Leipzig, Germany' });
-    expect(item?.facts).toEqual({ year: null, nameYourPrice: false, physical: false });
-  });
-
-  it('leaves facts null where a row says nothing', () => {
-    expect(toCollectionItem(rawTrack)?.facts).toEqual({
-      year: null,
-      nameYourPrice: null,
-      physical: false,
-    });
-    expect(toCollectionItem(rawTrack)?.band).toEqual({ genre: null, location: null });
-  });
-
   it('continues with the second page', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-p2.json'));
 
@@ -122,28 +85,6 @@ describe('toCollectionItem', () => {
 
   it('keeps a standalone single as its own item', () => {
     expect(toCollectionItem({ ...rawTrack, album_id: null })?.albumKey).toBeNull();
-  });
-
-  it('reads the price, its currency and whether it can be bought', () => {
-    const items = parseCollectionPage(fixtureJson('wishlist_items.json'), 'wishlist_items').items;
-
-    expect(items[0]?.price).toEqual({ amount: 15, currency: 'USD', purchasable: true });
-    expect(items[1]?.price).toEqual({ amount: 16, currency: 'EUR', purchasable: true });
-  });
-
-  it('has no price when the row lacks one, and flags private or subscriber-only items', () => {
-    expect(toCollectionItem(rawTrack)?.price).toBeNull();
-    const priced = { ...rawTrack, price: 7, currency: 'GBP', is_purchasable: true };
-    expect(toCollectionItem(priced)?.price).toEqual({
-      amount: 7,
-      currency: 'GBP',
-      purchasable: true,
-    });
-    expect(toCollectionItem({ ...priced, is_private: true })?.price?.purchasable).toBe(false);
-    expect(toCollectionItem({ ...priced, is_subscriber_only: true })?.price?.purchasable).toBe(
-      false,
-    );
-    expect(toCollectionItem({ ...priced, is_purchasable: false })?.price?.purchasable).toBe(false);
   });
 
   it('skips item kinds it does not track', () => {

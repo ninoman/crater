@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { ListFilters } from '../shared/listFilters';
 import type { CrateMatesLatestResult } from '../shared/crateMatesLatest';
 import { sendMessage } from '../shared/messages';
 import { type RowActions, useRowActions } from './rowActions';
@@ -10,29 +9,26 @@ export type CrateMatesLatestView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches Crate mates' latest on mount and whenever `hideHeard` or the filters change, once
- * `enabled` (the saved filters have been read). `hide` drops the rows it covers and re-fetches;
- * `reload` asks again, e.g. after an error.
+ * Fetches Crate mates' latest on mount and whenever `hideHeard` changes. `hide` drops the rows
+ * it covers and re-fetches; `reload` asks again, e.g. after an error.
  */
 export function useCrateMatesLatest(
   hideHeard: boolean,
-  filters: ListFilters,
-  enabled = true,
 ): RowActions & { view: CrateMatesLatestView; reload: () => void } {
   const [view, setView] = useState<CrateMatesLatestView>({ state: 'loading' });
 
   const load = useCallback(
     () =>
-      sendMessage('getCrateMatesLatest', { hideHeard, filters }).then(
+      sendMessage('getCrateMatesLatest', { hideHeard }).then(
         (result) => setView({ state: 'ready', result }),
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       ),
-    [hideHeard, filters],
+    [hideHeard],
   );
 
   useEffect(() => {
-    if (enabled) void load();
-  }, [load, enabled]);
+    void load();
+  }, [load]);
 
   const reload = useCallback(() => {
     setView({ state: 'loading' });
