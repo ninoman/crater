@@ -22,6 +22,7 @@ function item(over: Partial<ListedItem> = {}): ListedItem {
     price: { amount: 9.5, currency: 'GBP', purchasable: true },
     crateMateOwners: 3,
     crateMateScore: 7,
+    heard: false,
     ...over,
   };
 }

@@ -364,7 +364,7 @@ Design: decisions §22. Schema v14; no new requests.
 6. [x] "Hide heard" switch on For you, Also bought and Crate mates' latest, filtered in the worker before the list is cut, with an empty state that turns it off.
 7. [x] Play through a list: one player per list (`useListPlayer`) over the pure queue in `shared/playQueue.ts`. Play all, auto-advance, previous / next / stop, and K / N / P / Esc while playing.
 8. [x] Popup *Hidden* tab: what you hid, newest first, with Unhide.
-9. [ ] Wire `HeardBadge` and dimmed covers into the wishlist grid once the wishlist branch is merged (previews there already mark heard).
+9. [x] Wire `HeardBadge` and dimmed covers into the wishlist and collection grids (decisions §24, *Heard on cards*).
 10. [ ] Try it live: does Bandcamp's player put its `<audio>` in the page, so `useBandcampPlays` hears it? Does the queue keep playing in a background tab?
 
 **Done when:** hiding an artist from a row takes their releases out of every list, including ones scanned later, and Unhide in the popup brings them back; a release played for 30 s shows as heard in every list, and "Hide heard" leaves it out with a full list; Play all plays For you top to bottom.

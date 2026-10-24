@@ -1031,6 +1031,12 @@ Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Research
 - **Row shapes** in `shared/exportCsv.ts`. Wishlist: artist, title, label, URL, added (ISO date), price, currency, for sale, crate mates who own it, tags, rating, note. Collection: the same without the price columns, with the purchase date. For you: rank, artist, title, label, URL, owned by your top crate mates, owners on Bandcamp, best crate mate rank, newest crate mate purchase, who you follow behind it. Tags are names, joined with "; ".
 - **From the popup's Settings tab** ("CSV export"): Wishlist, Collection, For you, with a menu for which For you picks (All time, Fresh, Deep cuts). The popup can't see the profile tab's current mode, so it asks. It reads through the existing `listItems`, `listTags` and `getForYou` messages (no new one) and saves through a blob URL (`hooks/saveFile.ts`, now shared with the two backups). An empty list says so instead of saving an empty file. M3U export from the backlog is still open.
 
+### Heard on cards (merged 2026-10-24)
+
+- `listItems` answers `heard` per item, read from the heard store by matchKey (an album for its tracks), so wishlist and collection cards show `HeardBadge` and a dimmed cover like the recommendation rows (§22).
+- A card's preview marks the release heard in the worker after 30 s, as every preview does. The grid also flags the card at once (`onHeard` from `ReleasePreview`), instead of waiting for the next read of the list.
+- The cards have no Hide heard switch and no manual mark: the wishlist doubles as a to-listen list, and the badge is what that needs. Add either if it turns out to be missed.
+
 ## 25. Filters on recommendation lists
 
 Decided and built 2026-10-24. Roadmap: *List filters*. Code: `bandcamp/facts.ts` and `genres.ts`, `fillBandLocations` and v17 in `src/db/schema.ts`, `db/repo/listFacts.ts`, `scoring/listFilters.ts` (pure), `shared/listFilters.ts`, `background/recommend/filterGate.ts`, `ui/ListFilterBar.tsx`, `hooks/useListFilters.ts`. Research: [docs/research/bandcamp-user-needs.md](research/bandcamp-user-needs.md), feature #5.

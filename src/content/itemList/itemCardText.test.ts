@@ -15,6 +15,7 @@ const base: ListedItem = {
   price: { amount: 15, currency: 'USD', purchasable: true },
   crateMateOwners: 0,
   crateMateScore: 0,
+  heard: false,
 };
 
 describe('addedText', () => {

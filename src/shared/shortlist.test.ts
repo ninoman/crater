@@ -22,6 +22,7 @@ function item(
     price: amount === null ? null : { amount, currency, purchasable: true },
     crateMateOwners: 0,
     crateMateScore: 0,
+    heard: false,
     ...over,
   };
 }

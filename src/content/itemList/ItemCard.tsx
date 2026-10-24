@@ -10,6 +10,7 @@ import {
   Card,
   Checkbox,
   ExternalIcon,
+  HeardBadge,
   LinkButton,
   NotePopover,
   PlayableCover,
@@ -30,9 +31,12 @@ export interface ItemCardProps {
   previewing: boolean;
   /** The shortlist's cumulative total in this item's currency. */
   running?: number;
+  /** Heard, by the worker's last read or a preview since. */
+  heard: boolean;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
   onSaveNote: (itemKey: ItemKey, note: ItemNote) => void;
+  onHeard: (itemKey: ItemKey) => void;
   onError: (message: string) => void;
 }
 
@@ -48,9 +52,11 @@ export const ItemCard = memo(function ItemCard({
   selected,
   previewing,
   running,
+  heard,
   onSelect,
   onPreview,
   onSaveNote,
+  onHeard,
   onError,
 }: ItemCardProps) {
   const name = `${item.artist} – ${item.title}`;
@@ -62,6 +68,7 @@ export const ItemCard = memo(function ItemCard({
           src={item.coverUrl}
           size="fill"
           playing={previewing}
+          dimmed={heard}
           label={name}
           onToggle={() => onPreview(item.itemKey, !previewing)}
         />
@@ -96,6 +103,7 @@ export const ItemCard = memo(function ItemCard({
       meta={cardMeta(item, source, running)}
       badges={
         <>
+          {heard && <HeardBadge />}
           <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
           <NotePopover
             name={name}
@@ -106,7 +114,9 @@ export const ItemCard = memo(function ItemCard({
         </>
       }
     >
-      {previewing && <ReleasePreview url={item.url} name={name} />}
+      {previewing && (
+        <ReleasePreview url={item.url} name={name} onHeard={() => onHeard(item.itemKey)} />
+      )}
     </Card>
   );
 });

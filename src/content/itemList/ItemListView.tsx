@@ -87,6 +87,8 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
   const rendered = useMemo(() => shown.slice(0, limit), [shown, limit]);
   const [selected, setSelected] = useState<ReadonlySet<ItemKey>>(new Set());
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
+  // Previews mark heard in the worker; the card shows it now rather than at the next read.
+  const [heardNow, setHeardNow] = useState<ReadonlySet<ItemKey>>(new Set());
   const [error, setError] = useState<string | null>(null);
 
   // Ours can't stand in for Bandcamp's list until it has loaded; an empty list decides itself.
@@ -101,6 +103,10 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
   );
   const onPreview = useCallback(
     (itemKey: ItemKey, on: boolean) => setPreviewing(on ? itemKey : null),
+    [],
+  );
+  const onHeard = useCallback(
+    (itemKey: ItemKey) => setHeardNow((keys) => toggled(keys, itemKey, true)),
     [],
   );
   const onSaveNote = useCallback(
@@ -238,9 +244,11 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
                 selected={selected.has(item.itemKey)}
                 previewing={previewing === item.itemKey}
                 running={running?.get(item.itemKey)}
+                heard={item.heard || heardNow.has(item.itemKey)}
                 onSelect={onSelect}
                 onPreview={onPreview}
                 onSaveNote={onSaveNote}
+                onHeard={onHeard}
                 onError={setError}
               />
             ))}

@@ -17,6 +17,7 @@ function item(itemKey: ItemKey, over: Partial<ListedItem> = {}): ListedItem {
     price: null,
     crateMateOwners: 0,
     crateMateScore: 0,
+    heard: false,
     ...over,
   };
 }

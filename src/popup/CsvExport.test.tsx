@@ -19,6 +19,7 @@ const item: ListedItem = {
   price: { amount: 9, currency: 'USD', purchasable: true },
   crateMateOwners: 2,
   crateMateScore: 1,
+  heard: false,
 };
 const pick: ForYouRow = {
   matchKey: 'a5',

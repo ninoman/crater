@@ -5,11 +5,13 @@ export interface ReleasePreviewProps {
   url: string;
   /** "Artist – Title", for screen readers. */
   name: string;
+  /** Listening passed the heard threshold; the mark itself is already saved. */
+  onHeard?: () => void;
 }
 
 /** An open preview under a release row. Mount it only while previewing: it plays on mount. */
-export function ReleasePreview({ url, name }: ReleasePreviewProps) {
-  const { view, toggle, seek } = usePreviewPlayer(url);
+export function ReleasePreview({ url, name, onHeard }: ReleasePreviewProps) {
+  const { view, toggle, seek } = usePreviewPlayer(url, { onHeard });
   return (
     <AudioPlayer state={previewPlayerState(view)} label={name} onToggle={toggle} onSeek={seek} />
   );

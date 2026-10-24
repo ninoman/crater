@@ -24,6 +24,7 @@ function wish(
     price: null,
     crateMateOwners: 0,
     crateMateScore: 0,
+    heard: false,
     ...extra,
   };
 }

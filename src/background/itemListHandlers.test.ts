@@ -1,7 +1,14 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem } from '../bandcamp';
-import { createTag, DigheadDb, putOwnership, saveViewer, upsertCollectionItems } from '../db';
+import {
+  createTag,
+  DigheadDb,
+  markHeard,
+  putOwnership,
+  saveViewer,
+  upsertCollectionItems,
+} from '../db';
 import { itemListHandlers, type ItemListHandlers } from './itemListHandlers';
 
 const sender = {} as chrome.runtime.MessageSender;
@@ -58,6 +65,13 @@ describe('item list handlers', () => {
     expect(row?.coverUrl).toBe('https://f4.bcbits.com/img/a123_7.jpg');
     expect(row?.tagIds).toEqual([created.tag.id]);
     expect(await h.getItemTags({ itemKey: 'a1' }, sender)).toEqual([created.tag.id]);
+  });
+
+  it('says which items you have heard', async () => {
+    await saveViewer(db, { fanId: ME, username: 'me' });
+    expect((await h.listItems({ source: 'wishlist' }, sender))[0]?.heard).toBe(false);
+    await markHeard(db, 'a1', 'preview', 2000);
+    expect((await h.listItems({ source: 'wishlist' }, sender))[0]?.heard).toBe(true);
   });
 
   it('records hearts and un-hearts made on a release page once it knows you', async () => {
