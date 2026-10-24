@@ -846,3 +846,103 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 - On release pages the prompts mount in a shadow root of their own, since the sidebar renders nothing inside while collapsed.
 - **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
 - **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.
+
+## 22. Filters on recommendation lists
+
+Decided and built 2026-10-24. Roadmap: *List filters*. Code: `bandcamp/facts.ts` and `genres.ts`, `fillBandLocations` and v17 in `src/db/schema.ts`, `db/repo/listFacts.ts`, `scoring/listFilters.ts` (pure), `shared/listFilters.ts`, `background/recommend/filterGate.ts`, `ui/ListFilterBar.tsx`, `hooks/useListFilters.ts`. Research: [docs/research/bandcamp-user-needs.md](research/bandcamp-user-needs.md), feature #5.
+
+Fans ask to filter by genre, region, price, format and date ([R2][R27][R30][R34]). The filters narrow **our own lists**: For you (All, Fresh and Deep cuts), Also bought and Crate mates' latest. They don't search Bandcamp.
+
+### Facts, and where they come from
+
+Collection rows and release pages already carry most of what a filter needs. Facts about the **selling account** (genre, location) live on `bands`, once per band. Facts about the **release** live on `items`.
+
+| Fact | Collection row | Release page | Stored |
+| --- | --- | --- | --- |
+| Genre | `genre_id`. The same for every row of a band (55 bands in the fixtures, none with two) | ld+json `publisher.genre`, a `bandcamp.com/discover/<slug>` link | `bands.genre`, a genre id |
+| Location | `band_location`. **`null` in all 89 fixture rows**, which were fetched logged out. Not checked logged in | ld+json `publisher.foundingLocation.name`, the same text as the page header ("UK", "Istanbul, Türkiye") | `bands.location` |
+| Name your price | `is_set_price`, inverted: true is a fixed price | `current.is_set_price`, inverted | `items.nyp` |
+| Physical edition | `merch_ids` non-empty and `merch_sold_out` not true. No `merch_ids` means none, which is known | any public, non-ticket package with `quantity_available` not 0 | `items.physical` |
+| Release year | none: rows only have the buyer's date | `current.release_date`, else ld+json `datePublished` (track pages) | `items.year` |
+
+- **Genre names.** Collection rows give a number. Bandcamp's own list is in `#pagedata` of `bandcamp.com/discover` (`genres`: 27 ids from 1 to 28, no 8, each with a slug). It's saved as `tests/fixtures/discover-genres.json` (2026-10-24), and a test checks `GENRES` in `bandcamp/genres.ts` against it. The ids match what we had seen (`band-page.html` has `genre_id` 10, the electronic floatingpoints). Release pages give the slug, which the same table turns into the id. A slug that isn't one of the 27 leaves the genre unknown. These are Bandcamp's top-level genres, not its free-form tags (`items.tags`).
+- **"Name your price" means the artist lets fans pay the asking price *or more*** (`is_set_price` false, the default on Bandcamp: 36 of 40 fixture rows). It does **not** mean free. A release with a minimum of 0 is also `false`, and the collection row can't tell the two apart: it holds `price` (the suggested price) and not the minimum. Release pages do have `minimum_price`, but one rule for both sources beats a sharper one for few. A "free or pay what you want" filter would need the minimum on every row, which Bandcamp doesn't send.
+- **Physical** is stock at the time of the last sighting. It goes stale as editions sell out, until the release is seen again.
+- **Year is only known from release pages**, so it's mostly unknown in lists built from other fans' collections. See *Older rows* below.
+- **Not kept: price and currency.** No filter uses them, and prices come in many currencies with no rate to compare them by. Keeping them would have cost 14.8 MB of JSON more (table below). `nyp` answers the question the filter asks. Also not kept: license ids (null on all 89 fixture rows), `merch_ids` (only whether there are any matters), preorder and subscriber flags.
+
+### Stored
+
+`StoredItem` gets `year`, `nyp` and `physical`, each left out while unknown (as §19 does for defaults). `BandRecord` gets `genre` and `location`. Parsers fill `CollectionItem` and `ReleasePageItem` with `facts` and `band`; both are optional on the parsed types, so a record with none means "nothing known". The repo merges, never erases: a newer sighting's known fact replaces the old one, and a fact a sighting lacks stays (a collection row has no year, so it keeps the year a release page found; a null location keeps the known one). Reading `ItemFields` gives `facts` only when the row has one, so nothing that compared records before changes.
+
+**Cost.** Measured on the 2026-10-22 backup (v12 shape: 543,157 items, 57,547 bands, 275 MB of JSON, 77.6 MB gzipped) by adding the new fields to every item and band with the fixtures' mix (90% name your price, 40% physical, year on 2% of items, locations from the 576 you follow, avg 14.5 characters) and re-serializing the two tables:
+
+| Added to every row | JSON | gzipped (`gzip -6`) |
+| --- | --- | --- |
+| `items`: `nyp` and `physical`, `year` on 2% | **+15.2 MB** | +1.0 MB |
+| `bands`: genre and location (all bands) | **+2.3 MB** | +0.3 MB |
+| Together (worst case: every row seen again after v17) | **+17.5 MB (6.4% of the file)** | **+1.3 MB (1.7%)** |
+| *Rejected:* `items` also with `price` and `currency` | +30.0 MB (14.8 MB more) | +2.4 MB |
+| Bands with genre only | +0.6 MB | +0.07 MB |
+
+There's no new index, so the disk cost is the values only. LevelDB's Snappy squeezes repeated keys, as the gzip numbers suggest; the disk figure wasn't measured. §19 saved about 160 MB on disk, so this takes back a small part. Packing the three item fields into one number would save roughly 10 MB of JSON, at the price of readable rows. Left for if disk size ever matters.
+
+### Schema v17, older rows
+
+- **Nothing to rewrite.** Absent means unknown, and there's no index, so `this.version(17).stores({})` needs no pass over 543,000 items. The upgrade's only work is `fillBandLocations`: followed bands' `following.location` goes onto their `bands` record when it has none. `migrateRows` runs the same function for a backup made before v17. (Versions 14 to 16 belong to work on other branches; gaps are fine for Dexie.)
+- **Rows get their facts when they're seen again:** your own sync (every item of your collection, each time), a release page you open or the scanner reads, and a fan's collection page when they're scanned or re-read. **Old scanned rows stay unknown until then**, and a crate mate's older purchases are only re-read by a full rescan. Until a fan is rescanned their releases can't pass a genre, price, physical or year filter. The bar says so (below). A one-off re-read of the top crate mates' collections after the upgrade would close the gap quickly (~20 requests each at batch 100); it isn't built, since it spends Bandcamp requests the task didn't ask for.
+- **Followed bands' locations** reach `bands` only through that upgrade. `syncFollowing` doesn't write them on later syncs.
+
+### Unknown facts fail the filter
+
+A release whose fact a filter needs isn't known is **hidden**, not shown. Every filter is "show only": "near me" shouldn't list bands whose location we don't know, and "physical" shouldn't list releases we know nothing about. The alternative, letting unknowns through, makes every filter look broken on a database that hasn't been rescanned. The cost is that an unknown hides things that might match, so the bar says how many: `judge()` returns `pass`, `fail` or `unknown`, and an `unknown` counts in `hidden` and in `unjudged` ("N of them couldn't be judged: Dighead hasn't seen that detail yet"). A definite fail on one filter wins over an unknown on another. A filter that is off needs no fact.
+
+### Applying them
+
+- **In the worker, before the list is cut.** `filterGate.ts` wraps `getShownFacts` (the facts of the record each match would show, plus its band) and `judge`. Each recommender asks it which candidates of the chunk it is about to look up pass, and drops the rest *before* looking up their items or scoring them, so a rejected release never takes a place:
+  - **For you (All, Fresh) and Also bought:** in each chunk of 200, after the pruning check.
+  - **Deep cuts:** the same; a chunk the filter empties moves on to the next, where the unfiltered loop would stop.
+  - **Also bought's same-artist and same-label picks:** the seller's items, only those a pick could be made of.
+  - **Crate mates' latest:** `firstPassing` walks the feed newest first until it has the 100 spare rows the unfiltered feed looks up, so a narrow filter still fills the list.
+- **Requests.** `getForYou`, `getAlsoBought` and `getCrateMatesLatest` take an optional `filters`. Without it, or with nothing on, no gate is made and nothing else changes. Results carry `filtered?: { filters, summary }`, absent when no filter narrowed the list.
+- **Also bought re-scores itself** as supporters are scanned. The worker keeps the filters each watched release was last asked for (`filtersOfRelease`, in memory), and results say which filters they were built with. If the worker forgot (it was suspended), the sidebar sees a result for other filters and asks again instead of showing it.
+- **The search limit.** Pruning works by stopping once no remaining candidate can reach the list. A filter that few candidates pass never fills the list, so the loop would read all of them (78,000 in the Deep cuts perf data). It stops after **4,000 candidates** (`FILTER_SEARCH_LIMIT`) and sets `limited`, which the bar reports ("only the best 4,000 candidates were checked"). Candidates come best first, so what's missed ranks lowest.
+- **What "N hidden by filters" counts:** candidates the filter turned down among those the scorer was about to look up. The scorer stops once nothing left can rank, so these are the ones that could have made the list, not every release in the database. For Also bought's fallback and the latest feed it's every candidate looked at.
+
+### Near me
+
+`filters.nearMe` matches a band's location against `settings.homePlace`, a line in the popup's Recommendations section ("Berlin, Germany"; up to 100 characters). **No geocoding.** The match is text:
+
+- The place is split at commas into alternatives ("Berlin, Germany" is Berlin *or* Germany), so a country or region catches the cities in it. Type just a city to stay local.
+- Each alternative must match whole words, ignoring case and accents: "turkiye" matches "Istanbul, Türkiye", "Niger" doesn't match "Lagos, Nigeria". It's escaped, never a pattern.
+- **No aliases.** "UK" doesn't match "United Kingdom" or the other way round; Bandcamp shows whatever the band typed. Put both in the place ("UK, United Kingdom").
+- With no place set the switch is disabled in the bar (with the reason) and the worker ignores it. The hook sends `nearMe: false` then, so the bar, the request and the sidebar's check agree.
+
+### The bar
+
+One `ListFilterBar` (`src/ui/`) on For you (all modes share one set), Also bought and Crate mates' latest: a **Filters** button (Radix Popover, portalled into the shadow root like the tag picker) with a genre check list, Near me, Name your price, Physical edition available and a year range; **Clear filters**; and the summary line under it, shown while a filter is on.
+
+- **Remembered per list** in `chrome.storage.local` (`listFilters.forYou`, `.alsoBought`, `.latest`). The list isn't fetched until the saved filters are read, so there's no unfiltered flash. Stored values are checked on the way in (`sanitizeFilters`).
+- **States.** Loading and unreachable are the list's own, with the bar above. A filtered list with nothing left says "Nothing matches these filters" with the summary and a **Clear filters** button (`NoMatches`), except during Also bought's warm-up, where an empty list still means "still gathering". A list that was already empty shows its usual reasons.
+- Year boxes keep what you type and report it once it's four digits, or empty for no limit.
+
+### Checked
+
+- Fixture tests for every parser: `collection_items-p1.json` (facts per row, band genre), `album-page.html` (year 2021, name your price, physical, genre 10, "UK"), `album-page-small.html` (Istanbul, Türkiye; free), `album-page-compilation.html` (both packages sold out), `track-page.html` (year from `datePublished`).
+- Synthetic tests: `judge` and `locationMatches` (`scoring/listFilters.test.ts`); each recommender with filters (`recommend/listFilters.test.ts`), including a list that only fills because the filter runs before the cut, and the 4,000 limit; the v17 upgrade and a v16 backup; storage round trips; the bar and the empty state.
+- **Perf** (`pnpm perf`; the filter checks are in `tests/perf/deepCuts.perf.ts`, on the same 200-crate-mate, 100,000-release seed with genres on bands and facts on items):
+
+  | Check | Budget | Before (§19) | Unfiltered now | With filters |
+  | --- | --- | --- | --- | --- |
+  | Also bought re-score | 200 ms | 61 ms | 65 ms | **141 ms**: genre in 9 of 27 and a physical edition; 3,063 candidates hidden |
+  | For you, All | 200 ms | 107 ms | 115 ms | **127 ms** broad (a third of the genres); **101 ms** narrow (nothing passes, so it stops at the 4,000 limit) |
+  | Deep cuts | 200 ms | 132 ms | 139 ms | **133 ms** broad |
+  | Crate mates recompute | 2 s | 482 ms | 489 ms | not filtered |
+
+  Medians of five runs on 2026-10-24, on a machine other sessions were also loading (load average 30 to 60), so the "unfiltered now" column moves by a few ms between runs, and one Deep cuts run came out at 780 ms and didn't repeat in three more. Two things keep filtered runs cheap: records come from the gate's one read instead of a second one, and each band is read once per request (`BandFactsCache`). The perf seed has 500 bands, so a real database with 57,000 will read more of them; the limit bounds that to 4,000 candidates' worth.
+
+### Not done
+
+- Re-reading crate mates after the upgrade so old rows get facts (above).
+- A price filter (needs a minimum on every row), a license filter (ids are null in every sample) and filtering the wishlist or collection tabs (other sessions own those).
+- Writing followed bands' locations on each following sync.

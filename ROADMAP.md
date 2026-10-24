@@ -333,6 +333,26 @@ Design: decisions §16. Uses the following sync from *Following tags*; no new re
 
 ---
 
+## List filters (not MVP)
+
+**Goal:** narrow For you, Also bought and Crate mates' latest by genre, location, name your price, physical edition and release year, so a fan can dig locally or by format.
+
+Design: decisions §22. Research: feature #5 in `docs/research/bandcamp-user-needs.md`. No new requests.
+
+1. [x] Genre table from `bandcamp.com/discover` (fixture), and `bandcamp/facts.ts`: genre, location, name your price, physical and year read from collection rows and release pages, with fixture tests.
+2. [x] Schema v17: facts on `items` and `bands` (nothing to rewrite), `fillBandLocations` from the following list, `migrateRows` for older backups. Storage cost measured against the real backup.
+3. [x] `scoring/listFilters.ts` (pure `judge` and `locationMatches`) with synthetic tests; unknown facts hide the release and are counted.
+4. [x] `filters` on `getForYou`, `getAlsoBought` and `getCrateMatesLatest`, applied in the worker before each list is cut, with a search limit; Also bought keeps its filters through its own re-scores.
+5. [x] "Your place" setting for Near me (text match, no geocoding).
+6. [x] `ListFilterBar` in `src/ui/`, remembered per list, with the "N hidden by filters" line and the empty state.
+7. [x] `pnpm perf`: filters stay within budget (decisions §22).
+8. [ ] Try it on real data: do the filters leave enough on a database that hasn't been rescanned? If not, re-read the top crate mates' collections once (decisions §22, *Older rows*).
+9. [ ] Check `band_location` on collection rows logged in.
+
+**Done when:** on fixtures and synthetic data each filter narrows each list, a filter few releases pass still returns what matches, and the bar says how many it hid and how many it couldn't judge.
+
+---
+
 ## Phase 7: Hardening and dogfooding
 
 1. [x] Popup v1: queue progress, pause and resume, budget counter, and settings for pace, caps and thresholds. Add "Clear all data".
