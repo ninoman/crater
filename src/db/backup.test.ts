@@ -238,6 +238,22 @@ describe('older backups', () => {
   });
 });
 
+describe('a backup from before filter facts', () => {
+  it('imports a v16 file, giving followed bands their location', async () => {
+    await seed(db);
+    await db.bands.put({ bandId: 9, hosts: ['b'] });
+    await db.following.update(['band', 9], { location: 'Berlin, Germany' });
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await jsonText(file));
+    json.data.databaseVersion = 16;
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.bands.get(9)).toEqual({ bandId: 9, hosts: ['b'], location: 'Berlin, Germany' });
+  });
+});
+
 describe('refused files', () => {
   it('refuses a newer schema version and keeps the data', async () => {
     await seed(db);

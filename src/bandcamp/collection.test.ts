@@ -43,6 +43,43 @@ describe('parseCollectionPage', () => {
     expect(castrovalva).toMatchObject({ label: null, labelId: null });
   });
 
+  it('reads filter facts from the fixture rows', () => {
+    const items = parseCollectionPage(fixtureJson('collection_items-p1.json')).items;
+    const [denali] = items;
+
+    // Denali: is_set_price false, no merch, genre 2 (alternative), band_location null logged out.
+    expect(denali?.facts).toEqual({ year: null, nameYourPrice: true, physical: false });
+    expect(denali?.band).toEqual({ genre: 2, location: null });
+    // 4 of the 40 rows are fixed-price, 21 list merch and 5 of those are sold out.
+    expect(items.filter((item) => item.facts?.nameYourPrice === false)).toHaveLength(4);
+    expect(items.filter((item) => item.facts?.physical)).toHaveLength(16);
+    // One row has no genre_id.
+    expect(items.filter((item) => item.band?.genre === null)).toHaveLength(1);
+  });
+
+  it('reads a band location when a row has one', () => {
+    const item = toCollectionItem({
+      ...rawTrack,
+      genre_id: 10,
+      band_location: ' Leipzig, Germany ',
+      is_set_price: true,
+      merch_ids: [4, 5],
+      merch_sold_out: true,
+    });
+
+    expect(item?.band).toEqual({ genre: 10, location: 'Leipzig, Germany' });
+    expect(item?.facts).toEqual({ year: null, nameYourPrice: false, physical: false });
+  });
+
+  it('leaves facts null where a row says nothing', () => {
+    expect(toCollectionItem(rawTrack)?.facts).toEqual({
+      year: null,
+      nameYourPrice: null,
+      physical: false,
+    });
+    expect(toCollectionItem(rawTrack)?.band).toEqual({ genre: null, location: null });
+  });
+
   it('continues with the second page', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-p2.json'));
 

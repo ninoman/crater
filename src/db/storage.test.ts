@@ -5,8 +5,11 @@ import {
   readOwnership,
   releaseUrlHost,
   shortHost,
+  readFacts,
+  readItemFields,
   storeItem,
   storeOwnership,
+  withBandFacts,
 } from './storage';
 
 function record(patch: Partial<ItemRecord> = {}): ItemRecord {
@@ -101,6 +104,52 @@ describe('storeItem', () => {
   it('reads a row stored before v12 as it was', () => {
     const legacy = { ...record({ tags: ['x'] }), fetchedAt: 5 };
     expect(readItem(legacy, undefined)).toEqual(record({ tags: ['x'] }));
+  });
+});
+
+describe('filter facts on items', () => {
+  const facts = { year: 2021, nameYourPrice: false, physical: true };
+
+  it('stores each known fact under a short name', () => {
+    const { stored } = storeItem(record({ facts }), undefined);
+
+    expect(stored).toMatchObject({ year: 2021, nyp: false, physical: true });
+    expect(readItemFields(stored).facts).toEqual(facts);
+  });
+
+  it('leaves out facts that are not known, and the whole object when none is', () => {
+    const { stored } = storeItem(
+      record({ facts: { year: null, nameYourPrice: true, physical: null } }),
+      undefined,
+    );
+
+    expect(stored).not.toHaveProperty('year');
+    expect(stored).not.toHaveProperty('physical');
+    expect(readFacts(stored)).toEqual({ year: null, nameYourPrice: true, physical: null });
+
+    const bare = storeItem(record(), undefined).stored;
+    expect(readFacts(bare)).toBeUndefined();
+    expect(readItemFields(bare)).not.toHaveProperty('facts');
+  });
+});
+
+describe('withBandFacts', () => {
+  const band: BandRecord = { bandId: 7, hosts: ['artist'] };
+
+  it('adds a genre and a location', () => {
+    expect(withBandFacts(band, { genre: 10, location: 'Leipzig, Germany' })).toEqual({
+      ...band,
+      genre: 10,
+      location: 'Leipzig, Germany',
+    });
+  });
+
+  it('never erases a fact with a missing one, and says when nothing changed', () => {
+    const known = { ...band, genre: 10, location: 'Leipzig, Germany' };
+
+    expect(withBandFacts(known, { genre: null, location: null })).toBeUndefined();
+    expect(withBandFacts(known, { genre: 10, location: 'Leipzig, Germany' })).toBeUndefined();
+    expect(withBandFacts(known, { genre: 3, location: null })).toEqual({ ...known, genre: 3 });
   });
 });
 

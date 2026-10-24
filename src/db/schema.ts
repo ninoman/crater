@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import { isCompilation, type ItemKey } from '../bandcamp';
+import { isCompilation, type ItemKey, type ReleaseFacts } from '../bandcamp';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
 
@@ -23,6 +23,8 @@ export interface ItemRecord {
   supporterCount: number | null;
   /** A compilation: scorers ignore or down-weight it (decisions §17). */
   compilation: boolean;
+  /** What list filters judge it by (decisions §22). Absent until a collection row or page says. */
+  facts?: ReleaseFacts;
 }
 
 /** Everything about an item but its URL: what scoring reads, without looking up its band. */
@@ -51,6 +53,10 @@ export interface StoredItem {
   supporterCount?: number | null;
   tags?: string[];
   compilation?: boolean;
+  /** `facts`, flattened and left out while unknown (decisions §22). */
+  year?: number;
+  nyp?: boolean;
+  physical?: boolean;
 }
 
 /**
@@ -60,6 +66,9 @@ export interface StoredItem {
 export interface BandRecord {
   bandId: number;
   hosts: string[];
+  /** Bandcamp's genre id and the band's own location line, once a row or page has said (decisions §22). */
+  genre?: number;
+  location?: string;
 }
 
 /**
@@ -410,7 +419,31 @@ export class DigheadDb extends Dexie {
           await tx.table(to).bulkPut(await tx.table(from).toArray());
         }
       });
+    // v17: facts for list filters (decisions §22): genre and location on bands, year, name your
+    // price and physical on items. No index and nothing to rewrite, since absent means unknown.
+    // The only facts already in the database are followed bands' locations. (v14 to v16 belong to
+    // other work and are not in this schema yet.)
+    this.version(17)
+      .stores({})
+      .upgrade((tx) => fillBandLocations(tx.table('bands'), tx.table('following')));
   }
+}
+
+/**
+ * Gives bands you follow the location the following list already holds, for the bands that have
+ * a record. The v17 upgrade and importing an older backup (migrateRows) run it.
+ */
+export async function fillBandLocations(
+  bands: EntityTable<BandRecord, 'bandId'>,
+  following: Table<FollowingRecord, FollowingKey>,
+): Promise<void> {
+  const followed = await following.where('kind').equals('band').toArray();
+  const found = await bands.bulkGet(followed.map((row) => row.id));
+  const updated = followed.flatMap((row, i) => {
+    const band = found[i];
+    return band && row.location && !band.location ? [{ ...band, location: row.location }] : [];
+  });
+  await bands.bulkPut(updated);
 }
 
 /**

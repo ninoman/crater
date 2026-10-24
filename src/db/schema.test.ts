@@ -240,4 +240,40 @@ describe('DigheadDb', () => {
     expect([...upgraded.backendDB().objectStoreNames]).not.toContain('latelyTwins');
     await upgraded.delete();
   });
+
+  it('gives followed bands their location on the band record in v17', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(13).stores({
+      bands: 'bandId, *hosts',
+      following: '[kind+id], kind, *tagIds',
+    });
+    await old.table('bands').bulkAdd([
+      { bandId: 1, hosts: ['one'] },
+      { bandId: 2, hosts: ['two'], location: 'Kept' },
+      { bandId: 3, hosts: ['three'] },
+    ]);
+    const followed = { name: 'n', url: 'u', imageId: null, followedAt: 1, tagIds: [] };
+    await old.table('following').bulkAdd([
+      { kind: 'band', id: 1, location: 'Berlin, Germany', ...followed },
+      { kind: 'band', id: 2, location: 'Overwritten', ...followed },
+      // A fan, not a band: ids of the two kinds overlap.
+      { kind: 'fan', id: 3, location: 'Elsewhere', ...followed },
+      // No band record to put it on, and no location to give.
+      { kind: 'band', id: 4, location: 'Nowhere', ...followed },
+      { kind: 'band', id: 5, location: null, ...followed },
+    ]);
+    old.close();
+
+    const upgraded = new DigheadDb(name);
+    await upgraded.open();
+    expect(
+      (await upgraded.bands.orderBy('bandId').toArray()).map((b) => [b.bandId, b.location]),
+    ).toEqual([
+      [1, 'Berlin, Germany'],
+      [2, 'Kept'],
+      [3, undefined],
+    ]);
+    await upgraded.delete();
+  });
 });

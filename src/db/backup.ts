@@ -15,6 +15,7 @@ import { renameTables } from './renameTables';
 import {
   blankLately,
   type DigheadDb,
+  fillBandLocations,
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
@@ -97,6 +98,12 @@ async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
   // v12 slimmed items and ownership rows (decisions §19).
   if (fromVersion < 12) {
     await db.transaction('rw', [db.items, db.bands], () => slimToV12(db.items, db.bands));
+  }
+  // v17 added filter facts (decisions §22); only followed bands' locations are already known.
+  if (fromVersion < 17) {
+    await db.transaction('rw', [db.bands, db.following], () =>
+      fillBandLocations(db.bands, db.following),
+    );
   }
 }
 

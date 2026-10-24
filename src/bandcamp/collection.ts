@@ -1,4 +1,5 @@
 import { isCompilation } from './compilation';
+import { cleanLocation, nameYourPriceOf, physicalFromMerch } from './facts';
 import { itemKey, parseBandcampDate } from './keys';
 import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
@@ -29,6 +30,13 @@ export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null 
     otherOwners: raw.also_collected_count ?? null,
     addedAt: parseBandcampDate(raw.purchased ?? raw.added),
     compilation: isCompilation({ artist: raw.band_name, title: raw.item_title }),
+    facts: {
+      // Collection rows carry no release date.
+      year: null,
+      nameYourPrice: nameYourPriceOf(raw.is_set_price),
+      physical: physicalFromMerch(raw.merch_ids, raw.merch_sold_out),
+    },
+    band: { genre: raw.genre_id ?? null, location: cleanLocation(raw.band_location) },
   };
 }
 

@@ -8,6 +8,7 @@ export * from './followSignal';
 export * from './forYou';
 export * from './hidden';
 export * from './items';
+export * from './listFacts';
 export * from './matchIndex';
 export * from './me';
 export * from './ownership';

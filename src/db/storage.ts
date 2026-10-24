@@ -1,6 +1,7 @@
 // How `items` and `ownership` rows are stored, and back (decisions §19): a release URL becomes its
 // band's host plus a slug, and default values are left out. Pure; repos do the reads and writes.
 
+import type { BandFacts, ReleaseFacts } from '../bandcamp';
 import type {
   BandRecord,
   ItemFields,
@@ -72,11 +73,30 @@ export function storeItem(
   if (item.supporterCount !== null) stored.supporterCount = item.supporterCount;
   if (item.tags.length > 0) stored.tags = item.tags;
   if (item.compilation) stored.compilation = true;
+  if (item.facts?.year != null) stored.year = item.facts.year;
+  if (item.facts?.nameYourPrice != null) stored.nyp = item.facts.nameYourPrice;
+  if (item.facts?.physical != null) stored.physical = item.facts.physical;
   return { stored, band };
+}
+
+/**
+ * The band with a genre or location it didn't have, or its facts changed; undefined when
+ * `facts` adds nothing. A null fact never erases one we know.
+ */
+export function withBandFacts(band: BandRecord, facts: BandFacts): BandRecord | undefined {
+  const genre = facts.genre ?? band.genre;
+  const location = facts.location ?? band.location;
+  if (genre === band.genre && location === band.location) return undefined;
+  return {
+    ...band,
+    ...(genre !== undefined && { genre }),
+    ...(location !== undefined && { location }),
+  };
 }
 
 /** A stored row's fields with defaults filled in, in either the v12 shape or the one before. */
 export function readItemFields(row: StoredItem): ItemFields {
+  const facts = readFacts(row);
   return {
     itemKey: row.itemKey,
     albumKey: row.albumKey ?? null,
@@ -89,6 +109,19 @@ export function readItemFields(row: StoredItem): ItemFields {
     tags: row.tags ?? [],
     supporterCount: row.supporterCount ?? null,
     compilation: row.compilation ?? false,
+    ...(facts && { facts }),
+  };
+}
+
+/** The row's facts, or undefined when it has none, as rows from before v17 don't. */
+export function readFacts(row: StoredItem): ReleaseFacts | undefined {
+  if (row.year === undefined && row.nyp === undefined && row.physical === undefined) {
+    return undefined;
+  }
+  return {
+    year: row.year ?? null,
+    nameYourPrice: row.nyp ?? null,
+    physical: row.physical ?? null,
   };
 }
 

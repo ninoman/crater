@@ -1,12 +1,14 @@
 import {
   keyFromNumber,
+  type BandFacts,
   type CollectionItem,
   type ItemKey,
+  type ReleaseFacts,
   type ReleasePageItem,
 } from '../../bandcamp';
 import { itemFromCollection, itemFromReleasePage } from '../mappers';
 import type { BandRecord, DigheadDb, ItemFields, ItemRecord, StoredItem } from '../schema';
-import { readItem, readItemFields, storeItem } from '../storage';
+import { readItem, readItemFields, storeItem, withBandFacts } from '../storage';
 
 /**
  * Item records for stored rows, URLs rebuilt from their bands' hosts (decisions §19). Call
@@ -33,8 +35,15 @@ async function readSome(
   return rows.map((row) => (row ? found[next++] : undefined));
 }
 
-/** Writes item records, adding any new host to its band. Call inside a transaction with `bands`. */
-async function storeItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
+/**
+ * Writes item records, adding any new host to its band and any new genre or location from
+ * `bandFacts` (by band id). Call inside a transaction with `bands`.
+ */
+async function storeItems(
+  db: DigheadDb,
+  items: ItemRecord[],
+  bandFacts: ReadonlyMap<number, BandFacts> = new Map(),
+): Promise<void> {
   const bandIds = [...new Set(items.map((item) => item.bandId))];
   const known = new Map<number, BandRecord>();
   for (const band of await db.bands.bulkGet(bandIds)) if (band) known.set(band.bandId, band);
@@ -47,6 +56,11 @@ async function storeItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
     }
     return stored;
   });
+  for (const [bandId, facts] of bandFacts) {
+    const band = changed.get(bandId) ?? known.get(bandId) ?? { bandId, hosts: [] };
+    const withFacts = withBandFacts(band, facts);
+    if (withFacts) changed.set(bandId, withFacts);
+  }
   await db.bands.bulkPut([...changed.values()]);
   await db.items.bulkPut(rows);
 }
@@ -56,9 +70,19 @@ export function putItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
   return db.transaction('rw', [db.items, db.bands], () => storeItems(db, items));
 }
 
+/** Facts from a newer sighting over the ones we had; a fact the newer one lacks stays. */
+function mergeFacts(fresh: ReleaseFacts | undefined, old: ReleaseFacts | undefined) {
+  if (!fresh) return old;
+  return {
+    year: fresh.year ?? old?.year ?? null,
+    nameYourPrice: fresh.nameYourPrice ?? old?.nameYourPrice ?? null,
+    physical: fresh.physical ?? old?.physical ?? null,
+  };
+}
+
 /**
  * Saves release metadata seen in a collection page. Keeps what collection items don't carry
- * (tags from a release page) and a known supporter count when the new one is missing. A
+ * (tags and year from a release page) and a known supporter count when the new one is missing. A
  * collection page can't see track artists, so it never clears a compilation flag (§17).
  */
 export async function upsertCollectionItems(db: DigheadDb, items: CollectionItem[]): Promise<void> {
@@ -72,15 +96,23 @@ export async function upsertCollectionItems(db: DigheadDb, items: CollectionItem
       const fresh = itemFromCollection(item);
       const old = existing[i];
       if (!old) return fresh;
+      const facts = mergeFacts(fresh.facts, old.facts);
       return {
         ...fresh,
         tags: old.tags,
         supporterCount: fresh.supporterCount ?? old.supporterCount,
         compilation: fresh.compilation || old.compilation,
+        ...(facts && { facts }),
       };
     });
-    await storeItems(db, records);
+    await storeItems(db, records, bandFactsOf(items));
   });
+}
+
+function bandFactsOf(items: readonly (CollectionItem | ReleasePageItem)[]): Map<number, BandFacts> {
+  const facts = new Map<number, BandFacts>();
+  for (const item of items) if (item.band) facts.set(item.bandId, item.band);
+  return facts;
 }
 
 /**
@@ -90,14 +122,21 @@ export async function upsertCollectionItems(db: DigheadDb, items: CollectionItem
 export async function upsertReleasePageItem(db: DigheadDb, item: ReleasePageItem): Promise<void> {
   await db.transaction('rw', [db.items, db.bands], async () => {
     const [old] = await getItemFields(db, [item.itemKey]);
-    await storeItems(db, [
-      {
-        ...itemFromReleasePage(item),
-        supporterCount: old?.supporterCount ?? null,
-        label: old?.label ?? null,
-        labelId: old?.labelId ?? null,
-      },
-    ]);
+    const record = itemFromReleasePage(item);
+    const facts = mergeFacts(record.facts, old?.facts);
+    await storeItems(
+      db,
+      [
+        {
+          ...record,
+          supporterCount: old?.supporterCount ?? null,
+          label: old?.label ?? null,
+          labelId: old?.labelId ?? null,
+          ...(facts && { facts }),
+        },
+      ],
+      bandFactsOf([item]),
+    );
   });
 }
 

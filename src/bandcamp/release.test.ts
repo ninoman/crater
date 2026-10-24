@@ -22,6 +22,28 @@ describe('parseReleasePage', () => {
     expect(new Set(page.item.tags).size).toBe(page.item.tags.length);
   });
 
+  it('reads filter facts from an album page', () => {
+    const { item } = parseReleasePage(fixtureText('album-page.html'));
+
+    expect(item.facts).toEqual({ year: 2021, nameYourPrice: true, physical: true });
+    expect(item.band).toEqual({ genre: 10, location: 'UK' });
+  });
+
+  it('reads sold-out packages, a free release and a location with a comma', () => {
+    const small = parseReleasePage(fixtureText('album-page-small.html')).item;
+    const compilation = parseReleasePage(fixtureText('album-page-compilation.html')).item;
+
+    expect(small.facts).toEqual({ year: 2026, nameYourPrice: true, physical: false });
+    expect(small.band).toEqual({ genre: 23, location: 'Istanbul, Türkiye' });
+    // Both of this release's packages have quantity 0.
+    expect(compilation.facts?.physical).toBe(false);
+    expect(compilation.facts?.year).toBe(2016);
+  });
+
+  it("takes a track page's year from its published date", () => {
+    expect(parseReleasePage(fixtureText('track-page.html')).item.facts?.year).toBe(2021);
+  });
+
   it('reads reviewers first, then thumbs, from the collectors blob', () => {
     const page = parseReleasePage(fixtureText('album-page.html'));
 
