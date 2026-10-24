@@ -12,31 +12,48 @@ Purchase-based discovery for Bandcamp. Everything stays in your browser.
 
 ## Detailed description (draft)
 
-Dighead adds recommendations to Bandcamp, based on what people actually bought.
+Paste as is. The store shows plain text and doesn't render Markdown, hence the capitals and • bullets.
 
-**Find music**
+```text
+Find your next favourite record through what real Bandcamp fans actually bought.
 
-- **Also bought:** on any album or track page, the releases that other buyers of it also own. Early picks appear while the scan runs.
-- **Crate mates:** the fans whose collections overlap yours most, scored out of 100 and weighted toward recent buys. See them on a tab on your profile, and as a rank on other fans' profiles.
-- **For you:** releases your crate mates own that you don't, with a reason on every pick. Switch to *Fresh* for their recent buys or *Deep cuts* for the lesser-known ones.
-- **Crate mates' latest:** a feed of your crate mates' newest buys.
-- **New from your follows:** a tab with new releases from the artists and labels you follow, checked weekly. Turn on an optional desktop notification if you like.
+Dighead looks at the collections of people who bought the music you love, and turns them into recommendations right inside Bandcamp. No algorithms trained on streams, no sponsored picks: just purchases.
 
-**Listen**
+WHAT YOU GET
 
-- Play previews straight from the cover, or play a whole list with next, previous and keyboard shortcuts.
-- Releases you've listened to get a "heard" mark, and you can hide heard ones from any list.
-- Hide a release, or everything by an artist or label, from your recommendations.
-- Badges next to release links across Bandcamp show what you own, what you've wishlisted and how many crate mates own it.
+• Also bought: on any album or track page, a sidebar shows what other buyers of that release also own, ranked by how strongly they're connected, not just by popularity. Small releases fall back to the same label and artist.
 
-**Organise your wishlist and collection**
+• Crate mates: a new tab on your profile ranks the fans whose collections overlap yours most. Switch between All time and Lately to see who shares your taste right now, with trends and "this year" counts. On other fans' pages you'll see where they rank ("your #4 crate mate · 37 in common").
 
-- Add tags to releases, and tag the fans, artists and labels you follow.
-- Export your wishlist, collection or For you list as CSV, or back up the whole database.
+• For you: a second tab on your profile, with three parts:
+  – Picks: releases your crate mates own that you don't, in three modes. All time gives the strongest picks from your closest crate mates, Fresh what they've been buying recently, and Deep cuts rare releases with only a handful of owners.
+  – Crate mates' latest: a feed of what your top crate mates just bought.
+  – New from follows: new releases from the artists and labels you follow, with what's new since your last visit at the top. Filter by your follow tags, mute any account, and turn on a desktop notification for new releases if you like.
 
-**Private by design**
+• Listen as you dig: preview any pick from its cover, or press Play all and work through a whole list with next, previous and keyboard shortcuts. Anything you've listened to gets a "heard" mark, and you can hide heard releases from any list.
 
-Dighead reads public Bandcamp pages and your own collection, and keeps everything in your browser. There is no account, no server and no tracking. The popup shows scan progress, lets you pause, tune or reset the scanner, and has a **Clear all data** button.
+• Tags for follows and wishlist: tag the artists, labels and fans you follow, and the releases on your wishlist, then filter by tag and tag many at once. Tag as you go: heart a release and the tag picker opens right next to the heart; follow an artist, label or fan and their tags are ready on their page straight away. Tags also show on each artist's and release's own page, and stay with a release after you buy it.
+
+• Your wishlist and follows, fast: both tabs fill in while your first sync is still running, and stay quick with thousands of items, loading more as you scroll.
+
+• Page badges (optional): small markers next to release links show what you already own, what's on your wishlist and how many crate mates have it.
+
+• Smarter picks: artists and labels you follow get a gentle boost, compilations are down-weighted, and you can preview, wishlist or hide any suggestion in one click, or hide everything by an artist or label.
+
+PRIVATE BY DESIGN
+
+Everything stays in your browser. There's no account, no server, no analytics and no tracking. Dighead only talks to Bandcamp, at a slow, polite pace, with a daily request limit.
+
+YOU'RE IN CONTROL
+
+The popup shows scan progress and lets you pause or resume. You can tune the scanner, turn the tag picker on or off, unhide anything you've hidden, export your wishlist, collection or For you list as CSV, back up or restore your database, export and import your tags, and clear all data at any time.
+
+HOW IT WORKS
+
+Open Bandcamp while signed in. Dighead syncs your collection, wishlist and follows, then gradually reads the public collections of fans who bought the same releases. Recommendations get better the more you browse: every release page you open is scanned first.
+
+Dighead is an independent project and isn't affiliated with Bandcamp.
+```
 
 ## Manifest permissions
 

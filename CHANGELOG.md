@@ -4,22 +4,20 @@
 
 ### Added
 
-- **New from your follows**: a profile tab with new releases from the artists and labels you
-  follow, checked weekly, with per-account mute and an optional desktop notification.
-- **Filters** on For you, Also bought and Crate mates' latest: genre, release year, name your
-  price, physical editions and Near me.
+- **New from follows**: new releases from the artists and labels you follow, checked weekly,
+  with per-account mute and an optional desktop notification.
 - Hide a release, or everything by an artist or label, from recommendations. Hidden items are
   listed in the popup, where you can unhide them.
 - **Heard** marks: releases you've listened to for 30 seconds get a badge and a dimmed cover,
   and each list can hide them.
 - Play a whole list: Play all, next, previous and stop, with K / N / P / Esc.
-- Wishlist and collection: sort by added, artist, label, price, crate mates or buy next;
-  private notes and 1 to 5 ratings; a Bandcamp Friday shortlist with totals per currency.
 - CSV export of your wishlist, collection and For you from the popup.
 
 ### Changed
 
-- The collection tab gets the same card grid, tags and tools as the wishlist.
+- **For you** is one profile tab with three sub-tabs: Picks, Crate mates' latest and New from
+  follows.
+- The collection tab gets the same card grid and tags as the wishlist.
 - Tags on a wishlist item stay after you buy it.
 
 ## [0.3.0] - 2026-10-23
