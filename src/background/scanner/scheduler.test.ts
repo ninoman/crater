@@ -304,7 +304,7 @@ describe('drainQueue', () => {
 
     expect(await drainQueue(deps())).toBe('idle');
 
-    expect(await countJobs(db)).toEqual({ release: 0, fan: 0 });
+    expect(await countJobs(db)).toEqual({ release: 0, fan: 0, followReleases: 0 });
     expect((await db.fans.get(4))?.status).toBe('error');
     expect((await db.fans.get(5))?.status).toBe('done');
     expect(store.state.lastError).toBeNull(); // cleared by the success after it

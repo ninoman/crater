@@ -165,3 +165,31 @@ export interface ReleasePreview {
   /** The track Bandcamp features on the page, where playback starts. */
   startIndex: number;
 }
+
+/** One release in a band account's discography (decisions §23). */
+export interface DiscographyRelease {
+  itemKey: ItemKey;
+  /** The account selling it: the band itself, or one of a label's artists. */
+  sellerId: number;
+  title: string;
+  artist: string;
+  artId: number | null;
+  /** Bandcamp's release date, in ms. In the future for a pre-order. */
+  releasedAt: number | null;
+}
+
+export interface Discography {
+  bandId: number;
+  name: string;
+  releases: DiscographyRelease[];
+}
+
+/** What a release's details add to its discography entry. */
+export interface ReleaseDetails {
+  itemKey: ItemKey;
+  /** For a track that belongs to an album, the album's key. */
+  albumKey: ItemKey | null;
+  url: string;
+  releasedAt: number | null;
+  preorder: boolean;
+}

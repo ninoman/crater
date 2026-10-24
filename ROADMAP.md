@@ -351,6 +351,23 @@ Design: decisions §22. Schema v14; no new requests.
 10. [ ] Try it live: does Bandcamp's player put its `<audio>` in the page, so `useBandcampPlays` hears it? Does the queue keep playing in a background tab?
 
 **Done when:** hiding an artist from a row takes their releases out of every list, including ones scanned later, and Unhide in the popup brings them back; a release played for 30 s shows as heard in every list, and "Hide heard" leaves it out with a full list; Play all plays For you top to bottom.
+## New from your follows (not MVP)
+
+**Goal:** see what the artists and labels you follow released lately, in one list, with your own mutes, and optionally a notification when there's something new. Research #1 and #10.
+
+Design: decisions §23.
+
+1. [x] Recon: the mobile API's `band_details` (discography with release dates) and `tralbum_details` (URL), chosen over `/music` (no dates, custom-domain redirects) and the logged-in feed. Fixtures and refresh specs.
+2. [x] Parser `bandcamp/discography.ts` with fixture tests and `ParserError` / `BandcampApiError`.
+3. [x] Schema v15: `bandReleases`, `bandReads`, `followMutes`. In backups and Clear all data.
+4. [x] Job kind `followReleases`: weekly reads at priority 2.75, inside the daily budget; opening the tab moves them up.
+5. [x] `scoring/followsDigest.ts`: news time, window, exclusions, newest day first with crate-mate interest. Synthetic tests.
+6. [x] Profile tab `#follows`: rows with preview, "New since your last visit", follow tags as filters, per-account mute, every view state.
+7. [x] Notifications: optional `notifications` permission, popup setting (off by default), one grouped notification per round, click opens the tab.
+8. [ ] Try it live: the tab, a first round on a few hundred follows, a notification and its click.
+9. [x] After the merge with *Heard it*: rows use the shared row controls (heard mark, the "Hide from recommendations" menu, play through) and the tab has its own *Hide heard* switch (decisions §23, "With hide and heard").
+
+**Done when:** a week after following a few active labels, the tab lists their new releases newest first, muting one hides it, and the notification (when on) arrives once.
 
 ---
 

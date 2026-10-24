@@ -35,6 +35,8 @@ export interface Settings {
   followingBoost: boolean;
   /** Releases with more Bandcamp owners than this are not deep cuts (decisions §18). */
   deepCutMaxSupporters: number;
+  /** A desktop notification when a read of your follows finds new releases (decisions §23). */
+  followNotifications: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -59,6 +61,8 @@ export const DEFAULT_SETTINGS: Settings = {
   followingBoost: true,
   // Underground electronic runs small; what counts as rare depends on the genre you dig in.
   deepCutMaxSupporters: 50,
+  // Needs an optional permission, asked for when it's turned on.
+  followNotifications: false,
 };
 
 export type NumericSetting = {

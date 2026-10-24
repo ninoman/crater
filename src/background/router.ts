@@ -4,6 +4,7 @@ import type { MessageHandlers } from '../shared/messages';
 import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
 import { hideHeardHandlers } from './hideHeardHandlers';
+import { followsHandlers } from './follows/handlers';
 import { fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import { getPageBadges } from './pageBadges';
@@ -65,4 +66,5 @@ export const handlers: MessageHandlers = {
     await clearScanData();
     return null;
   },
+  ...followsHandlers(db),
 };

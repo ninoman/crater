@@ -1,6 +1,7 @@
 import { useSyncExternalStore, type ComponentType } from 'react';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { NoticeStack } from '../../ui';
+import { FollowsTab } from './follows/FollowsTab';
 import { ForYouTab } from './forYou/ForYouTab';
 import { LatestTab } from './latest/LatestTab';
 import type { ProfileTabs, ProfileTabSpec } from './profileTabs';
@@ -15,6 +16,7 @@ export const PROFILE_TABS = [
   { id: 'crate-mates', label: 'crate mates', View: CrateMatesTab },
   { id: 'for-you', label: 'for you', View: ForYouTab },
   { id: 'latest', label: "mates' latest", View: LatestTab },
+  { id: 'follows', label: 'new from follows', View: FollowsTab },
 ] as const satisfies readonly ProfileTab<string>[];
 
 export type ProfileTabId = (typeof PROFILE_TABS)[number]['id'];

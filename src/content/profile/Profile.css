@@ -75,3 +75,32 @@
   color: var(--dh-color-muted);
   white-space: nowrap;
 }
+
+/* New from your follows (decisions §23). */
+.dh-follows__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  min-width: 12rem;
+}
+
+.dh-follows__progress .dh-progress {
+  flex: 1;
+}
+
+.dh-follows__muted {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dh-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--dh-text-sm);
+}
+
+.dh-follows__muted li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dh-space-2);
+}

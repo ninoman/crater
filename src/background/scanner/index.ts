@@ -22,18 +22,20 @@ import {
 import { broadcastToTabs } from '../../shared/messages';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
+import { notifyWhenRoundEnds } from '../follows/notify';
 import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled, type SyncResult } from '../meSync';
 import { onFanScanned, onScanStep } from '../recommend';
 import { usedToday } from './budget';
 import type { StepEvent } from './context';
 import { fanIdOf } from './fanJob';
+import { queueFollowReads } from './followReleases';
 import { supportersAreFresh } from './freshness';
 import { queueLatelyRescans } from './latelyRescan';
 import { rankSupporters } from './passZero';
 import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
-import { BACKGROUND, FOREGROUND } from './priority';
+import { BACKGROUND, FOLLOW_RELEASES, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { withImportPause } from './importPause';
@@ -48,6 +50,7 @@ export const SCANNER_ALARM = 'scanner';
  */
 async function reportProgress(job: QueueJob, event: StepEvent): Promise<void> {
   const changed = event !== 'continued';
+  if (job.kind === 'followReleases') return;
   try {
     const releases: ItemKey[] =
       job.kind === 'release'
@@ -79,6 +82,11 @@ const deps: SchedulerDeps = {
   waitForOwnSync: ownSyncSettled,
   onStep: async (job, event) => {
     if (event === 'finished' && job.kind === 'fan') onFanScanned();
+    if (event === 'finished' && job.kind === 'followReleases') {
+      notifyWhenRoundEnds().catch((error: unknown) =>
+        console.warn('dighead: could not notify about follows', error),
+      );
+    }
     await reportProgress(job, event);
   },
 };
@@ -155,6 +163,17 @@ export async function seedFromSync({ me, mode, added }: SyncResult): Promise<voi
 /** Queues latest reads of the top lately crate mates that are due (decisions §11). */
 export async function rescanLatelyCrateMates(): Promise<void> {
   if ((await queueLatelyRescans(db, await loadSettings(), Date.now())) > 0) kickScanner();
+}
+
+/** Queues the weekly reads of your follows that are due (decisions §23). */
+export async function queueFollowReleases(): Promise<void> {
+  if ((await queueFollowReads(db, FOLLOW_RELEASES, Date.now())) > 0) kickScanner();
+}
+
+/** The follows tab opened: its reads, due or waiting, go ahead of the seed backlog. */
+export async function openFollowsDigest(now: number): Promise<void> {
+  await queueFollowReads(db, BACKGROUND, now);
+  kickScanner();
 }
 
 export async function getScannerStatus(): Promise<ScannerStatus> {

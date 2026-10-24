@@ -30,6 +30,7 @@
 <ul>
   <li><strong>The page you are viewing.</strong> On Bandcamp pages the extension reads the page's own data: the release you are looking at (title, artist, label, tags, id), and who is logged in (your Bandcamp fan id and username), so it can tell which collection is yours.</li>
   <li><strong>Public data about other fans and releases.</strong> To find the people who bought a release, and what else they bought, Dighead requests public Bandcamp data: a release's list of supporters, each supporter's public collection and wishlist, and the release pages themselves. For each fan it stores their fan id, username, display name, avatar id and the items in their public collection. These requests are sent without your login where Bandcamp doesn't need it (release pages).</li>
+  <li><strong>Releases of the artists and labels you follow.</strong> About once a week Dighead requests each followed account's public list of releases, and the page address of recent ones, from Bandcamp, without your login. It stores them with when it first saw each one.</li>
   <li><strong>Your own collection and wishlist.</strong> To sync your own collection, Dighead's background service worker calls Bandcamp's collection API <strong>with your Bandcamp session cookies</strong> (the browser attaches them, as it does for Bandcamp's own pages). This lets it read a wishlist you've set to private. The cookies are sent only to <code>bandcamp.com</code>. Dighead cannot read their values and does not store them.</li>
 </ul>
 <p>The same session cookies are attached to the requests that read other fans' public collections. They go to Bandcamp only, as with any Bandcamp page.</p>
@@ -41,7 +42,9 @@
   <li>Scanned fans and their collections, release and supporter lists, the recommendation index and the crate-mate leaderboard.</li>
   <li>Your own synced collection and wishlist, your Bandcamp fan id and username, and the time of your last sync.</li>
   <li>Releases you hid, and the scan queue.</li>
+  <li>Releases of the accounts you follow, when each account was last checked, and the accounts you muted there.</li>
   <li>Your settings, plus the scanner's pacing state (back-off, daily request count) and small interface preferences, in <code>chrome.storage.local</code>.</li>
+  <li>When you last opened <em>New from your follows</em> and when Dighead last notified you, in <code>chrome.storage.local</code>.</li>
   <li>A short-lived list of release pages open in tabs, in <code>chrome.storage.session</code> (cleared when the browser closes).</li>
 </ul>
 <p>All recommendations are computed on your device from this data.</p>
@@ -49,6 +52,9 @@
 <h2>What is sent to third parties</h2>
 <p>Nothing. Dighead does not transmit stored data anywhere. Cover art and avatars are loaded from Bandcamp's image servers (<code>bcbits.com</code>), and the optional preview player is Bandcamp's own embedded player. Both are loaded by your browser from Bandcamp, as on Bandcamp itself.</p>
 <p>We do not sell, share or use your data for advertising or credit decisions, and we do not use it for anything other than the extension's single purpose.</p>
+
+<h2>Notifications</h2>
+<p>If you turn on <em>Notify me about new releases</em> in the popup, Chrome asks you to allow Dighead's optional <code>notifications</code> permission. With it, Dighead shows a desktop notification when its weekly check finds new releases from the artists and labels you follow. The notification is made on your device from the data above; nothing is sent anywhere. It's off by default, and turning it off stops it.</p>
 
 <h2>Deleting your data</h2>
 <ul>

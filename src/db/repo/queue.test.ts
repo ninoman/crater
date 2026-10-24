@@ -146,7 +146,7 @@ describe('queue', () => {
     await enqueue(db, [fanJob(1), fanJob(1)], 1, 99);
     await enqueue(db, [fanJob(1)], 5, 99);
 
-    expect(await countJobs(db)).toEqual({ release: 1, fan: 1 });
+    expect(await countJobs(db)).toEqual({ release: 1, fan: 1, followReleases: 0 });
     expect(await db.queue.toArray()).toContainEqual(
       expect.objectContaining({
         target: '1',

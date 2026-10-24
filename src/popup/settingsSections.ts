@@ -8,7 +8,9 @@ export type SettingEntry =
   /** Pace and daily budget as one Gentle / Normal / Fast choice. */
   | { kind: 'speed' }
   /** Lately re-reads on or off; the count and interval are in Advanced. */
-  | { kind: 'lately-rescan' };
+  | { kind: 'lately-rescan' }
+  /** Notifications for new releases from your follows, behind Chrome's permission prompt. */
+  | { kind: 'follow-notifications' };
 
 export interface SettingSection {
   title: string;
@@ -58,6 +60,10 @@ export const MAIN_SECTIONS: SettingSection[] = [
         description: 'A release counts as a deep cut when fewer fans own it on Bandcamp.',
       },
     ],
+  },
+  {
+    title: 'New from your follows',
+    entries: [{ kind: 'follow-notifications' }],
   },
   {
     title: 'On Bandcamp pages',

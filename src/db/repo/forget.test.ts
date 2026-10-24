@@ -95,7 +95,7 @@ describe('forgetFansNotSeenSince', () => {
       ]),
     );
     expect(await db.crateMates.toCollection().primaryKeys()).toEqual([3]);
-    expect(await countJobs(db)).toEqual({ release: 0, fan: 1 });
+    expect(await countJobs(db)).toEqual({ release: 0, fan: 1, followReleases: 0 });
   });
 
   it('works through more fans than one batch', async () => {

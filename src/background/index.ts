@@ -5,17 +5,30 @@ import { db } from '../db';
 import { listenForMessages } from '../shared/messages';
 import { opfsSnapshot } from './backupHandlers';
 import { recoverInterruptedImport } from './importRecovery';
+import { listenForNotificationClicks } from './follows/notify';
 import { keepAliveWhile } from './keepAlive';
 import { chromeImportStateStore } from './importState';
 import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
 import { onSynced, startSync } from './meSync';
 import { refreshCrateMates } from './recommend';
 import { handlers } from './router';
-import { ensureScannerAlarm, kickScanner, SCANNER_ALARM, seedFromSync } from './scanner';
+import {
+  ensureScannerAlarm,
+  kickScanner,
+  queueFollowReleases,
+  SCANNER_ALARM,
+  seedFromSync,
+} from './scanner';
 import { chromeScannerStore } from './scanner/state';
 
 listenForMessages(handlers);
-onSynced(seedFromSync);
+// A sync may bring new follows, whose releases are then read (decisions §23).
+onSynced(async (result) => {
+  await seedFromSync(result);
+  await queueFollowReleases();
+});
+listenForNotificationClicks();
+chrome.permissions.onAdded.addListener(listenForNotificationClicks);
 
 // Opening may run a schema upgrade that takes minutes on a big database. Every other use of `db`
 // waits for this same open.

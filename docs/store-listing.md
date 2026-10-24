@@ -27,7 +27,13 @@ Dighead reads public Bandcamp pages and your own collection, and keeps everythin
 | `storage` | `chrome.storage.local` for settings, scanner pacing/back-off state and UI preferences; `chrome.storage.session` for the list of release pages open in tabs | Stores the user's settings and the scanner's small working state on their device. The large database lives in IndexedDB, which needs no permission. |
 | `alarms` | `chrome.alarms` in the service worker | Wakes the service worker to continue the background scan queue at a polite pace (a service worker can't keep timers alive between wake-ups) and to check for a due re-sync. |
 
-Not requested: `tabs`, `cookies`, `activeTab`, `scripting`, `webRequest`, `history`, `downloads`, `notifications`, `identity`. `chrome.tabs.query` and `tabs.sendMessage` are used only on Bandcamp URLs, which the host permission already covers, so the `tabs` permission isn't needed. Cookies are never read; the browser attaches them to the worker's fetches to Bandcamp (`credentials: 'include'`).
+Optional, asked for at runtime:
+
+| Permission | Used for | Justification (for the store form) |
+| --- | --- | --- |
+| `notifications` | `chrome.notifications` in the service worker, only when the user turns on "Notify me about new releases" in the popup | Shows one desktop notification when the weekly check of the artists and labels the user follows finds new releases. Off by default; Chrome asks for the permission when the user turns it on, and it's never needed otherwise (decisions §23). |
+
+Not requested: `tabs`, `cookies`, `activeTab`, `scripting`, `webRequest`, `history`, `downloads`, `identity`. `chrome.tabs.query` and `tabs.sendMessage` are used only on Bandcamp URLs, which the host permission already covers, so the `tabs` permission isn't needed. Cookies are never read; the browser attaches them to the worker's fetches to Bandcamp (`credentials: 'include'`).
 
 ## Host permissions
 
@@ -35,7 +41,7 @@ Declared as `https://bandcamp.com/*` and `https://*.bandcamp.com/*`. The same pa
 
 | Host | Justification |
 | --- | --- |
-| `https://bandcamp.com/*` | The service worker calls Bandcamp's collection, wishlist and supporters endpoints and loads fan pages. Without this permission those cross-origin requests fail. It also lets the worker send the user's own Bandcamp session cookies, so their private wishlist can be synced. The content script runs here to show the profile tabs and fan-page rank. |
+| `https://bandcamp.com/*` | The service worker calls Bandcamp's collection, wishlist and supporters endpoints, reads the public release lists of the artists and labels the user follows (`/api/mobile/24/band_details` and `tralbum_details`), and loads fan pages. Without this permission those cross-origin requests fail. It also lets the worker send the user's own Bandcamp session cookies, so their private wishlist can be synced. The content script runs here to show the profile tabs and fan-page rank. |
 | `https://*.bandcamp.com/*` | Artists and labels host their release pages on subdomains. The content script runs here to show the *Also bought* sidebar, and the worker fetches release pages from these hosts to read tags, label and supporter tokens. |
 
 No other host is contacted by script. Images from `f4.bcbits.com` and Bandcamp's embedded player are loaded by the page like any other image or frame, which needs no host permission. Custom-domain Bandcamp sites are out of scope.

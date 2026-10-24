@@ -132,3 +132,30 @@ export function artUrl(artId: number, size: 2 | 5 | 7 | 10 = 7): string {
 export function followingImageUrl(imageId: number): string {
   return `https://f4.bcbits.com/img/${String(imageId).padStart(10, '0')}_41.jpg`;
 }
+
+// A band's releases come from the mobile app's public API (decisions §23). Logged out, since
+// nothing in them is personal, and on bandcamp.com, so custom domains never redirect them away.
+const MOBILE_API = `${API}/mobile/24`;
+
+function publicPostJson(url: string, body: object): BandcampRequest {
+  const request = postJson(url, body);
+  return { url, init: { ...request.init, credentials: 'omit' } };
+}
+
+/** Everything a band account sells, with release dates: its own releases and, for a label, its artists'. */
+export function bandDetailsRequest(bandId: number): BandcampRequest {
+  return publicPostJson(`${MOBILE_API}/band_details`, { band_id: bandId });
+}
+
+/** One release's details, for its URL. `bandId` is the account selling it. */
+export function tralbumDetailsRequest(
+  bandId: number,
+  tralbumType: TralbumType,
+  tralbumId: number,
+): BandcampRequest {
+  return publicPostJson(`${MOBILE_API}/tralbum_details`, {
+    band_id: bandId,
+    tralbum_type: tralbumType,
+    tralbum_id: tralbumId,
+  });
+}

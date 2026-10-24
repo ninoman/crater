@@ -7,6 +7,12 @@ export {
 } from './collection';
 export { hasTralbumItem, parseBandId } from './bandPage';
 export { BAND_PAGE_DOM } from './bandPageDom';
+export {
+  fetchDiscography,
+  fetchReleaseDetails,
+  parseDiscography,
+  parseReleaseDetails,
+} from './discography';
 export { isCompilation } from './compilation';
 export { BandcampApiError, ParserError } from './errors';
 export { followCardHtml } from './followCard';
