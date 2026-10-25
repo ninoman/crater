@@ -28,12 +28,8 @@
   color: var(--dh-color-muted);
 }
 
-/* Floats at the bottom of the window, so it's in reach while scrolling a long list. */
+/* Placed in a Dock, which floats it at the bottom of the window. */
 .dh-bulk-bar {
-  position: fixed;
-  bottom: var(--dh-space-4);
-  left: 50%;
-  z-index: var(--dh-z-panel);
   display: flex;
   align-items: center;
   gap: var(--dh-space-2);
@@ -43,7 +39,6 @@
   background: var(--dh-color-bg);
   box-shadow: var(--dh-shadow-panel);
   font-size: var(--dh-text-sm);
-  transform: translateX(-50%);
 }
 
 .dh-bulk-bar__count {
