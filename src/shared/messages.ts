@@ -230,6 +230,12 @@ function isEventEnvelope(message: unknown): message is EventEnvelope<EventType> 
   return typeof message === 'object' && message !== null && 'event' in message;
 }
 
+/**
+ * A message to a frozen tab waits until the tab thaws, which can be never. The scan loop awaits
+ * broadcasts, so one such tab would stall scanning for good.
+ */
+export const TAB_MESSAGE_TIMEOUT_MS = 2_000;
+
 /** Sends an event to every open tab matching `urlPatterns`. Tabs without our script are skipped. */
 export async function broadcastToTabs<K extends EventType>(
   urlPatterns: string[],
@@ -237,12 +243,17 @@ export async function broadcastToTabs<K extends EventType>(
   payload: EventMap[K],
 ): Promise<void> {
   const envelope: EventEnvelope<K> = { event, payload };
-  const tabs = await chrome.tabs.query({ url: urlPatterns });
+  // Frozen and discarded tabs can't run our listener anyway.
+  const tabs = await chrome.tabs.query({ url: urlPatterns, frozen: false, discarded: false });
   await Promise.all(
     tabs.map(async ({ id }) => {
       if (id === undefined) return;
-      // A tab opened before the extension loaded has no listener; that's fine.
-      await chrome.tabs.sendMessage(id, envelope).catch(() => undefined);
+      // A tab opened before the extension loaded has no listener; that's fine. The timeout
+      // covers a tab that freezes between the query and the send.
+      await Promise.race([
+        chrome.tabs.sendMessage(id, envelope),
+        new Promise((resolve) => setTimeout(resolve, TAB_MESSAGE_TIMEOUT_MS)),
+      ]).catch(() => undefined);
     }),
   );
 }
