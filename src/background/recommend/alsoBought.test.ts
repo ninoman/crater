@@ -15,6 +15,7 @@ import {
   upsertSupporterFans,
   type FanStatus,
 } from '../../db';
+import type { AlsoBoughtRow } from '../../shared/alsoBought';
 import { computeAlsoBought } from './alsoBought';
 
 const ME = 1;
@@ -81,6 +82,15 @@ function supporter(fanId: number): Supporter {
 
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, i) => from + i);
+
+const isCoOwned = (row: AlsoBoughtRow) => row.reason.kind === 'co-owned';
+
+/** Co-owned rows only: every test item shares a band, so same-artist picks fill in behind. */
+async function coOwned(releaseKey: ItemKey) {
+  return (await computeAlsoBought(db, releaseKey, ME)).rows
+    .filter(isCoOwned)
+    .map((row) => row.matchKey);
+}
 
 async function ranking(releaseKey: ItemKey, me: number | null = ME) {
   return (await computeAlsoBought(db, releaseKey, me)).rows.map((row) => row.matchKey);
@@ -153,6 +163,36 @@ describe('computeAlsoBought', () => {
     expect(await ranking('a100')).toEqual(['a200', 'a400', 'a900', 'a300']);
     const unchanged = await computeAlsoBought(db, 'a100', ME, { ignoreCompilations: false });
     expect(unchanged.rows.map((row) => row.matchKey)).toEqual(['a300', 'a200', 'a400', 'a900']);
+  });
+
+  it("scores a track page on the album's buyers and its own, not other tracks'", async () => {
+    // Fans 10–12 bought t101, fans 13–15 t102, fans 16–17 the whole album.
+    await fans(range(10, 12), [track('t101', 'a100'), item('a300')]);
+    await fans(range(13, 15), [track('t102', 'a100'), item('a400')]);
+    await fans(range(16, 17), [item('a100'), item('a300')]);
+
+    // Both tracks see the album buyers' a300; neither sees the other track's buyers.
+    expect(await coOwned('t101')).toEqual(['a300']);
+    expect(await coOwned('t102')).toEqual(['a400', 'a300']);
+    expect(await coOwned('a100')).toEqual(['a300', 'a400']);
+  });
+
+  it("weighs a compilation's buyers at half on its track pages, and only them on its page", async () => {
+    const comp = (key: ItemKey) => item(key, {}, 'a100');
+    await upsertCollectionItems(db, [item('a100', { compilation: true })]);
+    // Fans 10–12 bought t101, fans 13–15 t102, fans 16–17 the whole comp.
+    await fans(range(10, 12), [comp('t101'), item('a300')]);
+    await fans(range(13, 15), [comp('t102'), item('a400')]);
+    await fans(range(16, 17), [item('a100'), item('a500')]);
+    // Fan 18 is listed on t101's page; their scan holds the whole comp.
+    await fans([18], [item('a100'), item('a300')]);
+    await listSupporters('t101', [10, 11, 12, 18]);
+
+    const t101 = await computeAlsoBought(db, 't101', ME);
+    expect(t101.rows.filter(isCoOwned).map((row) => row.matchKey)).toEqual(['a300', 'a500']);
+    expect(await coOwned('t102')).toEqual(['a400', 'a500']);
+    // The comp's page leaves track buyers out: a300 has one comp buyer, a400 none.
+    expect(await coOwned('a100')).toEqual(['a500']);
   });
 
   it('explains each row and leaves out albums you own a track of', async () => {

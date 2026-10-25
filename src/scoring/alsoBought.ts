@@ -68,6 +68,8 @@ export interface SupporterList {
   matchIds: Float64Array;
   /** Their collection size, as far as we know it. */
   size: number;
+  /** How much this page counts their buys, at most 1 (scoring/releaseBuyers). */
+  weight: number;
 }
 
 /**
@@ -96,7 +98,7 @@ function includes(sorted: Float64Array, id: number): boolean {
 }
 
 /**
- * Σ voteWeight over the supporters owning each id. Asked only for the candidates about to be
+ * Σ voteWeight × weight over the supporters owning each id. Asked only for the candidates about to be
  * scored, so a binary search per list beats tagging every id in coOwnership with its owner.
  */
 export function coOwnerVotes(
@@ -104,8 +106,8 @@ export function coOwnerVotes(
   supporters: readonly SupporterList[],
 ): Map<number, number> {
   const votes = new Map<number, number>(ids.map((id) => [id, 0]));
-  for (const { matchIds, size } of supporters) {
-    const weight = voteWeight(size);
+  for (const { matchIds, size, weight: pageWeight } of supporters) {
+    const weight = voteWeight(size) * pageWeight;
     for (const id of ids) {
       if (includes(matchIds, id)) votes.set(id, (votes.get(id) ?? 0) + weight);
     }
@@ -128,7 +130,7 @@ export function wilsonLower(hits: number, trials: number, z: number = CONFIDENCE
 }
 
 export interface Basis {
-  /** N: the release's supporters whose collection we've read. */
+  /** N: the release's supporters whose collection we've read, each counted at its weight. */
   supporters: number;
   /** Fans with a known collection: the base rate's denominator. */
   population: number;

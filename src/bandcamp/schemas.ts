@@ -89,6 +89,8 @@ export const rawTralbumTracks = z.object({
 
 export const rawLdJson = z.object({
   keywords: z.union([z.array(z.string()), z.string()]).nullish(),
+  /** On a track page, the album it's from. */
+  inAlbum: z.object({ name: z.string().nullish() }).nullish(),
 });
 
 const rawViewer = z.object({ id: z.number(), username: z.string() });

@@ -9,6 +9,8 @@ import type {
   OwnershipRecord,
   StoredItem,
 } from '../schema';
+import type { SupporterList } from '../../scoring/alsoBought';
+import { releaseBuyers } from '../../scoring/releaseBuyers';
 import { readItemFields, readOwnership } from '../storage';
 import { fanRows } from './fanRows';
 import { collectionRead } from './fans';
@@ -22,10 +24,10 @@ export interface AlsoBoughtData {
   /** The release's own record and, for a track, its album's. Either may not be saved yet. */
   release: ItemFields | undefined;
   album: ItemFields | undefined;
-  /** Fans other than you known to own the release, scanned or not. */
+  /** Fans other than you whose buys count for this page (scoring/releaseBuyers), scanned or not. */
   knownOwners: number;
-  /** Each owner whose collection has been read (the "supporters" N): match ids and size. */
-  supporters: { matchIds: Float64Array; size: number }[];
+  /** Each owner whose collection has been read (the "supporters" N), with their vote's weight. */
+  supporters: SupporterList[];
   /** Fans on the release's supporter list, or null before it's fetched. */
   listed: number | null;
   /** Whether every listed supporter's scan has ended, whatever the outcome. */
@@ -64,32 +66,36 @@ export async function gatherAlsoBought(
       const [release] = await getItemFields(db, [releaseKey]);
       const matchKey = release?.albumKey ?? releaseKey;
       const album = matchKey === releaseKey ? undefined : (await getItemFields(db, [matchKey]))[0];
+      const compilation = release?.compilation === true || album?.compilation === true;
 
       // The matchKey index finds track buyers and album buyers alike.
-      const ownerRows = (await db.ownership.where('matchKey').equals(matchKey).toArray()).map(
-        readOwnership,
+      const [matchRows, list] = await Promise.all([
+        db.ownership.where('matchKey').equals(matchKey).toArray(),
+        db.releaseSupporters.get(releaseKey),
+      ]);
+      const weights = releaseBuyers(
+        { releaseKey, matchKey, compilation },
+        matchRows.map(readOwnership).filter((row) => row.source === 'collection'),
+        list?.fanIds ?? [],
       );
-      const ownerIds = [
-        ...new Set(ownerRows.filter((row) => row.source === 'collection').map((row) => row.fanId)),
-      ].filter((fanId) => fanId !== meFanId);
+      if (meFanId !== null) weights.delete(meFanId);
+      const ownerIds = [...weights.keys()];
       const fans = await db.fans.bulkGet(ownerIds);
       const readFans = fans.filter(
         (fan): fan is FanRecord => fan !== undefined && collectionRead(fan.status),
       );
       const readIds = readFans.map((fan) => fan.fanId);
 
-      const [lists, crateMates, best, population, myList, mine, hidden, heard, list] =
-        await Promise.all([
-          db.fanMatches.bulkGet(readIds),
-          db.crateMates.bulkGet(readIds),
-          db.crateMates.orderBy('score').last(),
-          db.fanMatches.count(),
-          meFanId === null ? undefined : db.fanMatches.get(meFanId),
-          meFanId === null ? [] : fanRows(db, meFanId),
-          hiddenSets(db),
-          heardKeys(db),
-          db.releaseSupporters.get(releaseKey),
-        ]);
+      const [lists, crateMates, best, population, myList, mine, hidden, heard] = await Promise.all([
+        db.fanMatches.bulkGet(readIds),
+        db.crateMates.bulkGet(readIds),
+        db.crateMates.orderBy('score').last(),
+        db.fanMatches.count(),
+        meFanId === null ? undefined : db.fanMatches.get(meFanId),
+        meFanId === null ? [] : fanRows(db, meFanId),
+        hiddenSets(db),
+        heardKeys(db),
+      ]);
       const listedFans = list ? await db.fans.bulkGet(list.fanIds) : [];
 
       const crateMateSupporters = lists.flatMap((record, i) => {
@@ -107,7 +113,7 @@ export async function gatherAlsoBought(
           if (!record || !fan) return [];
           // Only a full read knows the size; a partial one is at least what we've seen.
           const size = Math.max(record.matchIds.length, fan.collectionSize ?? fan.scannedItems);
-          return [{ matchIds: record.matchIds, size }];
+          return [{ matchIds: record.matchIds, size, weight: weights.get(fan.fanId) ?? 1 }];
         }),
         listed: list ? list.fanIds.length : null,
         allScanned:

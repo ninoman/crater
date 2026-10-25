@@ -193,6 +193,21 @@ Code: `crateMateBoosts` in `src/scoring/alsoBought.ts`; `gatherAlsoBought` reads
 - **Display:** rows point at the album. If no scanned collection holds the album itself, only tracks of it, the row shows one of those tracks (title and link) until the album turns up. The reason line doesn't say whether owners bought the album or only tracks.
 - **`weights.ts`** implements `w(i)` and `supporters(i)` (album count, then track count, then owners we've seen). Phase 4 only uses `supporters(i)`, to order fallback picks. `w(i)` is for crate mates and For you.
 
+### Whose buys count (changed 2026-10-25)
+
+Before, every page scored the whole matchKey (§3.8), so every track of an album showed the album's list. On a compilation that list is what fans of all its other artists bought. Now `releaseBuyers` (pure, `scoring/releaseBuyers.ts`) picks the owners, each with a vote weight:
+
+| Page | Album / EP | Compilation (§17) |
+| --- | --- | --- |
+| Album page | Album buyers + buyers of any of its tracks | Buyers of the whole comp only |
+| Track page | Album buyers + this track's buyers | This track's buyers ×1, comp buyers ×`COMP_BUYER_WEIGHT` (0.5) |
+
+- "This track's buyers" are collection rows for the track plus the track page's listed supporters. Buyers of the album's other tracks drop out of a track page.
+- On a single-artist album a single-track buyer is the same audience as an album buyer, so the album page keeps them. A comp's track buyers came for one artist, so the comp page leaves them out.
+- At full weight a comp's buyers, the same fans on every track, would usually outnumber the track's own and the lists would converge again. A fan who bought both counts fully.
+- The weight multiplies `voteWeight`, and N in the lift is Σ weights, so a half-weight fan is half a trial as well as half a vote. Weights are ≤ 1, so votes stay ≤ co and pruning stays valid. Crate mate boosts and the warm-up's "supporters read" count fans unweighted.
+- The release's matchKey is still what's excluded from the picks, so a track page never recommends its own album.
+
 ### Small-release fallback
 
 - A release counts as **small when fewer than 8 fans other than you are known to own it**, scanned or not.
@@ -642,7 +657,7 @@ Decided and built 2026-10-22. Roadmap: *Ignoring compilations*. Code: `src/bandc
 `isCompilation` in `bandcamp/compilation.ts`. Wrongly flagging a normal album would silently drop real overlap, so each rule needs strong evidence, and missing a comp only leaves things as they were before.
 
 1. **Artist is a various-artists placeholder.** After lowercasing, trimming and dropping trailing dots: `various artists`, `various artist`, `various`, `va`, `v.a`, `v/a`, `v-a`, plus the common translations (`varios artistas`, `vários artistas`, `artistes variés`, `artisti vari`, `verschiedene künstler`, `diverse artiesten`, `vv.aa`). The artist must be exactly one of these: "Various Artists" as part of a longer name doesn't count. On collection pages `band_name` is the release's artist line, not the selling account's name: the Jazzman comp in `collection_items-p1.json` has `band_name` "Various Artists", sold from `jazzmanalbums`.
-2. **The title starts with a VA prefix:** `VA - Title`, `V/A: Title`, `Various Artists – Title`, optionally after a catalog number in brackets (`[LBL001] VA - Title`). This is how labels selling from their own account often name comps, with the label as the artist.
+2. **The title starts with a VA prefix:** `VA - Title`, `V/A: Title`, `Various Artists – Title`, optionally after a catalog number in brackets (`[LBL001] VA - Title`). This is how labels selling from their own account often name comps, with the label as the artist. *Changed 2026-10-25:* "Various Artists" anywhere in the title counts too (*Nautilus - Various Artists Compilation Vol.1* by MBM, whose track artists are all null, with the names in the track titles). On a track page the album's title (ld+json `inAlbum.name`) is checked as well, so a track of such a comp is flagged.
 3. **Release pages only: at least 3 distinct track artists other than the album artist, on at least half the tracks.** `data-tralbum.trackinfo[].artist` is null on a normal album (all 9 tracks of `album-page.html`) and set per track on a comp (24 different artists on the 24 tracks of `album-page-compilation.html`). A track artist that contains the album artist or is contained in it doesn't count, which keeps "Artist feat. Guest" and split releases whose artist line names everyone out. Titles that say remix, rework, edits, versions or reimagined skip this rule, since remix albums list the remixers per track but are bought by the original artist's fans.
 
 Collection pages carry only the featured track's artist (`tracklists`), and on a comp it's the album artist again ("Various Artists"), so rule 3 can't run there.
@@ -656,7 +671,7 @@ Collection pages carry only the featured track's artist (`tracklists`), and on a
 The `ignoreCompilations` setting (default on, a popup toggle next to the label-cluster one) turns all of this off. Changing it takes effect at the next crate mates recompute and the next score of Also bought or For you.
 
 - **Crate mates, all-time and lately: dropped.** Shared compilations are removed from the shared releases before anything is counted, so they add nothing to the score, the lately score, the overlap, Jaccard, "this year" or the label-cluster test. A fan whose only overlap is comps isn't a crate mate at all. The comp still counts in both collection sizes (√(|M|·|F|)), so a collector of comps is a little diluted, as with any release they don't share with you. Dropping rather than down-weighting because overlap on a comp is evidence about the comp's artist list, not about taste.
-- **Also bought: down-weighted ×0.5** (`COMPILATION_FACTOR`) as a candidate. Kept, because a comp with a high lift among this release's buyers is a real association. The release you're looking at being a comp changes nothing: you chose that page. Pruning stays valid, since the factor only lowers scores.
+- **Also bought: down-weighted ×0.5** (`COMPILATION_FACTOR`) as a candidate. Kept, because a comp with a high lift among this release's buyers is a real association. The release you're looking at being a comp changes nothing for an album page: you chose that page. *Changed 2026-10-25:* which buyers count depends on the page (`scoring/releaseBuyers.ts`), see §6 "Whose buys count". Pruning stays valid, since the factor only lowers scores.
 - **For you and Fresh: down-weighted ×0.5** as a candidate, for the same reason. Crate mate scores feeding it are already comp-free.
 - **Left alone:** Crate mates' latest (a feed of what crate mates bought, not a ranking), crate mates who own this, same-artist and same-label picks, and pass 0's supporter ranking (§12; it only orders scans).
 

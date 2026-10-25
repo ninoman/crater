@@ -70,7 +70,9 @@ export async function computeAlsoBought(
     release: data.matchKey,
     heard: hideHeard ? data.heard : undefined,
   });
-  const basis = { supporters: data.supporters.length, population: data.population };
+  // A comp's buyers count for less on its track pages (§17), in the share's trials as in its votes.
+  const n = data.supporters.reduce((sum, s) => sum + s.weight, 0);
+  const basis = { supporters: n, population: data.population };
 
   const boosts = crateMateBoosts(data.crateMateSupporters, data.bestCrateMateScore);
   const candidates = coOwnership(

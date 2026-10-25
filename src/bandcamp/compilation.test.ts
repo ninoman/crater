@@ -45,6 +45,18 @@ describe('isCompilation', () => {
     expect(album('[LBL001] VA - Ten Years')).toBe(true);
   });
 
+  it('flags "Various Artists" anywhere in the title', () => {
+    expect(album('Nautilus - Various Artists Compilation Vol.1', 'MBM')).toBe(true);
+  });
+
+  it("flags a track by its album's title", () => {
+    const track = { artist: 'MBM', title: 'Worg - Hybris' };
+    expect(isCompilation(track)).toBe(false);
+    expect(
+      isCompilation({ ...track, albumTitle: 'Nautilus - Various Artists Compilation Vol.1' }),
+    ).toBe(true);
+  });
+
   it('leaves titles alone that only look a bit like one', () => {
     expect(album('Va-Va-Voom')).toBe(false);
     expect(album('Vacation - Live')).toBe(false);

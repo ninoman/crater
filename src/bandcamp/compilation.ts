@@ -26,6 +26,9 @@ const VARIOUS_ARTISTS = new Set([
 const VA_TITLE_PREFIX =
   /^(?:\[[^\]]*\]\s*)?(?:v\.?\s?a\.?|v\/a|various\s+artists?)(?:\s+[-–—|]\s+|\s*:\s*)\S/i;
 
+/** "Nautilus - Various Artists Compilation Vol.1": the phrase anywhere in a title. */
+const VA_IN_TITLE = /\bvarious\s+artists\b/i;
+
 /** Remix albums list remixers per track but are bought by the original artist's fans. */
 const REMIX_TITLE = /\b(?:remix(?:es|ed)?|rework(?:s|ed)?|edits|versions|reimagined)\b/i;
 
@@ -42,6 +45,8 @@ export interface CompilationEvidence {
    * Only release pages carry it.
    */
   trackArtists?: readonly (string | null)[];
+  /** On a track page, the title of the album it's from (ld+json `inAlbum.name`). */
+  albumTitle?: string | null;
 }
 
 function normalize(name: string): string {
@@ -73,11 +78,19 @@ export function hasCompilationTracks(
   );
 }
 
-/** Whether a release is a compilation, from its artist, title and (when known) track artists. */
+function hasVariousArtistsTitle(title: string): boolean {
+  return VA_TITLE_PREFIX.test(title) || VA_IN_TITLE.test(title);
+}
+
+/**
+ * Whether a release is a compilation, from its artist, title and (when known) track artists.
+ * A track counts as one when its album's title says so.
+ */
 export function isCompilation(release: CompilationEvidence): boolean {
   return (
     isVariousArtists(release.artist) ||
-    VA_TITLE_PREFIX.test(release.title) ||
+    hasVariousArtistsTitle(release.title) ||
+    (release.albumTitle != null && hasVariousArtistsTitle(release.albumTitle)) ||
     hasCompilationTracks(release.artist, release.title, release.trackArtists ?? [])
   );
 }

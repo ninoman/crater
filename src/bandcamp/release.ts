@@ -8,12 +8,15 @@ import { toSupporter } from './supporters';
 import type { ReleasePage } from './types';
 import { validate } from './validate';
 
-function readTags(html: string): string[] {
+function readLd(html: string): { tags: string[]; albumTitle: string | null } {
   const ld = readLdJson(html);
-  if (ld === null) return [];
-  const { keywords } = validate(rawLdJson, ld, 'ld+json');
+  if (ld === null) return { tags: [], albumTitle: null };
+  const { keywords, inAlbum } = validate(rawLdJson, ld, 'ld+json');
   const list = typeof keywords === 'string' ? keywords.split(',') : (keywords ?? []);
-  return [...new Set(list.map((tag) => tag.trim().toLowerCase()).filter(Boolean))];
+  return {
+    tags: [...new Set(list.map((tag) => tag.trim().toLowerCase()).filter(Boolean))],
+    albumTitle: inAlbum?.name ?? null,
+  };
 }
 
 /** Parses an album or track page. */
@@ -23,6 +26,7 @@ export function parseReleasePage(html: string): ReleasePage {
   const tralbum = validate(rawTralbum, tralbumJson, 'data-tralbum');
   const type = tralbum.item_type === 'album' ? 'a' : 't';
   const albumId = type === 't' ? tralbum.current.album_id : null;
+  const { tags, albumTitle } = readLd(html);
 
   // A release with no supporters yet has no collectors blob.
   const collectorsJson = readBlobById(html, 'collectors-data');
@@ -40,11 +44,12 @@ export function parseReleasePage(html: string): ReleasePage {
       bandId: tralbum.current.band_id,
       url: tralbum.url,
       artId: tralbum.art_id ?? null,
-      tags: readTags(html),
+      tags,
       compilation: isCompilation({
         artist: tralbum.artist,
         title: tralbum.current.title,
         trackArtists: (tralbum.trackinfo ?? []).map((track) => track.artist ?? null),
+        albumTitle,
       }),
     },
     supporters: collectors

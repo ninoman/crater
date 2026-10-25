@@ -91,6 +91,7 @@ describe('omnivore votes', () => {
   const supporter = (size: number, ...ids: number[]) => ({
     matchIds: Float64Array.from(ids).sort(),
     size,
+    weight: 1,
   });
 
   it('gives collections up to 250 items a full vote, bigger ones √(250 / size)', () => {
