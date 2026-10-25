@@ -6,6 +6,7 @@ import {
   Button,
   EmptyState,
   Identity,
+  NowPlaying,
   SearchField,
   Segmented,
   Table,
@@ -22,7 +23,7 @@ import {
   type CrateMateBoard,
   type CrateMateSort,
 } from './crateMatesView';
-import { NowPlaying } from './NowPlaying';
+import { ReleasePreview } from '../../shared/ReleasePreview';
 import { CrateMateBuys } from './CrateMateBuys';
 
 type Column = TableColumn<CrateMateRow, CrateMateSort>;
@@ -229,10 +230,19 @@ export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now
       )}
       {playing && (
         <NowPlaying
-          buy={playing.buy}
-          crateMateName={playing.crateMateName}
+          name={`${playing.buy.artist} – ${playing.buy.title}`}
+          href={playing.buy.url}
+          detail={`bought by ${playing.crateMateName}`}
+          layout="sticky"
           onStop={() => setPlaying(null)}
-        />
+        >
+          {/* Keyed so a new release remounts the player, which starts it playing. */}
+          <ReleasePreview
+            key={playing.buy.url}
+            url={playing.buy.url}
+            name={`${playing.buy.artist} – ${playing.buy.title}`}
+          />
+        </NowPlaying>
       )}
       <p className="dh-profile__note">
         {board === 'all' ? (

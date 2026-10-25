@@ -11,7 +11,6 @@ import {
   type TagOption,
   Tooltip,
 } from '../../ui';
-import { ReleasePreview } from '../shared/ReleasePreview';
 import { itemTagHandlers, type TagMutations } from '../shared/tagActions';
 import { TagEditor } from '../shared/TagEditor';
 import { cardMeta } from './itemCardText';
@@ -27,7 +26,6 @@ export interface ItemCardProps {
   heard: boolean;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
-  onHeard: (itemKey: ItemKey) => void;
   onError: (message: string) => void;
 }
 
@@ -45,7 +43,6 @@ export const ItemCard = memo(function ItemCard({
   heard,
   onSelect,
   onPreview,
-  onHeard,
   onError,
 }: ItemCardProps) {
   const name = `${item.artist} – ${item.title}`;
@@ -96,10 +93,6 @@ export const ItemCard = memo(function ItemCard({
           <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
         </>
       }
-    >
-      {previewing && (
-        <ReleasePreview url={item.url} name={name} onHeard={() => onHeard(item.itemKey)} />
-      )}
-    </Card>
+    />
   );
 });

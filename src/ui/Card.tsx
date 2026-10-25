@@ -21,12 +21,10 @@ export interface CardProps {
   meta?: ReactNode[];
   /** Small tags after the meta lines. */
   badges?: ReactNode;
-  /** Content under the card, e.g. an open preview player. */
-  children?: ReactNode;
 }
 
 /** One item in a CardGrid: big artwork with its text underneath, like Bandcamp's own grids. */
-export function Card({ media, select, actions, title, meta = [], badges, children }: CardProps) {
+export function Card({ media, select, actions, title, meta = [], badges }: CardProps) {
   return (
     <li className="dh-card">
       <div className="dh-card__media">
@@ -42,7 +40,6 @@ export function Card({ media, select, actions, title, meta = [], badges, childre
         </TruncatedText>
       ))}
       {badges && <span className="dh-card__badges">{badges}</span>}
-      {children}
     </li>
   );
 }

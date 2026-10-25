@@ -9,6 +9,7 @@ export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog';
 export { Cover } from './Cover';
 export { cx } from './cx';
 export { Disclosure, type DisclosureProps } from './Disclosure';
+export { Dock } from './Dock';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
 export { InfoHint, type InfoHintProps } from './InfoHint';
@@ -21,6 +22,7 @@ export {
   StopIcon,
 } from './icons';
 export { Menu, type MenuItem, type MenuProps } from './Menu';
+export { NowPlaying, type NowPlayingProps } from './NowPlaying';
 export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
 export { LoadMore, type LoadMoreProps } from './LoadMore';
 export { NumberField, type NumberFieldProps } from './NumberField';

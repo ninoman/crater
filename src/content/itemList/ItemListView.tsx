@@ -6,9 +6,10 @@ import { useSyncReload } from '../../hooks/useSyncReload';
 import { useTags } from '../../hooks/useTags';
 import type { Tag } from '../../shared/following';
 import type { ListedItem } from '../../shared/itemList';
-import { Button, CardGrid, EmptyState, LoadMore, Notice } from '../../ui';
+import { Button, CardGrid, Dock, EmptyState, LoadMore, Notice, NowPlaying } from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { FilterControls } from '../shared/FilterControls';
+import { ReleasePreview } from '../shared/ReleasePreview';
 import { syncingStep } from '../shared/syncEmpty';
 import { itemTagHandlers } from '../shared/tagActions';
 import { actionable, isFiltering, liveTagIds, NO_FILTER, toggled } from '../shared/tagFilter';
@@ -84,6 +85,8 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
 
   const picked = actionable(selected, visible);
   const common = commonItemTagIds(items, picked);
+  // From the whole list, so a preview keeps playing when a filter hides its card.
+  const nowPlaying = previewing ? items.find((item) => item.itemKey === previewing) : undefined;
 
   function emptyShown() {
     if (shown.length === 0) {
@@ -142,16 +145,6 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
               </p>
             )}
             {emptyShown()}
-            {picked.length > 0 && (
-              <BulkBar
-                label="Selected releases"
-                count={picked.length}
-                tags={tags}
-                commonIds={common}
-                onClear={() => setSelected(new Set())}
-                {...itemTagHandlers(mutations, picked, common, setError)}
-              />
-            )}
           </>
         );
     }
@@ -182,7 +175,6 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
                 heard={item.heard || heardNow.has(item.itemKey)}
                 onSelect={onSelect}
                 onPreview={onPreview}
-                onHeard={onHeard}
                 onError={setError}
               />
             ))}
@@ -192,6 +184,36 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
             onMore={() => setLimit((current) => current + PAGE_SIZE)}
           />
         </div>
+      )}
+      {(picked.length > 0 || nowPlaying) && (
+        <Dock>
+          {picked.length > 0 && (
+            <BulkBar
+              label="Selected releases"
+              count={picked.length}
+              tags={tags}
+              commonIds={common}
+              onClear={() => setSelected(new Set())}
+              {...itemTagHandlers(mutations, picked, common, setError)}
+            />
+          )}
+          {nowPlaying && (
+            <NowPlaying
+              name={`${nowPlaying.artist} – ${nowPlaying.title}`}
+              href={nowPlaying.url}
+              layout="docked"
+              onStop={() => setPreviewing(null)}
+            >
+              {/* Keyed so a new release remounts the player, which starts it playing. */}
+              <ReleasePreview
+                key={nowPlaying.itemKey}
+                url={nowPlaying.url}
+                name={`${nowPlaying.artist} – ${nowPlaying.title}`}
+                onHeard={() => onHeard(nowPlaying.itemKey)}
+              />
+            </NowPlaying>
+          )}
+        </Dock>
       )}
     </>
   );

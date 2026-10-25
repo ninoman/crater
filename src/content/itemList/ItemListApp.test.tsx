@@ -214,6 +214,22 @@ describe('the wishlist tab', () => {
     expect(root(doc)?.querySelector('.dh-bulk-bar')?.textContent).toContain('2 selected');
   });
 
+  it('docks the open preview at the bottom of the window, not under its card', async () => {
+    const doc = fanPage();
+    await openTab(doc);
+
+    const cover = cards(doc)[1]?.querySelector('.dh-playable-cover') as HTMLButtonElement;
+    await act(async () => cover.click());
+
+    const player = root(doc)?.querySelector('.dh-dock .dh-now-playing');
+    expect(player?.textContent).toContain('Artist 2 – Title 2');
+    expect(cards(doc)[1]?.querySelector('.dh-player')).toBeNull();
+
+    const stop = player?.querySelector('button[aria-label="Stop preview"]') as HTMLButtonElement;
+    await act(async () => stop.click());
+    expect(root(doc)?.querySelector('.dh-now-playing')).toBeNull();
+  });
+
   it('untags a release from its chip', async () => {
     const doc = fanPage();
     await openTab(doc);

@@ -9,6 +9,7 @@ import { useCrateMateStandings } from '../../hooks/useCrateMateStandings';
 import type { Following, FollowingKey, Tag } from '../../shared/following';
 import {
   Button,
+  Dock,
   EmptyState,
   LoadMore,
   Notice,
@@ -193,14 +194,16 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
               )
             )}
             {picked.length > 0 && (
-              <BulkBar
-                label="Selected follows"
-                count={picked.length}
-                tags={tags}
-                commonIds={common}
-                onClear={() => setSelected(new Set())}
-                {...followTagHandlers(mutations, pickedKeys, common, setError)}
-              />
+              <Dock>
+                <BulkBar
+                  label="Selected follows"
+                  count={picked.length}
+                  tags={tags}
+                  commonIds={common}
+                  onClear={() => setSelected(new Set())}
+                  {...followTagHandlers(mutations, pickedKeys, common, setError)}
+                />
+              </Dock>
             )}
           </>
         );

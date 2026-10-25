@@ -11,6 +11,7 @@ import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
 import disclosure from './Disclosure.css?inline';
+import dock from './Dock.css?inline';
 import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
 import identity from './Identity.css?inline';
@@ -19,6 +20,7 @@ import infoHint from './InfoHint.css?inline';
 import loadMore from './LoadMore.css?inline';
 import menu from './Menu.css?inline';
 import notice from './Notice.css?inline';
+import nowPlaying from './NowPlaying.css?inline';
 import panel from './Panel.css?inline';
 import playQueueBar from './PlayQueueBar.css?inline';
 import playableCover from './PlayableCover.css?inline';
@@ -53,6 +55,7 @@ export const uiStyles = [
   playableCover,
   audioPlayer,
   notice,
+  nowPlaying,
   progress,
   row,
   card,
@@ -72,6 +75,7 @@ export const uiStyles = [
   skeleton,
   sectionHeading,
   disclosure,
+  dock,
   loadMore,
   menu,
   heardBadge,

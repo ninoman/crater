@@ -1,0 +1,13 @@
+/* One stack at the bottom of the window, so a bulk bar and a player never overlap. */
+.dh-dock {
+  position: fixed;
+  bottom: var(--dh-space-4);
+  left: 50%;
+  z-index: var(--dh-z-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dh-space-2);
+  max-width: calc(100vw - 2 * var(--dh-space-4));
+  transform: translateX(-50%);
+}
