@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0] - 2026-10-25
+
+### Changed
+
+- The wishlist and collection preview plays in a panel docked to the bottom of the window,
+  like Bandcamp's own list player.
+- **Also bought** on a track page counts the album's buyers and that track's, not buyers of
+  the album's other tracks.
+
+### Fixed
+
+- Every track of a compilation showed the same **Also bought** list. Each track now gets its
+  own, and more Various Artists releases are recognised as compilations.
+- The Hide heard switch in the sidebar is no longer flush against the edge.
+
 ## [0.4.0] - 2026-10-24
 
 ### Added
