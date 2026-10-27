@@ -1,5 +1,6 @@
 # Keeps a release PR open on main. Merging it tags a release, which builds the
-# extension and submits it to the Chrome Web Store. See docs/releasing.md.
+# extension and attaches the zip to the GitHub release. The zip is uploaded to the
+# Chrome Web Store by hand; see docs/releasing.md.
 name: Release
 
 on:
@@ -57,12 +58,3 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload "$TAG" "crater-$TAG.zip"
 
-      # Uploads and submits for review; the store publishes once review passes.
-      - name: Submit to the Chrome Web Store
-        env:
-          EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
-          PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
-          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
-          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
-        run: pnpm dlx chrome-webstore-upload-cli@4.0.2 --source "crater-$TAG.zip"
