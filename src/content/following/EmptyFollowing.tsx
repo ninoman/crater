@@ -29,7 +29,7 @@ export function EmptyFollowing({
       <EmptyState
         tone="error"
         title="Couldn't check your sync"
-        description={`Dighead's background worker didn't answer. Reload the extension from chrome://extensions. ${BELOW}`}
+        description={`Crater's background worker didn't answer. Reload the extension from chrome://extensions. ${BELOW}`}
       />
     );
   }
@@ -39,8 +39,8 @@ export function EmptyFollowing({
     case 'no-viewer':
       return (
         <EmptyState
-          title="Dighead hasn't seen you log in yet"
-          description={`Reload this page so Dighead can pick up your account and sync your follows. ${BELOW}`}
+          title="Crater hasn't seen you log in yet"
+          description={`Reload this page so Crater can pick up your account and sync your follows. ${BELOW}`}
         />
       );
     case 'syncing':
@@ -55,21 +55,21 @@ export function EmptyFollowing({
         <EmptyState
           tone="error"
           title="Couldn't sync your follows"
-          description={`${reason.message} Dighead tries again on your next sync. ${BELOW}`}
+          description={`${reason.message} Crater tries again on your next sync. ${BELOW}`}
         />
       );
     case 'unsynced':
       return (
         <EmptyState
           title="Your follows haven't synced yet"
-          description={`They sync with your collection, which starts when Dighead sees you on a Bandcamp page. ${BELOW}`}
+          description={`They sync with your collection, which starts when Crater sees you on a Bandcamp page. ${BELOW}`}
         />
       );
     case 'none':
       return (
         <EmptyState
           title={`You don't follow any ${kindLabel(kind)} yet`}
-          description="Follow them on Bandcamp and they show up here, ready to tag. Dighead picks them up on your next sync."
+          description="Follow them on Bandcamp and they show up here, ready to tag. Crater picks them up on your next sync."
         />
       );
   }

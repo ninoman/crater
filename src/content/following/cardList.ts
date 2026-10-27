@@ -39,9 +39,9 @@ function buildCard(doc: Document, row: Following): Card {
       .querySelector(FAN_PAGE_DOM.followButton)
       ?.classList.remove(FAN_PAGE_DOM.followingButtonClass);
   }
-  const select = createShadowSlot(doc, 'dighead-card-select', cardSelectCss);
+  const select = createShadowSlot(doc, 'crater-card-select', cardSelectCss);
   item.querySelector(FAN_PAGE_DOM.followingImage)?.append(select.host);
-  const { host, container } = createShadowSlot(doc, 'dighead-card', followingCss);
+  const { host, container } = createShadowSlot(doc, 'crater-card', followingCss);
   item.append(host);
   return { id: row.id, item, slot: container, selectSlot: select.container };
 }

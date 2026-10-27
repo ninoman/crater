@@ -13,7 +13,7 @@ import { createLinkBadger } from './linkBadger';
 
 /** Infinite-scroll pages add cards in bursts: wait for a burst to settle before scanning. */
 const SETTLE_MS = 300;
-const HOST_TAG = 'dighead-badge';
+const HOST_TAG = 'crater-badge';
 
 /** Starts badging if the setting is on. Never on your own profile, where everything is owned. */
 export async function mountPageBadges(doc: Document, kind: PageKind): Promise<void> {
@@ -40,7 +40,7 @@ export function startPageBadges(doc: Document, pageUrl: string): () => void {
     },
   });
   const run = () => {
-    scan().catch((error: unknown) => console.warn('dighead: page badges failed', error));
+    scan().catch((error: unknown) => console.warn('crater: page badges failed', error));
   };
 
   let timer: ReturnType<typeof setTimeout> | undefined;

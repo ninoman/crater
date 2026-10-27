@@ -35,7 +35,7 @@ export function LatestList({ result, now, actions }: LatestListProps) {
       </div>
       <p className="dh-profile__note">
         What your top crate mates on the Lately board, then the all-time one, bought recently and
-        you don&apos;t own. Dighead re-reads your closest lately crate mates every week, everyone
+        you don&apos;t own. Crater re-reads your closest lately crate mates every week, everyone
         else monthly. Hidden, owned and wishlisted releases are left out.
       </p>
     </>

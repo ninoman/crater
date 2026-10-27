@@ -22,7 +22,7 @@ export function FollowsTab() {
         <EmptyState
           tone="error"
           title="Couldn't load New from your follows"
-          description="Dighead's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );
@@ -55,8 +55,8 @@ function NoReleases({ result }: { result: FollowsDigestResult }) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
-        title="Dighead hasn't seen you log in yet"
-        description="Reload this page so Dighead can pick up your account and the artists and labels you follow."
+        title="Crater hasn't seen you log in yet"
+        description="Reload this page so Crater can pick up your account and the artists and labels you follow."
       />
     );
   }
@@ -68,7 +68,7 @@ function NoReleases({ result }: { result: FollowsDigestResult }) {
             ? 'Your follows are still syncing'
             : "You don't follow any artists or labels yet"
         }
-        description="This tab lists what the artists and labels you follow on Bandcamp released lately. Follow some from their pages, and Dighead reads their releases every week."
+        description="This tab lists what the artists and labels you follow on Bandcamp released lately. Follow some from their pages, and Crater reads their releases every week."
       />
     );
   }
@@ -76,7 +76,7 @@ function NoReleases({ result }: { result: FollowsDigestResult }) {
     return (
       <EmptyState
         title={`Reading the releases of the ${result.accounts.length} accounts you follow…`}
-        description="Dighead reads one account at a time, politely, so the first round takes a while. Releases show up here as they come in."
+        description="Crater reads one account at a time, politely, so the first round takes a while. Releases show up here as they come in."
         action={<CheckingProgress result={result} />}
       />
     );

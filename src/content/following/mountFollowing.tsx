@@ -11,7 +11,7 @@ import { followingCss } from './followingStyles';
 export function mountFollowing(doc: Document): void {
   const grid = doc.querySelector(FAN_PAGE_DOM.followingGrid);
   if (!grid) {
-    console.warn('dighead: following tab not found; Bandcamp may have changed its layout');
+    console.warn('crater: following tab not found; Bandcamp may have changed its layout');
     return;
   }
   mountShadow(grid, <FollowingApp tab={watchFollowingTab(doc, grid)} />, followingCss);

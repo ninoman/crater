@@ -62,7 +62,7 @@ function PromptPicker({ view, close, own, title, handlers }: PromptPickerProps) 
 
   useEffect(() => {
     if (view.open && all.view.state === 'unreachable') {
-      console.warn('dighead: tag list failed', all.view.error);
+      console.warn('crater: tag list failed', all.view.error);
     }
   }, [view.open, all.view]);
 
@@ -78,7 +78,7 @@ function PromptPicker({ view, close, own, title, handlers }: PromptPickerProps) 
       tags={all.view.data}
       assignedIds={own.data}
       {...handlers(mutations, own.data, (message) =>
-        console.warn('dighead: tagging failed', message),
+        console.warn('crater: tagging failed', message),
       )}
     />
   );

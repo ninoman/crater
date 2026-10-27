@@ -59,7 +59,7 @@ function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
         <EmptyState
           tone="error"
           title="Couldn't load Crate mates' latest"
-          description="Dighead's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );
@@ -78,8 +78,8 @@ function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
-        title="Dighead hasn't seen you log in yet"
-        description="Reload this page so Dighead can pick up your account and sync your collection."
+        title="Crater hasn't seen you log in yet"
+        description="Reload this page so Crater can pick up your account and sync your collection."
       />
     );
   }
@@ -87,7 +87,7 @@ function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
     return (
       <EmptyState
         title="Your collection is still syncing"
-        description="Crate mates' latest follows your crate mates, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
+        description="Crate mates' latest follows your crate mates, and they're worked out once your collection's first sync finishes. The Crater popup shows how far it has got."
       />
     );
   }
@@ -95,7 +95,7 @@ function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
     return (
       <EmptyState
         title="No crate mates yet"
-        description="Crate mates' latest shows what your closest crate mates just bought. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
+        description="Crate mates' latest shows what your closest crate mates just bought. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time."
         action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );

@@ -5,14 +5,14 @@ import {
   type ReleasePageItem,
 } from '../../bandcamp';
 import { itemFromCollection, itemFromReleasePage } from '../mappers';
-import type { BandRecord, DigheadDb, ItemFields, ItemRecord, StoredItem } from '../schema';
+import type { BandRecord, CraterDb, ItemFields, ItemRecord, StoredItem } from '../schema';
 import { readItem, readItemFields, storeItem } from '../storage';
 
 /**
  * Item records for stored rows, URLs rebuilt from their bands' hosts (decisions §19). Call
  * inside a transaction that includes `bands`. Readers that show no URL use the fields reads.
  */
-export async function readItems(db: DigheadDb, rows: StoredItem[]): Promise<ItemRecord[]> {
+export async function readItems(db: CraterDb, rows: StoredItem[]): Promise<ItemRecord[]> {
   const bandIds = [...new Set(rows.map((row) => row.bandId))];
   const bands = await db.bands.bulkGet(bandIds);
   const byId = new Map<number, BandRecord>();
@@ -22,7 +22,7 @@ export async function readItems(db: DigheadDb, rows: StoredItem[]): Promise<Item
 
 /** Like readItems, keeping missing rows as undefined. */
 async function readSome(
-  db: DigheadDb,
+  db: CraterDb,
   rows: (StoredItem | undefined)[],
 ): Promise<(ItemRecord | undefined)[]> {
   const found = await readItems(
@@ -34,7 +34,7 @@ async function readSome(
 }
 
 /** Writes item records, adding any new host to its band. Call inside a transaction with `bands`. */
-async function storeItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
+async function storeItems(db: CraterDb, items: ItemRecord[]): Promise<void> {
   const bandIds = [...new Set(items.map((item) => item.bandId))];
   const known = new Map<number, BandRecord>();
   for (const band of await db.bands.bulkGet(bandIds)) if (band) known.set(band.bandId, band);
@@ -52,7 +52,7 @@ async function storeItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
 }
 
 /** Saves whole item records, e.g. seeding a test database. */
-export function putItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
+export function putItems(db: CraterDb, items: ItemRecord[]): Promise<void> {
   return db.transaction('rw', [db.items, db.bands], () => storeItems(db, items));
 }
 
@@ -61,7 +61,7 @@ export function putItems(db: DigheadDb, items: ItemRecord[]): Promise<void> {
  * (tags from a release page) and a known supporter count when the new one is missing. A
  * collection page can't see track artists, so it never clears a compilation flag (§17).
  */
-export async function upsertCollectionItems(db: DigheadDb, items: CollectionItem[]): Promise<void> {
+export async function upsertCollectionItems(db: CraterDb, items: CollectionItem[]): Promise<void> {
   if (items.length === 0) return;
   await db.transaction('rw', [db.items, db.bands], async () => {
     const existing = await getItemFields(
@@ -87,7 +87,7 @@ export async function upsertCollectionItems(db: DigheadDb, items: CollectionItem
  * Saves what a release page says about itself. Keeps what only collection pages tell us: the
  * supporter count and the label.
  */
-export async function upsertReleasePageItem(db: DigheadDb, item: ReleasePageItem): Promise<void> {
+export async function upsertReleasePageItem(db: CraterDb, item: ReleasePageItem): Promise<void> {
   await db.transaction('rw', [db.items, db.bands], async () => {
     const [old] = await getItemFields(db, [item.itemKey]);
     await storeItems(db, [
@@ -101,13 +101,13 @@ export async function upsertReleasePageItem(db: DigheadDb, item: ReleasePageItem
   });
 }
 
-export async function getItem(db: DigheadDb, itemKey: ItemKey): Promise<ItemRecord | undefined> {
+export async function getItem(db: CraterDb, itemKey: ItemKey): Promise<ItemRecord | undefined> {
   return (await getItemList(db, [itemKey]))[0];
 }
 
 /** Records for these keys, in order; undefined where there's none. */
 export function getItemList(
-  db: DigheadDb,
+  db: CraterDb,
   itemKeys: readonly ItemKey[],
 ): Promise<(ItemRecord | undefined)[]> {
   return db.transaction('r', [db.items, db.bands], async () =>
@@ -116,7 +116,7 @@ export function getItemList(
 }
 
 export async function getItems(
-  db: DigheadDb,
+  db: CraterDb,
   itemKeys: ItemKey[],
 ): Promise<Map<ItemKey, ItemRecord>> {
   const items = await getItemList(db, itemKeys);
@@ -125,7 +125,7 @@ export async function getItems(
 
 /** Rows under these index values. `equals` for one value: `anyOf` is far slower in fake-indexeddb. */
 function itemRowsWhere(
-  db: DigheadDb,
+  db: CraterDb,
   index: 'bandId' | 'labelId',
   values: readonly number[],
 ): Promise<StoredItem[]> {
@@ -137,7 +137,7 @@ function itemRowsWhere(
 
 /** Fields of the items with these keys, in order, without their URLs (no band lookup). */
 export async function getItemFields(
-  db: DigheadDb,
+  db: CraterDb,
   itemKeys: readonly ItemKey[],
 ): Promise<(ItemFields | undefined)[]> {
   const rows = await db.items.bulkGet([...itemKeys]);
@@ -146,7 +146,7 @@ export async function getItemFields(
 
 /** Fields of every item stored under these values of an index, without their URLs. */
 export async function itemFieldsWhere(
-  db: DigheadDb,
+  db: CraterDb,
   index: 'bandId' | 'labelId',
   values: readonly number[],
 ): Promise<ItemFields[]> {
@@ -155,7 +155,7 @@ export async function itemFieldsWhere(
 
 /** Every item stored under these values of an index, e.g. a band's releases by `bandId`. */
 export function itemsWhere(
-  db: DigheadDb,
+  db: CraterDb,
   index: 'bandId' | 'labelId',
   values: readonly number[],
 ): Promise<ItemRecord[]> {
@@ -166,7 +166,7 @@ export function itemsWhere(
 
 /** Which of these match ids have a record flagged as a compilation (decisions §17). */
 export async function getCompilations(
-  db: DigheadDb,
+  db: CraterDb,
   matchIds: readonly number[],
 ): Promise<Set<number>> {
   const items = await db.items.bulkGet(matchIds.map(keyFromNumber));

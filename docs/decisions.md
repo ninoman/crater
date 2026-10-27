@@ -74,7 +74,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 | Private or hidden collections? | No fully private collections turned up in 50 sampled supporters. Bandcamp hides at the item level (`hidden_items_count`) and the whole-wishlist level (`wishlist_data.hidden`). Of the 50, **0 had hidden collection items** and **9 (18%) had hidden wishlists**. A hidden wishlist makes `wishlist_items` return HTTP 200 `{"error":true}`, **the same response as a malformed token**, so the scanner can only tell them apart with the first-page synthetic token. Impact is low: the MVP only reads *your own* wishlist. A fan is marked `private` only if `collection_items` errors on the first page (see "Private fans" below). | Answered |
 | Tracks vs albums | **Decided (2026-10-20): owning a track counts as a match with owning its album.** Track-from-album buys are common in underground scenes. The link is cheap: a collection item's `album_id` matched the track page's `album_id` in 10 of 10 sampled tracks, so no extra requests are needed. Standalone singles have `album_id: null` and stay their own item. How this works is in §3.8. | Decided |
 | Private fans | **Decided (2026-10-20): ignore them.** If a fan's collection can't be read (`collection_items` errors on the first page), set `status = private`. Leave them out of crate mates, scoring and the fan count `N`, and show nothing in the UI. | Decided |
-| Name | Still open. "Dighead" stays the working name. | Open |
+| Name | **Decided (2026-10-27): Crater.** It replaces the working name "Dighead". The IndexedDB keeps the name `dighead` so existing local databases stay readable. | Decided |
 
 ## 3. Changes to the spec's design
 
@@ -133,7 +133,7 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
   - *throttled*: HTTP 429, 5xx, **or no response at all** (offline, DNS, 30 s timeout). The whole queue pauses and the job stays as it is, with no attempt counted. Network errors are in this group because being offline is never one job's fault. Counting them per job would burn every job's retries in seconds.
   - *permanent*: another 4xx, a `ParserError`, or a `{"error": true}` other than a fan's first page. The job is dropped, and a dropped fan gets `status = error`.
   - *transient*: anything else, which is probably our own bug (e.g. a DB error). The job is retried after 60 s, then 120 s, then dropped.
-- **Offline vs. Bandcamp pushing back:** both use the same back-off, but a back-off started by a request with no answer is flagged `offline` in the scanner state, and `getScannerStatus` reports it as `pause.reason = 'offline'`, plus `online` from `navigator.onLine`. The UI then says "You're offline", not "Bandcamp asked Dighead to slow down". The flag clears on the next successful request.
+- **Offline vs. Bandcamp pushing back:** both use the same back-off, but a back-off started by a request with no answer is flagged `offline` in the scanner state, and `getScannerStatus` reports it as `pause.reason = 'offline'`, plus `online` from `navigator.onLine`. The UI then says "You're offline", not "Bandcamp asked Crater to slow down". The flag clears on the next successful request.
 - **Back-off:** honour `Retry-After` (seconds or an HTTP date). Without it, wait 60 s and double the wait after each consecutive throttled request, up to 1 h. The first successful request resets it. The pause lives in `chrome.storage.local` (`scanner` key), so it survives a killed worker and a browser restart.
 - **Lock:** `chrome.storage.local` holds the lock as `{owner, heartbeatAt}`, with the heartbeat refreshed before every request. A lock older than 45 s is treated as left behind by a dead worker. Only one worker instance exists at a time, so in practice this only matters after a kill: the queue resumes on the first 1-minute alarm after those 45 s, usually within 1–2 minutes.
 - **Supporter paging:** the first page (up to 80 thumbs and 6 reviews) comes free with the release page. After that, **thumbs come first, then reviews**, 100 per request (fewer for the last one), until the cap. Thumbs are the most recent buyers, which is what the cap means ("500 most recent").
@@ -246,7 +246,7 @@ Code: `src/scoring/crateMates.ts` (pure), `src/db/repo/crateMates.ts` (gathering
 Code: `src/content/profile/`. Decided 2026-10-20, tried against `me-fan-page.html` with Bandcamp's real CSS and a stand-in for its tab script. Not yet tried on the live page with Bandcamp's own JS.
 
 - **Your own page** is told apart by `fan_data.is_own_page` in `#pagedata` (`isOwnFanPage`), not by comparing usernames.
-- **The tab handle is light DOM**, an `<li class="dighead-tab"><a class="tab-title" href="#crate-mates">` appended to Bandcamp's `#grid-tabs`, so Bandcamp's CSS styles it exactly like its own tabs. It's the one exception to "injected UI lives in a shadow root". It has no `data-tab`, and clicks on it stop at the `<li>` (`stopImmediatePropagation`) so Bandcamp's tab switcher never sees them. The tab content renders in a shadow root in a slot right after `.grid-tabs-anchor`, kept at the tab list's width by a ResizeObserver because Bandcamp's grid width steps with the viewport.
+- **The tab handle is light DOM**, an `<li class="crater-tab"><a class="tab-title" href="#crate-mates">` appended to Bandcamp's `#grid-tabs`, so Bandcamp's CSS styles it exactly like its own tabs. It's the one exception to "injected UI lives in a shadow root". It has no `data-tab`, and clicks on it stop at the `<li>` (`stopImmediatePropagation`) so Bandcamp's tab switcher never sees them. The tab content renders in a shadow root in a slot right after `.grid-tabs-anchor`, kept at the tab list's width by a ResizeObserver because Bandcamp's grid width steps with the viewport.
 - **The hash is the state.** The link sets `#crate-mates` itself (a history entry, so Back works), `hashchange` opens and closes our tabs, and a direct `#crate-mates` link opens it on load. Clicking one of Bandcamp's tabs drops the hash with `replaceState` and hands the `active` class back to the tab that had it, in the capture phase, before Bandcamp's handler runs.
 - **While ours is open**, a class on `#grids` hides every `.grid` and `.owner-controls` through one injected `<style>`. Bandcamp's selectors live in `bandcamp/fanPageDom.ts`.
 - **% match is Jaccard**, shown as a percentage. The roadmap's columns (overlap, % match, score) and sorts (overlap, Jaccard, score) are the same three numbers. Sorting is one-way, best first; ties keep leaderboard order.
@@ -609,7 +609,7 @@ A quiet pill after release links anywhere on bandcamp.com: **owned**, **wishlist
 ### Infinite scroll and rendering
 
 - A `MutationObserver` on `document.body` re-runs the scan 300 ms after the last change. Every anchor seen goes in a `WeakSet`, so nothing is looked up or badged twice, and Bandcamp's own DOM isn't marked.
-- Each badge is a `<dighead-badge>` host inserted right after its link, with a shadow root holding the shared styles, so Bandcamp CSS can't reach in. **One React root** renders every badge through portals into those shadow roots; a page doesn't get a React root per link.
+- Each badge is a `<crater-badge>` host inserted right after its link, with a shadow root holding the shared styles, so Bandcamp CSS can't reach in. **One React root** renders every badge through portals into those shadow roots; a page doesn't get a React root per link.
 - Colours come from the tokens, with the page theme (§13) on release pages, so a badge on a dark artist page isn't a light pill.
 - Errors (worker unreachable, a broken page) are `console.warn`ed and the page simply has no badges.
 
@@ -776,7 +776,7 @@ Each change lists what it saves, in JSON and on disk.
 
 ### Gzip backups
 
-- **Export:** `exportDB`, then `CompressionStream('gzip')`, saved as `dighead-backup-YYYY-MM-DD.json.gz`. The OPFS import snapshot (§10) is gzipped the same way.
+- **Export:** `exportDB`, then `CompressionStream('gzip')`, saved as `crater-backup-YYYY-MM-DD.json.gz`. The OPFS import snapshot (§10) is gzipped the same way.
 - **Import:** one `readBackup(blob)` decompresses when the first two bytes are `1f 8b`, whatever the file is called; otherwise it reads plain JSON. The popup's import, snapshot restore, `importRecovery` and `pnpm eval` (`loadBackup`) all go through it.
 - **File picker:** accepts `.json`, `.gz` and `application/gzip`.
 
@@ -851,7 +851,7 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 ### Saving
 
 - **Follow:** `markFollowed` adds the account with the details on the page (name, URL, location; no avatar) and no tags. A row we already have keeps what the sync wrote and its tags; only the unfollowed mark is cleared. **Unfollow** reuses `setUnfollowed`, so a quick re-follow keeps the tags, and the next full sync deletes the row (§8).
-- **Heart:** `markWishlisted` writes your wishlist `ownership` row (dated now) and refreshes your match index. An item you own stays owned; one already wishlisted keeps its date. It answers false before Dighead knows who you are, and then nothing opens. **Un-heart** deletes the wishlist row but keeps `itemTags`, so a quick re-add keeps the tags; the next full sync drops them (§14).
+- **Heart:** `markWishlisted` writes your wishlist `ownership` row (dated now) and refreshes your match index. An item you own stays owned; one already wishlisted keeps its date. It answers false before Crater knows who you are, and then nothing opens. **Un-heart** deletes the wishlist row but keeps `itemTags`, so a quick re-add keeps the tags; the next full sync drops them (§14).
 - The release itself is in `items` already: opening its page saved it (`releaseOpened`).
 - After either, the page's hooks refetch, so the inline tag editor shows at once.
 

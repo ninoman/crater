@@ -3,7 +3,7 @@
 // sync rewriting `ownership` keeps them.
 
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, ItemRecord, ItemTagsRecord, OwnershipRecord } from '../schema';
+import type { CraterDb, ItemRecord, ItemTagsRecord, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
 import { getItemList } from './items';
 
@@ -21,7 +21,7 @@ export interface OwnedRow {
 
 /** Your wishlist or collection, newest first. Items whose metadata we lack are left out. */
 export async function listOwnedItems(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   source: Source,
 ): Promise<OwnedRow[]> {
@@ -42,7 +42,7 @@ export async function listOwnedItems(
 
 /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
 export async function getItemTags(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   itemKey: ItemKey,
 ): Promise<number[] | null> {
@@ -55,7 +55,7 @@ export async function getItemTags(
 
 /** Adds a tag to, or removes it from, many items in one transaction. Returns how many changed. */
 export async function assignItemTag(
-  db: DigheadDb,
+  db: CraterDb,
   tagId: number,
   itemKeys: ItemKey[],
   action: 'add' | 'remove',
@@ -82,7 +82,7 @@ export async function assignItemTag(
  * After a full sync: drops tags of items that are in neither list any more. A bought item keeps
  * its tags (decisions §24).
  */
-export async function pruneItemData(db: DigheadDb, fanId: number): Promise<void> {
+export async function pruneItemData(db: CraterDb, fanId: number): Promise<void> {
   await db.transaction('rw', [db.ownership, db.itemTags], async () => {
     const listed = new Set((await fanRows(db, fanId)).map((row) => row.itemKey));
     await db.itemTags.filter((row) => !listed.has(row.itemKey)).delete();
@@ -91,7 +91,7 @@ export async function pruneItemData(db: DigheadDb, fanId: number): Promise<void>
 
 /** Which of `itemKeys` are in your wishlist or collection. */
 export async function listedKeys(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   itemKeys: ItemKey[],
 ): Promise<Set<ItemKey>> {

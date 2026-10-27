@@ -37,7 +37,7 @@ export function useTagPrompt(
           setView({ open: true, anchor });
         }
       })
-      .catch((error: unknown) => console.warn('dighead: could not save the change', error));
+      .catch((error: unknown) => console.warn('crater: could not save the change', error));
   });
 
   const close = useCallback(() => setView({ open: false }), []);

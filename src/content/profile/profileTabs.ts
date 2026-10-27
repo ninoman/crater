@@ -23,12 +23,12 @@ export interface ProfileTabs<Route extends string> {
   subscribe: (listener: () => void) => () => void;
 }
 
-const OPEN_CLASS = 'dighead-tab-open';
-const TAB_CLASS = 'dighead-tab';
-const SLOT_CLASS = 'dighead-tab-content';
-const STYLE_ID = 'dighead-profile-tabs';
+const OPEN_CLASS = 'crater-tab-open';
+const TAB_CLASS = 'crater-tab';
+const SLOT_CLASS = 'crater-tab-content';
+const STYLE_ID = 'crater-profile-tabs';
 /** The tab list's width, so tab content lines up with it at every Bandcamp breakpoint. */
-const WIDTH_VAR = '--dighead-tabs-width';
+const WIDTH_VAR = '--crater-tabs-width';
 
 /**
  * While one of our tabs is open, Bandcamp's grids and their controls are hidden. Our tab link
@@ -92,7 +92,7 @@ export function injectProfileTabs<Route extends string>(
 ): ProfileTabs<Route> | null {
   const page = findTabBar(doc);
   if (!page) {
-    console.warn('dighead: fan page tabs not found; Bandcamp may have changed its layout');
+    console.warn('crater: fan page tabs not found; Bandcamp may have changed its layout');
     return null;
   }
   const { grids, list, bar } = page;

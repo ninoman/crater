@@ -10,7 +10,7 @@ import {
   getSellerItems,
   getShownFields,
   type AlsoBoughtData,
-  type DigheadDb,
+  type CraterDb,
   type ItemRecord,
 } from '../../db';
 import {
@@ -57,7 +57,7 @@ export interface AlsoBoughtOptions {
 }
 
 export async function computeAlsoBought(
-  db: DigheadDb,
+  db: CraterDb,
   releaseKey: ItemKey,
   meFanId: number | null,
   { followingBoost = true, ignoreCompilations = true, hideHeard = false }: AlsoBoughtOptions = {},
@@ -121,7 +121,7 @@ export async function computeAlsoBought(
  * are dropped (§22); their records are read only when something like that is hidden.
  */
 async function scoreTop(
-  db: DigheadDb,
+  db: CraterDb,
   candidates: CoOwned[],
   supporters: readonly SupporterList[],
   basis: Basis,
@@ -172,7 +172,7 @@ async function scoreTop(
 
 /** Candidates whose shown record isn't from a hidden artist or label. */
 async function allowedSellers(
-  db: DigheadDb,
+  db: CraterDb,
   chunk: CoOwned[],
   excluded: Exclusions,
 ): Promise<CoOwned[]> {
@@ -188,7 +188,7 @@ async function allowedSellers(
 }
 
 async function fallbackFor(
-  db: DigheadDb,
+  db: CraterDb,
   data: AlsoBoughtData,
   excluded: Exclusions,
 ): Promise<FallbackPick[]> {

@@ -2,7 +2,7 @@
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { PageBadge, ReleaseRef } from '../../shared/pageBadges';
-import type { DigheadDb, ItemFields, ItemRecord, OwnershipRecord } from '../schema';
+import type { CraterDb, ItemFields, ItemRecord, OwnershipRecord } from '../schema';
 import { releaseUrlHost } from '../storage';
 import { fanRows } from './fanRows';
 import { getItemFields, itemsWhere } from './items';
@@ -31,7 +31,7 @@ function contains(sorted: Float64Array, value: number): boolean {
  * Items that may sit at these URLs: every release of the bands seen under their hosts. Each
  * stored URL's host is in its band's `hosts` (decisions §19), so none is missed.
  */
-async function itemsAtUrls(db: DigheadDb, urls: string[]): Promise<ItemRecord[]> {
+async function itemsAtUrls(db: CraterDb, urls: string[]): Promise<ItemRecord[]> {
   const hosts = [...new Set(urls.flatMap((url) => releaseUrlHost(url) ?? []))];
   if (hosts.length === 0) return [];
   const bandIds = await db.bands.where('hosts').anyOf(hosts).primaryKeys();
@@ -39,7 +39,7 @@ async function itemsAtUrls(db: DigheadDb, urls: string[]): Promise<ItemRecord[]>
 }
 
 /** Each ref's release: its item record when we have one, else its id alone. Null when unknown. */
-async function resolve(db: DigheadDb, refs: ReleaseRef[]): Promise<(Release | null)[]> {
+async function resolve(db: CraterDb, refs: ReleaseRef[]): Promise<(Release | null)[]> {
   const keys = refs.flatMap((ref) => (ref.itemKey ? [ref.itemKey] : []));
   const urls = refs.flatMap((ref) => (ref.itemKey ? [] : [ref.url]));
   const [byKeyList, byUrlList] = await Promise.all([
@@ -70,7 +70,7 @@ function ownsRelease(rows: OwnershipRecord[], release: Release): boolean {
  * from your own rows; crate mates are the top `topCrateMatesK` of the leaderboard, counted by matchKey.
  */
 export async function pageBadges(
-  db: DigheadDb,
+  db: CraterDb,
   refs: ReleaseRef[],
   topCrateMatesK: number,
 ): Promise<(PageBadge | null)[]> {

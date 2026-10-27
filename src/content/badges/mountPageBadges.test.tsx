@@ -36,7 +36,7 @@ afterEach(() => {
 const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 400)));
 
 function badges() {
-  return [...document.querySelectorAll('dighead-badge')].map((host) => ({
+  return [...document.querySelectorAll('crater-badge')].map((host) => ({
     after: host.previousElementSibling,
     text: host.shadowRoot?.querySelector('.dh-badge')?.textContent,
   }));
@@ -58,7 +58,7 @@ describe('startPageBadges', () => {
     expect(promises?.text).toBe('owned');
     expect(promises?.after?.classList.contains('item-link')).toBe(true);
     const cards = document.querySelectorAll('li.collection-item-container');
-    for (const card of cards) expect(card.querySelectorAll('dighead-badge')).toHaveLength(1);
+    for (const card of cards) expect(card.querySelectorAll('crater-badge')).toHaveLength(1);
     expect(placed.filter(({ text }) => text === '2 crate mates').length).toBeGreaterThanOrEqual(9);
 
     // Infinite scroll: a new card and a link we can't identify. Only they are asked about.

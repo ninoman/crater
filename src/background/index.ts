@@ -33,7 +33,7 @@ chrome.permissions.onAdded.addListener(listenForNotificationClicks);
 // Opening may run a schema upgrade that takes minutes on a big database. Every other use of `db`
 // waits for this same open.
 keepAliveWhile(db.open()).catch((error: unknown) =>
-  console.error('dighead: the database failed to open', error),
+  console.error('crater: the database failed to open', error),
 );
 
 chrome.runtime.onStartup.addListener(() => {
@@ -48,7 +48,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === SCANNER_ALARM) kickScanner();
   if (alarm.name === MAINTENANCE_ALARM) {
-    runMaintenance().catch((error: unknown) => console.error('dighead: maintenance failed', error));
+    runMaintenance().catch((error: unknown) => console.error('crater: maintenance failed', error));
   }
 });
 
@@ -57,7 +57,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 void recoverInterruptedImport(db, chromeImportStateStore, opfsSnapshot, async () => {
   await chromeScannerStore.save({ importing: false });
 })
-  .catch((error: unknown) => console.error('dighead: import recovery failed', error))
+  .catch((error: unknown) => console.error('crater: import recovery failed', error))
   .finally(kickScanner);
 
 // Every wake-up, including the one after the worker was killed, picks the queue back up.

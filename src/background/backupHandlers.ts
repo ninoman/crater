@@ -1,6 +1,6 @@
 // Message handlers for full-database backup. The file travels through staging (shared/backupStaging).
 
-import { exportDatabase, importDatabase, type DigheadDb, type SnapshotStore } from '../db';
+import { exportDatabase, importDatabase, type CraterDb, type SnapshotStore } from '../db';
 import {
   discardStagedFile,
   hasStagedFile,
@@ -25,7 +25,7 @@ export const opfsSnapshot: SnapshotStore = {
   discard: () => discardStagedFile('snapshot'),
 };
 
-export function backupHandlers(db: DigheadDb): BackupHandlers {
+export function backupHandlers(db: CraterDb): BackupHandlers {
   return {
     exportBackup: async () => {
       const { file, summary } = await keepAliveWhile(exportDatabase(db));

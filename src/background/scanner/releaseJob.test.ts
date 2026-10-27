@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureJson, fixtureText } from '../../../tests/fixtures';
 import { ParserError, type BandcampRequest } from '../../bandcamp';
-import { DigheadDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
+import { CraterDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
 import { runReleaseStep } from './releaseJob';
@@ -10,11 +10,11 @@ import { runReleaseStep } from './releaseJob';
 const NOW = 1_800_000_000_000;
 const PROMISES = 'a3149089081';
 
-let db: DigheadDb;
+let db: CraterDb;
 let requests: { kind: string; count: number; token: string }[];
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   requests = [];
 });

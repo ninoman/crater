@@ -21,6 +21,6 @@ export function useRecordFollow(doc: Document, account: FollowedAccount): void {
         : sendMessage('setUnfollowed', { key: [kind, id], unfollowed: true });
     saved
       .then(notifyFollowingChanged)
-      .catch((error: unknown) => console.warn('dighead: could not save the follow', error));
+      .catch((error: unknown) => console.warn('crater: could not save the follow', error));
   });
 }

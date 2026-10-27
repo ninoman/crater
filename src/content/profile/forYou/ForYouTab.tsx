@@ -74,7 +74,7 @@ function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProp
         <EmptyState
           tone="error"
           title="Couldn't load For you"
-          description="Dighead's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );
@@ -95,8 +95,8 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
-        title="Dighead hasn't seen you log in yet"
-        description="Reload this page so Dighead can pick up your account and sync your collection."
+        title="Crater hasn't seen you log in yet"
+        description="Reload this page so Crater can pick up your account and sync your collection."
       />
     );
   }
@@ -104,7 +104,7 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
     return (
       <EmptyState
         title="Your collection is still syncing"
-        description="For you is built from your crate mates, and they're worked out once your collection's first sync finishes. The Dighead popup shows how far it has got."
+        description="For you is built from your crate mates, and they're worked out once your collection's first sync finishes. The Crater popup shows how far it has got."
       />
     );
   }
@@ -114,7 +114,7 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
     return (
       <EmptyState
         title="No crate mates yet"
-        description="For you is built from what your closest crate mates own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time, or open the pages of releases you love to scan their supporters first."
+        description="For you is built from what your closest crate mates own. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time, or open the pages of releases you love to scan their supporters first."
         action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
@@ -122,7 +122,7 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
   return (
     <EmptyState
       title="Nothing new from your crate mates yet"
-      description={`Your ${result.crateMatesUsed} closest crate mates own nothing you haven't already got, wishlisted or hidden. More turns up as Dighead scans more fans.`}
+      description={`Your ${result.crateMatesUsed} closest crate mates own nothing you haven't already got, wishlisted or hidden. More turns up as Crater scans more fans.`}
       action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
@@ -141,7 +141,7 @@ function NoFreshPicks({ crateMatesUsed }: { crateMatesUsed: number }) {
   return (
     <EmptyState
       title="Nothing fresh from your lately crate mates"
-      description={`Your ${crateMatesUsed} lately ${crateMatesUsed === 1 ? 'crate mate has' : 'crate mates have'} bought nothing in the last year that you haven't already got, wishlisted or hidden. Try All time, or check back after Dighead scans more fans.`}
+      description={`Your ${crateMatesUsed} lately ${crateMatesUsed === 1 ? 'crate mate has' : 'crate mates have'} bought nothing in the last year that you haven't already got, wishlisted or hidden. Try All time, or check back after Crater scans more fans.`}
       action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
@@ -152,7 +152,7 @@ function NoDeepCuts({ crateMatesUsed }: { crateMatesUsed: number }) {
     return (
       <EmptyState
         title="No crate mates yet"
-        description="Deep cuts are built from what your closest crate mates own. Dighead finds them as its scanner reads the collections of your releases' supporters, so give it time."
+        description="Deep cuts are built from what your closest crate mates own. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time."
         action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
@@ -160,7 +160,7 @@ function NoDeepCuts({ crateMatesUsed }: { crateMatesUsed: number }) {
   return (
     <EmptyState
       title="No deep cuts yet"
-      description="Your crate mates' rare records show up as more of them are scanned. You can raise the owner limit in Dighead's settings."
+      description="Your crate mates' rare records show up as more of them are scanned. You can raise the owner limit in Crater's settings."
       action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );

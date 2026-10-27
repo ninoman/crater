@@ -46,7 +46,7 @@ export function ProfileApp({ tabs }: { tabs: ProfileTabs<ProfileRoute> }) {
   const route = useSyncExternalStore(tabs.subscribe, tabs.getActive);
   if (route === null) return null;
   return (
-    <section className="dh-profile" aria-label={`Dighead: ${labelOf(route)}`}>
+    <section className="dh-profile" aria-label={`Crater: ${labelOf(route)}`}>
       <ScannerNotices />
       <RouteView route={route} />
     </section>

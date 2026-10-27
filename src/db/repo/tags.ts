@@ -2,13 +2,7 @@
 // Tag ids live on the following rows and in `itemTags`.
 
 import type { ItemKey } from '../../bandcamp';
-import type {
-  DigheadDb,
-  FollowingKey,
-  FollowingRecord,
-  ItemTagsRecord,
-  TagRecord,
-} from '../schema';
+import type { CraterDb, FollowingKey, FollowingRecord, ItemTagsRecord, TagRecord } from '../schema';
 import type { TagBackup } from '../tagBackup';
 import { followingKey } from './following';
 import { listedKeys } from './itemLists';
@@ -29,12 +23,12 @@ export function tagNameKey(name: string): string {
   return name.trim().toLowerCase();
 }
 
-export function listTags(db: DigheadDb): Promise<TagRecord[]> {
+export function listTags(db: CraterDb): Promise<TagRecord[]> {
   return db.tags.orderBy('nameKey').toArray();
 }
 
 /** Creates a tag. A name that already exists returns that tag, so Enter in the picker just works. */
-export async function createTag(db: DigheadDb, name: string): Promise<TagResult> {
+export async function createTag(db: CraterDb, name: string): Promise<TagResult> {
   const nameKey = tagNameKey(name);
   if (!nameKey) return { ok: false, reason: 'empty' };
   return db.transaction('rw', db.tags, async () => ({
@@ -43,7 +37,7 @@ export async function createTag(db: DigheadDb, name: string): Promise<TagResult>
   }));
 }
 
-export async function renameTag(db: DigheadDb, id: number, name: string): Promise<TagResult> {
+export async function renameTag(db: CraterDb, id: number, name: string): Promise<TagResult> {
   const nameKey = tagNameKey(name);
   if (!nameKey) return { ok: false, reason: 'empty' };
   return db.transaction('rw', db.tags, async (): Promise<TagResult> => {
@@ -57,7 +51,7 @@ export async function renameTag(db: DigheadDb, id: number, name: string): Promis
 }
 
 /** Deletes a tag and takes it off every following and item, in one transaction. */
-export async function deleteTag(db: DigheadDb, id: number): Promise<void> {
+export async function deleteTag(db: CraterDb, id: number): Promise<void> {
   await db.transaction('rw', [db.tags, db.following, db.itemTags], async () => {
     const untag = (row: { tagIds: number[] }) => {
       row.tagIds = row.tagIds.filter((tagId) => tagId !== id);
@@ -73,7 +67,7 @@ export async function deleteTag(db: DigheadDb, id: number): Promise<void> {
  * are skipped. Returns how many rows changed.
  */
 export async function assignTag(
-  db: DigheadDb,
+  db: CraterDb,
   tagId: number,
   keys: FollowingKey[],
   action: 'add' | 'remove',
@@ -93,7 +87,7 @@ export async function assignTag(
 }
 
 /** Every tag with the followings and items it's on, in the backup file's shape. */
-export async function exportTags(db: DigheadDb): Promise<TagBackup> {
+export async function exportTags(db: CraterDb): Promise<TagBackup> {
   return db.transaction('r', [db.tags, db.following, db.itemTags], async () => {
     const tags = await listTags(db);
     const assignments = new Map<number, FollowingKey[]>(tags.map((tag) => [tag.id, []]));
@@ -120,7 +114,7 @@ export async function exportTags(db: DigheadDb): Promise<TagBackup> {
  * (gone, or unfollowed on the tab) and to items in neither of `fanId`'s lists are skipped.
  */
 export async function importTags(
-  db: DigheadDb,
+  db: CraterDb,
   backup: TagBackup,
   fanId: number | null,
 ): Promise<TagImportSummary> {
@@ -159,7 +153,7 @@ export async function importTags(
 
 /** The tag with `name`'s key, added if new. Call inside a transaction on `tags`. */
 async function findOrAdd(
-  db: DigheadDb,
+  db: CraterDb,
   name: string,
 ): Promise<{ tag: TagRecord; created: boolean }> {
   const nameKey = tagNameKey(name);

@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
-import { DigheadDb, enqueueAt, fanJob, putFollowing, refreshFanMatches } from '../../db';
+import { CraterDb, enqueueAt, fanJob, putFollowing, refreshFanMatches } from '../../db';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import type { StepEvent } from './context';
@@ -105,7 +105,7 @@ function memoryStore(): ScannerStore & { state: ScannerState } {
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 let store: ReturnType<typeof memoryStore>;
 let settings: Settings;
 
@@ -165,7 +165,7 @@ async function listSupporters(fanIds: number[], priority: number = FOREGROUND) {
 beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(START);
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   store = memoryStore();
   settings = { ...DEFAULT_SETTINGS, collectionBatchSize: 100, collectionCap: 2000 };

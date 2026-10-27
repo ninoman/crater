@@ -2,7 +2,7 @@
 // src/scoring/followsDigest.ts.
 
 import type { ItemKey } from '../../bandcamp';
-import type { BandReleaseRecord, DigheadDb, FollowingRecord, OwnershipRecord } from '../schema';
+import type { BandReleaseRecord, CraterDb, FollowingRecord, OwnershipRecord } from '../schema';
 import { bandCatalogues, mutedBandIds, recentBandReleases } from './bandReleases';
 import { fanRows } from './fanRows';
 import { heardKeys } from './heard';
@@ -26,7 +26,7 @@ export interface FollowsDigestData {
 }
 
 export async function gatherFollowsDigest(
-  db: DigheadDb,
+  db: CraterDb,
   since: number,
   meFanId: number,
   crateMateIds: readonly number[],

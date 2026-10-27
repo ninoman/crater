@@ -1,15 +1,15 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, putFollowing } from '../db';
+import { CraterDb, putFollowing } from '../db';
 import { followingHandlers, type FollowingHandlers } from './followingHandlers';
 
 const sender = {} as chrome.runtime.MessageSender;
 
-let db: DigheadDb;
+let db: CraterDb;
 let h: FollowingHandlers;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   h = followingHandlers(db);
   await putFollowing(db, [

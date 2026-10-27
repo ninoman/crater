@@ -30,7 +30,7 @@ export function ReleaseSidebar() {
         <EmptyState
           tone="error"
           title="Parser broken"
-          description="Bandcamp may have changed its page layout. Dighead needs an update."
+          description="Bandcamp may have changed its page layout. Crater needs an update."
         />
       </SidebarShell>
     );
@@ -98,7 +98,7 @@ function SidebarShell({ subtitle, children }: { subtitle?: string; children: Rea
   if (!open) {
     return (
       <Button variant="primary" className="dh-sidebar__toggle" onClick={() => setOpen(true)}>
-        Dighead
+        Crater
       </Button>
     );
   }
@@ -108,7 +108,7 @@ function SidebarShell({ subtitle, children }: { subtitle?: string; children: Rea
       title="Fans of this also bought"
       subtitle={subtitle}
       actions={
-        <Button variant="ghost" icon aria-label="Collapse Dighead" onClick={() => setOpen(false)}>
+        <Button variant="ghost" icon aria-label="Collapse Crater" onClick={() => setOpen(false)}>
           ×
         </Button>
       }
@@ -124,7 +124,7 @@ function WorkerFooter({ status }: { status: WorkerStatus }) {
     case 'connecting':
       return <StatusDot tone="neutral">Connecting…</StatusDot>;
     case 'connected':
-      return <StatusDot tone="ok">Dighead {status.version}</StatusDot>;
+      return <StatusDot tone="ok">Crater {status.version}</StatusDot>;
     case 'unreachable':
       return <StatusDot tone="error">Background worker unreachable</StatusDot>;
   }

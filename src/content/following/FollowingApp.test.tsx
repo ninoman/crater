@@ -96,10 +96,10 @@ async function nextPoll(): Promise<void> {
 }
 
 const ourCards = (doc: Document) => [
-  ...doc.querySelectorAll<HTMLLIElement>('.dighead-following-list > li.followeer'),
+  ...doc.querySelectorAll<HTMLLIElement>('.crater-following-list > li.followeer'),
 ];
 const bar = (doc: Document) =>
-  doc.querySelector('#following-bands-container dighead-following-bar')?.shadowRoot;
+  doc.querySelector('#following-bands-container crater-following-bar')?.shadowRoot;
 
 describe('the following tab', () => {
   it('shows every follow as a card with its tags, and filters by tag', async () => {
@@ -110,11 +110,11 @@ describe('the following tab', () => {
     const cards = ourCards(doc);
     expect(cards).toHaveLength(5);
     const chips = (card: Element) =>
-      [...(card.querySelector('dighead-card')?.shadowRoot?.querySelectorAll('.dh-chip') ?? [])].map(
+      [...(card.querySelector('crater-card')?.shadowRoot?.querySelectorAll('.dh-chip') ?? [])].map(
         (chip) => chip.textContent,
       );
     expect(chips(cards[0] as Element)).toEqual(['dub', 'techno']);
-    expect(cards[0]?.querySelector('dighead-card')?.shadowRoot?.textContent).toContain('+ tag');
+    expect(cards[0]?.querySelector('crater-card')?.shadowRoot?.textContent).toContain('+ tag');
 
     const techno = [...(bar(doc)?.querySelectorAll('button[aria-pressed]') ?? [])].find(
       (button) => button.textContent === 'techno',
@@ -159,8 +159,8 @@ describe('the following tab', () => {
 
     expect(unfollowCalls).toEqual([{ key: ['band', first?.id], unfollowed: true }]);
     const card = ourCards(doc)[0];
-    expect(card?.classList.contains('dighead-unfollowed')).toBe(true);
-    expect(card?.querySelector('dighead-card')?.shadowRoot?.textContent).toContain('dub');
+    expect(card?.classList.contains('crater-unfollowed')).toBe(true);
+    expect(card?.querySelector('crater-card')?.shadowRoot?.textContent).toContain('dub');
   });
 
   it('shows the bulk bar once a card is checked', async () => {
@@ -169,7 +169,7 @@ describe('the following tab', () => {
     await settle();
 
     const box = ourCards(doc)[1]
-      ?.querySelector('.fan-image dighead-card-select')
+      ?.querySelector('.fan-image crater-card-select')
       ?.shadowRoot?.querySelector('button[role="checkbox"]') as HTMLButtonElement | undefined;
     await act(async () => box?.click());
 
@@ -225,7 +225,7 @@ describe('the following tab', () => {
 
     expect(ourCards(doc)).toHaveLength(120);
     const more = doc
-      .querySelector('#following-bands-container dighead-following-more')
+      .querySelector('#following-bands-container crater-following-more')
       ?.shadowRoot?.querySelector('button');
     expect(more?.textContent).toBe('Show more (180 left)');
     await act(async () => more?.click());

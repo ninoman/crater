@@ -103,7 +103,7 @@ describe('forYouCsv', () => {
 describe('csvFilename', () => {
   it('names the kind and the day', () => {
     expect(csvFilename('for-you', new Date('2026-10-24T09:00:00Z'))).toBe(
-      'dighead-for-you-2026-10-24.csv',
+      'crater-for-you-2026-10-24.csv',
     );
   });
 });

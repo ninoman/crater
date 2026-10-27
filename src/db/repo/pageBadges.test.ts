@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import type { ReleaseRef } from '../../shared/pageBadges';
-import { DigheadDb, type CrateMateRecord } from '../schema';
+import { CraterDb, type CrateMateRecord } from '../schema';
 import { upsertCollectionItems } from './items';
 import { saveViewer } from './me';
 import { putOwnership } from './ownership';
@@ -47,12 +47,12 @@ function byUrl(key: ItemKey): ReleaseRef {
   return { url: item(key).url, itemKey: null };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 // a1 has tracks t11 and t12. You own a1 and t21 (a track of a2), and wishlisted a3 and t41.
 // Crate mates by score: 10 owns a2 and t11, 11 owns a3, 12 owns a3 but ranks past the top 2.
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   const all = [
     item('a1'),

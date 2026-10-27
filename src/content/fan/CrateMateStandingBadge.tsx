@@ -10,7 +10,7 @@ export function CrateMateStandingBadge({ fanId }: { fanId: number }) {
   const view = useCrateMateStanding(fanId);
 
   useEffect(() => {
-    if (view.state === 'unreachable') console.warn('dighead: crate mate lookup failed', view.error);
+    if (view.state === 'unreachable') console.warn('crater: crate mate lookup failed', view.error);
   }, [view]);
 
   if (view.state !== 'ready' || !view.standing) return null;

@@ -28,7 +28,7 @@ export function EmptyItemList({
       <EmptyState
         tone="error"
         title="Couldn't check your sync"
-        description={`Dighead's background worker didn't answer. Reload the extension from chrome://extensions. ${BELOW}`}
+        description={`Crater's background worker didn't answer. Reload the extension from chrome://extensions. ${BELOW}`}
       />
     );
   }
@@ -38,8 +38,8 @@ export function EmptyItemList({
     case 'no-viewer':
       return (
         <EmptyState
-          title="Dighead hasn't seen you log in yet"
-          description={`Reload this page so Dighead can pick up your account and sync your ${list.noun}. ${BELOW}`}
+          title="Crater hasn't seen you log in yet"
+          description={`Reload this page so Crater can pick up your account and sync your ${list.noun}. ${BELOW}`}
         />
       );
     case 'syncing':
@@ -54,7 +54,7 @@ export function EmptyItemList({
         <EmptyState
           tone="error"
           title={`Couldn't sync your ${list.noun}`}
-          description={`${reason.message} Dighead tries again on your next sync. ${BELOW}`}
+          description={`${reason.message} Crater tries again on your next sync. ${BELOW}`}
         />
       );
     case 'unsynced':
@@ -63,8 +63,8 @@ export function EmptyItemList({
           title={`Your ${list.noun} hasn't synced yet`}
           description={
             list.source === 'wishlist'
-              ? `It syncs with your collection, which starts when Dighead sees you on a Bandcamp page. ${BELOW}`
-              : `It syncs when Dighead sees you on a Bandcamp page. ${BELOW}`
+              ? `It syncs with your collection, which starts when Crater sees you on a Bandcamp page. ${BELOW}`
+              : `It syncs when Crater sees you on a Bandcamp page. ${BELOW}`
           }
         />
       );
@@ -74,8 +74,8 @@ export function EmptyItemList({
           title={`Your ${list.noun} is empty`}
           description={
             list.source === 'wishlist'
-              ? 'Wishlist releases on Bandcamp and they show up here, ready to tag. Dighead picks them up on your next sync.'
-              : 'Buy something on Bandcamp and it shows up here, ready to tag. Dighead picks it up on your next sync.'
+              ? 'Wishlist releases on Bandcamp and they show up here, ready to tag. Crater picks them up on your next sync.'
+              : 'Buy something on Bandcamp and it shows up here, ready to tag. Crater picks it up on your next sync.'
           }
         />
       );

@@ -35,7 +35,7 @@ function isOwnPage(pagedata: Element): boolean {
     return isOwnFanPage(pagedata.outerHTML);
   } catch (error) {
     if (error instanceof ParserError) {
-      console.warn('dighead: cannot tell whether this is your own fan page', error);
+      console.warn('crater: cannot tell whether this is your own fan page', error);
       return false;
     }
     throw error;

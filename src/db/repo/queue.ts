@@ -1,5 +1,5 @@
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanJob, FollowReleasesJob, QueueJob, ReleaseJob } from '../schema';
+import type { CraterDb, FanJob, FollowReleasesJob, QueueJob, ReleaseJob } from '../schema';
 
 /** What to scan. A job is unique per kind and target. */
 export type JobSpec =
@@ -25,7 +25,7 @@ function newJob({ spec, at, rank = 0 }: JobPlace, priority: number): QueueJob {
 
 /** Adds jobs that are due from `now`, skipping ones already queued (see enqueueAt). */
 export function enqueue(
-  db: DigheadDb,
+  db: CraterDb,
   specs: JobSpec[],
   priority: number,
   now: number,
@@ -42,7 +42,7 @@ export function enqueue(
  * A duplicate only raises the existing job's priority, so its cursor and retry state survive.
  */
 export async function enqueueAt(
-  db: DigheadDb,
+  db: CraterDb,
   entries: JobPlace[],
   priority: number,
 ): Promise<void> {
@@ -71,7 +71,7 @@ export async function enqueueAt(
 }
 
 export function getQueuedJob(
-  db: DigheadDb,
+  db: CraterDb,
   kind: QueueJob['kind'],
   target: string,
 ): Promise<QueueJob | undefined> {
@@ -82,19 +82,19 @@ export function getQueuedJob(
  * The most urgent job that is due: lowest priority first, then earliest nextAttemptAt, then
  * lowest rank, then insertion order.
  */
-export function nextJob(db: DigheadDb, now: number): Promise<QueueJob | undefined> {
+export function nextJob(db: CraterDb, now: number): Promise<QueueJob | undefined> {
   return db.queue
     .orderBy('[priority+nextAttemptAt+rank]')
     .filter((job) => job.nextAttemptAt <= now)
     .first();
 }
 
-export async function completeJob(db: DigheadDb, job: QueueJob): Promise<void> {
+export async function completeJob(db: CraterDb, job: QueueJob): Promise<void> {
   if (job.id !== undefined) await db.queue.delete(job.id);
 }
 
 /** Counts a failed run. With `retryAt` the job waits until then, without it the job is dropped. */
-export async function failJob(db: DigheadDb, job: QueueJob, retryAt: number | null) {
+export async function failJob(db: CraterDb, job: QueueJob, retryAt: number | null) {
   if (job.id === undefined) return;
   if (retryAt === null) await db.queue.delete(job.id);
   else await db.queue.update(job.id, { attempts: job.attempts + 1, nextAttemptAt: retryAt });
@@ -108,7 +108,7 @@ export interface JobProgress {
 }
 
 /** Saves how far a multi-request job got, so a killed worker resumes instead of restarting. */
-export async function saveProgress(db: DigheadDb, job: QueueJob, progress: JobProgress) {
+export async function saveProgress(db: CraterDb, job: QueueJob, progress: JobProgress) {
   if (job.id !== undefined) await db.queue.update(job.id, { ...progress });
 }
 
@@ -116,7 +116,7 @@ export async function saveProgress(db: DigheadDb, job: QueueJob, progress: JobPr
  * Re-orders fan jobs within their place in line. Only jobs that haven't started (no cursor)
  * move: a started job already has its rank from what its first step learned.
  */
-export async function rankFanJobs(db: DigheadDb, ranks: Map<number, number>): Promise<void> {
+export async function rankFanJobs(db: CraterDb, ranks: Map<number, number>): Promise<void> {
   if (ranks.size === 0) return;
   await db.transaction('rw', db.queue, async () => {
     await db.queue
@@ -134,7 +134,7 @@ export async function rankFanJobs(db: DigheadDb, ranks: Map<number, number>): Pr
  * and jobs already at that priority (an earlier release's) move back to `otherwise`.
  */
 export async function focusRelease(
-  db: DigheadDb,
+  db: CraterDb,
   release: ItemKey,
   supporterIds: number[],
   priority: number,
@@ -154,11 +154,11 @@ export async function focusRelease(
   });
 }
 
-function jobsOfKind(db: DigheadDb, kind: QueueJob['kind']) {
+function jobsOfKind(db: CraterDb, kind: QueueJob['kind']) {
   return db.queue.where('[kind+target]').between([kind, ''], [kind, '￿']);
 }
 
-export async function countJobs(db: DigheadDb): Promise<Record<QueueJob['kind'], number>> {
+export async function countJobs(db: CraterDb): Promise<Record<QueueJob['kind'], number>> {
   const [release, fan, followReleases] = await Promise.all([
     jobsOfKind(db, 'release').count(),
     jobsOfKind(db, 'fan').count(),
@@ -168,7 +168,7 @@ export async function countJobs(db: DigheadDb): Promise<Record<QueueJob['kind'],
 }
 
 /** Of these fans, the ones with a scan of any kind waiting in the queue. */
-export async function queuedFans(db: DigheadDb, fanIds: readonly number[]): Promise<Set<number>> {
+export async function queuedFans(db: CraterDb, fanIds: readonly number[]): Promise<Set<number>> {
   const jobs = await db.queue
     .where('[kind+target]')
     .anyOf(fanIds.map((fanId) => ['fan', `${fanId}`]))
@@ -187,7 +187,7 @@ export interface LatestRead {
  * job keeps it: that scan reads their newest purchases anyway.
  */
 export async function enqueueLatestReads(
-  db: DigheadDb,
+  db: CraterDb,
   reads: readonly LatestRead[],
   priority: number,
   at: number,
@@ -221,7 +221,7 @@ export async function enqueueLatestReads(
 
 /** Moves every queued job of a kind up to `priority`. Jobs already more urgent stay put. */
 export async function raiseJobs(
-  db: DigheadDb,
+  db: CraterDb,
   kind: QueueJob['kind'],
   priority: number,
 ): Promise<void> {
@@ -231,6 +231,6 @@ export async function raiseJobs(
 }
 
 /** The targets of every queued job of a kind. */
-export async function queuedTargets(db: DigheadDb, kind: QueueJob['kind']): Promise<Set<string>> {
+export async function queuedTargets(db: CraterDb, kind: QueueJob['kind']): Promise<Set<string>> {
   return new Set((await jobsOfKind(db, kind).toArray()).map((job) => job.target));
 }

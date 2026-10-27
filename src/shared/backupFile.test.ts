@@ -23,7 +23,7 @@ const meta = {
 describe('backupFilename', () => {
   it('carries the UTC date', () => {
     expect(backupFilename(new Date('2026-10-21T23:59:00Z'))).toBe(
-      'dighead-backup-2026-10-21.json.gz',
+      'crater-backup-2026-10-21.json.gz',
     );
   });
 });
@@ -41,8 +41,8 @@ describe('summaries', () => {
 
 describe('parseBackupMeta', () => {
   it('refuses anything that is not a dexie export header', () => {
-    expect(() => parseBackupMeta({ fans: [] })).toThrow("isn't a Dighead backup");
-    expect(() => parseBackupMeta(null)).toThrow("isn't a Dighead backup");
+    expect(() => parseBackupMeta({ fans: [] })).toThrow("isn't a Crater backup");
+    expect(() => parseBackupMeta(null)).toThrow("isn't a Crater backup");
   });
 });
 

@@ -130,7 +130,7 @@ export function refreshCrateMates(): void {
       );
     } while (crateMatesAgain);
   })()
-    .catch((error: unknown) => console.error('dighead: crate mates recompute failed', error))
+    .catch((error: unknown) => console.error('crater: crate mates recompute failed', error))
     .finally(() => {
       crateMatesRun = null;
     });

@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, type FollowingKey } from '../schema';
+import { CraterDb, type FollowingKey } from '../schema';
 import { parseTagBackup, type TagBackup } from '../tagBackup';
 import { getFollowing, putFollowing, setUnfollowed } from './following';
 import {
@@ -14,10 +14,10 @@ import {
   tagNameKey,
 } from './tags';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   await putFollowing(
     db,

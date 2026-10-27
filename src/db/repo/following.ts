@@ -1,6 +1,6 @@
 // Your followings, from the always-full sync, and the tag filter over them (decisions §8).
 
-import type { DigheadDb, FollowKind, FollowingKey, FollowingRecord } from '../schema';
+import type { CraterDb, FollowKind, FollowingKey, FollowingRecord } from '../schema';
 import { matchesTags, type TagMode } from '../tagFilter';
 
 /** A following as the sync sees it. Tags and the unfollowed mark are ours, not Bandcamp's. */
@@ -19,7 +19,7 @@ export function followingKey(row: Pick<FollowingRecord, 'kind' | 'id'>): Followi
  * Saves synced followings, keeping the tags of rows we already have. Bandcamp listing a row
  * means you follow it, so its unfollowed mark is cleared.
  */
-export async function putFollowing(db: DigheadDb, rows: SyncedFollowing[]): Promise<void> {
+export async function putFollowing(db: CraterDb, rows: SyncedFollowing[]): Promise<void> {
   await db.transaction('rw', db.following, async () => {
     const existing = await db.following.bulkGet(rows.map(followingKey));
     await db.following.bulkPut(
@@ -30,7 +30,7 @@ export async function putFollowing(db: DigheadDb, rows: SyncedFollowing[]): Prom
 
 /** A full sync of one list: saves `rows` and deletes, with their tags, the rows that are gone. */
 export async function replaceFollowing(
-  db: DigheadDb,
+  db: CraterDb,
   kind: FollowKind,
   rows: SyncedFollowing[],
 ): Promise<void> {
@@ -49,7 +49,7 @@ export async function replaceFollowing(
  * Records a follow made on an account's page, before the next sync lists it (decisions §21).
  * A row we already have keeps what the sync wrote and its tags; only the unfollowed mark goes.
  */
-export async function markFollowed(db: DigheadDb, row: SyncedFollowing): Promise<void> {
+export async function markFollowed(db: CraterDb, row: SyncedFollowing): Promise<void> {
   await db.transaction('rw', db.following, async () => {
     const key = followingKey(row);
     if (await db.following.get(key)) await db.following.update(key, { unfollowed: false });
@@ -59,19 +59,19 @@ export async function markFollowed(db: DigheadDb, row: SyncedFollowing): Promise
 
 /** Marks or clears an unfollow made on the tab, so a quick re-follow keeps the tags. */
 export async function setUnfollowed(
-  db: DigheadDb,
+  db: CraterDb,
   key: FollowingKey,
   unfollowed: boolean,
 ): Promise<void> {
   await db.following.update(key, { unfollowed });
 }
 
-export function countFollowing(db: DigheadDb): Promise<number> {
+export function countFollowing(db: CraterDb): Promise<number> {
   return db.following.count();
 }
 
 export function getFollowing(
-  db: DigheadDb,
+  db: CraterDb,
   key: FollowingKey,
 ): Promise<FollowingRecord | undefined> {
   return db.following.get(key);
@@ -79,7 +79,7 @@ export function getFollowing(
 
 /** Followings passing the tag filter, newest follow first. */
 export async function listFollowing(
-  db: DigheadDb,
+  db: CraterDb,
   { tagIds, mode }: FollowingFilter,
 ): Promise<FollowingRecord[]> {
   const rows = await filteredRows(db, tagIds, mode);
@@ -87,7 +87,7 @@ export async function listFollowing(
 }
 
 async function filteredRows(
-  db: DigheadDb,
+  db: CraterDb,
   tagIds: number[],
   mode: TagMode,
 ): Promise<FollowingRecord[]> {

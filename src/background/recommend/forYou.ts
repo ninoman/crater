@@ -9,7 +9,7 @@ import {
   getLatelyCrateMates,
   getOwnerCounts,
   getCrateMates,
-  type DigheadDb,
+  type CraterDb,
   type ForYouData,
   type ItemFields,
   type MeRecord,
@@ -62,7 +62,7 @@ export interface ForYouInput {
 }
 
 export async function computeForYou(
-  db: DigheadDb,
+  db: CraterDb,
   me: MeRecord | undefined,
   input: ForYouInput,
 ): Promise<ForYouResult> {
@@ -126,7 +126,7 @@ export async function computeForYou(
 }
 
 /** The board a mode draws on, as crate mates scored by it. Lately crate mates without a lately score are out. */
-async function boardFor(db: DigheadDb, mode: RankedForYouMode): Promise<CrateMate[]> {
+async function boardFor(db: CraterDb, mode: RankedForYouMode): Promise<CrateMate[]> {
   if (mode === 'all') return getCrateMates(db);
   return (await getLatelyCrateMates(db)).flatMap((crateMate) =>
     crateMate.lately === null ? [] : [{ fanId: crateMate.fanId, score: crateMate.lately }],
@@ -169,7 +169,7 @@ function candidatesFor(
  * their shown record's flag (§17).
  */
 async function scoreTop(
-  db: DigheadDb,
+  db: CraterDb,
   candidates: readonly CrateMateOwned[],
   followed: ReadonlyMap<number, string>,
   { ignoreCompilations, excluded }: { ignoreCompilations: boolean; excluded: Exclusions },

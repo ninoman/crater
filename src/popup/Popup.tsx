@@ -29,7 +29,7 @@ function SyncBody() {
         return (
           <EmptyState
             title="Log in to Bandcamp"
-            description="Open any bandcamp.com page while logged in, and Dighead will sync your collection."
+            description="Open any bandcamp.com page while logged in, and Crater will sync your collection."
           />
         );
       }
@@ -64,7 +64,7 @@ export function Popup() {
   return (
     <div className="dh-popup">
       <header className="dh-popup__header">
-        <h1 className="dh-popup__title">Dighead</h1>
+        <h1 className="dh-popup__title">Crater</h1>
         <span className="dh-popup__status">
           {worker.state === 'connected' && <StatusDot tone="ok">v{worker.version}</StatusDot>}
           {worker.state === 'connecting' && <StatusDot tone="neutral">Connecting…</StatusDot>}
@@ -72,7 +72,7 @@ export function Popup() {
         </span>
       </header>
       <Tabs
-        label="Dighead"
+        label="Crater"
         items={[
           {
             value: 'status',

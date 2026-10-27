@@ -7,7 +7,7 @@ const BANDCAMP_MATCHES = ['https://bandcamp.com/*', 'https://*.bandcamp.com/*'];
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Dighead – Music discovery for Bandcamp',
+  name: 'Crater – Music discovery for Bandcamp',
   description: 'Purchase-based discovery for Bandcamp. Everything stays in your browser.',
   version: pkg.version,
   icons: {
@@ -33,7 +33,7 @@ export default defineManifest({
   ],
   action: {
     default_popup: 'src/popup/index.html',
-    default_title: 'Dighead',
+    default_title: 'Crater',
     default_icon: {
       16: 'icons/icon-16.png',
       32: 'icons/icon-32.png',

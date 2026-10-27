@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { keyFromNumber, type CollectionItem, type ItemKey, type Supporter } from '../../bandcamp';
 import { buildMatchIndex, fanMatchLists } from '../matchIndex';
-import { DigheadDb, type OwnershipRecord } from '../schema';
+import { CraterDb, type OwnershipRecord } from '../schema';
 import { hiddenSets, hide } from './hidden';
 import { getItem } from './items';
 import { getOwnerCounts } from './matchIndex';
@@ -39,10 +39,10 @@ function supporter(fanId: number): Supporter {
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 
@@ -183,7 +183,7 @@ describe('upgrade to v7', () => {
     await old.table('twins').put({ fanId: 2, overlap: 1, jaccard: 1, score: 1, computedAt: 0 });
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
 
     expect(await upgraded.fanMatches.get(1)).toEqual({
@@ -225,7 +225,7 @@ describe('upgrade to v3', () => {
     ]);
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
 
     expect(await getItem(upgraded, 'a1')).toMatchObject({ label: null, labelId: null });
@@ -260,7 +260,7 @@ describe('upgrade to v6', () => {
     await v5.table('fanMatches').put({ fanId: 1, matchIds: Float64Array.from([1, 5]) });
     v5.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
 
     expect(await upgraded.fanMatches.get(1)).toEqual({

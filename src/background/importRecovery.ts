@@ -1,11 +1,11 @@
 // Puts the database right after a worker died mid-import, before the scanner or a sync runs.
 // A leftover snapshot alone can't say what to do: only the recorded phase can (decisions §10).
 
-import { replaceAll, type DigheadDb, type SnapshotStore } from '../db';
+import { replaceAll, type CraterDb, type SnapshotStore } from '../db';
 import type { ImportNotice } from '../shared/backupFile';
 import type { ImportStateStore } from './importState';
 
-async function recover(db: DigheadDb, store: ImportStateStore, snapshot: SnapshotStore) {
+async function recover(db: CraterDb, store: ImportStateStore, snapshot: SnapshotStore) {
   const { phase } = await store.load();
   const present = await snapshot.exists();
   switch (phase) {
@@ -36,7 +36,7 @@ async function recover(db: DigheadDb, store: ImportStateStore, snapshot: Snapsho
  * scanner's import flag, which a dead worker never cleared.
  */
 export async function recoverInterruptedImport(
-  db: DigheadDb,
+  db: CraterDb,
   store: ImportStateStore,
   snapshot: SnapshotStore,
   clearPause: () => Promise<void>,

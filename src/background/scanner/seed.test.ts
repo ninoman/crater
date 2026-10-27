@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
-import { DigheadDb, enqueue, nextJob, type OwnershipRecord } from '../../db';
+import { CraterDb, enqueue, nextJob, type OwnershipRecord } from '../../db';
 import { SUPPORTERS_FRESH_MS } from './freshness';
 import { BACKGROUND, SEED } from './priority';
 import { ownReleaseProgress, ownReleases, seedOwnReleases } from './seed';
@@ -9,10 +9,10 @@ import { ownReleaseProgress, ownReleases, seedOwnReleases } from './seed';
 const ME = 1;
 const NOW = 1_800_000_000_000;
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

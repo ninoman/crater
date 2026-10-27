@@ -1,7 +1,7 @@
 // Reads what the Crate mates' latest feed needs, as plain data. The assembly is in src/scoring.
 
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanMatchesRecord, OwnershipRecord } from '../schema';
+import type { CraterDb, FanMatchesRecord, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
 import { heardKeys } from './heard';
 import { type HiddenSets, hiddenSets } from './hidden';
@@ -20,7 +20,7 @@ export interface CrateMatesLatestData {
 }
 
 export async function gatherCrateMatesLatest(
-  db: DigheadDb,
+  db: CraterDb,
   crateMateFanIds: readonly number[],
   meFanId: number,
 ): Promise<CrateMatesLatestData> {

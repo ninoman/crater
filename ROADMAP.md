@@ -1,6 +1,6 @@
-# Dighead: Roadmap
+# Crater: Roadmap
 
-Step-by-step build plan for the Bandcamp digging extension (MV3, no backend), based on *Bandcamp Digging Extension: Architecture & MVP Spec* (Oct 19, 2026). "Dighead" is a working name taken from the repo folder.
+Step-by-step build plan for the Bandcamp digging extension (MV3, no backend), based on *Bandcamp Digging Extension: Architecture & MVP Spec* (Oct 19, 2026). The product is called **Crater** (renamed from the working name "Dighead", which the repo folder still uses).
 
 Each phase ends with something you can load unpacked in Chrome and use. Phases 0–6 are the MVP. Phases 7–8 take it to the Web Store. After that comes the backlog.
 
@@ -406,7 +406,7 @@ Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate 
 
 ## Phase 8: Chrome Web Store release
 
-1. [ ] Pick the final name (open question in the spec), make an icon, and take store screenshots.
+1. [ ] Pick the final name (done: **Crater**), make an icon, and take store screenshots.
 2. [x] Write a privacy policy page: all data stays local, there is no server and no analytics.
 3. [x] Write a short justification for each permission (host permission for bandcamp.com only, plus `alarms` and `storage`).
 4. [ ] Build, zip and submit, then handle review feedback.

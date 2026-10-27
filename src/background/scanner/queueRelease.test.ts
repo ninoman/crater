@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, enqueue, getQueuedJob } from '../../db';
+import { CraterDb, enqueue, getQueuedJob } from '../../db';
 import { SUPPORTERS_FRESH_MS } from './freshness';
 import { BACKGROUND, SEED } from './priority';
 import { queueRelease } from './queueRelease';
@@ -8,10 +8,10 @@ import { queueRelease } from './queueRelease';
 const NOW = 1_800_000_000_000;
 const URL = 'https://artist.bandcamp.com/album/a1';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

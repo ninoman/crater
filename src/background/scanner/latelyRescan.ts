@@ -7,7 +7,7 @@ import {
   getFans,
   getLatelyCrateMates,
   queuedFans,
-  type DigheadDb,
+  type CraterDb,
   type FanRecord,
   type LatestRead,
 } from '../../db';
@@ -51,7 +51,7 @@ export function pickLatelyRescans(
 
 /** Queues the latest reads that are due. Returns how many were queued. */
 export async function queueLatelyRescans(
-  db: DigheadDb,
+  db: CraterDb,
   settings: Settings,
   now: number,
 ): Promise<number> {

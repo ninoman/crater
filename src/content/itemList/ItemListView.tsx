@@ -113,7 +113,7 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
           <EmptyState
             tone="error"
             title={`Couldn't load your ${noun}`}
-            description="Dighead's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from chrome://extensions."
+            description="Crater's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from chrome://extensions."
             action={<Button onClick={notifyFollowingChanged}>Try again</Button>}
           />
         );
@@ -152,7 +152,7 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
 
   return (
     <>
-      <section className="dh-tag-bar" aria-label={`Dighead: ${list.label}`}>
+      <section className="dh-tag-bar" aria-label={`Crater: ${list.label}`}>
         {error && (
           <Notice tone="error" title="Couldn't save that change.">
             {error}

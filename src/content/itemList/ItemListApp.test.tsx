@@ -111,9 +111,9 @@ async function settle(): Promise<void> {
 }
 
 const grid = (doc: Document) => doc.getElementById('wishlist-grid') as HTMLElement;
-const root = (doc: Document) => doc.querySelector('#wishlist-items dighead-wishlist')?.shadowRoot;
+const root = (doc: Document) => doc.querySelector('#wishlist-items crater-wishlist')?.shadowRoot;
 const collectionRoot = (doc: Document) =>
-  doc.querySelector('#collection-items dighead-collection')?.shadowRoot;
+  doc.querySelector('#collection-items crater-collection')?.shadowRoot;
 const cards = (doc: Document) => [...(root(doc)?.querySelectorAll('li.dh-card') ?? [])];
 const buttonNamed = (doc: Document, text: string) =>
   [...(root(doc)?.querySelectorAll('button') ?? [])].find(
@@ -165,7 +165,7 @@ describe('the wishlist tab', () => {
     const doc = fanPage();
     await openTab(doc);
 
-    expect(doc.getElementById('wishlist-items')?.classList).toContain('dighead-wishlist-taken');
+    expect(doc.getElementById('wishlist-items')?.classList).toContain('crater-wishlist-taken');
     // Ours is the only search: Bandcamp's covers just its hidden pages.
     const search = doc.getElementById('wishlist-search') as HTMLElement;
     expect(getComputedStyle(search).display).toBe('none');
@@ -250,7 +250,7 @@ describe('the wishlist tab', () => {
     await settle();
 
     expect(root(doc)?.textContent).toContain('Your wishlist is empty');
-    expect(doc.getElementById('wishlist-items')?.classList).toContain('dighead-wishlist-taken');
+    expect(doc.getElementById('wishlist-items')?.classList).toContain('crater-wishlist-taken');
   });
 
   it('shows the wishlist while it syncs, and adds pages as they arrive', async () => {
@@ -265,7 +265,7 @@ describe('the wishlist tab', () => {
     await nextPoll();
     expect(cards(doc)).toHaveLength(2);
     expect(root(doc)?.textContent).toContain('Still syncing your wishlist: 2 releases so far');
-    expect(doc.getElementById('wishlist-items')?.classList).toContain('dighead-wishlist-taken');
+    expect(doc.getElementById('wishlist-items')?.classList).toContain('crater-wishlist-taken');
 
     items = [wish(3, []), ...items];
     status = syncing('wishlist', 3);
@@ -330,14 +330,14 @@ describe('the collection tab', () => {
     await settle();
 
     expect(colCards(doc)).toHaveLength(2);
-    expect(doc.getElementById('collection-items')?.classList).toContain('dighead-collection-taken');
+    expect(doc.getElementById('collection-items')?.classList).toContain('crater-collection-taken');
     const native = doc.querySelectorAll(
       '#collection-items > ol.collection-grid, #collection-items > .expand-container',
     );
     expect(native.length).toBeGreaterThan(1);
     for (const element of native) expect(getComputedStyle(element).display).toBe('none');
     expect(
-      collectionRoot(doc)?.querySelector('[aria-label="Dighead: your collection"]'),
+      collectionRoot(doc)?.querySelector('[aria-label="Crater: your collection"]'),
     ).not.toBeNull();
   });
 
@@ -359,7 +359,7 @@ describe('the collection tab', () => {
 
     expect(collectionRoot(doc)?.textContent).toContain('Syncing your collection and wishlist');
     expect(doc.getElementById('collection-items')?.classList).not.toContain(
-      'dighead-collection-taken',
+      'crater-collection-taken',
     );
   });
 

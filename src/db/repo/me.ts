@@ -1,12 +1,12 @@
 import type { Viewer } from '../../bandcamp';
-import type { DigheadDb, MeRecord } from '../schema';
+import type { CraterDb, MeRecord } from '../schema';
 
-export function getMe(db: DigheadDb): Promise<MeRecord | undefined> {
+export function getMe(db: CraterDb): Promise<MeRecord | undefined> {
   return db.me.get('self');
 }
 
 /** Records the logged-in fan. A different fan than before starts unsynced. */
-export async function saveViewer(db: DigheadDb, viewer: Viewer): Promise<MeRecord> {
+export async function saveViewer(db: CraterDb, viewer: Viewer): Promise<MeRecord> {
   const current = await getMe(db);
   const me: MeRecord = {
     id: 'self',
@@ -18,6 +18,6 @@ export async function saveViewer(db: DigheadDb, viewer: Viewer): Promise<MeRecor
   return me;
 }
 
-export async function markSynced(db: DigheadDb, at: number): Promise<void> {
+export async function markSynced(db: CraterDb, at: number): Promise<void> {
   await db.me.update('self', { syncedAt: at });
 }

@@ -65,7 +65,7 @@ async function reportProgress(job: QueueJob, event: StepEvent): Promise<void> {
       if (changed) await onScanStep(key, job.kind, progress);
     }
   } catch (error) {
-    console.warn('dighead: could not report scan progress', error);
+    console.warn('crater: could not report scan progress', error);
   }
 }
 
@@ -84,7 +84,7 @@ const deps: SchedulerDeps = {
     if (event === 'finished' && job.kind === 'fan') onFanScanned();
     if (event === 'finished' && job.kind === 'followReleases') {
       notifyWhenRoundEnds().catch((error: unknown) =>
-        console.warn('dighead: could not notify about follows', error),
+        console.warn('crater: could not notify about follows', error),
       );
     }
     await reportProgress(job, event);
@@ -106,7 +106,7 @@ export function kickScanner(): void {
       await drainQueue(deps);
     } while (again);
   })()
-    .catch((error: unknown) => console.error('dighead: scanner stopped', error))
+    .catch((error: unknown) => console.error('crater: scanner stopped', error))
     .finally(() => {
       running = null;
     });

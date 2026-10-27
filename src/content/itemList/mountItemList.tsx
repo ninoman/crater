@@ -12,7 +12,7 @@ import type { ListConfig } from './lists';
 export function mountItemList(doc: Document, list: ListConfig): void {
   const grid = doc.querySelector(list.grid);
   if (!grid) {
-    console.warn(`dighead: ${list.noun} tab not found; Bandcamp may have changed its layout`);
+    console.warn(`crater: ${list.noun} tab not found; Bandcamp may have changed its layout`);
     return;
   }
   mountShadow(

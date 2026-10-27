@@ -21,7 +21,7 @@ export function HiddenList() {
         <EmptyState
           tone="error"
           title="Couldn't load what you hid"
-          description="Dighead's background worker didn't answer."
+          description="Crater's background worker didn't answer."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );

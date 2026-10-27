@@ -378,7 +378,7 @@ export const TABLES_RENAMED: Readonly<Record<string, { to: string; version: numb
   hidden: { to: 'hides', version: 14 },
 };
 
-export class DigheadDb extends Dexie {
+export class CraterDb extends Dexie {
   items!: EntityTable<StoredItem, 'itemKey'>;
   bands!: EntityTable<BandRecord, 'bandId'>;
   fans!: EntityTable<FanRecord, 'fanId'>;
@@ -400,6 +400,7 @@ export class DigheadDb extends Dexie {
   bandReads!: EntityTable<BandReadRecord, 'bandId'>;
   followMutes!: EntityTable<FollowMuteRecord, 'bandId'>;
 
+  // Stays 'dighead', the working name: renaming the IndexedDB would orphan every existing local database.
   constructor(name = 'dighead') {
     super(name);
     // Never edit a released version: add a new this.version(n) with an upgrade instead.

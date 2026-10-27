@@ -13,7 +13,7 @@ import {
   collectionRows,
   collectorsOf,
   countOwnership,
-  type DigheadDb,
+  type CraterDb,
   getCompilations,
   getDisplayItems,
   getItems,
@@ -50,7 +50,7 @@ function plain(value: unknown): unknown {
   return value;
 }
 
-export async function collectOutputs(db: DigheadDb): Promise<unknown> {
+export async function collectOutputs(db: CraterDb): Promise<unknown> {
   const me = await getMe(db);
   const out: Record<string, unknown> = {};
 

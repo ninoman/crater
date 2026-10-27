@@ -1,6 +1,6 @@
 import type { ItemKey, Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
-import type { DigheadDb, FanRecord, FanStatus } from '../schema';
+import type { CraterDb, FanRecord, FanStatus } from '../schema';
 import { deleteFanRows } from './fanRows';
 import { refreshFanMatches } from './matchIndex';
 
@@ -28,7 +28,7 @@ export function collectionFullyRead(status: FanStatus | undefined): boolean {
  * name, avatar and last-seen time refreshed, keeping their scan state.
  */
 export async function upsertSupporterFans(
-  db: DigheadDb,
+  db: CraterDb,
   supporters: Supporter[],
   now: number,
 ): Promise<FanRecord[]> {
@@ -53,15 +53,15 @@ export async function upsertSupporterFans(
 }
 
 /** How many fans' collections we've fully read: the pool crate mates draw from. */
-export function countReadFans(db: DigheadDb): Promise<number> {
+export function countReadFans(db: CraterDb): Promise<number> {
   return db.fans.where('status').anyOf(FULLY_READ).count();
 }
 
-export function getFan(db: DigheadDb, fanId: number): Promise<FanRecord | undefined> {
+export function getFan(db: CraterDb, fanId: number): Promise<FanRecord | undefined> {
   return db.fans.get(fanId);
 }
 
-export async function getFans(db: DigheadDb, fanIds: number[]): Promise<(FanRecord | undefined)[]> {
+export async function getFans(db: CraterDb, fanIds: number[]): Promise<(FanRecord | undefined)[]> {
   return db.fans.bulkGet(fanIds);
 }
 
@@ -70,7 +70,7 @@ export async function getFans(db: DigheadDb, fanIds: number[]): Promise<(FanReco
  * fetched again for a while. Only a full read tells us the collection size.
  */
 export async function finishFanScan(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   status: Exclude<FanStatus, 'queued' | 'quick'>,
   scannedItems: number,
@@ -94,7 +94,7 @@ export async function finishFanScan(
  * it's lost the fan is queued again the next time a release lists them.
  */
 export async function markQuickRead(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   scannedItems: number,
   now: number,
@@ -104,7 +104,7 @@ export async function markQuickRead(
 
 /** What a fan's profile page told us (pass 1, decisions §12). */
 export async function saveFanProfile(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   profile: Pick<FanRecord, 'itemCount' | 'inCommon'>,
 ): Promise<void> {
@@ -116,7 +116,7 @@ export async function saveFanProfile(
  * with their collection sizes.
  */
 export async function profiledSupporters(
-  db: DigheadDb,
+  db: CraterDb,
   releaseKey: ItemKey,
 ): Promise<{ inCommon: number; itemCount: number }[]> {
   const list = await db.releaseSupporters.get(releaseKey);
@@ -130,12 +130,12 @@ export async function profiledSupporters(
 }
 
 /** How many releases your collection holds, as one side of the in-common ratio. */
-export async function collectionMatchCount(db: DigheadDb, fanId: number): Promise<number> {
+export async function collectionMatchCount(db: CraterDb, fanId: number): Promise<number> {
   return (await db.fanMatches.get(fanId))?.matchIds.length ?? 0;
 }
 
 /** Fans whose scan has ended, whatever the outcome. */
-export function countScannedFans(db: DigheadDb): Promise<number> {
+export function countScannedFans(db: CraterDb): Promise<number> {
   return db.fans.where('status').noneOf(['queued']).count();
 }
 
@@ -147,7 +147,7 @@ const FORGET_BATCH = 100;
  * crate mate rows and queued scans. `keepFanId` (you) is never forgotten. Returns how many went.
  */
 export async function forgetFansNotSeenSince(
-  db: DigheadDb,
+  db: CraterDb,
   before: number,
   keepFanId: number | null,
 ): Promise<number> {
@@ -197,7 +197,7 @@ export async function forgetFansNotSeenSince(
  * it was known.
  */
 export async function finishLatestRead(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   added: number,
   now: number,

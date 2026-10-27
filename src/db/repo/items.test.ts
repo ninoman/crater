@@ -2,13 +2,13 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
 import { keyToNumber, parseReleasePage, type CollectionItem } from '../../bandcamp';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import { getCompilations, getItem, upsertCollectionItems, upsertReleasePageItem } from './items';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

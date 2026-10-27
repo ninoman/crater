@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DiscographyRelease, ItemKey } from '../../bandcamp';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import {
   bandCatalogues,
   bandReadTimes,
@@ -22,9 +22,9 @@ function release(itemKey: ItemKey, releasedAt: number | null = null): Discograph
   return { itemKey, sellerId: 7, title: `T ${itemKey}`, artist: 'A', artId: 1, releasedAt };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 beforeEach(async () => {
-  db = new DigheadDb(`band-releases-${Math.random()}`);
+  db = new CraterDb(`band-releases-${Math.random()}`);
   await db.open();
 });
 afterEach(async () => {

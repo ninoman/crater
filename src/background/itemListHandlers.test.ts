@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem } from '../bandcamp';
 import {
   createTag,
-  DigheadDb,
+  CraterDb,
   markHeard,
   putOwnership,
   saveViewer,
@@ -30,11 +30,11 @@ const ITEM: CollectionItem = {
   compilation: false,
 };
 
-let db: DigheadDb;
+let db: CraterDb;
 let h: ItemListHandlers;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   h = itemListHandlers(db, async () => 30);
   await upsertCollectionItems(db, [ITEM]);
@@ -46,7 +46,7 @@ afterEach(async () => {
 });
 
 describe('item list handlers', () => {
-  it('answers nothing before Dighead has seen you', async () => {
+  it('answers nothing before Crater has seen you', async () => {
     expect(await h.listItems({ source: 'wishlist' }, sender)).toEqual([]);
     expect(await h.getItemTags({ itemKey: 'a1' }, sender)).toBeNull();
   });

@@ -42,5 +42,5 @@ switch (kind) {
 }
 
 mountPageBadges(document, kind).catch((error: unknown) => {
-  console.warn('dighead: page badges failed to start', error);
+  console.warn('crater: page badges failed to start', error);
 });

@@ -1,7 +1,7 @@
 // Reads what the crate mates scorer needs, as plain data, and stores the leaderboard it produces.
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
-import type { DigheadDb, FanMatchesRecord, ItemFields, CrateMateRecord } from '../schema';
+import type { CraterDb, FanMatchesRecord, ItemFields, CrateMateRecord } from '../schema';
 import { collectionFullyRead } from './fans';
 import { fanRows } from './fanRows';
 import { getItemFields, itemFieldsWhere } from './items';
@@ -51,10 +51,7 @@ function matchId(item: ItemFields): number {
 }
 
 /** Your side of the comparison. Empty when you have no synced collection. */
-export async function gatherCrateMateBasis(
-  db: DigheadDb,
-  meFanId: number,
-): Promise<CrateMateBasis> {
+export async function gatherCrateMateBasis(db: CraterDb, meFanId: number): Promise<CrateMateBasis> {
   return db.transaction('r', [db.ownership, db.fanMatches, db.matchOwners, db.items], async () => {
     const [list, rows] = await Promise.all([db.fanMatches.get(meFanId), fanRows(db, meFanId)]);
     const lists = list ?? NO_LISTS;
@@ -104,7 +101,7 @@ export async function gatherCrateMateBasis(
 }
 
 /** Each label's releases in the local DB, keyed by match id so tracks fold into albums. */
-async function labelCatalogs(db: DigheadDb, labels: Set<number>) {
+async function labelCatalogs(db: CraterDb, labels: Set<number>) {
   const labelOf = new Map<number, number>();
   const catalogSize = new Map<number, number>();
   await Promise.all(
@@ -129,7 +126,7 @@ async function labelCatalogs(db: DigheadDb, labels: Set<number>) {
  * read. `next` is where the following page starts, or null at the end.
  */
 export async function readCrateMateCandidates(
-  db: DigheadDb,
+  db: CraterDb,
   afterFanId: number,
   limit: number,
   meFanId: number,
@@ -157,7 +154,7 @@ export async function readCrateMateCandidates(
 
 /** Swaps in both leaderboards at once, so they always come from the same pass. */
 export async function replaceCrateMates(
-  db: DigheadDb,
+  db: CraterDb,
   crateMates: CrateMateRecord[],
   latelyCrateMates: CrateMateRecord[],
 ): Promise<void> {
@@ -169,18 +166,18 @@ export async function replaceCrateMates(
 }
 
 /** The leaderboard, best first. */
-export function getCrateMates(db: DigheadDb): Promise<CrateMateRecord[]> {
+export function getCrateMates(db: CraterDb): Promise<CrateMateRecord[]> {
   return db.crateMates.orderBy('score').reverse().toArray();
 }
 
 /** The lately leaderboard, most in step first. */
-export function getLatelyCrateMates(db: DigheadDb): Promise<CrateMateRecord[]> {
+export function getLatelyCrateMates(db: CraterDb): Promise<CrateMateRecord[]> {
   return db.latelyCrateMates.orderBy('lately').reverse().toArray();
 }
 
 /** Fans' match lists with purchase times, for showing what they bought last. Missing fans are left out. */
 export async function getPurchaseLists(
-  db: DigheadDb,
+  db: CraterDb,
   fanIds: readonly number[],
 ): Promise<Pick<FanMatchesRecord, 'fanId' | 'matchIds' | 'matchTimes'>[]> {
   const records = await db.fanMatches.bulkGet([...fanIds]);

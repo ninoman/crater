@@ -1,6 +1,6 @@
 // What a row's "Hide from recommendations" menu offers beyond the release (decisions §22).
 
-import { type DigheadDb, type ItemRecord, multiArtistSellers, releaseUrlHost } from '../../db';
+import { type CraterDb, type ItemRecord, multiArtistSellers, releaseUrlHost } from '../../db';
 import type { HideScopes } from '../../shared/hide';
 
 type ScopeFacts = Pick<ItemRecord, 'bandId' | 'labelId' | 'label' | 'artist' | 'url'>;
@@ -30,7 +30,7 @@ export function hideScopes(item: ScopeFacts, sellsManyArtists: boolean): HideSco
 
 /** hideScopes for the rows about to be shown, keyed like `items`. */
 export async function loadHideScopes<K>(
-  db: DigheadDb,
+  db: CraterDb,
   items: ReadonlyMap<K, ScopeFacts>,
 ): Promise<Map<K, HideScopes>> {
   const unlabelled = [...items.values()].filter((item) => item.labelId === null);

@@ -7,7 +7,7 @@ export type ClearDataState =
   | { state: 'done' }
   | { state: 'error'; error: string };
 
-/** Asks the worker to delete everything Dighead has stored. */
+/** Asks the worker to delete everything Crater has stored. */
 export function useClearData(): { status: ClearDataState; clear: () => Promise<void> } {
   const [status, setStatus] = useState<ClearDataState>({ state: 'idle' });
 

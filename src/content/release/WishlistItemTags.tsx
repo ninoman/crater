@@ -22,13 +22,13 @@ export function WishlistItemTags({ itemKey, name }: WishlistItemTagsProps) {
   const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
 
   useEffect(() => {
-    if (own.state === 'unreachable') console.warn('dighead: item tag lookup failed', own.error);
+    if (own.state === 'unreachable') console.warn('crater: item tag lookup failed', own.error);
   }, [own]);
 
   if (own.state !== 'ready' || own.data === null || all.view.state !== 'ready') return null;
 
   const handlers = itemTagHandlers(mutations, [itemKey], own.data, (message) =>
-    console.warn('dighead: tagging failed', message),
+    console.warn('crater: tagging failed', message),
   );
   return (
     <div className="dh-page-tags">

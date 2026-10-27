@@ -7,7 +7,7 @@ import {
   getDisplayItems,
   getShownFields,
   getCrateMates,
-  type DigheadDb,
+  type CraterDb,
   type ItemFields,
   type MeRecord,
 } from '../../db';
@@ -43,7 +43,7 @@ export interface DeepCutsInput {
 }
 
 export async function computeDeepCuts(
-  db: DigheadDb,
+  db: CraterDb,
   me: MeRecord | undefined,
   input: DeepCutsInput,
 ): Promise<ForYouResult> {
@@ -111,7 +111,7 @@ export async function computeDeepCuts(
  * from a hidden artist or label count as having no record (§22).
  */
 async function scoreTop(
-  db: DigheadDb,
+  db: CraterDb,
   candidates: readonly DeepCutCandidate[],
   options: DeepCutOptions & { limit: number },
   input: DeepCutsInput,

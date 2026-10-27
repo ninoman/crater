@@ -1,6 +1,6 @@
 import type { ItemKey } from '../../bandcamp';
 import type { HideTarget } from '../../shared/hide';
-import type { DigheadDb, HideRecord } from '../schema';
+import type { CraterDb, HideRecord } from '../schema';
 
 /** Everything hidden, by kind: what every recommender filters with (decisions §22). */
 export interface HiddenSets {
@@ -35,18 +35,18 @@ function keyOf(target: HideTarget): [HideRecord['kind'], HideRecord['key']] {
 }
 
 /** Hides a release, artist or label from every recommender. Hiding again keeps the first time. */
-export async function hide(db: DigheadDb, target: HideTarget, now: number): Promise<void> {
+export async function hide(db: CraterDb, target: HideTarget, now: number): Promise<void> {
   await db.transaction('rw', db.hides, async () => {
     if (!(await db.hides.get(keyOf(target)))) await db.hides.put(recordFor(target, now));
   });
 }
 
 /** Undoes a hide. A heard mark on the release is left as it was. */
-export async function unhide(db: DigheadDb, target: HideTarget): Promise<void> {
+export async function unhide(db: CraterDb, target: HideTarget): Promise<void> {
   await db.hides.delete(keyOf(target));
 }
 
-export async function hiddenSets(db: DigheadDb): Promise<HiddenSets> {
+export async function hiddenSets(db: CraterDb): Promise<HiddenSets> {
   const sets: HiddenSets = { releases: new Set(), bands: new Set(), labels: new Set() };
   for (const row of await db.hides.toArray()) {
     if (row.kind === 'release') sets.releases.add(row.key);
@@ -57,7 +57,7 @@ export async function hiddenSets(db: DigheadDb): Promise<HiddenSets> {
 }
 
 /** Every hide, newest first. */
-export async function listHides(db: DigheadDb): Promise<HideRecord[]> {
+export async function listHides(db: CraterDb): Promise<HideRecord[]> {
   const rows = await db.hides.toArray();
   return rows.sort((a, b) => b.hiddenAt - a.hiddenAt);
 }

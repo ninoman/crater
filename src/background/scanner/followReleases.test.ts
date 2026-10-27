@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureJson } from '../../../tests/fixtures';
-import { DigheadDb, enqueue, getBandRelease, saveDiscography } from '../../db';
+import { CraterDb, enqueue, getBandRelease, saveDiscography } from '../../db';
 import type { FollowingRecord } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
@@ -67,7 +67,7 @@ function fakeBandcamp(extra: object[] = [], missing: ReadonlySet<number> = new S
   return requests;
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 function drain() {
   return drainQueue({
@@ -88,7 +88,7 @@ function drain() {
 beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(START);
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

@@ -84,7 +84,7 @@ async function settle(): Promise<void> {
 }
 
 const picker = () =>
-  document.querySelector('dighead-root')?.shadowRoot?.querySelector('.dh-tag-picker');
+  document.querySelector('crater-root')?.shadowRoot?.querySelector('.dh-tag-picker');
 const followButton = () => document.getElementById('follow-unfollow');
 const heart = () => document.getElementById('collect-item');
 

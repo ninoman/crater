@@ -1,6 +1,6 @@
 // A small made-up database as a backup file, for testing the eval end to end.
 
-import { buildMatchIndex, DigheadDb, exportDatabase } from '../../src/db';
+import { buildMatchIndex, CraterDb, exportDatabase } from '../../src/db';
 import type { FanRecord, ItemRecord, OwnershipRecord } from '../../src/db';
 import { seededRandom } from './splits';
 
@@ -52,7 +52,7 @@ function fan(fanId: number, scanned: number): FanRecord {
  * some of 60 extra releases, skewed so low-numbered extras are widely owned and high ones rare.
  */
 export async function syntheticBackup(): Promise<Blob> {
-  const db = new DigheadDb(`synthetic-${crypto.randomUUID()}`);
+  const db = new CraterDb(`synthetic-${crypto.randomUUID()}`);
   await db.open();
   const next = seededRandom(7);
   const rows: OwnershipRecord[] = [];

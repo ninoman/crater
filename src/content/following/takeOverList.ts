@@ -9,15 +9,15 @@ import { followingCss } from './followingStyles';
 
 /** Our classes in Bandcamp's light DOM. Cards use the last three. */
 export const FOLLOWING_CLASSES = {
-  list: 'dighead-following-list',
+  list: 'crater-following-list',
   /** On every card we build, so any other card in our list stands out. */
-  card: 'dighead-following-card',
+  card: 'crater-following-card',
   /** On the sub-tab container while Bandcamp's own list is hidden. */
-  taken: 'dighead-following-taken',
-  unfollowed: 'dighead-unfollowed',
+  taken: 'crater-following-taken',
+  unfollowed: 'crater-unfollowed',
 } as const;
 
-const STYLE_ID = 'dighead-following';
+const STYLE_ID = 'crater-following';
 
 /**
  * Bandcamp's list and "view all" go while ours is up, so its paging never runs. An unfollowed
@@ -34,7 +34,7 @@ function pageCss(): string {
 .${list} > ${followingCard}:not(.${card}) { display: none !important; }
 .${list} ${followingCard}.${unfollowed} { opacity: 0.5; }
 .${list} ${followingImage} { position: relative; }
-dighead-following-bar, dighead-following-more { display: block; }`;
+crater-following-bar, crater-following-more { display: block; }`;
 }
 
 function addPageStyle(doc: Document): void {
@@ -61,15 +61,15 @@ export interface TakenList {
 export function takeOverList(doc: Document, grid: Element, kind: FollowKind): TakenList | null {
   const container = grid.querySelector(FAN_PAGE_DOM.followingContainers[kind]);
   if (!container) {
-    console.warn(`dighead: following ${kind} list not found; Bandcamp may have changed its layout`);
+    console.warn(`crater: following ${kind} list not found; Bandcamp may have changed its layout`);
     return null;
   }
   addPageStyle(doc);
 
   const list = doc.createElement('ol');
   list.className = `${FAN_PAGE_DOM.followingListClass} ${FOLLOWING_CLASSES.list}`;
-  const bar = createShadowSlot(doc, 'dighead-following-bar', followingCss);
-  const footer = createShadowSlot(doc, 'dighead-following-more', followingCss);
+  const bar = createShadowSlot(doc, 'crater-following-bar', followingCss);
+  const footer = createShadowSlot(doc, 'crater-following-more', followingCss);
   const native = container.querySelector(FAN_PAGE_DOM.followingNativeList);
   if (native) native.before(bar.host, list, footer.host);
   else container.append(bar.host, list, footer.host);

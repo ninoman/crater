@@ -1,10 +1,10 @@
 # Chrome Web Store listing: compliance text
 
-*"Dighead" is a placeholder for the final name (ROADMAP 8.1). Facts below were checked against `src/manifest.ts` and the code on 2026-10-24. Re-check them if the manifest changes.*
+*Facts below were checked against `src/manifest.ts` and the code on 2026-10-24. Re-check them if the manifest changes.*
 
 ## Single purpose
 
-Dighead helps you discover music on Bandcamp. It builds a local database of Bandcamp fans and their collections, and uses it to show who else bought a release, which fans share your taste, and what to buy next.
+Crater helps you discover music on Bandcamp. It builds a local database of Bandcamp fans and their collections, and uses it to show who else bought a release, which fans share your taste, and what to buy next.
 
 ## Short description (manifest `description`)
 
@@ -17,7 +17,7 @@ Paste as is. The store shows plain text and doesn't render Markdown, hence the c
 ```text
 Find your next favourite record through what real Bandcamp fans actually bought.
 
-Dighead looks at the collections of people who bought the music you love, and turns them into recommendations right inside Bandcamp. No algorithms trained on streams, no sponsored picks: just purchases.
+Crater looks at the collections of people who bought the music you love, and turns them into recommendations right inside Bandcamp. No algorithms trained on streams, no sponsored picks: just purchases.
 
 WHAT YOU GET
 
@@ -42,7 +42,7 @@ WHAT YOU GET
 
 PRIVATE BY DESIGN
 
-Everything stays in your browser. There's no account, no server, no analytics and no tracking. Dighead only talks to Bandcamp, at a slow, polite pace, with a daily request limit.
+Everything stays in your browser. There's no account, no server, no analytics and no tracking. Crater only talks to Bandcamp, at a slow, polite pace, with a daily request limit.
 
 YOU'RE IN CONTROL
 
@@ -50,9 +50,9 @@ The popup shows scan progress and lets you pause or resume. You can tune the sca
 
 HOW IT WORKS
 
-Open Bandcamp while signed in. Dighead syncs your collection, wishlist and follows, then gradually reads the public collections of fans who bought the same releases. Recommendations get better the more you browse: every release page you open is scanned first.
+Open Bandcamp while signed in. Crater syncs your collection, wishlist and follows, then gradually reads the public collections of fans who bought the same releases. Recommendations get better the more you browse: every release page you open is scanned first.
 
-Dighead is an independent project and isn't affiliated with Bandcamp.
+Crater is an independent project and isn't affiliated with Bandcamp.
 ```
 
 ## Manifest permissions

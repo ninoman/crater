@@ -1,6 +1,6 @@
 // Message handlers for New from your follows (decisions §23).
 
-import { db, getMe, setFollowMute, type DigheadDb } from '../../db';
+import { db, getMe, setFollowMute, type CraterDb } from '../../db';
 import type { MessageHandlers } from '../../shared/messages';
 import { loadSettings } from '../../shared/settings';
 import { openFollowsDigest } from '../scanner';
@@ -12,7 +12,7 @@ type FollowsHandlers = Pick<
   'getFollowsDigest' | 'followsDigestOpened' | 'setFollowMute'
 >;
 
-export function followsHandlers(database: DigheadDb = db): FollowsHandlers {
+export function followsHandlers(database: CraterDb = db): FollowsHandlers {
   return {
     getFollowsDigest: async ({ previousVisitAt, hideHeard }) => {
       const [me, settings] = await Promise.all([getMe(database), loadSettings()]);

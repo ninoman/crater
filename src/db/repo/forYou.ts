@@ -1,7 +1,7 @@
 // Reads what the For-you scorer needs, as plain data. The ranking itself is in src/scoring.
 
 import type { ItemKey } from '../../bandcamp';
-import type { DigheadDb, OwnershipRecord } from '../schema';
+import type { CraterDb, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
 import { heardKeys } from './heard';
 import { type HiddenSets, hiddenSets } from './hidden';
@@ -17,7 +17,7 @@ export interface ForYouData {
 }
 
 export async function gatherForYou(
-  db: DigheadDb,
+  db: CraterDb,
   crateMateFanIds: readonly number[],
   meFanId: number,
 ): Promise<ForYouData> {

@@ -1,7 +1,7 @@
 // What each crate mate bought last, dressed for the covers on the leaderboard.
 
 import { artUrl, keyFromNumber, type ItemKey } from '../../bandcamp';
-import { getDisplayItems, getPurchaseLists, type DigheadDb } from '../../db';
+import { getDisplayItems, getPurchaseLists, type CraterDb } from '../../db';
 import { recentBuys } from '../../scoring/recentBuys';
 import type { CrateMateBuy } from '../../shared/crateMates';
 
@@ -10,7 +10,7 @@ export const CRATE_MATE_BUYS = 6;
 
 /** Each fan's newest purchases that have an item record to show, newest first. */
 export async function readCrateMateBuys(
-  db: DigheadDb,
+  db: CraterDb,
   fanIds: readonly number[],
 ): Promise<Map<number, CrateMateBuy[]>> {
   const lists = await getPurchaseLists(db, fanIds);

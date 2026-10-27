@@ -23,7 +23,7 @@ export function DatabaseBackup() {
           {status.state === 'working' &&
             (status.action === 'export' ? 'Exporting…' : 'Importing… keep this popup open.')}
           {status.state === 'idle' &&
-            'Everything Dighead has stored, to a file you can restore here or on another machine.'}
+            'Everything Crater has stored, to a file you can restore here or on another machine.'}
         </span>
       </div>
       {notice && (

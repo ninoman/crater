@@ -24,7 +24,7 @@ export interface BackupSummary {
 }
 
 export function backupFilename(date: Date): string {
-  return `dighead-backup-${date.toISOString().slice(0, 10)}.json.gz`;
+  return `crater-backup-${date.toISOString().slice(0, 10)}.json.gz`;
 }
 
 /** Whether a file starts with gzip's magic bytes, `1f 8b`. */
@@ -45,10 +45,10 @@ export function backupSummaryText({ tables, rows }: BackupSummary): string {
   return `Restored ${count(rows, 'row')} in ${count(tables, 'table')}`;
 }
 
-/** Reads a file header. Throws a message fit for the user when it isn't a Dighead backup. */
+/** Reads a file header. Throws a message fit for the user when it isn't a Crater backup. */
 export function parseBackupMeta(json: unknown): BackupMeta {
   const parsed = backupMetaSchema.safeParse(json);
-  if (!parsed.success) throw new Error("That file isn't a Dighead backup.");
+  if (!parsed.success) throw new Error("That file isn't a Crater backup.");
   return parsed.data;
 }
 
@@ -59,11 +59,11 @@ export const OLDEST_RESTORABLE_VERSION = 5;
 export function assertRestorableVersion(fileVersion: number, buildVersion: number): void {
   if (fileVersion > buildVersion) {
     throw new Error(
-      'That backup was made by a newer version of Dighead. Update the extension, then import it again.',
+      'That backup was made by a newer version of Crater. Update the extension, then import it again.',
     );
   }
   if (fileVersion < OLDEST_RESTORABLE_VERSION) {
-    throw new Error('That backup was made by an older version of Dighead and can’t be imported.');
+    throw new Error('That backup was made by an older version of Crater and can’t be imported.');
   }
 }
 
