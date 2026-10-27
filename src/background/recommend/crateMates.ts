@@ -5,7 +5,7 @@ import {
   gatherCrateMateBasis,
   readCrateMateCandidates,
   replaceCrateMates,
-  type DigheadDb,
+  type CraterDb,
   type CrateMateRecord,
 } from '../../db';
 import { moment, MONTH_MS, TREND_LOOKBACK_MS } from '../../scoring/lately';
@@ -26,7 +26,7 @@ export const CRATE_MATES_KEPT = 200;
 const PAGE = 500;
 
 export interface CrateMatesDeps {
-  db: DigheadDb;
+  db: CraterDb;
   settings: Settings;
   now: number;
   /** Lets other work run between pages. */

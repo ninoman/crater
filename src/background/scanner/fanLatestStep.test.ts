@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { DigheadDb, enqueueLatestReads, type FanRecord } from '../../db';
+import { CraterDb, enqueueLatestReads, type FanRecord } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { LATELY_RESCAN } from './priority';
@@ -58,7 +58,7 @@ function memoryStore(): ScannerStore {
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 async function drain(collectionBatchSize: number) {
   return drainQueue({
@@ -110,7 +110,7 @@ async function fanReadDaysAgo(days: number, owned: number) {
 beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(START);
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

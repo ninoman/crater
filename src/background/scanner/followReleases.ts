@@ -8,7 +8,7 @@ import {
   queuedTargets,
   raiseJobs,
   readBandsNotFollowed,
-  type DigheadDb,
+  type CraterDb,
 } from '../../db';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -41,7 +41,7 @@ export function bandsDueForRead(
  * `priority`, and raises reads already waiting to it. Returns how many were queued.
  */
 export async function queueFollowReads(
-  db: DigheadDb,
+  db: CraterDb,
   priority: number,
   now: number,
 ): Promise<number> {

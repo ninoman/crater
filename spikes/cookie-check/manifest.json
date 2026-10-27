@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Dighead cookie spike",
+  "name": "Crater cookie spike",
   "version": "0.0.1",
   "description": "Phase 0 spike: does a service-worker fetch to bandcamp.com carry the user's session cookies?",
   "host_permissions": ["https://*.bandcamp.com/*"],

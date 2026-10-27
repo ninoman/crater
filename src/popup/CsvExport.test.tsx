@@ -99,7 +99,7 @@ describe('the CSV export in the popup', () => {
 
     await press('Wishlist');
 
-    expect(saved[0]?.name).toMatch(/^dighead-wishlist-\d{4}-\d{2}-\d{2}\.csv$/);
+    expect(saved[0]?.name).toMatch(/^crater-wishlist-\d{4}-\d{2}-\d{2}\.csv$/);
     const text = await saved[0]?.text;
     expect(text).toContain('Burial,Untrue,,https://x.bandcamp.com/album/untrue,2026-10-03,2,dub');
     expect(host.textContent).toContain('Exported 1 row from your wishlist');
@@ -128,7 +128,7 @@ describe('the CSV export in the popup', () => {
       mode: 'fresh',
       hideHeard: false,
     });
-    expect(saved[0]?.name).toMatch(/^dighead-for-you-/);
+    expect(saved[0]?.name).toMatch(/^crater-for-you-/);
     expect(await saved[0]?.text).toContain('1,Floating Points,Promises');
   });
 

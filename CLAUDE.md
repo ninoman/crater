@@ -1,4 +1,4 @@
-# Dighead
+# Crater
 
 Chrome extension (MV3, no backend) that builds a local database of Bandcamp fans and their collections, and turns it into recommendations: *Also bought*, *Crate mates* and *For you*.
 

@@ -3,9 +3,7 @@ import { importSummaryText, readTagBackup, tagBackupFilename } from './tagBackup
 
 describe('tagBackupFilename', () => {
   it('uses the UTC date', () => {
-    expect(tagBackupFilename(new Date('2026-10-20T12:00:00Z'))).toBe(
-      'dighead-tags-2026-10-20.json',
-    );
+    expect(tagBackupFilename(new Date('2026-10-20T12:00:00Z'))).toBe('crater-tags-2026-10-20.json');
   });
 });
 

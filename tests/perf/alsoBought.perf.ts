@@ -9,7 +9,7 @@ import type { ItemKey } from '../../src/bandcamp';
 import { computeAlsoBought } from '../../src/background/recommend/alsoBought';
 import {
   buildMatchIndex,
-  DigheadDb,
+  CraterDb,
   type FanRecord,
   type ItemRecord,
   type OwnershipRecord,
@@ -65,10 +65,10 @@ function fan(fanId: number): FanRecord {
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeAll(async () => {
-  db = new DigheadDb(`perf-${crypto.randomUUID()}`);
+  db = new CraterDb(`perf-${crypto.randomUUID()}`);
   await db.open();
   const next = random(42);
 

@@ -12,7 +12,7 @@ import {
   listOwnedItems,
   markUnwishlisted,
   markWishlisted,
-  type DigheadDb,
+  type CraterDb,
   type OwnedRow,
 } from '../db';
 import { topCrateMates } from '../scoring/forYou';
@@ -26,7 +26,7 @@ export type ItemListHandlers = Pick<
 >;
 
 /** How many of your top crate mates own each row's release, in row order. */
-async function crateMateOwners(db: DigheadDb, rows: readonly OwnedRow[], k: number) {
+async function crateMateOwners(db: CraterDb, rows: readonly OwnedRow[], k: number) {
   const top = topCrateMates(await getCrateMates(db), k);
   const lists = await getPurchaseLists(
     db,
@@ -39,7 +39,7 @@ async function crateMateOwners(db: DigheadDb, rows: readonly OwnedRow[], k: numb
 }
 
 export function itemListHandlers(
-  db: DigheadDb,
+  db: CraterDb,
   topCrateMatesK: () => Promise<number>,
 ): ItemListHandlers {
   return {

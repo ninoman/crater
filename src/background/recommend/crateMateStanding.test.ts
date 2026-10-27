@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, replaceCrateMates, type CrateMateRecord } from '../../db';
+import { CraterDb, replaceCrateMates, type CrateMateRecord } from '../../db';
 import {
   getCrateMateStanding,
   getCrateMateStandings,
@@ -75,10 +75,10 @@ describe('crateMateStandings', () => {
 });
 
 describe('getCrateMateStanding', () => {
-  let db: DigheadDb;
+  let db: CraterDb;
 
   beforeEach(async () => {
-    db = new DigheadDb(`test-${crypto.randomUUID()}`);
+    db = new CraterDb(`test-${crypto.randomUUID()}`);
     await db.open();
   });
 

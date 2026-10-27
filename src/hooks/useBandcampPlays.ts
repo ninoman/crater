@@ -26,7 +26,7 @@ export function useBandcampPlays(itemKey: ItemKey, root: Document = document): v
       if (marked || !isHeard(listening, endedTrackSeconds)) return;
       marked = true;
       sendMessage('markHeard', { itemKey, source: 'bandcamp' }).catch((error: unknown) =>
-        console.warn('dighead: could not save a heard mark', error),
+        console.warn('crater: could not save a heard mark', error),
       );
     };
     const onTime = (event: Event) => {

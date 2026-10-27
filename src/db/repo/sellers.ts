@@ -1,4 +1,4 @@
-import type { DigheadDb } from '../schema';
+import type { CraterDb } from '../schema';
 
 /**
  * Items read per account. A label's first few releases almost always name several artists, and
@@ -12,7 +12,7 @@ const SAMPLE = 25;
  * artist may sell one. Only the first SAMPLE items of each account are looked at.
  */
 export async function multiArtistSellers(
-  db: DigheadDb,
+  db: CraterDb,
   sellers: readonly { bandId: number; artist: string }[],
 ): Promise<Set<number>> {
   const byBand = new Map(sellers.map((seller) => [seller.bandId, seller.artist]));

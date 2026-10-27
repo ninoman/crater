@@ -166,7 +166,7 @@ export function FollowsList({
       )}
       <p className="dh-profile__note">
         What the artists and labels you follow released in the last {result.windowDays} days, newest
-        first; on the same day, accounts more of your top crate mates buy from go first. Dighead
+        first; on the same day, accounts more of your top crate mates buy from go first. Crater
         reads each account about once a week. Owned, wishlisted and hidden releases are left out.
       </p>
     </>

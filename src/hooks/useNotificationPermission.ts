@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 const NOTIFICATIONS: chrome.permissions.Permissions = { permissions: ['notifications'] };
 
 /**
- * Chrome's optional `notifications` permission (decisions §23): whether Dighead has it, and a way
+ * Chrome's optional `notifications` permission (decisions §23): whether Crater has it, and a way
  * to ask for it. Asking must happen in a click handler, since Chrome only prompts on a gesture.
  */
 export function useNotificationPermission(): {

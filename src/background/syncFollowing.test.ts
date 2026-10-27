@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { BandcampRequest } from '../bandcamp';
-import { DigheadDb, getFollowing, saveViewer, setUnfollowed } from '../db';
+import { CraterDb, getFollowing, saveViewer, setUnfollowed } from '../db';
 import { syncFollowing } from './syncFollowing';
 import { syncMe, type SyncDeps } from './syncMe';
 
@@ -68,10 +68,10 @@ function fakeFollowing(lists: Lists) {
   return { fetchJson, counts };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

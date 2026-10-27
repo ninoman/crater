@@ -28,7 +28,7 @@ export function ReleaseCrateMatesList({ view }: { view: ReleaseCrateMatesView })
     return (
       <EmptyState
         title="None of your crate mates own this"
-        description={`None of your ${crateMateCount} closest crate mates has this in their collection, as far as Dighead has scanned.`}
+        description={`None of your ${crateMateCount} closest crate mates has this in their collection, as far as Crater has scanned.`}
       />
     );
   }

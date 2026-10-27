@@ -5,7 +5,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import {
-  DigheadDb,
+  CraterDb,
   ensureFileReader,
   exportDatabase,
   importDatabase,
@@ -47,7 +47,7 @@ const V11_STORES = {
 const golden = () => JSON.parse(readFileSync(GOLDEN, 'utf8'));
 
 /** Items are in the v12 shape: no URLs or defaults, and their bands' hosts stored. */
-async function expectSlim(target: DigheadDb): Promise<void> {
+async function expectSlim(target: CraterDb): Promise<void> {
   const items = await target.items.toArray();
   expect(items.length).toBeGreaterThan(0);
   expect(items.filter((item) => 'url' in item || 'fetchedAt' in item)).toEqual([]);
@@ -56,18 +56,18 @@ async function expectSlim(target: DigheadDb): Promise<void> {
 }
 
 /** Ownership rows written by v12 leave out `source: 'collection'`; migrated ones keep it. */
-const collectionRows = (target: DigheadDb) =>
+const collectionRows = (target: CraterDb) =>
   target.ownership.filter((row) => row.source === 'collection').count();
 const v11Backup = () => new Blob([readFileSync(V11_BACKUP)]);
-const outputsOf = async (target: DigheadDb) =>
+const outputsOf = async (target: CraterDb) =>
   JSON.parse(JSON.stringify(await collectOutputs(target)));
 
-let db: DigheadDb;
+let db: CraterDb;
 let name: string;
 
 beforeEach(() => {
   name = `golden-${crypto.randomUUID()}`;
-  db = new DigheadDb(name);
+  db = new CraterDb(name);
 });
 
 afterEach(async () => {
@@ -111,7 +111,7 @@ it('answers the same after a gzipped round trip', async () => {
   await db.open();
   await buildScenario(db);
   const { file } = await exportDatabase(db);
-  const copy = new DigheadDb(`${name}-copy`);
+  const copy = new CraterDb(`${name}-copy`);
   await copy.open();
   await importDatabase(copy, file, memorySnapshot().store, async () => undefined);
   expect(await outputsOf(copy)).toEqual(golden());

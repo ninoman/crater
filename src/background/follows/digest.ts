@@ -1,7 +1,7 @@
 // New from your follows, dressed for display (decisions §23).
 
 import { artUrl, type ItemKey } from '../../bandcamp';
-import { gatherFollowsDigest, getCrateMates, type DigheadDb, type MeRecord } from '../../db';
+import { gatherFollowsDigest, getCrateMates, type CraterDb, type MeRecord } from '../../db';
 import { exclusions } from '../../scoring/exclusions';
 import {
   buildDigest,
@@ -19,7 +19,7 @@ import { loadHideScopes } from '../recommend/hideScopes';
 
 /** The digest's entries and accounts, before they're dressed as rows. */
 export async function followsDigestEntries(
-  db: DigheadDb,
+  db: CraterDb,
   me: MeRecord,
   topCrateMatesK: number,
   now: number,
@@ -56,7 +56,7 @@ export async function followsDigestEntries(
  * listing it (`sellerOf`), named by the account's name where we follow it.
  */
 async function entryHideScopes(
-  db: DigheadDb,
+  db: CraterDb,
   entries: readonly DigestEntry[],
   names: ReadonlyMap<number, string>,
 ): Promise<Map<ItemKey, HideScopes>> {
@@ -96,7 +96,7 @@ function toRow(
 }
 
 export async function computeFollowsDigest(
-  db: DigheadDb,
+  db: CraterDb,
   me: MeRecord | undefined,
   topCrateMatesK: number,
   lastVisitAt: number | null,

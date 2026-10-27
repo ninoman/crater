@@ -100,7 +100,7 @@ export function usePreviewPlayer(
       if (!isHeard(listening.current, endedTrackSeconds)) return;
       heard.current = true;
       sendMessage('markHeard', { itemKey: matchKey, source: 'preview' }).catch((error: unknown) =>
-        console.warn('dighead: could not save a heard mark', error),
+        console.warn('crater: could not save a heard mark', error),
       );
       callbacks.current.onHeard?.(matchKey);
     };

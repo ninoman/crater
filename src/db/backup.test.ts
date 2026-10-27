@@ -4,16 +4,16 @@ import { memorySnapshot } from '../../tests/memorySnapshot';
 import { exportDatabase, importDatabase } from './backup';
 import { readBackup } from './gzip';
 import { clearAllData, getItemList } from './repo';
-import { DigheadDb } from './schema';
+import { CraterDb } from './schema';
 
 const noPhase = async () => {};
 
 /** An exported backup's JSON, unzipped. */
 const jsonText = async (file: Blob) => (await readBackup(file)).text();
 
-let db: DigheadDb;
+let db: CraterDb;
 
-async function seed(target: DigheadDb): Promise<void> {
+async function seed(target: CraterDb): Promise<void> {
   await target.fans.put({
     fanId: 1,
     username: 'a',
@@ -63,14 +63,14 @@ async function seed(target: DigheadDb): Promise<void> {
   });
 }
 
-async function snapshot(target: DigheadDb) {
+async function snapshot(target: CraterDb) {
   return Object.fromEntries(
     await Promise.all(target.tables.map(async (t) => [t.name, await t.toArray()] as const)),
   );
 }
 
 beforeEach(async () => {
-  db = new DigheadDb('backup-test');
+  db = new CraterDb('backup-test');
   await db.open();
 });
 
@@ -307,7 +307,7 @@ describe('refused files', () => {
 
     await expect(
       importDatabase(db, new Blob(['{"tags":[]}']), memorySnapshot().store, noPhase),
-    ).rejects.toThrow("isn't a Dighead backup");
+    ).rejects.toThrow("isn't a Crater backup");
     await expect(
       importDatabase(db, new Blob(['not json']), memorySnapshot().store, noPhase),
     ).rejects.toThrow();
@@ -318,7 +318,7 @@ describe('refused files', () => {
 describe('all or nothing', () => {
   /** Passes the header and the read-through, then fails mid-write on the unique tag name. */
   async function failingWriteFile(): Promise<Blob> {
-    const other = new DigheadDb('backup-source');
+    const other = new CraterDb('backup-source');
     await other.open();
     await other.tags.bulkPut([
       { id: 1, name: 'One', nameKey: 'dup' },

@@ -8,9 +8,9 @@ import type { ListedItem, ListSource } from './itemList';
 
 export type CsvKind = 'wishlist' | 'collection' | 'for-you';
 
-/** "dighead-wishlist-2026-10-24.csv" */
+/** "crater-wishlist-2026-10-24.csv" */
 export function csvFilename(kind: CsvKind, date: Date): string {
-  return `dighead-${kind}-${date.toISOString().slice(0, 10)}.csv`;
+  return `crater-${kind}-${date.toISOString().slice(0, 10)}.csv`;
 }
 
 /** "2026-10-03", or empty when Bandcamp gave no date. Sorts as text and every spreadsheet reads it. */

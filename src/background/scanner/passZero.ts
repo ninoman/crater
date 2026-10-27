@@ -2,7 +2,7 @@
 // already know they own of yours. Free: no requests.
 
 import type { ItemKey } from '../../bandcamp';
-import { followedFanIds, gatherPassZero, getMe, rankFanJobs, type DigheadDb } from '../../db';
+import { followedFanIds, gatherPassZero, getMe, rankFanJobs, type CraterDb } from '../../db';
 import { followedFirst } from '../../scoring/following';
 import { passZeroOrder } from '../../scoring/supporterRank';
 import { supporters, weight } from '../../scoring/weights';
@@ -11,7 +11,7 @@ import { supporters, weight } from '../../scoring/weights';
  * Ranks the release's queued, not-yet-started fan jobs: fans you follow first (decisions §16),
  * then best expected overlap.
  */
-export async function rankSupporters(db: DigheadDb, releaseKey: ItemKey): Promise<void> {
+export async function rankSupporters(db: CraterDb, releaseKey: ItemKey): Promise<void> {
   const me = await getMe(db);
   const basis = await gatherPassZero(db, releaseKey, me?.fanId ?? null);
   if (!basis) return;

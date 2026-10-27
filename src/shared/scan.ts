@@ -34,7 +34,7 @@ export interface ScannerStatus {
   /** The browser's own guess at a network connection, as the worker sees it. */
   online: boolean;
   lastError: string | null;
-  /** Set while Bandcamp data fails to parse: Dighead needs an update. */
+  /** Set while Bandcamp data fails to parse: Crater needs an update. */
   parserError: string | null;
 }
 

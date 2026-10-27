@@ -93,7 +93,7 @@ export const ADVANCED_SECTIONS: SettingSection[] = [
         kind: 'number',
         key: 'paceMinMs',
         label: 'Shortest wait (ms)',
-        description: 'Dighead waits a random time between these two before each request.',
+        description: 'Crater waits a random time between these two before each request.',
       },
       {
         kind: 'number',
@@ -128,7 +128,7 @@ export const ADVANCED_SECTIONS: SettingSection[] = [
         kind: 'number',
         key: 'supportersPerReleaseCap',
         label: 'Fans per release',
-        description: 'Newest supporters first, for each release Dighead looks at.',
+        description: 'Newest supporters first, for each release Crater looks at.',
       },
     ],
   },

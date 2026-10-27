@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import {
   completeJob,
   countJobs,
@@ -14,10 +14,10 @@ import {
   saveProgress,
 } from './queue';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

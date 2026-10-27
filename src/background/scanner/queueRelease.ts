@@ -1,5 +1,5 @@
 import type { ItemKey } from '../../bandcamp';
-import { enqueueAt, getQueuedJob, supportersFetchedAt, type DigheadDb } from '../../db';
+import { enqueueAt, getQueuedJob, supportersFetchedAt, type CraterDb } from '../../db';
 import type { QueueReleaseStatus } from '../../shared/scan';
 import { supportersAreFresh } from './freshness';
 import { BACKGROUND } from './priority';
@@ -10,7 +10,7 @@ import { BACKGROUND } from './priority';
  * though it still moves up if it was waiting at a lower priority.
  */
 export async function queueRelease(
-  db: DigheadDb,
+  db: CraterDb,
   itemKey: ItemKey,
   url: string,
   now: number,

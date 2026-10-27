@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import { upsertCollectionItems } from './items';
 import { markUnwishlisted, markWishlisted, putOwnership } from './ownership';
 import { createTag, deleteTag, exportTags, importTags } from './tags';
@@ -27,10 +27,10 @@ function item(itemKey: ItemKey, addedAt: number | null): CollectionItem {
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   const wished = [item('a1', 100), item('a2', 300), item('t3', null)];
   const owned = [item('a4', 200)];

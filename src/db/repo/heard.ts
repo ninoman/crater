@@ -1,13 +1,13 @@
 import type { ItemKey } from '../../bandcamp';
 import type { HeardSource } from '../../shared/heard';
-import type { DigheadDb } from '../schema';
+import type { CraterDb } from '../schema';
 
 /**
  * Marks a release heard. A track of an album marks the album, when its record says so, since
  * rows are keyed by matchKey. Marking again keeps the first time and source.
  */
 export async function markHeard(
-  db: DigheadDb,
+  db: CraterDb,
   itemKey: ItemKey,
   source: HeardSource,
   now: number,
@@ -18,10 +18,10 @@ export async function markHeard(
   });
 }
 
-export async function unmarkHeard(db: DigheadDb, matchKey: ItemKey): Promise<void> {
+export async function unmarkHeard(db: CraterDb, matchKey: ItemKey): Promise<void> {
   await db.heard.delete(matchKey);
 }
 
-export async function heardKeys(db: DigheadDb): Promise<Set<ItemKey>> {
+export async function heardKeys(db: CraterDb): Promise<Set<ItemKey>> {
   return new Set(await db.heard.toCollection().primaryKeys());
 }

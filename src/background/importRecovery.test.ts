@@ -1,12 +1,12 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { memorySnapshot } from '../../tests/memorySnapshot';
-import { exportDatabase, DigheadDb } from '../db';
+import { exportDatabase, CraterDb } from '../db';
 import type { ImportPhase } from '../shared/backupFile';
 import { recoverInterruptedImport } from './importRecovery';
 import type { ImportState, ImportStateStore } from './importState';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 function memoryState(phase: ImportPhase | null) {
   let state: ImportState = { phase, notice: null };
@@ -40,7 +40,7 @@ async function run(phase: ImportPhase | null, snapshot: ReturnType<typeof memory
 }
 
 beforeEach(async () => {
-  db = new DigheadDb('recovery-test');
+  db = new CraterDb('recovery-test');
   await db.open();
 });
 

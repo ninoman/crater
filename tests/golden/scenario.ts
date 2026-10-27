@@ -6,7 +6,7 @@ import type { CollectionItem, ItemKey, ReleasePageItem, Supporter } from '../../
 import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   addSupporterOwnership,
-  type DigheadDb,
+  type CraterDb,
   enqueueAt,
   fanJob,
   finishFanScan,
@@ -127,7 +127,7 @@ function supporter(fanId: number, purchasedAt: number | null): Supporter {
   };
 }
 
-export async function buildScenario(db: DigheadDb): Promise<void> {
+export async function buildScenario(db: CraterDb): Promise<void> {
   const rand = seededRandom(11);
   const items = catalog(rand);
   const byKey = new Map(items.map((item) => [item.itemKey, item]));

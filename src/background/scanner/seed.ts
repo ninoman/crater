@@ -7,7 +7,7 @@ import {
   getItems,
   listedReleases,
   supportersFetchedAt,
-  type DigheadDb,
+  type CraterDb,
   type OwnershipRecord,
 } from '../../db';
 import { supportersAreFresh } from './freshness';
@@ -49,7 +49,7 @@ export function ownReleases(rows: OwnershipRecord[]): OwnRelease[] {
  * across syncs too; any negative time is already due. Returns how many were queued.
  */
 export async function seedOwnReleases(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   now: number,
   only?: ReadonlySet<ItemKey>,
@@ -73,7 +73,7 @@ export async function seedOwnReleases(
 
 /** How many of your releases have had their supporters listed, out of all you own. */
 export async function ownReleaseProgress(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
 ): Promise<{ scanned: number; total: number }> {
   const releases = ownReleases(await collectionRows(db, fanId));

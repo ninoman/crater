@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { FollowKind } from '../schema';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import {
   getFollowing,
   listFollowing,
@@ -24,10 +24,10 @@ function follow(kind: FollowKind, id: number, followedAt = id): SyncedFollowing 
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

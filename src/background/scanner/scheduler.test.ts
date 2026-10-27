@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
 import { parseReleasePage } from '../../bandcamp';
-import { DigheadDb, countJobs, enqueue, fanJob, type JobSpec } from '../../db';
+import { CraterDb, countJobs, enqueue, fanJob, type JobSpec } from '../../db';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { releaseProgress } from './progress';
@@ -90,7 +90,7 @@ function memoryStore(initial: Partial<ScannerState> = {}): ScannerStore & { stat
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 let store: ReturnType<typeof memoryStore>;
 let settings: Settings;
 let slept: number[];
@@ -123,7 +123,7 @@ async function queue(specs: JobSpec[], priority = 1) {
 beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(START);
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   store = memoryStore();
   settings = { ...DEFAULT_SETTINGS, collectionBatchSize: 100, collectionCap: 200 };

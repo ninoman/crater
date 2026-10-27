@@ -1,14 +1,14 @@
 import './env';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb } from '../../src/db';
+import { CraterDb } from '../../src/db';
 import { loadBackup, runEval } from './pipeline';
 import { formatReport } from './report';
 import { syntheticBackup } from './syntheticBackup';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`eval-test-${crypto.randomUUID()}`);
+  db = new CraterDb(`eval-test-${crypto.randomUUID()}`);
   await db.open();
 });
 

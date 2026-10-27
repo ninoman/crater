@@ -2,7 +2,7 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type {
-  DigheadDb,
+  CraterDb,
   FanRecord,
   ItemFields,
   ItemRecord,
@@ -46,7 +46,7 @@ export interface AlsoBoughtData {
 }
 
 export async function gatherAlsoBought(
-  db: DigheadDb,
+  db: CraterDb,
   releaseKey: ItemKey,
   meFanId: number | null,
 ): Promise<AlsoBoughtData> {
@@ -132,7 +132,7 @@ export async function gatherAlsoBought(
 
 /** Other releases sold from the same Bandcamp account or on the same label. */
 export async function getSellerItems(
-  db: DigheadDb,
+  db: CraterDb,
   bandId: number,
   labelId: number | null,
 ): Promise<ItemFields[]> {
@@ -149,7 +149,7 @@ export async function getSellerItems(
  * tracks of an album have turned up so far. Call inside a transaction with `items`.
  */
 export async function shownRows(
-  db: DigheadDb,
+  db: CraterDb,
   matchKeys: readonly ItemKey[],
 ): Promise<Map<ItemKey, StoredItem>> {
   const direct = await db.items.bulkGet([...matchKeys]);
@@ -174,7 +174,7 @@ export async function shownRows(
  * chunk of candidates at a time, without a band lookup per chunk.
  */
 export async function getShownFields(
-  db: DigheadDb,
+  db: CraterDb,
   matchKeys: readonly ItemKey[],
 ): Promise<Map<ItemKey, ItemFields>> {
   return db.transaction('r', db.items, async () => {
@@ -185,7 +185,7 @@ export async function getShownFields(
 
 /** The record to show for each matchKey (see shownRows), with its URL. */
 export async function getDisplayItems(
-  db: DigheadDb,
+  db: CraterDb,
   matchKeys: readonly ItemKey[],
 ): Promise<Map<ItemKey, ItemRecord>> {
   return db.transaction('r', [db.items, db.bands], async () => {

@@ -77,10 +77,10 @@ async function runSync(requested: SyncMode): Promise<void> {
     activity = { state: 'idle' };
     refreshCrateMates();
     await afterSync({ me, mode, added }).catch((error: unknown) =>
-      console.error('dighead: after-sync step failed', error),
+      console.error('crater: after-sync step failed', error),
     );
   } catch (error) {
-    console.error('dighead: sync failed', error);
+    console.error('crater: sync failed', error);
     activity = { state: 'error', message: error instanceof Error ? error.message : String(error) };
   }
 }

@@ -24,7 +24,7 @@ const NOTES: Record<ForYouMode, string> = {
   all: "Releases your closest crate mates own and you don't, weighted by how alike each crate mate is and how rare the release is.",
   fresh:
     'What the fans most in step with you lately bought in the last year, weighted by how in step each crate mate is, how recently they bought it and how rare it is.',
-  deep: "Releases few people own on Bandcamp but your closest crate mates do. The owner limit is in Dighead's settings.",
+  deep: "Releases few people own on Bandcamp but your closest crate mates do. The owner limit is in Crater's settings.",
 };
 
 function reasonFor(row: ForYouRow, mode: ForYouMode, now: number): string {

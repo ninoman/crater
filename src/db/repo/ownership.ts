@@ -6,7 +6,7 @@ import {
   type Supporter,
 } from '../../bandcamp';
 import { ownershipFromCollection, ownershipFromSupporter } from '../mappers';
-import type { DigheadDb, OwnershipRecord } from '../schema';
+import type { CraterDb, OwnershipRecord } from '../schema';
 import { readOwnership, storeOwnership } from '../storage';
 import { getItemFields } from './items';
 import { byFan, fanRows } from './fanRows';
@@ -15,12 +15,12 @@ import { refreshFanMatches } from './matchIndex';
 type Source = OwnershipRecord['source'];
 
 /** Runs an ownership write together with the match-index refresh it calls for. */
-function writeOwnership(db: DigheadDb, write: () => Promise<void>): Promise<void> {
+function writeOwnership(db: CraterDb, write: () => Promise<void>): Promise<void> {
   return db.transaction('rw', [db.ownership, db.fanMatches, db.matchOwners], write);
 }
 
 export async function putOwnership(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   items: CollectionItem[],
   source: Source,
@@ -38,7 +38,7 @@ export async function putOwnership(
  * An item you own stays owned, and one already wishlisted keeps its date.
  */
 export async function markWishlisted(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   addedAt: number,
@@ -63,7 +63,7 @@ export async function markWishlisted(
  * nothing; the next full sync drops them (decisions §14).
  */
 export async function markUnwishlisted(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   itemKey: ItemKey,
 ): Promise<void> {
@@ -79,7 +79,7 @@ export async function markUnwishlisted(
  * Fans with the release in their collection, by its matchKey, so a track page finds album
  * buyers and an album page finds track buyers.
  */
-export async function collectorsOf(db: DigheadDb, releaseKey: ItemKey): Promise<Set<number>> {
+export async function collectorsOf(db: CraterDb, releaseKey: ItemKey): Promise<Set<number>> {
   return db.transaction('r', [db.items, db.ownership], async () => {
     const [release] = await getItemFields(db, [releaseKey]);
     const rows = await db.ownership
@@ -94,7 +94,7 @@ export async function collectorsOf(db: DigheadDb, releaseKey: ItemKey): Promise<
 
 /** Item keys a fan has in their collection or wishlist. */
 export async function ownedItemKeys(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   source: Source,
 ): Promise<Set<ItemKey>> {
@@ -103,12 +103,12 @@ export async function ownedItemKeys(
 }
 
 /** A fan's collection rows (not the wishlist). */
-export async function collectionRows(db: DigheadDb, fanId: number): Promise<OwnershipRecord[]> {
+export async function collectionRows(db: CraterDb, fanId: number): Promise<OwnershipRecord[]> {
   const rows = await fanRows(db, fanId);
   return rows.filter((row) => row.source === 'collection');
 }
 
-export async function countOwnership(db: DigheadDb, fanId: number, source: Source) {
+export async function countOwnership(db: CraterDb, fanId: number, source: Source) {
   return byFan(db, fanId)
     .filter((row) => readOwnership(row).source === source)
     .count();
@@ -116,7 +116,7 @@ export async function countOwnership(db: DigheadDb, fanId: number, source: Sourc
 
 /** Deletes a fan's rows for `source` that aren't in `keep`, e.g. items removed from a wishlist. */
 export async function removeOwnershipExcept(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   source: Source,
   keep: ReadonlySet<ItemKey>,
@@ -135,7 +135,7 @@ export async function removeOwnershipExcept(
  * collection scan or your own sync wrote them, with the real purchase date.
  */
 export async function addSupporterOwnership(
-  db: DigheadDb,
+  db: CraterDb,
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   supporters: Supporter[],
 ): Promise<void> {
@@ -155,7 +155,7 @@ export async function addSupporterOwnership(
 
 /** When a fan bought an item, from their ownership row. Null when unknown or not owned. */
 export async function purchasedAt(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   itemKey: ItemKey,
 ): Promise<number | null> {
@@ -164,7 +164,7 @@ export async function purchasedAt(
 
 /** Which of these items a fan already has a row for, in either list. */
 export async function knownItemKeys(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   itemKeys: readonly ItemKey[],
 ): Promise<Set<ItemKey>> {

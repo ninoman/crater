@@ -8,7 +8,7 @@ import { followsDigestEntries } from './digest';
 import { followsNotification } from './notification';
 import { chromeFollowsStore } from './state';
 
-const NOTIFICATION_ID = 'dighead-follows';
+const NOTIFICATION_ID = 'crater-follows';
 /** The profile tab the notification opens. */
 const FOLLOWS_TAB_HASH = '#follows';
 
@@ -59,7 +59,7 @@ export function listenForNotificationClicks(): void {
   listening = true;
   chrome.notifications.onClicked.addListener((id) => {
     openFollowsTab(id).catch((error: unknown) =>
-      console.error('dighead: could not open the follows tab', error),
+      console.error('crater: could not open the follows tab', error),
     );
   });
 }

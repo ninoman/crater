@@ -27,7 +27,7 @@ async function mountPage() {
     mountBand(doc);
   });
   await act(async () => {});
-  return doc.querySelector('dighead-root')?.shadowRoot?.querySelector('.dh-tag-editor') ?? null;
+  return doc.querySelector('crater-root')?.shadowRoot?.querySelector('.dh-tag-editor') ?? null;
 }
 
 beforeEach(() => {

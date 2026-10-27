@@ -8,7 +8,7 @@ import {
   getLatelyCrateMates,
   getMe,
   getCrateMates,
-  type DigheadDb,
+  type CraterDb,
   type MeRecord,
   type CrateMateRecord,
 } from '../../db';
@@ -22,7 +22,7 @@ import type {
 import { readCrateMateBuys } from './crateMateBuys';
 
 export async function readCrateMatesResult(
-  db: DigheadDb,
+  db: CraterDb,
   latelyHalfLifeMonths: number,
 ): Promise<CrateMatesResult> {
   const [me, crateMates, latelyCrateMates, fansRead, followed] = await Promise.all([
@@ -47,7 +47,7 @@ export async function readCrateMatesResult(
 
 /** One leaderboard's rows, ranked in the order given. */
 async function crateMateRows(
-  db: DigheadDb,
+  db: CraterDb,
   crateMates: readonly CrateMateRecord[],
   followed: ReadonlySet<number>,
   buys: ReadonlyMap<number, CrateMateBuy[]>,

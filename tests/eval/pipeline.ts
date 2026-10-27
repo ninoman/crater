@@ -6,7 +6,7 @@ import { peakImportFile } from 'dexie-export-import';
 import { keyFromNumber, keyToNumber } from '../../src/bandcamp';
 import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
-  type DigheadDb,
+  type CraterDb,
   fanRows,
   gatherForYou,
   getShownFields,
@@ -67,7 +67,7 @@ function memorySnapshot(): SnapshotStore {
  * on each overwrite, so `modify` over 10⁵ items never finishes. They are rewritten into an
  * emptied table instead.
  */
-export async function loadBackup(db: DigheadDb, backup: Blob): Promise<void> {
+export async function loadBackup(db: CraterDb, backup: Blob): Promise<void> {
   const file = await readBackup(backup);
   // replaceAll first: it installs the FileReader that peakImportFile needs in Node.
   await replaceAll(db, file);
@@ -93,7 +93,7 @@ export interface EvalRun {
 
 /** Every method's metrics on each split, folds aggregated. */
 export async function runEval(
-  db: DigheadDb,
+  db: CraterDb,
   log: (message: string) => void = () => undefined,
 ): Promise<EvalRun> {
   const me = await db.me.get('self');
@@ -181,7 +181,7 @@ function purchasesOf(rows: readonly OwnershipRecord[]): Purchase[] {
  * are only read by fan, and no one asks for those fans again.
  */
 async function withHoldout<T>(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   mine: readonly OwnershipRecord[],
   heldOut: ReadonlySet<number>,
@@ -200,7 +200,7 @@ async function withHoldout<T>(
 }
 
 /** Removes a fan from the match index and the owner counts, leaving its ownership rows. */
-async function dropFanMatches(db: DigheadDb, fanId: number): Promise<void> {
+async function dropFanMatches(db: CraterDb, fanId: number): Promise<void> {
   const lists = await db.fanMatches.get(fanId);
   if (!lists) return;
   const ids = [...lists.matchIds];
@@ -218,7 +218,7 @@ async function dropFanMatches(db: DigheadDb, fanId: number): Promise<void> {
  * builds each K's candidates as For you does: the top-K crate mates' lists minus your exclusions.
  */
 async function candidatesByK(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
   crateMateKs: readonly number[],
 ): Promise<Map<number, Candidate[]>> {
@@ -252,7 +252,7 @@ async function candidatesByK(
 
 /** Fills in Bandcamp's count and the local owners for ids not looked up yet. */
 async function resolvePopularity(
-  db: DigheadDb,
+  db: CraterDb,
   into: Map<number, Popularity>,
   ids: readonly number[],
 ): Promise<void> {

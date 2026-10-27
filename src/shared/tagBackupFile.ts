@@ -1,7 +1,7 @@
 import { parseTagBackup, type TagBackup, type TagImportSummary } from './following';
 
 export function tagBackupFilename(date: Date): string {
-  return `dighead-tags-${date.toISOString().slice(0, 10)}.json`;
+  return `crater-tags-${date.toISOString().slice(0, 10)}.json`;
 }
 
 function count(n: number, noun: string): string {
@@ -24,6 +24,6 @@ export function readTagBackup(text: string): TagBackup {
     throw new Error("That file isn't valid JSON.");
   }
   const backup = parseTagBackup(json);
-  if (!backup) throw new Error("That file isn't a Dighead tags backup.");
+  if (!backup) throw new Error("That file isn't a Crater tags backup.");
   return backup;
 }

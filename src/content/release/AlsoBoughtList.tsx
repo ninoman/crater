@@ -135,7 +135,7 @@ function waiting(progress: ScanProgressView, scanStopped: boolean): WaitState {
     return {
       busy: true,
       title: 'Queued for scanning',
-      description: "Dighead will read this release's supporters shortly.",
+      description: "Crater will read this release's supporters shortly.",
     };
   }
   if (total === 0) {

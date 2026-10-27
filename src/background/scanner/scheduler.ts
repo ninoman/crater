@@ -7,7 +7,7 @@ import {
   failJob,
   nextJob,
   saveProgress,
-  type DigheadDb,
+  type CraterDb,
   type QueueJob,
 } from '../../db';
 import type { Settings } from '../../shared/settings';
@@ -23,7 +23,7 @@ import { runReleaseStep } from './releaseJob';
 import { pauseFor, type ScannerState, type ScannerStore } from './state';
 
 export interface SchedulerDeps {
-  db: DigheadDb;
+  db: CraterDb;
   fetchJson: FetchJson;
   fetchText: FetchText;
   store: ScannerStore;
@@ -111,7 +111,7 @@ async function runJob(
   const skipped = result.skippedParserError;
   if (skipped) {
     const message = `${job.kind} ${job.target}: ${skipped.message}`;
-    console.warn(`dighead: ${message}. Carried on without it.`);
+    console.warn(`crater: ${message}. Carried on without it.`);
     return deps.store.save({
       backoff: null,
       offline: false,
@@ -141,12 +141,12 @@ async function handleFailure(
 
   if (failure.kind === 'throttled') {
     const backoff = nextBackoff(state.backoff, failure.retryAfterMs, ctx.now);
-    console.warn(`dighead: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
+    console.warn(`crater: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
     return deps.store.save({ backoff, offline: failure.offline, lastError: message });
   }
 
   const retryAt = failure.kind === 'transient' ? jobRetryAt(job.attempts, ctx.now) : null;
-  console.warn(`dighead: ${message}. ${retryAt === null ? 'Dropped' : 'Will retry'}.`, error);
+  console.warn(`crater: ${message}. ${retryAt === null ? 'Dropped' : 'Will retry'}.`, error);
   await failJob(ctx.db, job, retryAt);
   if (retryAt === null) {
     if (job.kind === 'fan') await abandonFan(ctx, job);

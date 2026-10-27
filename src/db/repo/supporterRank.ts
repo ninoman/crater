@@ -1,7 +1,7 @@
 // Reads what pass 0 ranks a release's supporters by (decisions §12), as plain data.
 
 import { keyFromNumber, keyToNumber, matchKey, type ItemKey } from '../../bandcamp';
-import type { DigheadDb } from '../schema';
+import type { CraterDb } from '../schema';
 import { getItemFields, itemFieldsWhere } from './items';
 
 /** What a release's supporters are ranked by before any of them is read. */
@@ -25,7 +25,7 @@ const EMPTY = new Float64Array();
  * supporter is known to own. Null when the release or its supporter list isn't stored.
  */
 export async function gatherPassZero(
-  db: DigheadDb,
+  db: CraterDb,
   releaseKey: ItemKey,
   meFanId: number | null,
 ): Promise<PassZeroBasis | null> {

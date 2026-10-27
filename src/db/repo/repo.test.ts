@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, Supporter } from '../../bandcamp';
-import { DigheadDb } from '../schema';
+import { CraterDb } from '../schema';
 import { finishFanScan, upsertSupporterFans } from './fans';
 import { getItem, upsertCollectionItems } from './items';
 import { getMe, markSynced, saveViewer } from './me';
@@ -36,10 +36,10 @@ function item(itemKey: CollectionItem['itemKey'], otherOwners: number | null = 4
   };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

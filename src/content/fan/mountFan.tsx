@@ -20,7 +20,7 @@ export function mountFan(doc: Document): void {
     fanId = parseViewedFanId(pagedata.outerHTML);
   } catch (error) {
     if (error instanceof ParserError) {
-      console.warn('dighead: cannot tell whose profile this is', error);
+      console.warn('crater: cannot tell whose profile this is', error);
       return;
     }
     throw error;

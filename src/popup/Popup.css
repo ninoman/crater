@@ -104,10 +104,18 @@ body {
   font-weight: var(--dh-weight-bold);
 }
 
+/* Pinned to the popup's bottom edge so Save stays reachable in a long settings list. */
 .dh-settings__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: var(--dh-space-2);
+  margin: 0 calc(-1 * var(--dh-space-4)) calc(-1 * var(--dh-space-4));
+  padding: var(--dh-space-3) var(--dh-space-4);
+  border-top: 1px solid var(--dh-color-border);
+  background: var(--dh-color-bg);
 }
 
 .dh-settings__status {

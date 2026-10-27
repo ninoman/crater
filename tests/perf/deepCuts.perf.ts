@@ -13,7 +13,7 @@ import { computeForYou } from '../../src/background/recommend/forYou';
 import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   buildMatchIndex,
-  DigheadDb,
+  CraterDb,
   gatherForYou,
   getCrateMates,
   type ItemRecord,
@@ -60,11 +60,11 @@ function row(fanId: number, itemKey: ItemKey): OwnershipRecord {
   return { fanId, itemKey, matchKey: itemKey, source: 'collection', addedAt: null };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 const me: MeRecord = { id: 'self', fanId: ME, username: 'me', syncedAt: 0 };
 
 beforeAll(async () => {
-  db = new DigheadDb(`perf-${crypto.randomUUID()}`);
+  db = new CraterDb(`perf-${crypto.randomUUID()}`);
   await db.open();
   const next = random(7);
 

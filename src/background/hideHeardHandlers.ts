@@ -9,7 +9,7 @@ import {
   markHeard,
   unhide,
   unmarkHeard,
-  type DigheadDb,
+  type CraterDb,
 } from '../db';
 import type { HiddenEntry } from '../shared/hide';
 import type { MessageHandlers } from '../shared/messages';
@@ -19,7 +19,7 @@ export type HideHeardHandlers = Pick<
   'hide' | 'unhide' | 'listHidden' | 'markHeard' | 'unmarkHeard'
 >;
 
-export function hideHeardHandlers(db: DigheadDb): HideHeardHandlers {
+export function hideHeardHandlers(db: CraterDb): HideHeardHandlers {
   return {
     hide: async ({ target }) => {
       await hide(db, target, Date.now());
@@ -42,7 +42,7 @@ export function hideHeardHandlers(db: DigheadDb): HideHeardHandlers {
 }
 
 /** Hides newest first, releases named from their records. One whose record is gone shows its key. */
-async function listHidden(db: DigheadDb): Promise<HiddenEntry[]> {
+async function listHidden(db: CraterDb): Promise<HiddenEntry[]> {
   const rows = await listHides(db);
   const releases = await getDisplayItems(
     db,

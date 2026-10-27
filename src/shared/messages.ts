@@ -151,7 +151,7 @@ export interface MessageMap {
   /** Stops the scanner until resumed, from the popup. */
   pauseScanner: { request: NoPayload; response: null };
   resumeScanner: { request: NoPayload; response: null };
-  /** Deletes everything Dighead has stored except settings. Your collection re-syncs on the next Bandcamp page. */
+  /** Deletes everything Crater has stored except settings. Your collection re-syncs on the next Bandcamp page. */
   clearAllData: { request: NoPayload; response: null };
   // New from your follows (decisions §23).
   /** The digest, with rows found after `previousVisitAt` marked new, heard ones left out if asked. */

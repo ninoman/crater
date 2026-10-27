@@ -5,7 +5,7 @@ import { parseFanPage, type CollectionItem } from '../bandcamp';
 import { fixtureText } from '../../tests/fixtures';
 import { itemFromCollection, ownershipFromCollection } from './mappers';
 import { fanRows, getItem, putItems, readItems } from './repo';
-import { DigheadDb } from './schema';
+import { CraterDb } from './schema';
 
 const album: CollectionItem = {
   itemKey: 'a100',
@@ -29,10 +29,10 @@ const trackFromAlbum: CollectionItem = {
   purchaseKind: 'track',
 };
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 
@@ -40,7 +40,7 @@ afterEach(async () => {
   await db.delete();
 });
 
-describe('DigheadDb', () => {
+describe('CraterDb', () => {
   it('stores items and ownership mapped from a real fan page', async () => {
     const page = parseFanPage(fixtureText('fan-page.html'));
     await putItems(db, page.firstItems.map(itemFromCollection));
@@ -108,7 +108,7 @@ describe('DigheadDb', () => {
     ]);
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     const before = Date.now();
     const [scanned, queued] = await upgraded.fans.bulkGet([1, 2]);
     expect(scanned?.lastSeenAt).toBe(500);
@@ -148,7 +148,7 @@ describe('DigheadDb', () => {
     await old.table('hidden').put({ matchKey: 'a1', hiddenAt: 5 });
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     expect(await upgraded.hides.get(['release', 'a1'])).toEqual({
       kind: 'release',
       key: 'a1',
@@ -166,7 +166,7 @@ describe('DigheadDb', () => {
     await old.table('tags').add({ name: 'dub', nameKey: 'dub' });
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     expect(await upgraded.tags.count()).toBe(1);
     await upgraded.itemTags.bulkPut([
       { itemKey: 'a1', tagIds: [1, 2] },
@@ -188,7 +188,7 @@ describe('DigheadDb', () => {
     ]);
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     const items = await readItems(upgraded, await upgraded.items.toArray());
     expect(items.map((item) => [item.itemKey, item.compilation])).toEqual([
       ['a1', true],
@@ -210,7 +210,7 @@ describe('DigheadDb', () => {
     ]);
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     const jobs = await upgraded.queue.orderBy('[priority+nextAttemptAt+rank]').toArray();
     expect(jobs.map((job) => [job.target, job.rank])).toEqual([
       ['a1', 0],
@@ -236,7 +236,7 @@ describe('DigheadDb', () => {
     await old.table('latelyTwins').add({ fanId: 2, lately: 0.5 });
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
     expect(await upgraded.crateMates.orderBy('score').primaryKeys()).toEqual([2, 1]);
     expect(await upgraded.latelyCrateMates.toArray()).toEqual([{ fanId: 2, lately: 0.5 }]);
@@ -255,7 +255,7 @@ describe('DigheadDb', () => {
     ]);
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
     expect(await upgraded.hides.toArray()).toEqual([
       { kind: 'release', key: 'a1', hiddenAt: 5 },
@@ -284,7 +284,7 @@ describe('DigheadDb', () => {
     await old.table('itemNotes').add({ itemKey: 'a1', text: 'x', rating: 2, updatedAt: 1 });
     old.close();
 
-    const upgraded = new DigheadDb(name);
+    const upgraded = new CraterDb(name);
     await upgraded.open();
     expect(await upgraded.itemTags.get('a1')).toEqual({ itemKey: 'a1', tagIds: [3] });
     expect([...upgraded.backendDB().objectStoreNames]).not.toContain('itemNotes');

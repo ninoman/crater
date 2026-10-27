@@ -5,7 +5,7 @@ import {
   assignItemTag,
   countOwnership,
   createTag,
-  DigheadDb,
+  CraterDb,
   getItemTags,
   getMe,
   ownedItemKeys,
@@ -58,11 +58,11 @@ function fakeBandcamp(lists: { collection: number[]; wishlist: number[] | 'hidde
   return { fetchJson, requests };
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 let me: MeRecord;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   me = await saveViewer(db, { fanId: FAN, username: 'me' });
 });

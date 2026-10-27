@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { DigheadDb, enqueue, fanJob, type FanRecord, type CrateMateRecord } from '../../db';
+import { CraterDb, enqueue, fanJob, type FanRecord, type CrateMateRecord } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import {
   LATEST_READ_OVERLAP_MS,
@@ -54,10 +54,10 @@ describe('pickLatelyRescans', () => {
 });
 
 describe('queueLatelyRescans', () => {
-  let db: DigheadDb;
+  let db: CraterDb;
 
   beforeEach(async () => {
-    db = new DigheadDb(`test-${crypto.randomUUID()}`);
+    db = new CraterDb(`test-${crypto.randomUUID()}`);
     await db.open();
   });
 

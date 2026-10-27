@@ -1,11 +1,11 @@
 import type { FetchJson, FetchText, ParserError } from '../../bandcamp';
-import type { DigheadDb, JobProgress } from '../../db';
+import type { CraterDb, JobProgress } from '../../db';
 import type { Settings } from '../../shared/settings';
 import type { ParserKind } from './state';
 
 /** Everything one job run needs. Each run sends exactly one request. */
 export interface StepContext {
-  db: DigheadDb;
+  db: CraterDb;
   fetchJson: FetchJson;
   fetchText: FetchText;
   settings: Settings;

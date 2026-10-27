@@ -9,7 +9,7 @@ function readViewer(): Viewer | null {
     return parseViewer(pagedata.outerHTML);
   } catch (error) {
     if (error instanceof ParserError) {
-      console.warn('dighead: cannot read the logged-in fan', error);
+      console.warn('crater: cannot read the logged-in fan', error);
       return null;
     }
     throw error;
@@ -20,6 +20,6 @@ function readViewer(): Viewer | null {
 export function reportPage(): void {
   const purchaseConfirmation = isPurchaseConfirmationUrl(new URL(location.href));
   sendMessage('pageSeen', { viewer: readViewer(), purchaseConfirmation }).catch((error: unknown) =>
-    console.warn('dighead: worker unreachable', error),
+    console.warn('crater: worker unreachable', error),
   );
 }

@@ -4,7 +4,7 @@
 
 import './env';
 import { readFileSync } from 'node:fs';
-import { DigheadDb } from '../../src/db';
+import { CraterDb } from '../../src/db';
 import { loadBackup, runEval } from './pipeline';
 import { formatReport } from './report';
 
@@ -17,7 +17,7 @@ if (!path) {
   process.exit(1);
 }
 
-const db = new DigheadDb(`eval-${crypto.randomUUID()}`);
+const db = new CraterDb(`eval-${crypto.randomUUID()}`);
 await db.open();
 console.error(`Loading ${path} ...`);
 await loadBackup(db, new Blob([readFileSync(path)]));

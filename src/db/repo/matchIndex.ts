@@ -1,5 +1,5 @@
 import { addOwnerDeltas, fanMatchLists } from '../matchIndex';
-import type { DigheadDb, FanMatchesRecord } from '../schema';
+import type { CraterDb, FanMatchesRecord } from '../schema';
 import { fanRows } from './fanRows';
 
 const EMPTY = new Float64Array();
@@ -9,7 +9,7 @@ const EMPTY = new Float64Array();
  * inside the transaction that changed their rows, with ownership, fanMatches and matchOwners in
  * scope, so the index never drifts from `ownership`.
  */
-export async function refreshFanMatches(db: DigheadDb, fanIds: Iterable<number>): Promise<void> {
+export async function refreshFanMatches(db: CraterDb, fanIds: Iterable<number>): Promise<void> {
   const ids = [...new Set(fanIds)];
   if (ids.length === 0) return;
   const [before, rows] = await Promise.all([
@@ -31,7 +31,7 @@ export async function refreshFanMatches(db: DigheadDb, fanIds: Iterable<number>)
   await applyOwnerDeltas(db, deltas);
 }
 
-async function applyOwnerDeltas(db: DigheadDb, deltas: Map<number, number>): Promise<void> {
+async function applyOwnerDeltas(db: CraterDb, deltas: Map<number, number>): Promise<void> {
   const changed = [...deltas].filter(([, delta]) => delta !== 0);
   if (changed.length === 0) return;
   const current = await db.matchOwners.bulkGet(changed.map(([id]) => id));
@@ -48,7 +48,7 @@ async function applyOwnerDeltas(db: DigheadDb, deltas: Map<number, number>): Pro
 
 /** How many fans' collections hold each match id. Ids nobody holds are left out. */
 export async function getOwnerCounts(
-  db: DigheadDb,
+  db: CraterDb,
   matchIds: readonly number[],
 ): Promise<Map<number, number>> {
   const records = await db.matchOwners.bulkGet([...matchIds]);

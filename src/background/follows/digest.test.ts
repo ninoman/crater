@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DiscographyRelease } from '../../bandcamp';
 import {
-  DigheadDb,
+  CraterDb,
   hide,
   markHeard,
   markSynced,
@@ -57,10 +57,10 @@ async function readBand(bandId: number, releases: DiscographyRelease[], at: numb
   }
 }
 
-let db: DigheadDb;
+let db: CraterDb;
 let me: MeRecord;
 beforeEach(async () => {
-  db = new DigheadDb(`digest-${crypto.randomUUID()}`);
+  db = new CraterDb(`digest-${crypto.randomUUID()}`);
   await db.open();
   me = await saveViewer(db, { fanId: ME, username: 'me' });
   await markSynced(db, NOW);

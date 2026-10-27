@@ -84,7 +84,7 @@ function Entry({ entry, view, setDraft }: EntryProps) {
       return (
         <SettingRow
           label="Scan speed"
-          description="How fast Dighead reads Bandcamp in the background. Slower is kinder to Bandcamp."
+          description="How fast Crater reads Bandcamp in the background. Slower is kinder to Bandcamp."
           group
         >
           {({ describedBy }) => (
@@ -137,8 +137,8 @@ function FollowNotificationsToggle({
       label="Notify me about new releases"
       description={
         blocked
-          ? 'Chrome isn’t letting Dighead show notifications. Turn this off and on to ask again.'
-          : 'One notification when Dighead’s weekly check finds new releases from artists and labels you follow.'
+          ? 'Chrome isn’t letting Crater show notifications. Turn this off and on to ask again.'
+          : 'One notification when Crater’s weekly check finds new releases from artists and labels you follow.'
       }
       checked={checked}
       onChange={(next) => {

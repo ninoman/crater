@@ -15,7 +15,7 @@ export function mountShadow(
   extraCss = '',
   theme: ThemeVariables | null = null,
 ): () => void {
-  const { host, container } = createShadowSlot(document, 'dighead-root', extraCss);
+  const { host, container } = createShadowSlot(document, 'crater-root', extraCss);
   for (const [name, value] of Object.entries(theme ?? {})) host.style.setProperty(name, value);
   parent.append(host);
 

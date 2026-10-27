@@ -1,14 +1,14 @@
 // Releases of the band accounts you follow, when each was read, and your mutes (decisions §23).
 
 import type { Discography, ItemKey, ReleaseDetails } from '../../bandcamp';
-import type { BandReleaseRecord, DigheadDb } from '../schema';
+import type { BandReleaseRecord, CraterDb } from '../schema';
 
 /**
  * Saves one read of a band's discography and returns its rows now. Releases it no longer lists
  * go; new ones are first seen now, and count as back catalogue on the band's first read.
  */
 export async function saveDiscography(
-  db: DigheadDb,
+  db: CraterDb,
   { bandId, releases }: Discography,
   now: number,
 ): Promise<BandReleaseRecord[]> {
@@ -44,7 +44,7 @@ export async function saveDiscography(
 }
 
 export function getBandRelease(
-  db: DigheadDb,
+  db: CraterDb,
   bandId: number,
   itemKey: ItemKey,
 ): Promise<BandReleaseRecord | undefined> {
@@ -53,7 +53,7 @@ export function getBandRelease(
 
 /** Adds a release's URL and album from its details. A release read away meanwhile stays gone. */
 export async function saveReleaseDetails(
-  db: DigheadDb,
+  db: CraterDb,
   bandId: number,
   { itemKey, albumKey, url, releasedAt, preorder }: ReleaseDetails,
 ): Promise<void> {
@@ -66,12 +66,12 @@ export async function saveReleaseDetails(
 }
 
 /** When each band was last read, by band_id. */
-export async function bandReadTimes(db: DigheadDb): Promise<Map<number, number>> {
+export async function bandReadTimes(db: CraterDb): Promise<Map<number, number>> {
   return new Map((await db.bandReads.toArray()).map((read) => [read.bandId, read.readAt]));
 }
 
 /** Drops what was read for these bands, e.g. after you unfollowed them. Mutes stay. */
-export async function forgetBandReleases(db: DigheadDb, bandIds: readonly number[]) {
+export async function forgetBandReleases(db: CraterDb, bandIds: readonly number[]) {
   if (bandIds.length === 0) return;
   await db.transaction('rw', db.bandReleases, db.bandReads, async () => {
     await db.bandReleases.where('bandId').anyOf(bandIds).delete();
@@ -84,7 +84,7 @@ export async function forgetBandReleases(db: DigheadDb, bandIds: readonly number
  * up in both lists; it's returned once.
  */
 export async function recentBandReleases(
-  db: DigheadDb,
+  db: CraterDb,
   since: number,
 ): Promise<BandReleaseRecord[]> {
   const [released, seen] = await Promise.all([
@@ -97,7 +97,7 @@ export async function recentBandReleases(
 
 /** Every release listed under these bands, as item keys by band. */
 export async function bandCatalogues(
-  db: DigheadDb,
+  db: CraterDb,
   bandIds: readonly number[],
 ): Promise<Map<number, ItemKey[]>> {
   const catalogues = new Map<number, ItemKey[]>();
@@ -109,7 +109,7 @@ export async function bandCatalogues(
 }
 
 export async function setFollowMute(
-  db: DigheadDb,
+  db: CraterDb,
   bandId: number,
   muted: boolean,
   now: number,
@@ -118,12 +118,12 @@ export async function setFollowMute(
   else await db.followMutes.delete(bandId);
 }
 
-export async function mutedBandIds(db: DigheadDb): Promise<Set<number>> {
+export async function mutedBandIds(db: CraterDb): Promise<Set<number>> {
   return new Set(await db.followMutes.toCollection().primaryKeys());
 }
 
 /** The band accounts you follow, not counting ones unfollowed on the tab since the last sync. */
-export async function followedBandIds(db: DigheadDb): Promise<number[]> {
+export async function followedBandIds(db: CraterDb): Promise<number[]> {
   const rows = await db.following
     .where('kind')
     .equals('band')
@@ -133,7 +133,7 @@ export async function followedBandIds(db: DigheadDb): Promise<number[]> {
 }
 
 /** Bands with a read on file that you no longer follow at all (a sync deleted the row). */
-export async function readBandsNotFollowed(db: DigheadDb): Promise<number[]> {
+export async function readBandsNotFollowed(db: CraterDb): Promise<number[]> {
   const read = await db.bandReads.toCollection().primaryKeys();
   const following = await db.following.bulkGet(
     read.map((bandId): ['band', number] => ['band', bandId]),

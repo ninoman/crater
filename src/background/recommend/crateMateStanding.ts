@@ -1,6 +1,6 @@
 // Where one fan sits on your crate mates leaderboards, so a profile tab needn't download them.
 
-import { getLatelyCrateMates, getCrateMates, type DigheadDb, type CrateMateRecord } from '../../db';
+import { getLatelyCrateMates, getCrateMates, type CraterDb, type CrateMateRecord } from '../../db';
 import type { CrateMateStanding } from '../../shared/crateMates';
 
 function rankByFan(board: readonly CrateMateRecord[]): Map<number, number> {
@@ -43,12 +43,12 @@ export function crateMateStanding(
   return crateMateStandings(crateMates, latelyCrateMates, [fanId])[fanId] ?? null;
 }
 
-async function readBoards(db: DigheadDb): Promise<[CrateMateRecord[], CrateMateRecord[]]> {
+async function readBoards(db: CraterDb): Promise<[CrateMateRecord[], CrateMateRecord[]]> {
   return Promise.all([getCrateMates(db), getLatelyCrateMates(db)]);
 }
 
 export async function getCrateMateStandings(
-  db: DigheadDb,
+  db: CraterDb,
   fanIds: readonly number[],
 ): Promise<Record<number, CrateMateStanding>> {
   const [crateMates, latelyCrateMates] = await readBoards(db);
@@ -56,7 +56,7 @@ export async function getCrateMateStandings(
 }
 
 export async function getCrateMateStanding(
-  db: DigheadDb,
+  db: CraterDb,
   fanId: number,
 ): Promise<CrateMateStanding | null> {
   const [crateMates, latelyCrateMates] = await readBoards(db);

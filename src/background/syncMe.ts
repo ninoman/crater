@@ -14,14 +14,14 @@ import {
   putOwnership,
   removeOwnershipExcept,
   upsertCollectionItems,
-  type DigheadDb,
+  type CraterDb,
   type MeRecord,
 } from '../db';
 import type { SyncMode, SyncStep } from '../shared/sync';
 import { syncFollowing } from './syncFollowing';
 
 export interface SyncDeps {
-  db: DigheadDb;
+  db: CraterDb;
   fetchJson: FetchJson;
   batchSize: number;
   /** Waits between page requests, to stay polite. */
@@ -46,7 +46,7 @@ export async function syncMe(deps: SyncDeps, me: MeRecord, mode: SyncMode): Prom
   deps.onStep('following');
   // Its own failure leaves the followings as they were and doesn't stop the collection sync.
   await syncFollowing(deps, me.fanId).catch((error: unknown) =>
-    console.error('dighead: following sync failed', error),
+    console.error('crater: following sync failed', error),
   );
   deps.onStep('collection');
   await syncList(deps, me.fanId, 'collection', mode, fetched);

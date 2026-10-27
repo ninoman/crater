@@ -18,7 +18,7 @@ export function mountBand(doc: Document): void {
     bandId = parseBandId(tag.outerHTML);
   } catch (error) {
     if (error instanceof ParserError) {
-      console.warn('dighead: cannot tell which band this is', error);
+      console.warn('crater: cannot tell which band this is', error);
       return;
     }
     throw error;

@@ -7,8 +7,8 @@ import { createShadowSlot, type ShadowSlot } from '../shared/shadowSlot';
 import { itemListCss } from './itemListStyles';
 import type { ListConfig } from './lists';
 
-const takenClass = (list: ListConfig) => `dighead-${list.noun}-taken`;
-const tagName = (list: ListConfig) => `dighead-${list.noun}`;
+const takenClass = (list: ListConfig) => `crater-${list.noun}-taken`;
+const tagName = (list: ListConfig) => `crater-${list.noun}`;
 
 // Bandcamp's search box sits in the tab bar, away from the items, so `:has` ties it to them.
 // Ours searches the whole list; theirs only its own hidden pages.
@@ -39,7 +39,7 @@ export interface TakenList {
 export function takeOverItemList(doc: Document, grid: Element, list: ListConfig): TakenList | null {
   const container = grid.querySelector(list.items);
   if (!container) {
-    console.warn(`dighead: ${list.noun} items not found; Bandcamp may have changed its layout`);
+    console.warn(`crater: ${list.noun} items not found; Bandcamp may have changed its layout`);
     return null;
   }
   addPageStyle(doc, list);

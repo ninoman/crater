@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import {
-  DigheadDb,
+  CraterDb,
   putOwnership,
   replaceCrateMates,
   upsertCollectionItems,
@@ -11,10 +11,10 @@ import {
 } from '../../db';
 import { computeReleaseCrateMates } from './releaseCrateMates';
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

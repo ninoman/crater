@@ -13,7 +13,7 @@ import {
   markFollowed,
   renameTag,
   setUnfollowed,
-  type DigheadDb,
+  type CraterDb,
 } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 
@@ -32,7 +32,7 @@ export type FollowingHandlers = Pick<
   | 'importTags'
 >;
 
-export function followingHandlers(db: DigheadDb): FollowingHandlers {
+export function followingHandlers(db: CraterDb): FollowingHandlers {
   return {
     listTags: () => listTags(db),
     createTag: ({ name }) => createTag(db, name),

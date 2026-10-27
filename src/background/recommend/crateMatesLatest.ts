@@ -8,7 +8,7 @@ import {
   getFans,
   getLatelyCrateMates,
   getCrateMates,
-  type DigheadDb,
+  type CraterDb,
   type MeRecord,
 } from '../../db';
 import { exclusions } from '../../scoring/exclusions';
@@ -34,7 +34,7 @@ export interface CrateMatesLatestInput {
 }
 
 export async function computeCrateMatesLatest(
-  db: DigheadDb,
+  db: CraterDb,
   me: MeRecord | undefined,
   { topCrateMatesK, hideHeard, now }: CrateMatesLatestInput,
 ): Promise<CrateMatesLatestResult> {

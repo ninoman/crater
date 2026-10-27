@@ -14,7 +14,7 @@ import { gzip, readBackup } from './gzip';
 import { renameTables } from './renameTables';
 import {
   blankLately,
-  type DigheadDb,
+  type CraterDb,
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
@@ -52,7 +52,7 @@ export function ensureFileReader(): void {
 
 /** The whole database as a gzipped backup file. */
 export async function exportDatabase(
-  db: DigheadDb,
+  db: CraterDb,
 ): Promise<{ file: Blob; summary: BackupSummary }> {
   ensureFileReader();
   const json = await exportDB(db, { prettyJson: false });
@@ -61,7 +61,7 @@ export async function exportDatabase(
 }
 
 /** Reads every row without writing; the library doesn't notice a file cut short, so rows are counted. */
-async function verifyRows(db: DigheadDb, file: Blob, meta: BackupMeta): Promise<void> {
+async function verifyRows(db: CraterDb, file: Blob, meta: BackupMeta): Promise<void> {
   const seen = new Map<string, number>();
   try {
     await importInto(db, file, {
@@ -105,7 +105,7 @@ function upgradeRows(table: string, value: unknown): { value: unknown } {
 }
 
 /** Brings rows written by an older schema up to this one, as its Dexie upgrades would have. */
-async function migrateRows(db: DigheadDb, fromVersion: number): Promise<void> {
+async function migrateRows(db: CraterDb, fromVersion: number): Promise<void> {
   // v6 added track lists and v7 purchase times to fanMatches: one rebuild covers both.
   if (fromVersion < 7) {
     await db.transaction('rw', [db.fanMatches, db.ownership], () =>
@@ -141,7 +141,7 @@ export interface SnapshotStore {
 }
 
 /** Clears every table and writes the file's rows. Also how a snapshot is put back. */
-export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
+export async function replaceAll(db: CraterDb, file: Blob): Promise<void> {
   ensureFileReader();
   const json = await readJson(file);
   await Promise.all(db.tables.map((table) => table.clear()));
@@ -160,7 +160,7 @@ export async function replaceAll(db: DigheadDb, file: Blob): Promise<void> {
  * synchronously, so a transaction would close between chunks (decisions §10).
  */
 export async function importDatabase(
-  db: DigheadDb,
+  db: CraterDb,
   backup: Blob,
   snapshot: SnapshotStore,
   onPhase: (phase: ImportPhase | null) => Promise<void>,
@@ -173,7 +173,7 @@ export async function importDatabase(
   const exported = new Set(meta.data.tables.map((table) => table.name));
   const expected = db.tables.filter((table) => (TABLES_ADDED[table.name] ?? 0) <= fileVersion);
   if (expected.some((table) => !exported.has(table.name))) {
-    throw new Error("That backup is missing some of Dighead's tables.");
+    throw new Error("That backup is missing some of Crater's tables.");
   }
   await verifyRows(db, file, meta);
 

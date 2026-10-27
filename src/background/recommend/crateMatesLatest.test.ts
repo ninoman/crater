@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import {
-  DigheadDb,
+  CraterDb,
   enqueue,
   fanJob,
   getMe,
@@ -22,10 +22,10 @@ const ME = 1;
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 1000 * DAY;
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

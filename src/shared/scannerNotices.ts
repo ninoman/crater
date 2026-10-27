@@ -51,7 +51,7 @@ export function describeScannerNotice(notice: ScannerNotice, now: number): Scann
         tone: 'error',
         title: 'Parser broken.',
         detail:
-          "Bandcamp changed something Dighead reads, so scanning has stopped and results won't update. Dighead needs an update.",
+          "Bandcamp changed something Crater reads, so scanning has stopped and results won't update. Crater needs an update.",
       };
     case 'offline':
       return {
@@ -68,21 +68,21 @@ export function describeScannerNotice(notice: ScannerNotice, now: number): Scann
         id,
         tone: 'warning',
         title: 'Queue paused.',
-        detail: `Bandcamp asked Dighead to slow down. Resumes at ${resumes(notice.until, now)}.`,
+        detail: `Bandcamp asked Crater to slow down. Resumes at ${resumes(notice.until, now)}.`,
       };
     case 'budget':
       return {
         id,
         tone: 'warning',
         title: 'Daily budget reached.',
-        detail: `Dighead has sent today's ${notice.limit.toLocaleString('en')} requests. Resumes at midnight (${timeUntil(notice.until, now)}).`,
+        detail: `Crater has sent today's ${notice.limit.toLocaleString('en')} requests. Resumes at midnight (${timeUntil(notice.until, now)}).`,
       };
     case 'paused-by-you':
       return {
         id,
         tone: 'warning',
         title: 'Scanner paused.',
-        detail: 'Nothing is scanned until you resume it from the Dighead popup.',
+        detail: 'Nothing is scanned until you resume it from the Crater popup.',
       };
   }
 }

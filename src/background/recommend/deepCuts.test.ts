@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { CollectionItem, ItemKey } from '../../bandcamp';
 import {
-  DigheadDb,
+  CraterDb,
   getMe,
   hide,
   markHeard,
@@ -17,10 +17,10 @@ import { computeDeepCuts, type DeepCutsInput } from './deepCuts';
 const ME = 1;
 const INPUT: DeepCutsInput = { maxSupporters: 50, ignoreCompilations: true, hideHeard: false };
 
-let db: DigheadDb;
+let db: CraterDb;
 
 beforeEach(async () => {
-  db = new DigheadDb(`test-${crypto.randomUUID()}`);
+  db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
 });
 

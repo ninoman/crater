@@ -22,14 +22,14 @@ export function FollowedAccountTags({ kind, id, name }: FollowedAccountTagsProps
   const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
 
   useEffect(() => {
-    if (own.state === 'unreachable') console.warn('dighead: tag lookup failed', own.error);
-    if (all.view.state === 'unreachable') console.warn('dighead: tag list failed', all.view.error);
+    if (own.state === 'unreachable') console.warn('crater: tag lookup failed', own.error);
+    if (all.view.state === 'unreachable') console.warn('crater: tag list failed', all.view.error);
   }, [own, all.view]);
 
   if (own.state !== 'ready' || own.data === null || all.view.state !== 'ready') return null;
 
   const handlers = followTagHandlers(mutations, [[kind, id]], own.data, (message) =>
-    console.warn('dighead: tagging failed', message),
+    console.warn('crater: tagging failed', message),
   );
   return (
     <div className="dh-page-tags">

@@ -20,7 +20,7 @@ function tabBar(): string {
 }
 
 function ourTab(id: string): HTMLLIElement {
-  const link = document.querySelector(`.dighead-tab a[href="#${id}"]`);
+  const link = document.querySelector(`.crater-tab a[href="#${id}"]`);
   if (!(link?.parentElement instanceof HTMLLIElement)) throw new Error(`no tab ${id}`);
   return link.parentElement;
 }
@@ -73,7 +73,7 @@ describe('injectProfileTabs', () => {
 
   it('injects one tab per spec, whatever routes it owns', () => {
     injectProfileTabs(document, SPECS);
-    expect(document.querySelectorAll('.dighead-tab')).toHaveLength(2);
+    expect(document.querySelectorAll('.crater-tab')).toHaveLength(2);
   });
 
   it('marks a tab open for any of its routes', () => {
