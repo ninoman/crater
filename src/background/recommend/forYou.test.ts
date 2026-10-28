@@ -275,11 +275,13 @@ describe('computeForYou', () => {
     expect(await computeForYou(db, undefined, allTime(30))).toEqual({
       basis: 'no-viewer',
       rows: [],
+      limit: 30,
       crateMatesUsed: 0,
     });
     expect(await computeForYou(db, await me(), allTime(30))).toEqual({
       basis: 'ready',
       rows: [],
+      limit: 30,
       crateMatesUsed: 0,
     });
   });
@@ -348,6 +350,7 @@ describe('computeForYou, Fresh', () => {
     expect(await computeForYou(db, await me(), fresh())).toEqual({
       basis: 'ready',
       rows: [],
+      limit: 30,
       crateMatesUsed: 0,
     });
   });

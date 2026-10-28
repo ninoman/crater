@@ -13,6 +13,7 @@ export { Dock } from './Dock';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Identity, type IdentityProps } from './Identity';
 export { InfoHint, type InfoHintProps } from './InfoHint';
+export { InlineProgress, type InlineProgressProps } from './InlineProgress';
 export {
   ExternalIcon,
   HideIcon,
@@ -43,7 +44,14 @@ export { SectionHeading } from './SectionHeading';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { Select, type SelectOption, type SelectProps } from './Select';
 export { SettingRow, type SettingRowIds, type SettingRowProps } from './SettingRow';
-export { SkeletonRows, type SkeletonRowsProps } from './Skeleton';
+export {
+  SkeletonCovers,
+  SkeletonPeopleTable,
+  type SkeletonPeopleTableProps,
+  SkeletonPerson,
+  SkeletonRows,
+  type SkeletonRowsProps,
+} from './Skeleton';
 export { Stat, type StatProps } from './Stat';
 export { StatusDot, type StatusDotProps } from './StatusDot';
 export { injectStyles, uiStyles } from './styles';
@@ -58,6 +66,7 @@ export {
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { type PageColors, type ThemeVariables, themeVariables } from './theme';
 export { Toggle, type ToggleProps } from './Toggle';
+export { type WorkingRows, WorkingState, type WorkingStateProps } from './WorkingState';
 export { Toolbar } from './Toolbar';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export { TruncatedText, type TruncatedTextProps } from './TruncatedText';

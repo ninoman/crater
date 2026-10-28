@@ -60,6 +60,8 @@ export interface CrateMatesResult {
   rows: CrateMateRow[];
   /** The fans most in step with you lately, best first. Ranks are places on this list. */
   latelyRows: CrateMateRow[];
+  /** The most crate mates each board keeps, so a full board can tell more won't be added. */
+  limit: number;
   /** The lately half-life setting, for the note under the list. */
   latelyHalfLifeMonths: number;
   /** When the leaderboard was last worked out, or null if never. */

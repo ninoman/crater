@@ -1,15 +1,20 @@
 import { useCrateMates } from '../../../hooks/useCrateMates';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import type { CrateMatesResult } from '../../../shared/crateMates';
-import { Button, EmptyState } from '../../../ui';
-import { CrateMatesBoard } from './CrateMatesBoard';
+import type { ScanActivity } from '../../../shared/scanActivity';
+import { Button, EmptyState, WorkingState } from '../../../ui';
+import { FindingCrateMates } from '../../shared/FindingCrateMates';
+import { ScanningProgress } from '../../shared/ScanningProgress';
+import { BOARD_ROWS, CrateMatesBoard } from './CrateMatesBoard';
 
 /** The Crate mates tab on your profile: the leaderboard, or why there isn't one yet. */
 export function CrateMatesTab() {
-  const { view, reload } = useCrateMates();
+  const { view, reload, refresh } = useCrateMates();
+  const activity = useScanActivity(refresh);
 
   switch (view.state) {
     case 'loading':
-      return <EmptyState title="Loading your crate mates…" />;
+      return <WorkingState title="Loading your crate mates" rows={BOARD_ROWS} />;
     case 'unreachable':
       return (
         <EmptyState
@@ -21,14 +26,24 @@ export function CrateMatesTab() {
       );
     case 'ready':
       return view.result.rows.length > 0 ? (
-        <CrateMatesBoard result={view.result} now={view.loadedAt} />
+        <CrateMatesBoard
+          result={view.result}
+          now={view.loadedAt}
+          progress={<ScanningProgress activity={activity} />}
+          moreComing={activity?.kind === 'scanning'}
+        />
       ) : (
-        <NoCrateMates result={view.result} />
+        <NoCrateMates result={view.result} activity={activity} />
       );
   }
 }
 
-function NoCrateMates({ result }: { result: CrateMatesResult }) {
+interface NoCrateMatesProps {
+  result: CrateMatesResult;
+  activity: ScanActivity | null;
+}
+
+function NoCrateMates({ result, activity }: NoCrateMatesProps) {
   switch (result.basis) {
     case 'no-viewer':
       return (
@@ -39,16 +54,23 @@ function NoCrateMates({ result }: { result: CrateMatesResult }) {
       );
     case 'unsynced':
       return (
-        <EmptyState
-          title="Your collection is still syncing"
-          description="Crate mates are worked out from your collection once its first sync finishes. The Crater popup shows how far it has got."
+        <WorkingState
+          title="Syncing your collection"
+          line="Crate mates are found once it's in."
+          rows={BOARD_ROWS}
         />
       );
     case 'ready':
       return (
-        <EmptyState
-          title="No crate mates yet"
-          description={`Crate mates are fans who own what you own. Crater has read ${result.fansRead} fan ${result.fansRead === 1 ? 'collection' : 'collections'} so far. Open the pages of releases you love: Crater scans their supporters in the background and updates this list as it goes.`}
+        <FindingCrateMates
+          activity={activity}
+          rows={BOARD_ROWS}
+          idle={
+            <EmptyState
+              title="No crate mates yet"
+              description={`None of the ${result.fansRead} fans read so far own what you own. Open releases you love to scan their supporters.`}
+            />
+          }
         />
       );
   }

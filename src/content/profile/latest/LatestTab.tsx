@@ -1,9 +1,13 @@
 import { useCrateMatesLatest, type CrateMatesLatestView } from '../../../hooks/useCrateMatesLatest';
 import type { RowActions } from '../../../hooks/rowActions';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
-import { Button, EmptyState, LinkButton, StatusDot } from '../../../ui';
+import type { ScanActivity } from '../../../shared/scanActivity';
+import { Button, EmptyState, LinkButton, StatusDot, WorkingState } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
+import { FindingCrateMates } from '../../shared/FindingCrateMates';
+import { ScanningProgress } from '../../shared/ScanningProgress';
 import { HideHeardToggle } from '../../shared/RowControls';
 import { formatChecking, formatLatestSummary } from './latestText';
 import { LatestList } from './LatestList';
@@ -11,7 +15,8 @@ import { LatestList } from './LatestList';
 /** Crate mates' latest on your profile: what your top crate mates just bought, or why there's nothing yet. */
 export function LatestTab() {
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.latest', false);
-  const { view, reload, ...actions } = useCrateMatesLatest(hideHeard);
+  const { view, reload, refresh, ...actions } = useCrateMatesLatest(hideHeard);
+  const activity = useScanActivity(refresh);
 
   return (
     <>
@@ -25,6 +30,9 @@ export function LatestTab() {
               view.result.windowDays,
             )}
         </p>
+        {view.state === 'ready' && view.result.rows.length > 0 && (
+          <ScanningProgress activity={activity} />
+        )}
         <div className="dh-profile__controls">
           {view.state === 'ready' && view.result.checking > 0 && (
             <StatusDot tone="neutral">{formatChecking(view.result.checking)}</StatusDot>
@@ -35,6 +43,7 @@ export function LatestTab() {
       <LatestBody
         view={view}
         reload={reload}
+        activity={activity}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
       />
@@ -45,15 +54,16 @@ export function LatestTab() {
 interface LatestBodyProps {
   view: CrateMatesLatestView;
   reload: () => void;
+  activity: ScanActivity | null;
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
 }
 
-function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
+function LatestBody({ view, reload, activity, actions, onShowHeard }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
-      return <EmptyState title="Looking at what your crate mates bought lately…" />;
+      return <WorkingState title="Looking at what your crate mates bought lately" />;
     case 'unreachable':
       return (
         <EmptyState
@@ -65,16 +75,28 @@ function LatestBody({ view, reload, actions, onShowHeard }: LatestBodyProps) {
       );
     case 'ready':
       if (view.result.rows.length > 0) {
-        return <LatestList result={view.result} now={Date.now()} actions={actions} />;
+        return (
+          <LatestList
+            result={view.result}
+            now={Date.now()}
+            actions={actions}
+            moreComing={activity?.kind === 'scanning'}
+          />
+        );
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;
       }
-      return <NoPurchases result={view.result} />;
+      return <NoPurchases result={view.result} activity={activity} />;
   }
 }
 
-function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
+interface NoPurchasesProps {
+  result: CrateMatesLatestResult;
+  activity: ScanActivity | null;
+}
+
+function NoPurchases({ result, activity }: NoPurchasesProps) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
@@ -85,18 +107,24 @@ function NoPurchases({ result }: { result: CrateMatesLatestResult }) {
   }
   if (result.basis === 'unsynced') {
     return (
-      <EmptyState
-        title="Your collection is still syncing"
-        description="Crate mates' latest follows your crate mates, and they're worked out once your collection's first sync finishes. The Crater popup shows how far it has got."
+      <WorkingState
+        title="Syncing your collection"
+        line="This fills in once your crate mates are found."
       />
     );
   }
   if (result.crateMatesUsed === 0) {
     return (
-      <EmptyState
-        title="No crate mates yet"
-        description="Crate mates' latest shows what your closest crate mates just bought. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time."
-        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
+      <FindingCrateMates
+        activity={activity}
+        rows={{ kind: 'releases' }}
+        idle={
+          <EmptyState
+            title="No crate mates yet"
+            description="This shows what fans who own what you own just bought. Open releases you love to scan their supporters."
+            action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
+          />
+        }
       />
     );
   }

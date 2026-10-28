@@ -17,6 +17,7 @@ import field from './Field.css?inline';
 import identity from './Identity.css?inline';
 import heardBadge from './HeardBadge.css?inline';
 import infoHint from './InfoHint.css?inline';
+import inlineProgress from './InlineProgress.css?inline';
 import loadMore from './LoadMore.css?inline';
 import menu from './Menu.css?inline';
 import notice from './Notice.css?inline';
@@ -40,6 +41,7 @@ import tabs from './Tabs.css?inline';
 import tokens from './tokens.css?inline';
 import toolbar from './Toolbar.css?inline';
 import tooltip from './Tooltip.css?inline';
+import working from './WorkingState.css?inline';
 
 export const uiStyles = [
   tokens,
@@ -57,6 +59,7 @@ export const uiStyles = [
   notice,
   nowPlaying,
   progress,
+  inlineProgress,
   row,
   card,
   releaseRow,
@@ -73,6 +76,7 @@ export const uiStyles = [
   segmented,
   select,
   skeleton,
+  working,
   sectionHeading,
   disclosure,
   dock,

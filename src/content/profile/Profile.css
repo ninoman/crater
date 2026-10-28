@@ -54,18 +54,12 @@
   list-style: none;
 }
 
-/* New from your follows (decisions §23). */
-.dh-follows__progress {
+/* Flex items, so an inline cover doesn't leave a descender gap under it. */
+.dh-crate-mate-buys > li {
   display: flex;
-  align-items: center;
-  gap: var(--dh-space-2);
-  min-width: 12rem;
 }
 
-.dh-follows__progress .dh-progress {
-  flex: 1;
-}
-
+/* New from your follows (decisions §23). */
 .dh-follows__muted {
   display: flex;
   flex-direction: column;

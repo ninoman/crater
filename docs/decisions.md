@@ -239,7 +239,7 @@ Code: `src/scoring/crateMates.ts` (pure), `src/db/repo/crateMates.ts` (gathering
 - **Label** = `labelId ?? bandId` (§3.3). A label's catalog is its distinct matchKeys in the local `items` table. Only the labels of releases you own are looked up, since only they can carry an overlap.
 - **Label-cluster flag:** more than 50% of the overlap from one label, the fan owns more than 60% of that label's local catalog, **and at least 3 shared releases come from that label**. The last rule is new: local catalogs start tiny (often one release), so one shared release would otherwise flag everyone who owns it. Flagged crate mates are multiplied by 0.3 when `labelClusterDownweight` is on, and the flag is stored either way.
 - **The leaderboard keeps the top 200**, replaced in full on each recompute. Fans are scored 500 at a time with a yield between pages.
-- **Recompute triggers:** after each finished sync of your own collection, after every 25 fan scans (an in-memory counter, lost with the worker), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.
+- **Recompute triggers:** after each finished sync of your own collection, after every 15 fan scans (an in-memory counter, lost with the worker; was 25 until 2026-10-28, lowered so the first crate mates show sooner), and on install or update. Only one runs at a time; a trigger during a run queues one more pass.
 - **"Crate mates who own this" (sidebar tab):** leaderboard crate mates with the release in their collection, by its matchKey, so track buyers count and wishlists don't. Any owner counts, not just listed supporters, since owners come from every scanned collection. Rows show the crate mate's leaderboard rank, name, overlap and profile link. The list is pushed with each Also-bought re-score (`releaseCrateMates` event), so it doesn't refresh on its own after a crate mates recompute until the next scan step or page load.
 
 ### Profile tabs (Phase 5.5)
@@ -770,7 +770,7 @@ Each change lists what it saves, in JSON and on disk.
   - `matchKey` is kept even when it equals `itemKey`. A row without it would drop out of the `matchKey` index, which Also bought and "crate mates who own this" depend on.
 
 **5. Display fields only where they can be shown: rejected.**
-- Items owned by one non-crate-mate fan are 144k records (48 MB of JSON). But crate mates are recomputed after every 25 scans and after each sync, so today's non-crate-mate can be tomorrow's Deep cuts single-crate-mate pick, which would then have nothing to show without a re-fetch.
+- Items owned by one non-crate-mate fan are 144k records (48 MB of JSON). But crate mates are recomputed after every 15 scans and after each sync, so today's non-crate-mate can be tomorrow's Deep cuts single-crate-mate pick, which would then have nothing to show without a re-fetch.
 - Same-seller fallback picks (§6) show any local item from the seller, whoever owns it.
 
 **Also dropped:** label names stored once per label. It saves 2.5 MB of JSON and nothing measurable on disk.
@@ -958,9 +958,9 @@ followMutes:  'bandId'
 
 - **Job kind `followReleases`**, target the `band_id`. One request per run, as every job (§5): the first run reads `band_details`; then one run per release that needs details: news (below) in the window with no URL yet, newest first, at most 20 a read so a big label's first read can't flood the queue (the rest follow on later reads). A release whose details answer `{"error": true}` is skipped; the next read drops it.
 - **Weekly:** the daily maintenance pass (§9), and every finished sync of your own (which may bring new follows), queue every account you follow (not unfollowed on the tab) whose last read is 7 days old or more, never-read first, then the longest unread. So each account is read every 7 to 8 days.
-- **Priority 2.75** (`FOLLOW_RELEASES`): after releases you opened and the lately re-reads, **before the seed backlog**. That's not the "lowest priority" the research row sketched: behind a large seed backlog a read could wait weeks, which defeats a digest. A round costs about one request per account plus a few details, e.g. ~250 requests a week for 200 follows, about 0.4% of a week's budget at the default 10,000 a day. It runs through the same loop, so pace, back-off and the daily budget apply.
+- **Priority 3.5** (`FOLLOW_RELEASES`): **after the seed backlog** (changed 2026-10-28, v19 moves reads queued at the old 2.75). It first sat at 2.75, ahead of the seed, so a weekly read couldn't wait weeks behind it. But on a first install that meant a request per follow (606 for one user, ~25 minutes) before any of your releases was read, with Crate mates empty all that time. Crate mates are the core of the extension, so they go first. While a big backlog drains, the digest can lag. Opening the follows tab still moves every waiting read up to BACKGROUND, and once the backlog is through, each sync seeds only what it added, so weekly rounds run promptly. A round costs about one request per account plus a few details, e.g. ~250 requests a week for 200 follows, about 0.4% of a week's budget at the default 10,000 a day. It runs through the same loop, so pace, back-off and the daily budget apply.
 - **Opening the tab** queues whatever is due and moves every waiting read up to BACKGROUND (2), behind only the release page you have open.
-- First install: the first sync queues every follow, so the first round runs right after it, ahead of the seed backlog (for 500 follows, about 500 requests, ~20 minutes at the default pace).
+- First install: the first sync queues every follow, but the round waits behind the seed backlog, unless you open the follows tab.
 
 ### What's news, and the order (`scoring/followsDigest.ts`)
 

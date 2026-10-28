@@ -377,7 +377,7 @@ Design: decisions §23.
 1. [x] Recon: the mobile API's `band_details` (discography with release dates) and `tralbum_details` (URL), chosen over `/music` (no dates, custom-domain redirects) and the logged-in feed. Fixtures and refresh specs.
 2. [x] Parser `bandcamp/discography.ts` with fixture tests and `ParserError` / `BandcampApiError`.
 3. [x] Schema v15: `bandReleases`, `bandReads`, `followMutes`. In backups and Clear all data.
-4. [x] Job kind `followReleases`: weekly reads at priority 2.75, inside the daily budget; opening the tab moves them up.
+4. [x] Job kind `followReleases`: weekly reads at priority 3.5 (behind the seed backlog since v19), inside the daily budget; opening the tab moves them up.
 5. [x] `scoring/followsDigest.ts`: news time, window, exclusions, newest day first with crate-mate interest. Synthetic tests.
 6. [x] Profile tab `#follows`: rows with preview, "New since your last visit", follow tags as filters, per-account mute, every view state.
 7. [x] Notifications: optional `notifications` permission, popup setting (off by default), one grouped notification per round, click opens the tab.

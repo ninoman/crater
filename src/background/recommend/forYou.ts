@@ -67,7 +67,7 @@ export async function computeForYou(
   input: ForYouInput,
 ): Promise<ForYouResult> {
   const basis = crateMatesBasis(me);
-  if (!me) return { basis, rows: [], crateMatesUsed: 0 };
+  if (!me) return { basis, rows: [], limit: FOR_YOU_LIMIT, crateMatesUsed: 0 };
 
   const crateMates = topCrateMates(await boardFor(db, input.mode), input.topCrateMatesK);
   const data = await gatherForYou(
@@ -121,6 +121,7 @@ export async function computeForYou(
   return {
     basis,
     rows,
+    limit: FOR_YOU_LIMIT,
     crateMatesUsed: data.crateMateLists.length,
   };
 }

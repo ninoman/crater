@@ -1,7 +1,7 @@
 import type { RowActions } from '../../../hooks/rowActions';
 import { useListPlayer } from '../../../hooks/useListPlayer';
 import type { ForYouMode, ForYouRow } from '../../../shared/forYou';
-import { ReleaseRow, RowList, Toolbar } from '../../../ui';
+import { ReleaseRow, RowList, SkeletonRows, Toolbar } from '../../../ui';
 import { withFollowed } from '../../shared/followedText';
 import { PlayThrough, rowControls } from '../../shared/RowControls';
 import { formatDeepCutReason, formatPickReason } from './forYouText';
@@ -9,9 +9,13 @@ import { formatDeepCutReason, formatPickReason } from './forYouText';
 export interface ForYouListProps {
   rows: readonly ForYouRow[];
   mode: ForYouMode;
+  /** The most rows the list holds. */
+  limit: number;
   /** When the list was loaded, for "latest 3 days ago". */
   now: number;
   actions: RowActions;
+  /** A scan is running: placeholders under the rows show where more will come, until the list is full. */
+  moreComing: boolean;
 }
 
 const LIST_LABELS: Record<ForYouMode, string> = {
@@ -32,7 +36,7 @@ function reasonFor(row: ForYouRow, mode: ForYouMode, now: number): string {
 }
 
 /** The ranked picks, played one at a time or through in order. */
-export function ForYouList({ rows, mode, now, actions }: ForYouListProps) {
+export function ForYouList({ rows, limit, mode, now, actions, moreComing }: ForYouListProps) {
   const player = useListPlayer(rows, (matchKey) => actions.setHeard(matchKey, true, false));
 
   return (
@@ -52,6 +56,7 @@ export function ForYouList({ rows, mode, now, actions }: ForYouListProps) {
             />
           ))}
         </RowList>
+        {moreComing && rows.length < limit && <SkeletonRows count={3} ranked />}
       </div>
       <p className="dh-profile__note">
         {NOTES[mode]} Hidden, owned and wishlisted releases are left out.

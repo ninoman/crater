@@ -82,6 +82,7 @@ describe('readCrateMatesResult', () => {
       basis: 'no-viewer',
       rows: [],
       latelyRows: [],
+      limit: 200,
       latelyHalfLifeMonths: 6,
       computedAt: null,
       fansRead: 0,

@@ -291,4 +291,26 @@ describe('CraterDb', () => {
     expect([...upgraded.backendDB().objectStoreNames]).not.toContain('itemPrices');
     await upgraded.delete();
   });
+
+  it('moves weekly follow reads behind the seed backlog in v19', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(18).stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt+rank]' });
+    const base = { attempts: 0, nextAttemptAt: 5, rank: 0, cursor: null };
+    await old.table('queue').bulkAdd([
+      { ...base, kind: 'followReleases', target: '1', priority: 2.75 },
+      { ...base, kind: 'followReleases', target: '2', priority: 2 },
+      { ...base, kind: 'release', target: 'a1', url: 'u', priority: 3 },
+    ]);
+    old.close();
+
+    const upgraded = new CraterDb(name);
+    const jobs = await upgraded.queue.toArray();
+    expect(jobs.map((job) => [job.target, job.priority])).toEqual([
+      ['1', 3.5],
+      ['2', 2],
+      ['a1', 3],
+    ]);
+    await upgraded.delete();
+  });
 });

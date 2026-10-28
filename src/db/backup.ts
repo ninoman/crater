@@ -15,6 +15,7 @@ import { renameTables } from './renameTables';
 import {
   blankLately,
   type CraterDb,
+  demoteFollowReadToV19,
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
@@ -121,6 +122,8 @@ async function migrateRows(db: CraterDb, fromVersion: number): Promise<void> {
   if (fromVersion < 12) {
     await db.transaction('rw', [db.items, db.bands], () => slimToV12(db.items, db.bands));
   }
+  // v19 put weekly follow reads behind the seed backlog.
+  if (fromVersion < 19) await db.queue.toCollection().modify(demoteFollowReadToV19);
 }
 
 /** A backup's JSON, with tables renamed since it was made under their current names. */

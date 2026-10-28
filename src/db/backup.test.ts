@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { memorySnapshot } from '../../tests/memorySnapshot';
 import { exportDatabase, importDatabase } from './backup';
 import { readBackup } from './gzip';
-import { clearAllData, getItemList } from './repo';
+import { clearAllData, enqueue, getItemList } from './repo';
 import { CraterDb } from './schema';
 
 const noPhase = async () => {};
@@ -209,6 +209,20 @@ describe('older backups', () => {
         via: null,
         cursor: { stage: 'full', token: 't', scanned: 100 },
       }),
+    ]);
+  });
+
+  it('imports a v18 file, moving weekly follow reads behind the seed backlog', async () => {
+    await enqueue(db, [{ kind: 'followReleases', target: '1' }], 2.75, 0);
+    const { file } = await exportDatabase(db);
+    const json = JSON.parse(await jsonText(file));
+    json.data.databaseVersion = 18;
+    await clearAllData(db);
+
+    await importDatabase(db, new Blob([JSON.stringify(json)]), memorySnapshot().store, noPhase);
+
+    expect(await db.queue.toArray()).toEqual([
+      expect.objectContaining({ kind: 'followReleases', priority: 3.5 }),
     ]);
   });
 

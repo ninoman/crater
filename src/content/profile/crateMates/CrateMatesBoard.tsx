@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { timeAgo } from '../../../shared/timeAgo';
 import type { CrateMateBuy, CrateMateRow, CrateMatesResult } from '../../../shared/crateMates';
 import {
@@ -9,8 +9,11 @@ import {
   NowPlaying,
   SearchField,
   Segmented,
+  SkeletonCovers,
+  SkeletonPerson,
   Table,
   type TableColumn,
+  type WorkingRows,
 } from '../../../ui';
 import {
   filterCrateMates,
@@ -27,6 +30,9 @@ import { ReleasePreview } from '../../shared/ReleasePreview';
 import { CrateMateBuys } from './CrateMateBuys';
 
 type Column = TableColumn<CrateMateRow, CrateMateSort>;
+
+/** Placeholders shaped like a board row: six latest buys, then four number columns. */
+export const BOARD_ROWS = { kind: 'people', covers: 6, numbers: 4 } as const satisfies WorkingRows;
 
 const RANK: Column = { key: 'rank', header: '#', numeric: true, cell: (row) => row.rank };
 const FAN: Column = {
@@ -45,6 +51,7 @@ const FAN: Column = {
       }
     />
   ),
+  placeholder: <SkeletonPerson />,
 };
 const OVERLAP: Column = {
   key: 'overlap',
@@ -138,6 +145,7 @@ function buysColumn(
         now={now}
       />
     ),
+    placeholder: <SkeletonCovers count={BOARD_ROWS.covers} />,
   };
 }
 
@@ -156,8 +164,22 @@ const BOARDS = [
   { value: 'lately', label: 'Lately' },
 ] as const;
 
+export interface CrateMatesBoardProps {
+  result: CrateMatesResult;
+  now: number;
+  /** Work still adding to the board, shown in the toolbar. */
+  progress?: ReactNode;
+  /** A scan is running: placeholders under the rows show where more will come, until the board is full. */
+  moreComing?: boolean;
+}
+
 /** The leaderboards, all time and lately, with a filter box and sortable columns. */
-export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now: number }) {
+export function CrateMatesBoard({
+  result,
+  now,
+  progress,
+  moreComing = false,
+}: CrateMatesBoardProps) {
   const [board, setBoard] = useState<CrateMateBoard>('all');
   const [query, setQuery] = useState('');
   const [sortedBy, setSortedBy] = useState<CrateMateSort>(DEFAULT_SORT.all);
@@ -193,6 +215,7 @@ export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now
           {boardRows.length === 1 ? 'crate mate' : 'crate mates'} from {result.fansRead} fans read
           {result.computedAt !== null && ` · updated ${timeAgo(result.computedAt, now)}`}
         </p>
+        {progress}
         <div className="dh-profile__controls">
           <Segmented
             label="Which crate mates"
@@ -216,6 +239,8 @@ export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now
           rowKey={(row) => row.fanId}
           sortedBy={sortedBy}
           onSortChange={setSortedBy}
+          // Not while filtering: new crate mates may not match.
+          placeholderRows={moreComing && !query.trim() && boardRows.length < result.limit ? 3 : 0}
         />
       ) : boardRows.length === 0 ? (
         <EmptyState

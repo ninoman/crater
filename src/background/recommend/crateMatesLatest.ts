@@ -38,7 +38,13 @@ export async function computeCrateMatesLatest(
   me: MeRecord | undefined,
   { topCrateMatesK, hideHeard, now }: CrateMatesLatestInput,
 ): Promise<CrateMatesLatestResult> {
-  const empty = { rows: [], crateMatesUsed: 0, windowDays: LATEST_WINDOW_DAYS, checking: 0 };
+  const empty = {
+    rows: [],
+    limit: LATEST_LIMIT,
+    crateMatesUsed: 0,
+    windowDays: LATEST_WINDOW_DAYS,
+    checking: 0,
+  };
   if (!me) return { basis: crateMatesBasis(me), ...empty };
 
   const [lately, allTime] = await Promise.all([getLatelyCrateMates(db), getCrateMates(db)]);
@@ -104,6 +110,7 @@ export async function computeCrateMatesLatest(
   return {
     basis: crateMatesBasis(me),
     rows: rows.slice(0, LATEST_LIMIT),
+    limit: LATEST_LIMIT,
     crateMatesUsed: data.crateMateLists.length,
     windowDays: LATEST_WINDOW_DAYS,
     checking: data.queued.size,

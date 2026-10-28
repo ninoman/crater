@@ -32,8 +32,8 @@ export function profiledRank(similarity: number, ahead: boolean): number {
 }
 
 /**
- * Weekly reads of the accounts you follow (decisions §23): after the lately re-reads, before the
- * seed backlog. Behind that backlog a read could wait for weeks, which would defeat a digest of
- * what's new; a round is about one request per account, a sliver of a week's budget.
+ * Weekly reads of the accounts you follow (decisions §23): after the seed backlog, so a first
+ * install fills in crate mates before it spends a request per follow. Opening the follows tab
+ * moves waiting reads up to BACKGROUND.
  */
-export const FOLLOW_RELEASES = 2.75;
+export const FOLLOW_RELEASES = 3.5;

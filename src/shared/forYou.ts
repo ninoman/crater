@@ -41,8 +41,10 @@ export interface ForYouRow {
 export interface ForYouResult {
   /** Same as the crate mates leaderboard's: why there may be no crate mates to draw on. */
   basis: CrateMatesBasis;
-  /** Best first, at most FOR_YOU_LIMIT. */
+  /** Best first, at most `limit`. */
   rows: ForYouRow[];
+  /** The most rows the list holds, so a full list can tell more won't be added. */
+  limit: number;
   /** Top crate mates the picks came from: up to settings.topCrateMatesK. 0 means no crate mates yet (on that board). */
   crateMatesUsed: number;
 }

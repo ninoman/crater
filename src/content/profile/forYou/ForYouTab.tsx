@@ -1,10 +1,21 @@
 import { useState } from 'react';
 import type { RowActions } from '../../../hooks/rowActions';
 import { useForYou, type ForYouView } from '../../../hooks/useForYou';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
-import { Button, EmptyState, LinkButton, Segmented } from '../../../ui';
+import type { ScanActivity } from '../../../shared/scanActivity';
+import {
+  Button,
+  EmptyState,
+  LinkButton,
+  Segmented,
+  type WorkingRows,
+  WorkingState,
+} from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
+import { FindingCrateMates } from '../../shared/FindingCrateMates';
+import { ScanningProgress } from '../../shared/ScanningProgress';
 import { HideHeardToggle } from '../../shared/RowControls';
 import { ForYouList } from './ForYouList';
 import { formatForYouSummary } from './forYouText';
@@ -15,10 +26,13 @@ const MODES = [
   { value: 'deep', label: 'Deep cuts' },
 ] as const;
 
+/** Picks are ranked ReleaseRows. */
+const PICK_ROWS: WorkingRows = { kind: 'releases', ranked: true };
+
 const LOADING_TITLES: Record<ForYouMode, string> = {
-  all: 'Finding releases for you…',
-  fresh: 'Finding fresh releases for you…',
-  deep: 'Digging for deep cuts…',
+  all: 'Finding releases for you',
+  fresh: 'Finding fresh releases for you',
+  deep: 'Digging for deep cuts',
 };
 
 /**
@@ -29,7 +43,8 @@ const LOADING_TITLES: Record<ForYouMode, string> = {
 export function ForYouTab() {
   const [mode, setMode] = useState<ForYouMode>('all');
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.forYou', false);
-  const { view, reload, ...actions } = useForYou(mode, hideHeard);
+  const { view, reload, refresh, ...actions } = useForYou(mode, hideHeard);
+  const activity = useScanActivity(refresh);
   const picks = view.state === 'ready' ? view.result.rows.length : 0;
 
   return (
@@ -40,6 +55,7 @@ export function ForYouTab() {
             view.state === 'ready' &&
             formatForYouSummary(picks, view.result.crateMatesUsed, mode)}
         </p>
+        {picks > 0 && <ScanningProgress activity={activity} />}
         <div className="dh-profile__controls">
           <HideHeardToggle checked={hideHeard} onChange={setHideHeard} />
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
@@ -49,6 +65,7 @@ export function ForYouTab() {
         view={view}
         mode={mode}
         reload={reload}
+        activity={activity}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
       />
@@ -60,15 +77,16 @@ interface ForYouBodyProps {
   view: ForYouView;
   mode: ForYouMode;
   reload: () => void;
+  activity: ScanActivity | null;
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
 }
 
-function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProps) {
+function ForYouBody({ view, mode, reload, activity, actions, onShowHeard }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
-      return <EmptyState title={LOADING_TITLES[mode]} />;
+      return <WorkingState title={LOADING_TITLES[mode]} rows={PICK_ROWS} />;
     case 'unreachable':
       return (
         <EmptyState
@@ -81,17 +99,30 @@ function ForYouBody({ view, mode, reload, actions, onShowHeard }: ForYouBodyProp
     case 'ready':
       if (view.result.rows.length > 0) {
         return (
-          <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} actions={actions} />
+          <ForYouList
+            rows={view.result.rows}
+            limit={view.result.limit}
+            mode={mode}
+            now={view.loadedAt}
+            actions={actions}
+            moreComing={activity?.kind === 'scanning'}
+          />
         );
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;
       }
-      return <NoPicks result={view.result} mode={mode} />;
+      return <NoPicks result={view.result} mode={mode} activity={activity} />;
   }
 }
 
-function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
+interface NoPicksProps {
+  result: ForYouResult;
+  mode: ForYouMode;
+  activity: ScanActivity | null;
+}
+
+function NoPicks({ result, mode, activity }: NoPicksProps) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
@@ -102,27 +133,34 @@ function NoPicks({ result, mode }: { result: ForYouResult; mode: ForYouMode }) {
   }
   if (result.basis === 'unsynced') {
     return (
-      <EmptyState
-        title="Your collection is still syncing"
-        description="For you is built from your crate mates, and they're worked out once your collection's first sync finishes. The Crater popup shows how far it has got."
+      <WorkingState
+        title="Syncing your collection"
+        line="Picks come once your crate mates are found."
+        rows={PICK_ROWS}
       />
     );
   }
-  if (mode === 'deep') return <NoDeepCuts crateMatesUsed={result.crateMatesUsed} />;
+  // Fresh can lack lately crate mates long after crate mates are found, so it doesn't wait on the scan.
   if (mode === 'fresh') return <NoFreshPicks crateMatesUsed={result.crateMatesUsed} />;
   if (result.crateMatesUsed === 0) {
-    return (
-      <EmptyState
-        title="No crate mates yet"
-        description="For you is built from what your closest crate mates own. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time, or open the pages of releases you love to scan their supporters first."
-        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
-      />
-    );
+    return <FindingCrateMates activity={activity} idle={<NoCrateMates />} rows={PICK_ROWS} />;
   }
+  if (mode === 'deep') return <NoDeepCuts />;
   return (
     <EmptyState
       title="Nothing new from your crate mates yet"
       description={`Your ${result.crateMatesUsed} closest crate mates own nothing you haven't already got, wishlisted or hidden. More turns up as Crater scans more fans.`}
+      action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
+    />
+  );
+}
+
+/** No crate mates, and the scanner has nothing left to find them with. */
+function NoCrateMates() {
+  return (
+    <EmptyState
+      title="No crate mates yet"
+      description="Picks come from fans who own what you own. Open releases you love to scan their supporters."
       action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
     />
   );
@@ -133,7 +171,7 @@ function NoFreshPicks({ crateMatesUsed }: { crateMatesUsed: number }) {
     return (
       <EmptyState
         title="No lately crate mates yet"
-        description="Fresh is built from the fans whose recent buying is most in step with yours. Either you haven't bought much lately, or none of the fans read so far bought the same releases around the same time. All time still has picks from your closest crate mates overall."
+        description="None of the fans read so far bought what you bought around the same time. All time may still have picks."
         action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
       />
     );
@@ -147,16 +185,7 @@ function NoFreshPicks({ crateMatesUsed }: { crateMatesUsed: number }) {
   );
 }
 
-function NoDeepCuts({ crateMatesUsed }: { crateMatesUsed: number }) {
-  if (crateMatesUsed === 0) {
-    return (
-      <EmptyState
-        title="No crate mates yet"
-        description="Deep cuts are built from what your closest crate mates own. Crater finds them as its scanner reads the collections of your releases' supporters, so give it time."
-        action={<LinkButton href="#crate-mates">See the Crate mates tab</LinkButton>}
-      />
-    );
-  }
+function NoDeepCuts() {
   return (
     <EmptyState
       title="No deep cuts yet"
