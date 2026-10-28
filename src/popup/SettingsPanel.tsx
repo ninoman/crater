@@ -26,7 +26,6 @@ type ReadyView = Extract<ReturnType<typeof useSettings>['view'], { state: 'ready
 type SpeedChoice = SpeedPreset | 'custom';
 
 const SPEED_OPTIONS: SegmentedOption<SpeedPreset>[] = [
-  { value: 'gentle', label: 'Gentle' },
   { value: 'normal', label: 'Normal' },
   { value: 'fast', label: 'Fast' },
 ];

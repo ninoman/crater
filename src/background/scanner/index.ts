@@ -192,6 +192,7 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     ownReleases,
     requestsToday: usedToday(state.budget, now),
     dailyBudget: settings.dailyRequestBudget,
+    paceFactor: state.pace.factor,
     pause: pauseFor(state, settings.dailyRequestBudget, now),
     online: navigator.onLine,
     lastError: state.lastError,

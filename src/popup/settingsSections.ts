@@ -5,7 +5,7 @@ import type { BooleanSetting, NumericSetting } from '../shared/settings';
 export type SettingEntry =
   | { kind: 'number'; key: NumericSetting; label: string; description: string }
   | { kind: 'toggle'; key: BooleanSetting; label: string; description: string }
-  /** Pace and daily budget as one Gentle / Normal / Fast choice. */
+  /** Pace and daily budget as one Normal / Fast choice. */
   | { kind: 'speed' }
   /** Lately re-reads on or off; the count and interval are in Advanced. */
   | { kind: 'lately-rescan' }
@@ -93,7 +93,8 @@ export const ADVANCED_SECTIONS: SettingSection[] = [
         kind: 'number',
         key: 'paceMinMs',
         label: 'Shortest wait (ms)',
-        description: 'Crater waits a random time between these two before each request.',
+        description:
+          'Crater waits a random time between these two before each request. It goes up to twice as fast while Bandcamp keeps answering, and slows down when asked to.',
       },
       {
         kind: 'number',

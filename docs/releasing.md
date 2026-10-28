@@ -4,7 +4,10 @@ Releases are driven by [release-please](https://github.com/googleapis/release-pl
 
 1. Push `feat:` / `fix:` commits to `main` as usual. release-please keeps a release PR open that bumps `package.json` and updates `CHANGELOG.md`.
 2. Merge the release PR when you want to ship. That tags `vX.Y.Z` and creates a GitHub release.
-3. The `publish` job then lints, tests and builds, attaches the zip to the GitHub release, and submits it to the Chrome Web Store. The store publishes it once review passes.
+3. The `publish` job then lints, tests and builds, and attaches the zip to the GitHub release.
+4. Download that zip and upload it in the [developer dashboard](https://chrome.google.com/webstore/devconsole): Crater → Package → Upload new package, then Submit for review. The store publishes it once review passes.
+
+The upload stays manual on purpose: the Web Store API needs a Google OAuth client and refresh token, which isn't worth it for a step that takes a minute.
 
 The manifest reads its version from `package.json`, so there is nothing else to bump.
 
@@ -14,10 +17,7 @@ The manifest reads its version from `package.json`, so there is nothing else to 
 
 ## One-time setup
 
-1. **First listing.** Run `pnpm release:build` (tests, builds and zips `dist/` into `releases/`) and upload that 0.1.0 zip by hand in the [developer dashboard](https://chrome.google.com/webstore/devconsole). The API can only update an existing item. Note the extension ID and your publisher ID.
-2. **API credentials.** Enable the Chrome Web Store API in a Google Cloud project and create an OAuth client and refresh token ([guide](https://github.com/fregante/chrome-webstore-upload-keys)).
-3. **Repo secrets.** In GitHub → Settings → Secrets and variables → Actions, add `CWS_EXTENSION_ID`, `CWS_PUBLISHER_ID`, `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET` and `CWS_REFRESH_TOKEN`.
-4. **Actions permission.** In GitHub → Settings → Actions → General, enable *Allow GitHub Actions to create and approve pull requests*, or release-please can't open its PR.
+- **Actions permission.** In GitHub → Settings → Actions → General, enable *Allow GitHub Actions to create and approve pull requests*, or release-please can't open its PR.
 
 ## Quick patch: Bandcamp broke a parser
 
@@ -28,4 +28,4 @@ Symptoms: the sidebar shows "parser broken", or a scan fails with a `ParserError
 3. Adopt the new samples with `pnpm fixtures:refresh --write` (or name single files) and review the fixture diff. Logged-in fixtures aren't refreshed by the script: recapture those by hand per `tests/fixtures/README.md`.
 4. Update the fixture tests to cover the new shape, then `pnpm test`.
 5. Commit as `fix: …` (for example `fix: parse the new supporters payload`) and push to `main`.
-6. Merge the release PR. CI submits the patch, and the store review usually takes hours to days; users on the old version stay broken until it's approved and Chrome auto-updates.
+6. Merge the release PR, then upload the zip from the GitHub release in the developer dashboard. The store review usually takes hours to days; users on the old version stay broken until it's approved and Chrome auto-updates.

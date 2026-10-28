@@ -9,7 +9,17 @@ import {
 import { budgetExhausted, localDay, nextLocalMidnight, spend, usedToday } from './budget';
 import { FAN_FRESH_MS, needsFanScan, supportersAreFresh, SUPPORTERS_FRESH_MS } from './freshness';
 import { canTakeLock, LOCK_TTL_MS } from './lock';
-import { paceWaitMs } from './pace';
+import {
+  INITIAL_PACE,
+  PACE_FACTOR_MAX,
+  PACE_FACTOR_MIN,
+  PACE_FLOOR_MS,
+  paceAfterRequest,
+  paceAfterThrottle,
+  paceDelayMs,
+  paceWaitMs,
+  SPEED_UP_AFTER,
+} from './pace';
 import { INITIAL_SCANNER_STATE, pauseFor } from './state';
 
 // Local wall-clock times, so these hold in any time zone.
@@ -137,14 +147,40 @@ describe('pace', () => {
   const pace = { paceMinMs: 1500, paceMaxMs: 3000 };
 
   it('waits a random 1.5–3 s after the last request', () => {
-    expect(paceWaitMs(1000, pace, () => 0, 1000)).toBe(1500);
-    expect(paceWaitMs(1000, pace, () => 1, 1000)).toBe(3000);
-    expect(paceWaitMs(1000, pace, () => 0.5, 2000)).toBe(1250);
+    expect(paceWaitMs(1000, pace, 1, () => 0, 1000)).toBe(1500);
+    expect(paceWaitMs(1000, pace, 1, () => 1, 1000)).toBe(3000);
+    expect(paceWaitMs(1000, pace, 1, () => 0.5, 2000)).toBe(1250);
   });
 
   it("doesn't wait when the last request was long ago or never", () => {
-    expect(paceWaitMs(0, pace, () => 1, 10_000)).toBe(0);
-    expect(paceWaitMs(null, pace, () => 1, 10_000)).toBe(0);
+    expect(paceWaitMs(0, pace, 1, () => 1, 10_000)).toBe(0);
+    expect(paceWaitMs(null, pace, 1, () => 1, 10_000)).toBe(0);
+  });
+
+  it('scales the wait by the factor, but never below the floor', () => {
+    expect(paceDelayMs(pace, () => 1, 0.5)).toBe(1500);
+    expect(paceDelayMs(pace, () => 0, 0.5)).toBe(750);
+    expect(paceDelayMs(pace, () => 0, 2)).toBe(3000);
+    const fastest = { paceMinMs: 1000, paceMaxMs: 1000 };
+    expect(paceDelayMs(fastest, () => 0, 0.4)).toBe(PACE_FLOOR_MS);
+  });
+
+  it(`speeds up by 10 % after every ${SPEED_UP_AFTER} calm requests, down to half the wait`, () => {
+    let state = INITIAL_PACE;
+    for (let i = 1; i < SPEED_UP_AFTER; i++) state = paceAfterRequest(state);
+    expect(state).toEqual({ factor: 1, calmRequests: SPEED_UP_AFTER - 1 });
+    state = paceAfterRequest(state);
+    expect(state.factor).toBeCloseTo(0.9);
+    expect(state.calmRequests).toBe(0);
+
+    for (let i = 0; i < SPEED_UP_AFTER * 20; i++) state = paceAfterRequest(state);
+    expect(state.factor).toBe(PACE_FACTOR_MIN);
+  });
+
+  it('doubles the wait on a throttle, up to four times, and restarts the calm count', () => {
+    const state = paceAfterThrottle({ factor: 0.5, calmRequests: 42 });
+    expect(state).toEqual({ factor: 1, calmRequests: 0 });
+    expect(paceAfterThrottle({ factor: 3, calmRequests: 0 }).factor).toBe(PACE_FACTOR_MAX);
   });
 });
 

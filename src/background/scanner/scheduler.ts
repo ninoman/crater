@@ -18,7 +18,7 @@ import { abandonFan, runFanStep } from './fanJob';
 import { runFollowReleasesStep } from './followReleasesJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
-import { paceWaitMs } from './pace';
+import { paceAfterRequest, paceAfterThrottle, paceWaitMs } from './pace';
 import { runReleaseStep } from './releaseJob';
 import { pauseFor, type ScannerState, type ScannerStore } from './state';
 
@@ -56,7 +56,13 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
       if (pauseFor(state, settings.dailyRequestBudget, deps.now())) return 'paused';
 
       if (!(await nextJob(db, deps.now()))) return 'idle';
-      const wait = paceWaitMs(state.lastRequestAt, settings, deps.random, deps.now());
+      const wait = paceWaitMs(
+        state.lastRequestAt,
+        settings,
+        state.pace.factor,
+        deps.random,
+        deps.now(),
+      );
       if (wait > 0) {
         await deps.sleep(wait);
         // An import may have paused the scanner while it waited.
@@ -73,6 +79,7 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
         lock: { owner, heartbeatAt: now },
         budget: spend(state.budget, now),
         lastRequestAt: now,
+        pace: paceAfterRequest(state.pace),
       });
       const ctx = { db, fetchJson: deps.fetchJson, fetchText: deps.fetchText, settings, now };
       state = await runJob(deps, job, ctx, state);
@@ -142,7 +149,9 @@ async function handleFailure(
   if (failure.kind === 'throttled') {
     const backoff = nextBackoff(state.backoff, failure.retryAfterMs, ctx.now);
     console.warn(`crater: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
-    return deps.store.save({ backoff, offline: failure.offline, lastError: message });
+    // Being offline says nothing about how fast Bandcamp lets us go.
+    const pace = failure.offline ? state.pace : paceAfterThrottle(state.pace);
+    return deps.store.save({ backoff, offline: failure.offline, lastError: message, pace });
   }
 
   const retryAt = failure.kind === 'transient' ? jobRetryAt(job.attempts, ctx.now) : null;

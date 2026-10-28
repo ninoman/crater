@@ -10,8 +10,8 @@ import {
 const PRESETS = Object.keys(SPEED_PRESETS) as SpeedPreset[];
 
 describe('speed presets', () => {
-  it('reads the defaults as normal', () => {
-    expect(speedPresetOf(DEFAULT_SETTINGS)).toBe('normal');
+  it('reads the defaults as fast', () => {
+    expect(speedPresetOf(DEFAULT_SETTINGS)).toBe('fast');
   });
 
   it.each(PRESETS)('applies and recognises %s, within the allowed limits', (preset) => {
@@ -21,7 +21,7 @@ describe('speed presets', () => {
   });
 
   it('leaves the other settings alone', () => {
-    const settings = applySpeedPreset({ ...DEFAULT_SETTINGS, topCrateMatesK: 50 }, 'gentle');
+    const settings = applySpeedPreset({ ...DEFAULT_SETTINGS, topCrateMatesK: 50 }, 'normal');
     expect(settings.topCrateMatesK).toBe(50);
   });
 

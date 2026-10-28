@@ -12,6 +12,7 @@ function status(patch: Partial<ScannerStatus> = {}): ScannerStatus {
     ownReleases: { scanned: 0, total: 0 },
     requestsToday: 5,
     dailyBudget: 3000,
+    paceFactor: 1,
     pause: null,
     online: true,
     lastError: null,

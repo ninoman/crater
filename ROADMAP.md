@@ -410,7 +410,7 @@ Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate 
 2. [x] Write a privacy policy page: all data stays local, there is no server and no analytics.
 3. [x] Write a short justification for each permission (host permission for bandcamp.com only, plus `alarms` and `storage`).
 4. [ ] Build, zip and submit, then handle review feedback.
-5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage. release-please opens the release PR and CI submits to the store; see `docs/releasing.md`.
+5. [x] Add a version bump and changelog process, plus a quick-patch path for parser breakage. release-please opens the release PR and CI attaches the zip to the GitHub release; the store upload is manual. See `docs/releasing.md`.
 
 Also added: full database export and import on the popup's Settings tab (backup, or moving to a new machine). Import replaces everything and keeps settings, pause and budget (decisions §10).
 
