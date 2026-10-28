@@ -144,6 +144,7 @@ describe('computeDeepCuts', () => {
     expect(await computeDeepCuts(db, undefined, INPUT)).toEqual({
       basis: 'no-viewer',
       rows: [],
+      limit: 30,
       crateMatesUsed: 0,
     });
   });

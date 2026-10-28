@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import type { RowActions } from '../../../hooks/rowActions';
 import { useForYou, type ForYouView } from '../../../hooks/useForYou';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
+import type { ScanActivity } from '../../../shared/scanActivity';
 import {
   Button,
   EmptyState,
@@ -42,6 +44,7 @@ export function ForYouTab() {
   const [mode, setMode] = useState<ForYouMode>('all');
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.forYou', false);
   const { view, reload, refresh, ...actions } = useForYou(mode, hideHeard);
+  const activity = useScanActivity(refresh);
   const picks = view.state === 'ready' ? view.result.rows.length : 0;
 
   return (
@@ -52,7 +55,7 @@ export function ForYouTab() {
             view.state === 'ready' &&
             formatForYouSummary(picks, view.result.crateMatesUsed, mode)}
         </p>
-        {picks > 0 && <ScanningProgress onFansRead={refresh} />}
+        {picks > 0 && <ScanningProgress activity={activity} />}
         <div className="dh-profile__controls">
           <HideHeardToggle checked={hideHeard} onChange={setHideHeard} />
           <Segmented label="Which picks" options={MODES} value={mode} onChange={setMode} />
@@ -62,7 +65,7 @@ export function ForYouTab() {
         view={view}
         mode={mode}
         reload={reload}
-        refresh={refresh}
+        activity={activity}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
       />
@@ -74,14 +77,13 @@ interface ForYouBodyProps {
   view: ForYouView;
   mode: ForYouMode;
   reload: () => void;
-  /** Fetches again quietly, as a scan finds crate mates. */
-  refresh: () => void;
+  activity: ScanActivity | null;
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
 }
 
-function ForYouBody({ view, mode, reload, refresh, actions, onShowHeard }: ForYouBodyProps) {
+function ForYouBody({ view, mode, reload, activity, actions, onShowHeard }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
       return <WorkingState title={LOADING_TITLES[mode]} rows={PICK_ROWS} />;
@@ -97,23 +99,30 @@ function ForYouBody({ view, mode, reload, refresh, actions, onShowHeard }: ForYo
     case 'ready':
       if (view.result.rows.length > 0) {
         return (
-          <ForYouList rows={view.result.rows} mode={mode} now={view.loadedAt} actions={actions} />
+          <ForYouList
+            rows={view.result.rows}
+            limit={view.result.limit}
+            mode={mode}
+            now={view.loadedAt}
+            actions={actions}
+            moreComing={activity?.kind === 'scanning'}
+          />
         );
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;
       }
-      return <NoPicks result={view.result} mode={mode} onFansRead={refresh} />;
+      return <NoPicks result={view.result} mode={mode} activity={activity} />;
   }
 }
 
 interface NoPicksProps {
   result: ForYouResult;
   mode: ForYouMode;
-  onFansRead: () => void;
+  activity: ScanActivity | null;
 }
 
-function NoPicks({ result, mode, onFansRead }: NoPicksProps) {
+function NoPicks({ result, mode, activity }: NoPicksProps) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
@@ -134,7 +143,7 @@ function NoPicks({ result, mode, onFansRead }: NoPicksProps) {
   // Fresh can lack lately crate mates long after crate mates are found, so it doesn't wait on the scan.
   if (mode === 'fresh') return <NoFreshPicks crateMatesUsed={result.crateMatesUsed} />;
   if (result.crateMatesUsed === 0) {
-    return <FindingCrateMates onFansRead={onFansRead} idle={<NoCrateMates />} rows={PICK_ROWS} />;
+    return <FindingCrateMates activity={activity} idle={<NoCrateMates />} rows={PICK_ROWS} />;
   }
   if (mode === 'deep') return <NoDeepCuts />;
   return (

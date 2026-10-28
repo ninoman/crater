@@ -1,16 +1,16 @@
 import { useCrateMates } from '../../../hooks/useCrateMates';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import type { CrateMatesResult } from '../../../shared/crateMates';
-import { Button, EmptyState, type WorkingRows, WorkingState } from '../../../ui';
+import type { ScanActivity } from '../../../shared/scanActivity';
+import { Button, EmptyState, WorkingState } from '../../../ui';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
 import { ScanningProgress } from '../../shared/ScanningProgress';
-import { CrateMatesBoard } from './CrateMatesBoard';
-
-/** A board row: six latest buys, then in common, match, score and trend. */
-const BOARD_ROWS: WorkingRows = { kind: 'people', covers: 6, numbers: 4 };
+import { BOARD_ROWS, CrateMatesBoard } from './CrateMatesBoard';
 
 /** The Crate mates tab on your profile: the leaderboard, or why there isn't one yet. */
 export function CrateMatesTab() {
   const { view, reload, refresh } = useCrateMates();
+  const activity = useScanActivity(refresh);
 
   switch (view.state) {
     case 'loading':
@@ -29,20 +29,21 @@ export function CrateMatesTab() {
         <CrateMatesBoard
           result={view.result}
           now={view.loadedAt}
-          progress={<ScanningProgress onFansRead={refresh} />}
+          progress={<ScanningProgress activity={activity} />}
+          moreComing={activity?.kind === 'scanning'}
         />
       ) : (
-        <NoCrateMates result={view.result} onFansRead={refresh} />
+        <NoCrateMates result={view.result} activity={activity} />
       );
   }
 }
 
 interface NoCrateMatesProps {
   result: CrateMatesResult;
-  onFansRead: () => void;
+  activity: ScanActivity | null;
 }
 
-function NoCrateMates({ result, onFansRead }: NoCrateMatesProps) {
+function NoCrateMates({ result, activity }: NoCrateMatesProps) {
   switch (result.basis) {
     case 'no-viewer':
       return (
@@ -62,7 +63,7 @@ function NoCrateMates({ result, onFansRead }: NoCrateMatesProps) {
     case 'ready':
       return (
         <FindingCrateMates
-          onFansRead={onFansRead}
+          activity={activity}
           rows={BOARD_ROWS}
           idle={
             <EmptyState

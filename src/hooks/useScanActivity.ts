@@ -4,7 +4,8 @@ import { useScannerStatus } from './useScannerStatus';
 
 /**
  * What the scanner is doing, polled while mounted; null until the worker answers. Each time
- * more fans have been read, `onFansRead` runs, so a waiting list can ask for its rows again.
+ * more fans have been read, `onFansRead` runs, so a list built from crate mates can ask for its
+ * rows again.
  */
 export function useScanActivity(onFansRead: () => void): ScanActivity | null {
   const view = useScannerStatus(2000);

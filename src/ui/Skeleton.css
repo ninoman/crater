@@ -17,19 +17,19 @@
   border-bottom: 0;
 }
 
-/* Each row fades a little, so the list trails off rather than ending in a hard edge. */
+/* Each row fades a little, so the list trails off rather than ending in a hard edge. Table
+   placeholders count from the end, since they follow real rows in the same table. */
 .dh-skeleton__row:nth-child(2),
-.dh-skeleton__table-row:nth-child(2) {
+.dh-table__placeholder:nth-last-child(2) {
   opacity: 0.75;
 }
 
 .dh-skeleton__row:nth-child(3),
-.dh-skeleton__table-row:nth-child(3) {
+.dh-table__placeholder:nth-last-child(1) {
   opacity: 0.5;
 }
 
-.dh-skeleton__row:nth-child(n + 4),
-.dh-skeleton__table-row:nth-child(n + 4) {
+.dh-skeleton__row:nth-child(n + 4) {
   opacity: 0.3;
 }
 

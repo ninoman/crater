@@ -20,6 +20,7 @@ import type {
   CrateMatesResult,
 } from '../../shared/crateMates';
 import { readCrateMateBuys } from './crateMateBuys';
+import { CRATE_MATES_KEPT } from './crateMates';
 
 export async function readCrateMatesResult(
   db: CraterDb,
@@ -39,6 +40,7 @@ export async function readCrateMatesResult(
     basis: crateMatesBasis(me),
     rows: await crateMateRows(db, crateMates, followed, buys),
     latelyRows: await crateMateRows(db, latelyCrateMates, followed, buys),
+    limit: CRATE_MATES_KEPT,
     latelyHalfLifeMonths,
     computedAt: crateMates[0]?.computedAt ?? latelyCrateMates[0]?.computedAt ?? null,
     fansRead,

@@ -41,6 +41,7 @@ const RESULT: CrateMatesResult = {
   basis: 'ready',
   rows: [ROW],
   latelyRows: [],
+  limit: 200,
   latelyHalfLifeMonths: 6,
   computedAt: NOW,
   fansRead: 1,

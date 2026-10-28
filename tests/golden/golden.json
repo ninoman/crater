@@ -4889,6 +4889,7 @@
     ]
    }
   ],
+  "limit": 200,
   "latelyHalfLifeMonths": 6,
   "computedAt": 1792627200000,
   "fansRead": 37
@@ -10246,6 +10247,7 @@
     }
    }
   ],
+  "limit": 30,
   "crateMatesUsed": 30
  },
  "forYou fresh": {
@@ -10940,6 +10942,7 @@
     }
    }
   ],
+  "limit": 30,
   "crateMatesUsed": 30
  },
  "deepCuts": {
@@ -11638,6 +11641,7 @@
     }
    }
   ],
+  "limit": 30,
   "crateMatesUsed": 37
  },
  "crateMatesLatest": {
@@ -12411,6 +12415,7 @@
     }
    }
   ],
+  "limit": 50,
   "crateMatesUsed": 34,
   "windowDays": 60,
   "checking": 8

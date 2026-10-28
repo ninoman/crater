@@ -1,7 +1,9 @@
 import { useCrateMatesLatest, type CrateMatesLatestView } from '../../../hooks/useCrateMatesLatest';
 import type { RowActions } from '../../../hooks/rowActions';
+import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
+import type { ScanActivity } from '../../../shared/scanActivity';
 import { Button, EmptyState, LinkButton, StatusDot, WorkingState } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
@@ -14,6 +16,7 @@ import { LatestList } from './LatestList';
 export function LatestTab() {
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.latest', false);
   const { view, reload, refresh, ...actions } = useCrateMatesLatest(hideHeard);
+  const activity = useScanActivity(refresh);
 
   return (
     <>
@@ -28,7 +31,7 @@ export function LatestTab() {
             )}
         </p>
         {view.state === 'ready' && view.result.rows.length > 0 && (
-          <ScanningProgress onFansRead={refresh} />
+          <ScanningProgress activity={activity} />
         )}
         <div className="dh-profile__controls">
           {view.state === 'ready' && view.result.checking > 0 && (
@@ -40,7 +43,7 @@ export function LatestTab() {
       <LatestBody
         view={view}
         reload={reload}
-        refresh={refresh}
+        activity={activity}
         actions={actions}
         onShowHeard={hideHeard ? () => setHideHeard(false) : null}
       />
@@ -51,14 +54,13 @@ export function LatestTab() {
 interface LatestBodyProps {
   view: CrateMatesLatestView;
   reload: () => void;
-  /** Fetches again quietly, as a scan finds crate mates. */
-  refresh: () => void;
+  activity: ScanActivity | null;
   actions: RowActions;
   /** Set while "Hide heard" is on, for an empty list to offer turning it off. */
   onShowHeard: (() => void) | null;
 }
 
-function LatestBody({ view, reload, refresh, actions, onShowHeard }: LatestBodyProps) {
+function LatestBody({ view, reload, activity, actions, onShowHeard }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
       return <WorkingState title="Looking at what your crate mates bought lately" />;
@@ -73,21 +75,28 @@ function LatestBody({ view, reload, refresh, actions, onShowHeard }: LatestBodyP
       );
     case 'ready':
       if (view.result.rows.length > 0) {
-        return <LatestList result={view.result} now={Date.now()} actions={actions} />;
+        return (
+          <LatestList
+            result={view.result}
+            now={Date.now()}
+            actions={actions}
+            moreComing={activity?.kind === 'scanning'}
+          />
+        );
       }
       if (onShowHeard && view.result.basis === 'ready' && view.result.crateMatesUsed > 0) {
         return <AllHeard onShowHeard={onShowHeard} />;
       }
-      return <NoPurchases result={view.result} onFansRead={refresh} />;
+      return <NoPurchases result={view.result} activity={activity} />;
   }
 }
 
 interface NoPurchasesProps {
   result: CrateMatesLatestResult;
-  onFansRead: () => void;
+  activity: ScanActivity | null;
 }
 
-function NoPurchases({ result, onFansRead }: NoPurchasesProps) {
+function NoPurchases({ result, activity }: NoPurchasesProps) {
   if (result.basis === 'no-viewer') {
     return (
       <EmptyState
@@ -107,7 +116,7 @@ function NoPurchases({ result, onFansRead }: NoPurchasesProps) {
   if (result.crateMatesUsed === 0) {
     return (
       <FindingCrateMates
-        onFansRead={onFansRead}
+        activity={activity}
         rows={{ kind: 'releases' }}
         idle={
           <EmptyState

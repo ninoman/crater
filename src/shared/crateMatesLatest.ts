@@ -32,8 +32,10 @@ export interface CrateMatesLatestRow {
 
 export interface CrateMatesLatestResult {
   basis: CrateMatesBasis;
-  /** Newest purchase first. */
+  /** Newest purchase first, at most `limit`. */
   rows: CrateMatesLatestRow[];
+  /** The most rows the feed holds, so a full feed can tell more won't be added. */
+  limit: number;
   /** Crate mates the feed was read from: the top of the lately board, then of the all-time one. */
   crateMatesUsed: number;
   /** How far back purchases count. */

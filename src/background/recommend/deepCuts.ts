@@ -48,7 +48,7 @@ export async function computeDeepCuts(
   input: DeepCutsInput,
 ): Promise<ForYouResult> {
   const basis = crateMatesBasis(me);
-  if (!me) return { basis, rows: [], crateMatesUsed: 0 };
+  if (!me) return { basis, rows: [], limit: FOR_YOU_LIMIT, crateMatesUsed: 0 };
 
   const crateMates = topCrateMates(await getCrateMates(db), DEEP_CUT_CRATE_MATES_K);
   const data = await gatherForYou(
@@ -101,6 +101,7 @@ export async function computeDeepCuts(
   return {
     basis,
     rows,
+    limit: FOR_YOU_LIMIT,
     crateMatesUsed: data.crateMateLists.length,
   };
 }

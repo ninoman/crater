@@ -45,8 +45,10 @@ export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmente
 export { Select, type SelectOption, type SelectProps } from './Select';
 export { SettingRow, type SettingRowIds, type SettingRowProps } from './SettingRow';
 export {
+  SkeletonCovers,
   SkeletonPeopleTable,
   type SkeletonPeopleTableProps,
+  SkeletonPerson,
   SkeletonRows,
   type SkeletonRowsProps,
 } from './Skeleton';

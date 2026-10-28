@@ -11,6 +11,7 @@ const empty: CrateMatesResult = {
   basis: 'ready',
   rows: [],
   latelyRows: [],
+  limit: 200,
   latelyHalfLifeMonths: 12,
   computedAt: null,
   fansRead: 0,
@@ -129,10 +130,25 @@ describe('CrateMatesTab', () => {
     await render();
     expect(text()).toContain('Ten');
     expect(text()).toContain('Scanned 12 of 903 releases');
+    expect(container.querySelectorAll('.dh-table__placeholder')).toHaveLength(3);
 
     status = scanner({ fansScanned: 41 });
     await poll();
     expect(crateMateFetches).toBe(2);
+  });
+
+  it('leaves placeholders off a full board', async () => {
+    board = { ...empty, rows: [mate], limit: 1 };
+    await render();
+    expect(container.querySelector('.dh-table__placeholder')).toBeNull();
+  });
+
+  it('leaves placeholders off while the scanner is paused', async () => {
+    board = { ...empty, rows: [mate] };
+    status = scanner({ pause: { reason: 'manual' } });
+    await render();
+    expect(text()).toContain('Scanning paused at 12 of 903 releases');
+    expect(container.querySelector('.dh-table__placeholder')).toBeNull();
   });
 
   it('holds still while the scanner is paused', async () => {

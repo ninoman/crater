@@ -1,11 +1,10 @@
 import type { ReactNode } from 'react';
-import { useScanActivity } from '../../hooks/useScanActivity';
-import { formatScanLine } from '../../shared/scanActivity';
+import { formatScanLine, type ScanActivity } from '../../shared/scanActivity';
 import { type WorkingRows, WorkingState } from '../../ui';
 
 export interface FindingCrateMatesProps {
-  /** Runs as more fans are read, to fetch the list again. */
-  onFansRead: () => void;
+  /** What the scanner is doing; null until it answers. */
+  activity: ScanActivity | null;
   /** Shown when the scanner has nothing left to do, so waiting won't help. */
   idle: ReactNode;
   /** The shape of the list's rows, for the placeholders. */
@@ -13,9 +12,7 @@ export interface FindingCrateMatesProps {
 }
 
 /** A list built from crate mates while there are none yet: when they'll come, and the scan. */
-export function FindingCrateMates({ onFansRead, idle, rows }: FindingCrateMatesProps) {
-  const activity = useScanActivity(onFansRead);
-
+export function FindingCrateMates({ activity, idle, rows }: FindingCrateMatesProps) {
   if (!activity) return <WorkingState title="Finding your crate mates" rows={rows} />;
   if (activity.kind === 'idle') return idle;
   const stopped = activity.kind === 'stopped';

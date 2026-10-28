@@ -28,6 +28,33 @@ export function SkeletonRows({ count, paused = false, ranked = false }: Skeleton
   );
 }
 
+/** A placeholder avatar and name, as an Identity cell. */
+export function SkeletonPerson() {
+  return (
+    <span className="dh-skeleton__person">
+      <span className="dh-skeleton__block dh-skeleton__avatar" />
+      <span className="dh-skeleton__block dh-skeleton__name" />
+    </span>
+  );
+}
+
+/** A placeholder strip of covers. */
+export function SkeletonCovers({ count }: { count: number }) {
+  return (
+    <span className="dh-skeleton__strip">
+      {Array.from({ length: count }, (_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: placeholders have no identity.
+        <span key={i} className="dh-skeleton__block dh-skeleton__cover" />
+      ))}
+    </span>
+  );
+}
+
+/** A placeholder for a short value, such as a number in a table cell. */
+export function SkeletonValue() {
+  return <span className="dh-skeleton__block dh-skeleton__number" />;
+}
+
 export interface SkeletonPeopleTableProps {
   count: number;
   paused?: boolean;
@@ -38,8 +65,8 @@ export interface SkeletonPeopleTableProps {
 }
 
 /**
- * Placeholder rows shaped like a Table of people: rank, avatar and name, a strip of covers and
- * number columns. Same cells as Table, so the spacing matches when the real rows come in.
+ * Placeholder rows shaped like a Table of people, for when there's no table yet: rank, avatar
+ * and name, a strip of covers and number columns, in Table's own cells.
  */
 export function SkeletonPeopleTable({
   count,
@@ -56,27 +83,19 @@ export function SkeletonPeopleTable({
       <tbody>
         {Array.from({ length: count }, (_, row) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: placeholders have no identity.
-          <tr key={row} className="dh-skeleton__table-row">
+          <tr key={row} className="dh-table__placeholder">
             <td className="dh-table__cell">
-              <span className="dh-skeleton__block dh-skeleton__rank" />
+              <SkeletonValue />
             </td>
             <td className="dh-table__cell">
-              <span className="dh-skeleton__person">
-                <span className="dh-skeleton__block dh-skeleton__avatar" />
-                <span className="dh-skeleton__block dh-skeleton__name" />
-              </span>
+              <SkeletonPerson />
             </td>
             <td className="dh-table__cell dh-table__head--grow">
-              <span className="dh-skeleton__strip">
-                {Array.from({ length: covers }, (_, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: placeholders have no identity.
-                  <span key={i} className="dh-skeleton__block dh-skeleton__cover" />
-                ))}
-              </span>
+              <SkeletonCovers count={covers} />
             </td>
             {numberCells.map((i) => (
               <td key={i} className="dh-table__cell">
-                <span className="dh-skeleton__block dh-skeleton__number" />
+                <SkeletonValue />
               </td>
             ))}
           </tr>
