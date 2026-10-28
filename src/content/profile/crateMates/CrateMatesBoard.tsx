@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { timeAgo } from '../../../shared/timeAgo';
 import type { CrateMateBuy, CrateMateRow, CrateMatesResult } from '../../../shared/crateMates';
 import {
@@ -157,7 +157,14 @@ const BOARDS = [
 ] as const;
 
 /** The leaderboards, all time and lately, with a filter box and sortable columns. */
-export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now: number }) {
+export interface CrateMatesBoardProps {
+  result: CrateMatesResult;
+  now: number;
+  /** Work still adding to the board, shown in the toolbar. */
+  progress?: ReactNode;
+}
+
+export function CrateMatesBoard({ result, now, progress }: CrateMatesBoardProps) {
   const [board, setBoard] = useState<CrateMateBoard>('all');
   const [query, setQuery] = useState('');
   const [sortedBy, setSortedBy] = useState<CrateMateSort>(DEFAULT_SORT.all);
@@ -193,6 +200,7 @@ export function CrateMatesBoard({ result, now }: { result: CrateMatesResult; now
           {boardRows.length === 1 ? 'crate mate' : 'crate mates'} from {result.fansRead} fans read
           {result.computedAt !== null && ` · updated ${timeAgo(result.computedAt, now)}`}
         </p>
+        {progress}
         <div className="dh-profile__controls">
           <Segmented
             label="Which crate mates"

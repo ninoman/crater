@@ -10,11 +10,12 @@ export type CrateMatesLatestView =
 
 /**
  * Fetches Crate mates' latest on mount and whenever `hideHeard` changes. `hide` drops the rows
- * it covers and re-fetches; `reload` asks again, e.g. after an error.
+ * it covers and re-fetches; `reload` asks again, e.g. after an error; `refresh` asks again
+ * without going back to loading.
  */
 export function useCrateMatesLatest(
   hideHeard: boolean,
-): RowActions & { view: CrateMatesLatestView; reload: () => void } {
+): RowActions & { view: CrateMatesLatestView; reload: () => void; refresh: () => void } {
   const [view, setView] = useState<CrateMatesLatestView>({ state: 'loading' });
 
   const load = useCallback(
@@ -41,5 +42,7 @@ export function useCrateMatesLatest(
   );
   const actions = useRowActions(setView, load, fail);
 
-  return { view, reload, ...actions };
+  const refresh = useCallback(() => void load(), [load]);
+
+  return { view, reload, refresh, ...actions };
 }

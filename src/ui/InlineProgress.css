@@ -1,0 +1,16 @@
+.dh-inline-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--dh-space-2);
+  min-width: var(--dh-inline-progress-width);
+}
+
+.dh-inline-progress__label {
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-muted);
+  white-space: nowrap;
+}
+
+.dh-inline-progress .dh-progress {
+  flex: 1;
+}

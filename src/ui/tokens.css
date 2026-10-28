@@ -78,6 +78,12 @@
   --dh-duration: 120ms;
   --dh-duration-reveal: 180ms;
   --dh-duration-shimmer: 1400ms;
+  /* One turn at 33⅓ rpm. */
+  --dh-duration-spin: 1800ms;
+  --dh-record-size: 48px;
+  --dh-working-width: 280px;
+  --dh-inline-progress-width: 12rem;
+  --dh-skeleton-name-width: 96px;
 
   --dh-z-panel: 2147483000;
   --dh-z-tooltip: 2147483001;

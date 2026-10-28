@@ -1,0 +1,81 @@
+.dh-working__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dh-space-1);
+  padding: var(--dh-space-5) var(--dh-space-4) var(--dh-space-4);
+  text-align: center;
+}
+
+.dh-working__record {
+  width: var(--dh-record-size);
+  height: var(--dh-record-size);
+  margin-bottom: var(--dh-space-2);
+  animation: dh-working-spin var(--dh-duration-spin) linear infinite;
+}
+
+.dh-working__disc {
+  fill: var(--dh-color-text);
+}
+
+.dh-working__groove,
+.dh-working__shine {
+  fill: none;
+  stroke: var(--dh-color-bg);
+  stroke-width: 1;
+  opacity: 0.25;
+}
+
+.dh-working__shine {
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.dh-working__label {
+  fill: var(--dh-color-accent);
+}
+
+.dh-working__hole {
+  fill: var(--dh-color-bg);
+}
+
+.dh-working__title {
+  margin: 0;
+  font-size: var(--dh-text-md);
+  font-weight: var(--dh-weight-bold);
+}
+
+.dh-working__line {
+  margin: 0;
+  font-size: var(--dh-text-sm);
+  color: var(--dh-color-muted);
+}
+
+.dh-working__caption {
+  margin: var(--dh-space-1) 0 0;
+  font-size: var(--dh-text-xs);
+  color: var(--dh-color-subtle);
+}
+
+.dh-working__progress {
+  width: 100%;
+  max-width: var(--dh-working-width);
+  margin-top: var(--dh-space-2);
+}
+
+@keyframes dh-working-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.dh-working--paused .dh-working__record {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dh-working__record {
+    animation: none;
+  }
+}

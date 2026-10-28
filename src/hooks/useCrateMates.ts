@@ -8,8 +8,11 @@ export type CrateMatesView =
   | { state: 'ready'; result: CrateMatesResult; loadedAt: number }
   | { state: 'unreachable'; error: string };
 
-/** Fetches the crate-mates leaderboard once on mount. `reload` asks again, e.g. after an error. */
-export function useCrateMates(): { view: CrateMatesView; reload: () => void } {
+/**
+ * Fetches the crate-mates leaderboard on mount. `reload` asks again, e.g. after an error;
+ * `refresh` asks again without going back to loading, e.g. while a scan fills it in.
+ */
+export function useCrateMates(): { view: CrateMatesView; reload: () => void; refresh: () => void } {
   const [view, setView] = useState<CrateMatesView>({ state: 'loading' });
 
   const load = useCallback(
@@ -30,5 +33,7 @@ export function useCrateMates(): { view: CrateMatesView; reload: () => void } {
     void load();
   }, [load]);
 
-  return { view, reload };
+  const refresh = useCallback(() => void load(), [load]);
+
+  return { view, reload, refresh };
 }

@@ -12,12 +12,12 @@ export type ForYouView =
 /**
  * Fetches For you in `mode`, again whenever the mode or `hideHeard` changes. `hide` drops the
  * rows it covers and re-fetches, so the next picks move up; `reload` asks again, e.g. after an
- * error.
+ * error; `refresh` asks again without going back to loading.
  */
 export function useForYou(
   mode: ForYouMode,
   hideHeard: boolean,
-): RowActions & { view: ForYouView; reload: () => void } {
+): RowActions & { view: ForYouView; reload: () => void; refresh: () => void } {
   const [view, setView] = useState<ForYouView>({ state: 'loading' });
   // Only the newest request may set the view, so a slow answer for the old mode can't win.
   const latest = useRef(0);
@@ -49,5 +49,5 @@ export function useForYou(
   );
   const actions = useRowActions(setView, load, fail);
 
-  return { view, reload, ...actions };
+  return { view, reload, refresh: load, ...actions };
 }
