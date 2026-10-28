@@ -12,7 +12,7 @@ export interface NowPlayingProps {
   /** A muted line after the name, e.g. "bought by Sam". */
   detail?: ReactNode;
   /**
-   * `docked`: a fixed-width panel for a Dock. `sticky`: full width, sticking to the bottom of the
+   * `docked`: spans its Dock's width. `sticky`: full width, sticking to the bottom of the
    * window while its container scrolls under it.
    */
   layout: 'docked' | 'sticky';
