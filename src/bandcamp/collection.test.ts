@@ -58,6 +58,14 @@ describe('parseCollectionPage', () => {
     expect(page.items[0]?.addedAt).toBe(Date.parse('21 May 2026 16:58:19 GMT'));
   });
 
+  it('skips subscriptions and keeps paging past them', () => {
+    const page = parseCollectionPage(fixtureJson('collection_items-subscription.json'));
+
+    expect(page.items.map((item) => item.itemKey)).toEqual(['a792094440', 'a2828211009']);
+    // The subscription is last; its token still pages on.
+    expect(page.nextToken).toBe('1788634572:5741628:s::');
+  });
+
   it('returns an empty page for an unknown fan', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-unknown-fan.json'));
 

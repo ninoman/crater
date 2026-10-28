@@ -8,7 +8,8 @@ const apiError = z.object({ error: z.literal(true) });
 export const rawCollectionItem = z.object({
   item_type: z.string(),
   tralbum_id: z.number(),
-  tralbum_type: z.enum(['a', 't']),
+  /** 'a' or 't' for releases; subscriptions use 's'. */
+  tralbum_type: z.string(),
   album_id: z.number().nullish(),
   item_title: z.string(),
   band_id: z.number(),

@@ -2,7 +2,7 @@ import { isCompilation } from './compilation';
 import { itemKey, parseBandcampDate } from './keys';
 import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
-import type { CollectionItem, CollectionList, CollectionPage } from './types';
+import type { CollectionItem, CollectionList, CollectionPage, TralbumType } from './types';
 import { assertNotApiError, validate } from './validate';
 
 const PURCHASE_KINDS = ['album', 'track', 'package'] as const;
@@ -11,12 +11,17 @@ function isPurchaseKind(value: string): value is CollectionItem['purchaseKind'] 
   return (PURCHASE_KINDS as readonly string[]).includes(value);
 }
 
+function isTralbumType(value: string): value is TralbumType {
+  return value === 'a' || value === 't';
+}
+
 /** Maps one raw item. Returns null for item kinds we don't track (e.g. subscriptions). */
 export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null {
-  if (!isPurchaseKind(raw.item_type)) return null;
-  const isAlbumTrack = raw.tralbum_type === 't' && raw.album_id != null;
+  const tralbumType = raw.tralbum_type;
+  if (!isPurchaseKind(raw.item_type) || !isTralbumType(tralbumType)) return null;
+  const isAlbumTrack = tralbumType === 't' && raw.album_id != null;
   return {
-    itemKey: itemKey(raw.tralbum_type, raw.tralbum_id),
+    itemKey: itemKey(tralbumType, raw.tralbum_id),
     albumKey: isAlbumTrack ? itemKey('a', raw.album_id as number) : null,
     title: raw.item_title,
     artist: raw.band_name,
