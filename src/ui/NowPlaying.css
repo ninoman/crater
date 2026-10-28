@@ -7,8 +7,7 @@
 }
 
 .dh-now-playing--docked {
-  width: var(--dh-dock-player-width);
-  max-width: 100%;
+  align-self: stretch;
 }
 
 .dh-now-playing--sticky {

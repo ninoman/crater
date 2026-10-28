@@ -1,13 +1,14 @@
-/* One stack at the bottom of the window, so a bulk bar and a player never overlap. */
+/*
+ * One stack at the bottom of its container, so a bulk bar and a player never overlap. Sticky rather
+ * than fixed so it spans the container's width, like Bandcamp's own collection player.
+ */
 .dh-dock {
-  position: fixed;
+  position: sticky;
   bottom: var(--dh-space-4);
-  left: 50%;
   z-index: var(--dh-z-panel);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--dh-space-2);
-  max-width: calc(100vw - 2 * var(--dh-space-4));
-  transform: translateX(-50%);
+  margin-top: var(--dh-space-2);
 }
