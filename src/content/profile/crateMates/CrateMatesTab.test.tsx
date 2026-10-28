@@ -23,6 +23,7 @@ function scanner(patch: Partial<ScannerStatus> = {}): ScannerStatus {
     ownReleases: { scanned: 12, total: 903 },
     requestsToday: 217,
     dailyBudget: 10_000,
+    paceFactor: 1,
     pause: null,
     online: true,
     lastError: null,

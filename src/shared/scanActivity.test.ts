@@ -8,6 +8,7 @@ const status: ScannerStatus = {
   ownReleases: { scanned: 1, total: 6 },
   requestsToday: 0,
   dailyBudget: 10_000,
+  paceFactor: 1,
   pause: null,
   online: true,
   lastError: null,
