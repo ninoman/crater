@@ -23,7 +23,7 @@ import { computeCrateMatesLatest } from './crateMatesLatest';
 export { getCrateMateStanding, getCrateMateStandings } from './crateMateStanding';
 
 /** Crate mates are recomputed after this many fans finish scanning. */
-export const CRATE_MATES_EVERY_FANS = 25;
+export const CRATE_MATES_EVERY_FANS = 15;
 
 /** Supporters scanned since each release was last scored. Lost with the worker, which is fine. */
 const fansSinceScore = new Map<ItemKey, number>();

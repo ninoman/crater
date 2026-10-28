@@ -334,6 +334,15 @@ export function upgradeJobToV8(job: QueueJob): void {
 }
 
 /**
+ * Moves a weekly follow read queued before v19 from 2.75 to 3.5, behind the seed backlog
+ * (decisions §23). Reads raised by opening the follows tab keep their place. The numbers are
+ * frozen here: the upgrade must mean the same thing whatever the priorities become.
+ */
+export function demoteFollowReadToV19(job: QueueJob): void {
+  if (job.kind === 'followReleases' && job.priority === 2.75) job.priority = 3.5;
+}
+
+/**
  * Flags an item stored before v11 from its artist and title. Track artists aren't stored, so
  * that rule waits for the release page's next fetch (decisions §17).
  */
@@ -528,6 +537,10 @@ export class CraterDb extends Dexie {
     // and `bands` stay as unread fields: rewriting every item would make the upgrade take minutes
     // (§19), and a rescan writes each row afresh.
     this.version(18).stores({ itemNotes: null, itemPrices: null });
+    // v19: weekly follow reads go behind the seed backlog (decisions §23).
+    this.version(19)
+      .stores({})
+      .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(demoteFollowReadToV19));
   }
 }
 
