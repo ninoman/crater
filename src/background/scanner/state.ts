@@ -6,6 +6,7 @@ import type { ScannerPause } from '../../shared/scan';
 import type { Backoff } from './backoff';
 import { budgetExhausted, nextLocalMidnight, type Budget } from './budget';
 import type { Lock } from './lock';
+import { INITIAL_PACE, type AdaptivePace } from './pace';
 
 /** Which parser broke: a job's own, or the profile page that only ranks fans (decisions §12). */
 export type ParserKind = JobKind | 'profile';
@@ -16,6 +17,7 @@ export interface ScannerState {
   offline: boolean;
   budget: Budget | null;
   lastRequestAt: number | null;
+  pace: AdaptivePace;
   lock: Lock | null;
   lastError: string | null;
   /**
@@ -34,6 +36,7 @@ export const INITIAL_SCANNER_STATE: ScannerState = {
   offline: false,
   budget: null,
   lastRequestAt: null,
+  pace: INITIAL_PACE,
   lock: null,
   lastError: null,
   parserError: null,

@@ -59,7 +59,10 @@ async function runSync(requested: SyncMode): Promise<void> {
         fetchJson,
         batchSize: settings.collectionBatchSize,
         // Re-reading settings is also an extension API call, which keeps the worker alive.
-        pause: async () => sleep(paceDelayMs(await loadSettings(), Math.random)),
+        pause: async () => {
+          const [current, scanner] = await Promise.all([loadSettings(), chromeScannerStore.load()]);
+          await sleep(paceDelayMs(current, Math.random, scanner.pace.factor));
+        },
         now: Date.now,
         onProgress: (itemsFetched) => {
           if (activity.state === 'syncing') activity = { ...activity, itemsFetched };
