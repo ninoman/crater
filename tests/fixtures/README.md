@@ -15,6 +15,7 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `collection_items-p1.json` / `-p2.json` | `POST https://bandcamp.com/api/fancollection/1/collection_items` with `{"fan_id":1138719,"older_than_token":"<token>","count":40}` | `parseCollectionPage`, token round trip |
 | `wishlist_items.json` | `POST .../fancollection/1/wishlist_items` with `{"fan_id":1138719,"older_than_token":"<now>::a::","count":40}` | `parseCollectionPage` (wishlist) |
 | `wishlist_items-hidden.json` | wishlist_items for a fan whose wishlist is hidden (`fan_id` 11705655) | hidden wishlist gives `{"error":true}` |
+| `collection_items-subscription.json` | collection_items for `fan_id` 3837945 (2026-10-28), trimmed to two albums and a label subscription (`item_type: "subscription"`, `tralbum_type: "s"`) | subscriptions are skipped, not a parser error |
 | `collection_items-unknown-fan.json` | collection_items with `fan_id: 1` | empty result: `items: []`, `last_token: null` |
 | `collection_items-bad-token.json` | collection_items with `older_than_token: "garbage"` | error shape: HTTP 200 with `{"error":true}` |
 | `following_bands-p1.json` / `-p2.json` | `POST https://bandcamp.com/api/fancollection/1/following_bands` with `{"fan_id":7027105,"older_than_token":"9999999999:","count":5}`, then the `last_token` (2026-10-20) | following parser: band rows, token round trip (decisions §8) |
