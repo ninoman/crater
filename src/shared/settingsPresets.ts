@@ -4,17 +4,16 @@ import { DEFAULT_SETTINGS, type Settings } from './settings';
 
 type SpeedSettings = Pick<Settings, 'paceMinMs' | 'paceMaxMs' | 'dailyRequestBudget'>;
 
-export type SpeedPreset = 'gentle' | 'normal' | 'fast';
+export type SpeedPreset = 'normal' | 'fast';
 
 export const SPEED_PRESETS: Record<SpeedPreset, SpeedSettings> = {
-  gentle: { paceMinMs: 3000, paceMaxMs: 6000, dailyRequestBudget: 3000 },
-  // Normal is the defaults, so a fresh install and a reset both land on it.
-  normal: {
+  normal: { paceMinMs: 1500, paceMaxMs: 3000, dailyRequestBudget: 15_000 },
+  // Fast is the defaults, so a fresh install and a reset both land on it.
+  fast: {
     paceMinMs: DEFAULT_SETTINGS.paceMinMs,
     paceMaxMs: DEFAULT_SETTINGS.paceMaxMs,
     dailyRequestBudget: DEFAULT_SETTINGS.dailyRequestBudget,
   },
-  fast: { paceMinMs: 1000, paceMaxMs: 2000, dailyRequestBudget: 20_000 },
 };
 
 /** Which preset the speed settings match, or 'custom' after hand edits. */

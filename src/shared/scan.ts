@@ -30,6 +30,8 @@ export interface ScannerStatus {
   ownReleases: { scanned: number; total: number };
   requestsToday: number;
   dailyBudget: number;
+  /** The adaptive pace: the configured wait is multiplied by this. Below 1 is faster. */
+  paceFactor: number;
   pause: ScannerPause | null;
   /** The browser's own guess at a network connection, as the worker sees it. */
   online: boolean;

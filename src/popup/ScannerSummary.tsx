@@ -24,7 +24,7 @@ function StateLine({ status, stopped }: { status: ScannerStatus; stopped: boolea
 
 function Ready({ status }: { status: ScannerStatus }) {
   const controls = useScannerControls();
-  const { queued, fansScanned, ownReleases, requestsToday, dailyBudget } = status;
+  const { queued, fansScanned, ownReleases, requestsToday, dailyBudget, paceFactor } = status;
   const pausedByYou = status.pause?.reason === 'manual';
   const fansKnown = fansScanned + queued.fan;
   const now = Date.now();
@@ -50,7 +50,10 @@ function Ready({ status }: { status: ScannerStatus }) {
         <Progress value={fansScanned} max={fansKnown} label="Fans scanned" />
       </div>
       <div className="dh-scanner__meter">
-        <Stat value={`${requestsToday} / ${dailyBudget}`} label="requests today" />
+        <div className="dh-scanner__stats">
+          <Stat value={`${requestsToday} / ${dailyBudget}`} label="requests today" />
+          <Stat value={`×${(1 / paceFactor).toFixed(1)}`} label="pace" />
+        </div>
         <Progress value={requestsToday} max={dailyBudget} label="Daily request budget used" />
       </div>
       <div className="dh-scanner__footer">

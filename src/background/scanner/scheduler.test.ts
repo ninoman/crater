@@ -162,7 +162,7 @@ describe('drainQueue', () => {
       expect.stringMatching(new RegExp(`^fan ${big} \\d+::a::$`)),
       `fan ${big} p:${big}:100`,
     ]);
-    expect(slept).toEqual([2250, 2250, 2250, 2250]);
+    expect(slept).toEqual([1500, 1500, 1500, 1500]);
     expect(store.state.budget?.used).toBe(5);
     expect(store.state.lock).toBeNull();
 
@@ -193,6 +193,7 @@ describe('drainQueue', () => {
 
     expect(await drainQueue(deps())).toBe('paused');
     expect(store.state.backoff).toEqual({ failures: 1, until: START + 120_000 });
+    expect(store.state.pace).toEqual({ factor: 2, calmRequests: 0 });
     expect(await db.queue.toArray()).toEqual([
       expect.objectContaining({ target: '7', attempts: 0, cursor: null }),
     ]);
@@ -221,6 +222,8 @@ describe('drainQueue', () => {
     expect(store.state.backoff?.failures).toBe(2);
     expect(store.state.backoff?.until).toBe(Date.now() + 120_000);
     expect(store.state.offline).toBe(true);
+    // The 503 slowed the pace; being offline didn't slow it further.
+    expect(store.state.pace.factor).toBe(2);
 
     vi.setSystemTime(START + 180_000);
     await drainQueue(deps());

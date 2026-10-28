@@ -1,7 +1,7 @@
 // User-adjustable settings. Stored in chrome.storage.local; everything else lives in IndexedDB.
 
 export interface Settings {
-  /** Random delay between scanner requests, in ms. */
+  /** Random delay between scanner requests, in ms, before the adaptive pace scales it. */
   paceMinMs: number;
   paceMaxMs: number;
   dailyRequestBudget: number;
@@ -40,9 +40,10 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  paceMinMs: 1500,
-  paceMaxMs: 3000,
-  dailyRequestBudget: 10_000,
+  // Fast by default so results show up quickly; the adaptive pace backs off if Bandcamp objects.
+  paceMinMs: 1000,
+  paceMaxMs: 2000,
+  dailyRequestBudget: 30_000,
   collectionCap: 2000,
   collectionBatchSize: 100,
   supportersPerReleaseCap: 500,
@@ -80,7 +81,7 @@ export type BooleanSetting = {
 export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }> = {
   paceMinMs: { min: 1000, max: 60_000 },
   paceMaxMs: { min: 1000, max: 120_000 },
-  dailyRequestBudget: { min: 0, max: 20_000 },
+  dailyRequestBudget: { min: 0, max: 30_000 },
   collectionCap: { min: 100, max: 10_000 },
   collectionBatchSize: { min: 20, max: 500 },
   supportersPerReleaseCap: { min: 80, max: 5000 },
