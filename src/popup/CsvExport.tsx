@@ -20,7 +20,7 @@ function StatusLine({ status }: { status: CsvExportStatus }) {
   switch (status.state) {
     case 'idle':
     case 'working':
-      return 'Your wishlist or collection with tags, notes and ratings, or a For you list, for a spreadsheet.';
+      return 'Your wishlist or collection with tags, or a For you list, for a spreadsheet.';
     case 'exported':
       return (
         <StatusDot tone="ok">
