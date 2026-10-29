@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { inCommonSimilarity, passZeroOrder, readsAhead, type PassZeroInput } from './supporterRank';
+import {
+  inCommonSimilarity,
+  passZeroOrder,
+  readsAhead,
+  seedFanOrder,
+  type PassZeroInput,
+} from './supporterRank';
 
 const ids = (...values: number[]) => Float64Array.from(values).sort();
 
@@ -80,5 +86,44 @@ describe('readsAhead', () => {
     expect(readsAhead(0.05, 0.1)).toBe(true);
     expect(readsAhead(0.049, 0.1)).toBe(false);
     expect(readsAhead(0, 0)).toBe(false);
+  });
+});
+
+describe('seedFanOrder', () => {
+  const mine = new Set([1, 2, 3, 4]);
+  // 1 and 2 are rare releases of yours, 3 and 4 hits.
+  const weights = new Map([
+    [1, 0.4],
+    [2, 0.4],
+    [3, 0.1],
+    [4, 0.1],
+  ]);
+
+  it('puts fans on two or more of your releases first, then rarer shared releases', () => {
+    const order = seedFanOrder({
+      mine,
+      weights,
+      fans: [
+        { fanId: 7, matchIds: ids(1) }, // one rare release
+        { fanId: 8, matchIds: ids(3, 4) }, // two hits
+        { fanId: 9, matchIds: ids(1, 2) }, // two rare releases
+        { fanId: 10, matchIds: ids(1, 50, 60) }, // one of yours, the rest not
+      ],
+    });
+    expect(order).toEqual([9, 8, 7, 10]);
+  });
+
+  it('keeps queue order for ties, including nothing in common', () => {
+    const order = seedFanOrder({
+      mine,
+      weights,
+      fans: [
+        { fanId: 7, matchIds: ids() },
+        { fanId: 8, matchIds: ids(3) },
+        { fanId: 9, matchIds: ids(50) },
+        { fanId: 10, matchIds: ids(4) },
+      ],
+    });
+    expect(order).toEqual([8, 10, 7, 9]);
   });
 });

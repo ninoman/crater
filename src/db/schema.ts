@@ -343,6 +343,16 @@ export function demoteFollowReadToV19(job: QueueJob): void {
 }
 
 /**
+ * Moves a seed fan scan queued before v20 from 3 to 3.25, behind every seed supporter list
+ * (decisions §5), due now instead of at its release's purchase time. Frozen numbers, as above.
+ */
+export function moveSeedFanToV20(job: QueueJob): void {
+  if (job.kind !== 'fan' || job.priority !== 3) return;
+  job.priority = 3.25;
+  job.nextAttemptAt = Math.max(0, job.nextAttemptAt);
+}
+
+/**
  * Flags an item stored before v11 from its artist and title. Track artists aren't stored, so
  * that rule waits for the release page's next fetch (decisions §17).
  */
@@ -541,6 +551,10 @@ export class CraterDb extends Dexie {
     this.version(19)
       .stores({})
       .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(demoteFollowReadToV19));
+    // v20: seed fans wait behind every seed list, scanned horizontally (decisions §5).
+    this.version(20)
+      .stores({})
+      .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(moveSeedFanToV20));
   }
 }
 

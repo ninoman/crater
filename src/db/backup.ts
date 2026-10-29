@@ -16,6 +16,7 @@ import {
   blankLately,
   type CraterDb,
   demoteFollowReadToV19,
+  moveSeedFanToV20,
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
@@ -124,6 +125,8 @@ async function migrateRows(db: CraterDb, fromVersion: number): Promise<void> {
   }
   // v19 put weekly follow reads behind the seed backlog.
   if (fromVersion < 19) await db.queue.toCollection().modify(demoteFollowReadToV19);
+  // v20 put seed fan scans behind every seed supporter list.
+  if (fromVersion < 20) await db.queue.toCollection().modify(moveSeedFanToV20);
 }
 
 /** A backup's JSON, with tables renamed since it was made under their current names. */

@@ -37,6 +37,42 @@ export function passZeroOrder(input: PassZeroInput): number[] {
   return scored.map(({ fanId }) => fanId);
 }
 
+/** Fans on at least this many of your releases are read before the rest of the seed backlog. */
+export const SEED_SHARED_FIRST = 2;
+
+export interface SeedOrderInput {
+  /** Your collection's match ids. */
+  mine: ReadonlySet<number>;
+  /** w(i) for every id in `mine`. */
+  weights: ReadonlyMap<number, number>;
+  /** In queue order. `matchIds` is what we know they own, often only your releases' lists. */
+  fans: readonly { fanId: number; matchIds: ArrayLike<number> }[];
+}
+
+/**
+ * The seed backlog's order across all your releases (decisions §5): fans on two or more of them
+ * first, then Σ w(i) over the releases they share with you, so two rare releases beat two hits.
+ * Match ids count each release once, whether the fan bought the album or tracks. Ties keep
+ * queue order.
+ */
+export function seedFanOrder(input: SeedOrderInput): number[] {
+  const scored = input.fans.map(({ fanId, matchIds }, position) => {
+    let shared = 0;
+    let score = 0;
+    for (let i = 0; i < matchIds.length; i++) {
+      const id = matchIds[i] as number;
+      if (!input.mine.has(id)) continue;
+      shared += 1;
+      score += input.weights.get(id) ?? 0;
+    }
+    return { fanId, first: shared >= SEED_SHARED_FIRST, score, position };
+  });
+  scored.sort(
+    (a, b) => Number(b.first) - Number(a.first) || b.score - a.score || a.position - b.position,
+  );
+  return scored.map(({ fanId }) => fanId);
+}
+
 /**
  * Pass 1: Bandcamp's in-common count scaled by both collection sizes, count / √(yours · theirs),
  * so a fan who owns everything doesn't win on volume. 0 when either side is empty.

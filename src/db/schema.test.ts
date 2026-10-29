@@ -313,4 +313,28 @@ describe('CraterDb', () => {
     ]);
     await upgraded.delete();
   });
+
+  it('moves seed fan scans behind every seed list in v20', async () => {
+    const name = `test-${crypto.randomUUID()}`;
+    const old = new Dexie(name);
+    old.version(19).stores({ queue: '++id, &[kind+target], [priority+nextAttemptAt+rank]' });
+    const base = { attempts: 0, rank: 1, cursor: null, via: null };
+    await old.table('queue').bulkAdd([
+      { ...base, kind: 'fan', target: '1', priority: 3, nextAttemptAt: -500 },
+      { ...base, kind: 'fan', target: '2', priority: 3, nextAttemptAt: 9_000 },
+      { ...base, kind: 'fan', target: '3', priority: 2, nextAttemptAt: -500 },
+      { ...base, kind: 'release', target: 'a1', url: 'u', priority: 3, nextAttemptAt: -500 },
+    ]);
+    old.close();
+
+    const upgraded = new CraterDb(name);
+    const jobs = await upgraded.queue.toArray();
+    expect(jobs.map((job) => [job.target, job.priority, job.nextAttemptAt])).toEqual([
+      ['1', 3.25, 0],
+      ['2', 3.25, 9_000],
+      ['3', 2, -500],
+      ['a1', 3, -500],
+    ]);
+    await upgraded.delete();
+  });
 });

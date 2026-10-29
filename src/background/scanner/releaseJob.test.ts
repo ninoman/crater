@@ -5,7 +5,7 @@ import { ParserError, type BandcampRequest } from '../../bandcamp';
 import { CraterDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
-import { FOREGROUND, SEED } from './priority';
+import { BACKGROUND, FOREGROUND, SEED, SEED_FANS } from './priority';
 import { runReleaseStep } from './releaseJob';
 
 const NOW = 1_800_000_000_000;
@@ -111,11 +111,19 @@ describe('runReleaseStep', () => {
   });
 
   it("queues fans at the release job's priority and place in line", async () => {
-    await runReleaseStep(context(86), { ...job(), priority: 3, nextAttemptAt: -500 });
+    await runReleaseStep(context(86), { ...job(), priority: BACKGROUND, nextAttemptAt: -500 });
 
     const queued = await db.queue.toArray();
     expect(queued).toHaveLength(86);
-    expect(queued.every((q) => q.priority === 3 && q.nextAttemptAt === -500)).toBe(true);
+    expect(queued.every((q) => q.priority === BACKGROUND && q.nextAttemptAt === -500)).toBe(true);
+  });
+
+  it("queues a seed list's fans behind every seed list, due now", async () => {
+    await runReleaseStep(context(86), { ...job(), priority: SEED, nextAttemptAt: -500 });
+
+    const queued = await db.queue.toArray();
+    expect(queued).toHaveLength(86);
+    expect(queued.every((q) => q.priority === SEED_FANS && q.nextAttemptAt === 0)).toBe(true);
   });
 
   it('keeps page order, then ranks supporters by what they own of yours once the list is in', async () => {
