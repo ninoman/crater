@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/ninoman/crater/compare/v0.8.0...v0.8.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* **scanner:** keep scanning through network errors and custom domains ([#23](https://github.com/ninoman/crater/issues/23)) ([3b6c7a0](https://github.com/ninoman/crater/commit/3b6c7a0851aeb12da78c72f5f7945af973b487e3))
+
 ## [0.8.0](https://github.com/ninoman/crater/compare/v0.7.0...v0.8.0) (2026-10-29)
 
 
