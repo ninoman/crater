@@ -209,6 +209,7 @@ describe('the following tab', () => {
     expect(bar(doc)?.textContent).not.toContain('Still syncing');
   });
 
+  // Renders 240 cards in jsdom: ~2 s locally, past the 5 s default on CI runners.
   it('builds cards a page at a time', async () => {
     const [first] = rows;
     if (!first) throw new Error('no fixture rows');
@@ -230,5 +231,5 @@ describe('the following tab', () => {
     expect(more?.textContent).toBe('Show more (180 left)');
     await act(async () => more?.click());
     expect(ourCards(doc)).toHaveLength(240);
-  });
+  }, 20_000);
 });
