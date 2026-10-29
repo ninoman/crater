@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/ninoman/crater/compare/v0.6.0...v0.7.0) (2026-10-29)
+
+
+### Features
+
+* **profile:** quick loads show a toolbar line over placeholders; first scan waits without them ([c83cbfe](https://github.com/ninoman/crater/commit/c83cbfe370f4eb9d1014240ccc9b9e8d7e7caf4a))
+* **profile:** quick loads show a toolbar line over placeholders; first scan waits without them ([07ffde1](https://github.com/ninoman/crater/commit/07ffde1ca57307c60262b8cda8decf323aca7089))
+
+
+### Bug Fixes
+
+* **scanner:** list track-only releases fully and keep crate mates fresh ([cc371d5](https://github.com/ninoman/crater/commit/cc371d535ef3da0fc670fc6d47ebe8f9fe69fc91))
+* **scanner:** list track-only releases fully and keep crate mates fresh ([09026d6](https://github.com/ninoman/crater/commit/09026d6254191cae6ef42effe13f8dfc025a8004))
+
 ## [0.6.0](https://github.com/ninoman/crater/compare/v0.5.0...v0.6.0) (2026-10-28)
 
 
