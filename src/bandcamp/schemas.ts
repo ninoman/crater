@@ -63,6 +63,8 @@ export const rawTralbum = z.object({
   artist: z.string(),
   art_id: z.number().nullish(),
   url: z.string(),
+  /** A track's album, relative to the band's host: "/album/promises". */
+  album_url: z.string().nullish(),
   current: z.object({
     title: z.string(),
     band_id: z.number(),

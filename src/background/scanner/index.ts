@@ -81,7 +81,11 @@ const deps: SchedulerDeps = {
   owner: crypto.randomUUID(),
   waitForOwnSync: ownSyncSettled,
   onStep: async (job, event) => {
-    if (event === 'finished' && job.kind === 'fan') onFanScanned();
+    if (event === 'finished' && job.kind === 'fan') {
+      onFanScanned().catch((error: unknown) =>
+        console.warn('crater: could not check crate mates', error),
+      );
+    }
     if (event === 'finished' && job.kind === 'followReleases') {
       notifyWhenRoundEnds().catch((error: unknown) =>
         console.warn('crater: could not notify about follows', error),

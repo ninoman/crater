@@ -26,6 +26,7 @@ export function parseReleasePage(html: string): ReleasePage {
   const tralbum = validate(rawTralbum, tralbumJson, 'data-tralbum');
   const type = tralbum.item_type === 'album' ? 'a' : 't';
   const albumId = type === 't' ? tralbum.current.album_id : null;
+  const albumKey = albumId == null ? null : itemKey('a', albumId);
   const { tags, albumTitle } = readLd(html);
 
   // A release with no supporters yet has no collectors blob.
@@ -38,7 +39,7 @@ export function parseReleasePage(html: string): ReleasePage {
   return {
     item: {
       itemKey: itemKey(type, tralbum.id),
-      albumKey: albumId == null ? null : itemKey('a', albumId),
+      albumKey,
       title: tralbum.current.title,
       artist: tralbum.artist,
       bandId: tralbum.current.band_id,
@@ -58,6 +59,10 @@ export function parseReleasePage(html: string): ReleasePage {
           ...collectors.thumbs.map((raw) => toSupporter(raw, false)),
         ]
       : [],
+    album:
+      albumKey && tralbum.album_url
+        ? { itemKey: albumKey, url: new URL(tralbum.album_url, tralbum.url).href }
+        : null,
     moreThumbsAvailable: collectors?.more_thumbs_available ?? false,
     moreReviewsAvailable: collectors?.more_reviews_available ?? false,
   };

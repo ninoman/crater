@@ -60,7 +60,7 @@ async function queuedTargets(): Promise<string[]> {
 }
 
 describe('ownReleases', () => {
-  it('keeps one release per matchKey, preferring the album, newest purchase first', () => {
+  it('keeps one release per matchKey, newest purchase first: the album when owned, else your tracks and the album', () => {
     expect(
       ownReleases([
         row('a1', 100),
@@ -70,9 +70,9 @@ describe('ownReleases', () => {
         row('a6', null),
       ]),
     ).toEqual([
-      { itemKey: 'a1', matchKey: 'a1', addedAt: 300, itemKeys: ['a1', 't2'] },
-      { itemKey: 't5', matchKey: 'a4', addedAt: 250, itemKeys: ['t3', 't5'] },
-      { itemKey: 'a6', matchKey: 'a6', addedAt: null, itemKeys: ['a6'] },
+      { matchKey: 'a1', addedAt: 300, targets: ['a1'], itemKeys: ['a1', 't2'] },
+      { matchKey: 'a4', addedAt: 250, targets: ['t5', 't3', 'a4'], itemKeys: ['t3', 't5'] },
+      { matchKey: 'a6', addedAt: null, targets: ['a6'], itemKeys: ['a6'] },
     ]);
   });
 });
@@ -90,6 +90,14 @@ describe('seedOwnReleases', () => {
       url: 'https://artist.bandcamp.com/a1',
     });
     expect(await queuedTargets()).toEqual(['a1', 'a3']);
+  });
+
+  it('queues each of your tracks when you only own tracks of an album', async () => {
+    await own([row('t2', 100, { matchKey: 'a1' }), row('t3', 200, { matchKey: 'a1' })]);
+
+    // The album has no item yet, so its URL comes from the first track page read.
+    expect(await seedOwnReleases(db, ME, NOW)).toBe(2);
+    expect((await queuedTargets()).sort()).toEqual(['t2', 't3']);
   });
 
   it('skips releases whose supporters are still fresh', async () => {
@@ -132,5 +140,14 @@ describe('ownReleaseProgress', () => {
     await db.releaseSupporters.put({ itemKey: 'a1', fanIds: [], fetchedAt: 0 });
 
     expect(await ownReleaseProgress(db, ME)).toEqual({ scanned: 1, total: 2 });
+  });
+
+  it('counts a track-only release once its tracks and the album are all listed', async () => {
+    await own([row('t2', 100, { matchKey: 'a1' })]);
+    await db.releaseSupporters.put({ itemKey: 't2', fanIds: [], fetchedAt: 0 });
+    expect(await ownReleaseProgress(db, ME)).toEqual({ scanned: 0, total: 1 });
+
+    await db.releaseSupporters.put({ itemKey: 'a1', fanIds: [], fetchedAt: 0 });
+    expect(await ownReleaseProgress(db, ME)).toEqual({ scanned: 1, total: 1 });
   });
 });
