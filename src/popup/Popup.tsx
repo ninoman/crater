@@ -50,6 +50,14 @@ function SettingsTab() {
   return (
     <>
       <SettingsPanel />
+    </>
+  );
+}
+
+// Occasional, file-level jobs kept apart from everyday settings, with Clear away from them.
+function DataTab() {
+  return (
+    <>
       <TagBackup />
       <CsvExport />
       <DatabaseBackup />
@@ -80,6 +88,7 @@ export function Popup() {
             content: <StatusTab connected={worker.state === 'connected'} />,
           },
           { value: 'settings', label: 'Settings', content: <SettingsTab /> },
+          { value: 'data', label: 'Data', content: <DataTab /> },
           // What you hid from recommendations, to unhide (decisions §22).
           { value: 'hidden', label: 'Hidden', content: <HiddenList /> },
         ]}
