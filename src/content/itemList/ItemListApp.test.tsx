@@ -290,6 +290,7 @@ describe('the wishlist tab', () => {
     expect(cards(doc)[0]?.querySelectorAll('.dh-tag-editor .dh-chip')).toHaveLength(2);
   });
 
+  // Renders 240 cards in jsdom: ~2 s locally, past the 5 s default on CI runners.
   it('renders a long wishlist a page at a time', async () => {
     items = Array.from({ length: 300 }, (_, n) => wish(300 - n, []));
     const doc = fanPage();
@@ -302,7 +303,7 @@ describe('the wishlist tab', () => {
     expect(more?.textContent).toBe('Show more (180 left)');
     await act(async () => more?.click());
     expect(cards(doc)).toHaveLength(240);
-  });
+  }, 20_000);
 
   it('marks heard releases with a badge and a dimmed cover', async () => {
     items = [wish(1, [], { heard: true }), wish(2, [])];
