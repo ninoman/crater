@@ -2,7 +2,7 @@ import { useCrateMates } from '../../../hooks/useCrateMates';
 import { useScanActivity } from '../../../hooks/useScanActivity';
 import type { CrateMatesResult } from '../../../shared/crateMates';
 import type { ScanActivity } from '../../../shared/scanActivity';
-import { Button, EmptyState, WorkingState } from '../../../ui';
+import { Button, EmptyState, SkeletonPeopleTable, WorkingState } from '../../../ui';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
 import { ScanningProgress } from '../../shared/ScanningProgress';
 import { BOARD_ROWS, CrateMatesBoard } from './CrateMatesBoard';
@@ -14,7 +14,16 @@ export function CrateMatesTab() {
 
   switch (view.state) {
     case 'loading':
-      return <WorkingState title="Loading your crate mates" rows={BOARD_ROWS} />;
+      return (
+        <>
+          <div className="dh-profile__toolbar">
+            <p className="dh-profile__summary" role="status">
+              Loading your crate mates…
+            </p>
+          </div>
+          <SkeletonPeopleTable count={3} covers={BOARD_ROWS.covers} numbers={BOARD_ROWS.numbers} />
+        </>
+      );
     case 'unreachable':
       return (
         <EmptyState
@@ -54,17 +63,12 @@ function NoCrateMates({ result, activity }: NoCrateMatesProps) {
       );
     case 'unsynced':
       return (
-        <WorkingState
-          title="Syncing your collection"
-          line="Crate mates are found once it's in."
-          rows={BOARD_ROWS}
-        />
+        <WorkingState title="Syncing your collection" line="Crate mates are found once it's in." />
       );
     case 'ready':
       return (
         <FindingCrateMates
           activity={activity}
-          rows={BOARD_ROWS}
           idle={
             <EmptyState
               title="No crate mates yet"

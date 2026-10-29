@@ -12,6 +12,8 @@
 }
 
 .dh-profile__toolbar {
+  /* As tall as its controls even before they show, so the rows below don't move when a board loads. */
+  min-height: var(--dh-field-height);
   display: flex;
   flex-wrap: wrap;
   align-items: center;

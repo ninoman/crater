@@ -13,7 +13,6 @@ import {
   SkeletonPerson,
   Table,
   type TableColumn,
-  type WorkingRows,
 } from '../../../ui';
 import {
   filterCrateMates,
@@ -32,7 +31,8 @@ import { CrateMateBuys } from './CrateMateBuys';
 type Column = TableColumn<CrateMateRow, CrateMateSort>;
 
 /** Placeholders shaped like a board row: six latest buys, then four number columns. */
-export const BOARD_ROWS = { kind: 'people', covers: 6, numbers: 4 } as const satisfies WorkingRows;
+/** The board's shape, for placeholders while it loads. */
+export const BOARD_ROWS = { covers: 6, numbers: 4 } as const;
 
 const RANK: Column = { key: 'rank', header: '#', numeric: true, cell: (row) => row.rank };
 const FAN: Column = {

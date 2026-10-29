@@ -5,14 +5,7 @@ import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
 import type { ScanActivity } from '../../../shared/scanActivity';
-import {
-  Button,
-  EmptyState,
-  LinkButton,
-  Segmented,
-  type WorkingRows,
-  WorkingState,
-} from '../../../ui';
+import { Button, EmptyState, LinkButton, Segmented, SkeletonRows, WorkingState } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
 import { ScanningProgress } from '../../shared/ScanningProgress';
@@ -25,9 +18,6 @@ const MODES = [
   { value: 'fresh', label: 'Fresh' },
   { value: 'deep', label: 'Deep cuts' },
 ] as const;
-
-/** Picks are ranked ReleaseRows. */
-const PICK_ROWS: WorkingRows = { kind: 'releases', ranked: true };
 
 const LOADING_TITLES: Record<ForYouMode, string> = {
   all: 'Finding releases for you',
@@ -50,7 +40,8 @@ export function ForYouTab() {
   return (
     <>
       <div className="dh-profile__toolbar">
-        <p className="dh-profile__summary">
+        <p className="dh-profile__summary" role="status">
+          {view.state === 'loading' && `${LOADING_TITLES[mode]}…`}
           {picks > 0 &&
             view.state === 'ready' &&
             formatForYouSummary(picks, view.result.crateMatesUsed, mode)}
@@ -86,7 +77,7 @@ interface ForYouBodyProps {
 function ForYouBody({ view, mode, reload, activity, actions, onShowHeard }: ForYouBodyProps) {
   switch (view.state) {
     case 'loading':
-      return <WorkingState title={LOADING_TITLES[mode]} rows={PICK_ROWS} />;
+      return <SkeletonRows count={3} ranked />;
     case 'unreachable':
       return (
         <EmptyState
@@ -136,14 +127,13 @@ function NoPicks({ result, mode, activity }: NoPicksProps) {
       <WorkingState
         title="Syncing your collection"
         line="Picks come once your crate mates are found."
-        rows={PICK_ROWS}
       />
     );
   }
   // Fresh can lack lately crate mates long after crate mates are found, so it doesn't wait on the scan.
   if (mode === 'fresh') return <NoFreshPicks crateMatesUsed={result.crateMatesUsed} />;
   if (result.crateMatesUsed === 0) {
-    return <FindingCrateMates activity={activity} idle={<NoCrateMates />} rows={PICK_ROWS} />;
+    return <FindingCrateMates activity={activity} idle={<NoCrateMates />} />;
   }
   if (mode === 'deep') return <NoDeepCuts />;
   return (
