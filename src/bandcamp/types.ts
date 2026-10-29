@@ -59,6 +59,8 @@ export interface ReleasePage {
   item: ReleasePageItem;
   /** First page of supporters embedded in the HTML: reviewers, then thumbs. */
   supporters: Supporter[];
+  /** For a track that belongs to an album, the album, so its buyers can be listed too. */
+  album: { itemKey: ItemKey; url: string } | null;
   moreThumbsAvailable: boolean;
   moreReviewsAvailable: boolean;
 }

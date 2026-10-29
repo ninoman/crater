@@ -40,15 +40,24 @@ function Ready({ status }: { status: ScannerStatus }) {
         <div className="dh-scanner__stats">
           <Stat value={`${fansScanned} / ${fansKnown}`} label="fans scanned" />
           {queued.release > 0 && <Stat value={queued.release} label="releases queued" />}
-          {ownReleases.total > 0 && (
+        </div>
+        <Progress value={fansScanned} max={fansKnown} label="Fans scanned" />
+      </div>
+      {ownReleases.total > 0 && (
+        <div className="dh-scanner__meter">
+          <div className="dh-scanner__stats">
             <Stat
               value={`${ownReleases.scanned} / ${ownReleases.total}`}
               label="your releases scanned"
             />
-          )}
+          </div>
+          <Progress
+            value={ownReleases.scanned}
+            max={ownReleases.total}
+            label="Your releases scanned"
+          />
         </div>
-        <Progress value={fansScanned} max={fansKnown} label="Fans scanned" />
-      </div>
+      )}
       <div className="dh-scanner__meter">
         <div className="dh-scanner__stats">
           <Stat value={`${requestsToday} / ${dailyBudget}`} label="requests today" />

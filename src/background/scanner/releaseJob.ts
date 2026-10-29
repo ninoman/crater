@@ -5,6 +5,7 @@ import {
   ParserError,
   fetchReleasePage,
   fetchSupportersPage,
+  type ItemKey,
   type ReleaseInfo,
   type Supporter,
 } from '../../bandcamp';
@@ -15,14 +16,16 @@ import {
   fanJob,
   getItem,
   saveReleaseSupporters,
+  supportersFetchedAt,
   upsertReleasePageItem,
   upsertSupporterFans,
   type ReleaseCursor,
   type ReleaseJob,
 } from '../../db';
 import type { StepContext } from './context';
-import { needsFanScan } from './freshness';
+import { needsFanScan, supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
+import { SEED } from './priority';
 
 /** The site pages supporters 100 at a time too. */
 const SUPPORTERS_PAGE_SIZE = 100;
@@ -41,6 +44,7 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
     throw new ParserError('release page', `expected ${job.target}, got ${page.item.itemKey}`);
   }
   await upsertReleasePageItem(ctx.db, page.item);
+  if (job.priority === SEED && page.album) await queueOwnTrackAlbum(ctx, job, page.album);
   const supporters = page.supporters.slice(0, ctx.settings.supportersPerReleaseCap);
   await saveReleaseSupporters(
     ctx.db,
@@ -57,6 +61,21 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
     reviewsToken: page.moreReviewsAvailable ? lastToken(true) : null,
     collected: supporters.length,
   });
+}
+
+/**
+ * A seed job on a track means you own tracks of its album but not the album, and the album's
+ * buyers are crate mate candidates too. Only a track page knows the album's URL.
+ */
+async function queueOwnTrackAlbum(
+  ctx: StepContext,
+  job: ReleaseJob,
+  album: { itemKey: ItemKey; url: string },
+): Promise<void> {
+  const listedAt = (await supportersFetchedAt(ctx.db, [album.itemKey])).get(album.itemKey);
+  if (listedAt !== undefined && supportersAreFresh({ fetchedAt: listedAt }, ctx.now)) return;
+  const spec = { kind: 'release' as const, target: album.itemKey, url: album.url };
+  await enqueueAt(ctx.db, [{ spec, at: job.nextAttemptAt }], SEED);
 }
 
 /** Thumbs first, since they're the most recent buyers; reviewers fill what's left of the cap. */

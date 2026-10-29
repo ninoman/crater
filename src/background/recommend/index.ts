@@ -2,7 +2,7 @@
 // sidebar's requests, and keeps the crate-mates leaderboard up to date.
 
 import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
-import { db, getMe, type JobKind } from '../../db';
+import { countReadFans, db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
 import type { ReleaseCrateMatesResult } from '../../shared/releaseCrateMates';
@@ -19,15 +19,15 @@ import { rescoreDue } from './rescore';
 import { readCrateMatesResult } from './crateMateRows';
 import { computeCrateMates } from './crateMates';
 import { computeCrateMatesLatest } from './crateMatesLatest';
+import { chromeCrateMatesBasisStore, recomputeDue } from './crateMatesBasis';
 
 export { getCrateMateStanding, getCrateMateStandings } from './crateMateStanding';
 
-/** Crate mates are recomputed after this many fans finish scanning. */
+/** Crate mates are recomputed after this many more fans are read. */
 export const CRATE_MATES_EVERY_FANS = 15;
 
 /** Supporters scanned since each release was last scored. Lost with the worker, which is fine. */
 const fansSinceScore = new Map<ItemKey, number>();
-let fansSinceCrateMates = 0;
 let crateMatesRun: Promise<void> | null = null;
 let crateMatesAgain = false;
 
@@ -79,8 +79,16 @@ export async function getCrateMatesLatest(hideHeard: boolean): Promise<CrateMate
   });
 }
 
-/** Both crate mates leaderboards for the Crate mates tab on your profile. */
+/**
+ * Both crate mates leaderboards for the Crate mates tab on your profile. Fans read since the last
+ * recompute are folded in first, so the tab never shows a list older than its fans count.
+ */
 export async function getCrateMatesResult(): Promise<CrateMatesResult> {
+  const [fansRead, atLastRecompute] = await Promise.all([
+    countReadFans(db),
+    chromeCrateMatesBasisStore.load(),
+  ]);
+  if (fansRead !== atLastRecompute) await refreshCrateMates();
   return readCrateMatesResult(db, (await loadSettings()).latelyHalfLifeMonths);
 }
 
@@ -112,34 +120,43 @@ export async function onScanStep(
   );
 }
 
-/** Recomputes crate mates now, or once more after the running pass if one is under way. */
-export function refreshCrateMates(): void {
-  fansSinceCrateMates = 0;
+/**
+ * Recomputes crate mates now, or once more after the running pass if one is under way. Resolves
+ * when no pass is left; failures are logged, not thrown.
+ */
+export function refreshCrateMates(): Promise<void> {
   if (crateMatesRun) {
     crateMatesAgain = true;
-    return;
+    return crateMatesRun;
   }
   crateMatesRun = (async () => {
     do {
       crateMatesAgain = false;
       const me = await getMe(db);
       if (!me) return;
+      const fansRead = await countReadFans(db);
       await computeCrateMates(
         { db, settings: await loadSettings(), now: Date.now(), yieldNow: yieldToEvents },
         me.fanId,
       );
+      await chromeCrateMatesBasisStore.save(fansRead);
     } while (crateMatesAgain);
   })()
     .catch((error: unknown) => console.error('crater: crate mates recompute failed', error))
     .finally(() => {
       crateMatesRun = null;
     });
+  return crateMatesRun;
 }
 
-/** A fan's collection scan ended. Every few fans, the leaderboard catches up. */
-export function onFanScanned(): void {
-  fansSinceCrateMates++;
-  if (fansSinceCrateMates >= CRATE_MATES_EVERY_FANS) refreshCrateMates();
+/** A fan's collection scan ended. Every few fans read, the leaderboard catches up. */
+export async function onFanScanned(): Promise<void> {
+  if (crateMatesRun) return;
+  const [fansRead, atLastRecompute] = await Promise.all([
+    countReadFans(db),
+    chromeCrateMatesBasisStore.load(),
+  ]);
+  if (recomputeDue(fansRead, atLastRecompute, CRATE_MATES_EVERY_FANS)) void refreshCrateMates();
 }
 
 function yieldToEvents(): Promise<void> {

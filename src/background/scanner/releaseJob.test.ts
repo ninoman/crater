@@ -5,6 +5,7 @@ import { ParserError, type BandcampRequest } from '../../bandcamp';
 import { CraterDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import type { StepContext } from './context';
+import { FOREGROUND, SEED } from './priority';
 import { runReleaseStep } from './releaseJob';
 
 const NOW = 1_800_000_000_000;
@@ -189,5 +190,40 @@ describe('runReleaseStep', () => {
     await expect(runReleaseStep(context(500), { ...job(), target: 'a1' })).rejects.toThrow(
       ParserError,
     );
+  });
+});
+
+describe('a seed job on your track', () => {
+  const TRACK = 't3961474810';
+  const trackJob = (priority: number): ReleaseJob => ({
+    ...job(),
+    target: TRACK,
+    url: 'https://floatingpoints.bandcamp.com/track/movement-1',
+    priority,
+  });
+  const trackContext = (): StepContext => ({
+    ...context(10),
+    fetchText: async () => fixtureText('track-page.html'),
+  });
+
+  it('queues its album too, whose buyers the track list leaves out', async () => {
+    await runReleaseStep(trackContext(), trackJob(SEED));
+
+    expect((await db.queue.toArray()).filter((queued) => queued.target === PROMISES)).toEqual([
+      expect.objectContaining({
+        kind: 'release',
+        url: 'https://floatingpoints.bandcamp.com/album/promises',
+        priority: SEED,
+      }),
+    ]);
+  });
+
+  it("doesn't when the album's supporters are fresh, or the track is just one you opened", async () => {
+    await db.releaseSupporters.put({ itemKey: PROMISES, fanIds: [], fetchedAt: NOW });
+    await runReleaseStep(trackContext(), trackJob(SEED));
+    await db.releaseSupporters.delete(PROMISES);
+    await runReleaseStep(trackContext(), trackJob(FOREGROUND));
+
+    expect((await db.queue.toArray()).some((queued) => queued.target === PROMISES)).toBe(false);
   });
 });

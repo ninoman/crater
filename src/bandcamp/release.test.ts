@@ -48,6 +48,10 @@ describe('parseReleasePage', () => {
     expect(page.item.albumKey).toBe('a3149089081');
     expect(page.item.title).toBe('Movement 1');
     expect(page.supporters).toHaveLength(80);
+    expect(page.album).toEqual({
+      itemKey: 'a3149089081',
+      url: 'https://floatingpoints.bandcamp.com/album/promises',
+    });
   });
 
   it('parses a small release with no more supporters', () => {
