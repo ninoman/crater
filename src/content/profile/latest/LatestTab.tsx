@@ -4,7 +4,7 @@ import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
 import type { ScanActivity } from '../../../shared/scanActivity';
-import { Button, EmptyState, LinkButton, StatusDot, WorkingState } from '../../../ui';
+import { Button, EmptyState, LinkButton, SkeletonRows, StatusDot, WorkingState } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
 import { ScanningProgress } from '../../shared/ScanningProgress';
@@ -21,7 +21,8 @@ export function LatestTab() {
   return (
     <>
       <div className="dh-profile__toolbar">
-        <p className="dh-profile__summary">
+        <p className="dh-profile__summary" role="status">
+          {view.state === 'loading' && 'Looking at what your crate mates bought lately…'}
           {view.state === 'ready' &&
             view.result.rows.length > 0 &&
             formatLatestSummary(
@@ -63,7 +64,7 @@ interface LatestBodyProps {
 function LatestBody({ view, reload, activity, actions, onShowHeard }: LatestBodyProps) {
   switch (view.state) {
     case 'loading':
-      return <WorkingState title="Looking at what your crate mates bought lately" />;
+      return <SkeletonRows count={3} />;
     case 'unreachable':
       return (
         <EmptyState
@@ -117,7 +118,6 @@ function NoPurchases({ result, activity }: NoPurchasesProps) {
     return (
       <FindingCrateMates
         activity={activity}
-        rows={{ kind: 'releases' }}
         idle={
           <EmptyState
             title="No crate mates yet"

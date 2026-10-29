@@ -52,18 +52,6 @@
   color: var(--dh-color-muted);
 }
 
-.dh-working__caption {
-  margin: var(--dh-space-1) 0 0;
-  font-size: var(--dh-text-xs);
-  color: var(--dh-color-subtle);
-}
-
-.dh-working__progress {
-  width: 100%;
-  max-width: var(--dh-working-width);
-  margin-top: var(--dh-space-2);
-}
-
 @keyframes dh-working-spin {
   to {
     transform: rotate(360deg);

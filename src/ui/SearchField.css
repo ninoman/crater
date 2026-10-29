@@ -1,7 +1,7 @@
 .dh-search {
   width: 220px;
   max-width: 100%;
-  height: 28px;
+  height: var(--dh-field-height);
   padding: 0 var(--dh-space-2);
   border: 1px solid var(--dh-color-border);
   border-radius: var(--dh-radius-sm);

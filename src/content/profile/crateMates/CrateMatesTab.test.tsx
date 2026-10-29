@@ -108,13 +108,11 @@ afterEach(() => {
 });
 
 describe('CrateMatesTab', () => {
-  it('shows the scan in progress, and asks again as more fans are read', async () => {
+  it('waits on the scan without a bar, and asks again as more fans are read', async () => {
     await render();
     expect(text()).toContain('Finding your crate mates');
-    expect(text()).toContain('12 of 903 releases scanned · 40 fans read');
-    expect(container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe(
-      '12',
-    );
+    // A bar out of 903 would read as "nothing until all 903 are scanned".
+    expect(container.querySelector('[role="progressbar"]')).toBeNull();
     expect(crateMateFetches).toBe(1);
 
     await poll();
