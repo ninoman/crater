@@ -199,6 +199,23 @@ describe('runReleaseStep', () => {
       ParserError,
     );
   });
+
+  it('asks the mobile API for the subdomain URL of a release on a custom domain', async () => {
+    await runReleaseStep(context(500), job());
+    const fetched: string[] = [];
+    const details = { ...(fixtureJson('tralbum_details.json') as object), bandcamp_url: job().url };
+    const ctx: StepContext = {
+      ...context(500),
+      fetchText: async (request: BandcampRequest) => {
+        fetched.push(request.url);
+        return fixtureText('album-page.html');
+      },
+      fetchJson: async () => details,
+    };
+
+    await runReleaseStep(ctx, { ...job(), url: 'https://music.floatingpoints.com/album/promises' });
+    expect(fetched).toEqual([job().url]);
+  });
 });
 
 describe('a seed job on your track', () => {

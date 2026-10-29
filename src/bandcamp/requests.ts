@@ -89,7 +89,7 @@ export const RELEASE_PAGE_PATTERNS = [
   'https://*.bandcamp.com/track/*',
 ];
 
-/** Release pages live on artist subdomains of bandcamp.com (custom domains are out of scope). */
+/** Release pages live on artist subdomains of bandcamp.com (a custom domain 303s to one). */
 export function isBandcampUrl(url: string): boolean {
   try {
     const { protocol, hostname } = new URL(url);

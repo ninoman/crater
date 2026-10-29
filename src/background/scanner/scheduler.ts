@@ -11,7 +11,7 @@ import {
   type QueueJob,
 } from '../../db';
 import type { Settings } from '../../shared/settings';
-import { jobRetryAt, nextBackoff } from './backoff';
+import { jobRetryAt, nextBackoff, OFFLINE_AFTER_FAILURES } from './backoff';
 import { spend } from './budget';
 import type { StepContext, StepEvent, StepResult } from './context';
 import { abandonFan, runFanStep } from './fanJob';
@@ -128,10 +128,11 @@ async function runJob(
     });
   }
   const parserFixed = state.parserError !== null && state.parserError.kind === result.parsed;
-  return state.backoff || state.offline || state.lastError || parserFixed
+  return state.backoff || state.offline || state.networkFailures || state.lastError || parserFixed
     ? deps.store.save({
         backoff: null,
         offline: false,
+        networkFailures: 0,
         lastError: null,
         ...(parserFixed ? { parserError: null } : {}),
       })
@@ -151,12 +152,25 @@ async function handleFailure(
   if (failure.kind === 'throttled') {
     const backoff = nextBackoff(state.backoff, failure.retryAfterMs, ctx.now);
     console.warn(`crater: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
-    // Being offline says nothing about how fast Bandcamp lets us go.
-    const pace = failure.offline ? state.pace : paceAfterThrottle(state.pace);
-    return deps.store.save({ backoff, offline: failure.offline, lastError: message, pace });
+    return deps.store.save({
+      backoff,
+      offline: false,
+      lastError: message,
+      pace: paceAfterThrottle(state.pace),
+    });
   }
 
-  const retryAt = failure.kind === 'transient' ? jobRetryAt(job.attempts, ctx.now) : null;
+  const networkFailures = failure.kind === 'network' ? state.networkFailures + 1 : 0;
+  if (networkFailures >= OFFLINE_AFTER_FAILURES) {
+    // Keeps doubling while still offline, and resumes on its own once the back-off ends.
+    // Being offline says nothing about how fast Bandcamp lets us go, so the pace stays.
+    const backoff = nextBackoff(state.backoff, null, ctx.now);
+    console.warn(`crater: ${message}. Offline; paused until ${new Date(backoff.until).toString()}`);
+    return deps.store.save({ backoff, offline: true, networkFailures, lastError: message });
+  }
+
+  // A lone network error retries just this job later, so one bad request can't stall the queue.
+  const retryAt = failure.kind === 'permanent' ? null : jobRetryAt(job.attempts, ctx.now);
   console.warn(`crater: ${message}. ${retryAt === null ? 'Dropped' : 'Will retry'}.`, error);
   await failJob(ctx.db, job, retryAt);
   // A seed list that's dropped or waiting on a retry no longer holds up the seed backlog.
@@ -168,6 +182,7 @@ async function handleFailure(
   }
   return deps.store.save({
     lastError: message,
+    networkFailures,
     ...(error instanceof ParserError ? { parserError: { kind: job.kind, message } } : {}),
   });
 }
