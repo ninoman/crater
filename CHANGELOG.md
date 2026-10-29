@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/ninoman/crater/compare/v0.7.0...v0.8.0) (2026-10-29)
+
+
+### Features
+
+* **scanner:** scan the seed backlog horizontally ([#21](https://github.com/ninoman/crater/issues/21)) ([883803e](https://github.com/ninoman/crater/commit/883803ebdc49b6b2efa81d89aa9b1dc086f44cd5))
+
 ## [0.7.0](https://github.com/ninoman/crater/compare/v0.6.0...v0.7.0) (2026-10-29)
 
 
