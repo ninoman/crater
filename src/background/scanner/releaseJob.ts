@@ -3,7 +3,9 @@
 
 import {
   ParserError,
+  fetchReleaseDetails,
   fetchReleasePage,
+  isBandcampUrl,
   fetchSupportersPage,
   type ItemKey,
   type ReleaseInfo,
@@ -40,7 +42,7 @@ export async function runReleaseStep(
 }
 
 async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCursor | null> {
-  const page = await fetchReleasePage(ctx.fetchText, job.url);
+  const page = await fetchReleasePage(ctx.fetchText, await bandcampUrl(ctx, job));
   if (page.item.itemKey !== job.target) {
     throw new ParserError('release page', `expected ${job.target}, got ${page.item.itemKey}`);
   }
@@ -62,6 +64,17 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
     reviewsToken: page.moreReviewsAvailable ? lastToken(true) : null,
     collected: supporters.length,
   });
+}
+
+/**
+ * A custom domain 303s to the band's subdomain, and that redirect fails CORS without host
+ * permission for the domain. The mobile API knows the subdomain URL, so ask it first.
+ */
+async function bandcampUrl(ctx: StepContext, job: ReleaseJob): Promise<string> {
+  if (isBandcampUrl(job.url)) return job.url;
+  const item = await getItem(ctx.db, job.target);
+  if (!item) return job.url;
+  return (await fetchReleaseDetails(ctx.fetchJson, item.bandId, job.target)).url;
 }
 
 /**

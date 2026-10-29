@@ -4,6 +4,9 @@
 export const BACKOFF_BASE_MS = 60_000;
 export const BACKOFF_MAX_MS = 60 * 60_000;
 
+/** This many requests in a row with no answer means we're offline, so the whole queue pauses. */
+export const OFFLINE_AFTER_FAILURES = 5;
+
 /** A failed job is retried this many times before it's dropped. */
 export const MAX_JOB_ATTEMPTS = 3;
 

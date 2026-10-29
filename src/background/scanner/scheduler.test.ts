@@ -208,8 +208,25 @@ describe('drainQueue', () => {
     expect(store.state.backoff).toBeNull();
   });
 
-  it('backs off exponentially from 60 s on 5xx and network failures', async () => {
+  it('retries a lone network failure later without pausing the queue', async () => {
+    const bandcamp = fakeBandcamp({ 7: 1, 8: 1 });
+    bandcamp.interrupt.push('offline');
+    await queue([fanJob(7), fanJob(8)]);
+
+    await drainQueue(deps());
+    expect(store.state.backoff).toBeNull();
+    expect(store.state.networkFailures).toBe(0);
+    expect(await db.ownership.where('fanId').equals(8).count()).toBe(1);
+    expect(await db.ownership.where('fanId').equals(7).count()).toBe(0);
+
+    vi.setSystemTime(START + 60_000);
+    await drainQueue(deps());
+    expect(await db.ownership.where('fanId').equals(7).count()).toBe(1);
+  });
+
+  it('backs off exponentially from 60 s on 5xx and runs of network failures', async () => {
     const bandcamp = fakeBandcamp({ 7: 1 });
+    store.state.networkFailures = 4;
     bandcamp.interrupt.push({ status: 503 }, 'offline');
     await queue([fanJob(7)]);
 

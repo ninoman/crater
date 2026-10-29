@@ -15,6 +15,8 @@ export interface ScannerState {
   backoff: Backoff | null;
   /** The back-off came from a request that got no answer, so it's us that are offline. */
   offline: boolean;
+  /** Requests in a row that got no answer. Reset by any success. */
+  networkFailures: number;
   budget: Budget | null;
   lastRequestAt: number | null;
   pace: AdaptivePace;
@@ -34,6 +36,7 @@ export interface ScannerState {
 export const INITIAL_SCANNER_STATE: ScannerState = {
   backoff: null,
   offline: false,
+  networkFailures: 0,
   budget: null,
   lastRequestAt: null,
   pace: INITIAL_PACE,
