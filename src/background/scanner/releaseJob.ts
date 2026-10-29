@@ -25,7 +25,8 @@ import {
 import type { StepContext } from './context';
 import { needsFanScan, supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
-import { SEED } from './priority';
+import { SEED, SEED_FANS } from './priority';
+import { rankSeedFansOnceListed } from './seedFans';
 
 /** The site pages supporters 100 at a time too. */
 const SUPPORTERS_PAGE_SIZE = 100;
@@ -115,7 +116,10 @@ async function nextSupportersPage(
   });
 }
 
-/** Carries on paging, or, with the whole list in, ranks its supporters' scans (pass 0). */
+/**
+ * Carries on paging, or, with the whole list in, ranks its supporters' scans: pass 0 for a
+ * release you opened, the whole seed backlog once the last seed list is in.
+ */
 async function carryOn(
   ctx: StepContext,
   job: ReleaseJob,
@@ -123,15 +127,17 @@ async function carryOn(
 ): Promise<ReleaseCursor | null> {
   const exhausted = cursor.thumbsToken === null && cursor.reviewsToken === null;
   if (!exhausted && cursor.collected < ctx.settings.supportersPerReleaseCap) return cursor;
-  await rankSupporters(ctx.db, job.target);
+  if (job.priority === SEED) await rankSeedFansOnceListed(ctx.db, ctx.now, job.id);
+  else await rankSupporters(ctx.db, job.target);
   return null;
 }
 
 /**
- * Saves the fans and what they own, and queues the ones not scanned recently. They take the
- * release job's priority and place in line, so a release's fans run before the next release at
- * that priority: your newest seed releases fill in fully before older ones start. Within it they
- * keep page order (`offset` is where this page starts) until pass 0 ranks them.
+ * Saves the fans and what they own, and queues the ones not scanned recently. For a release you
+ * opened they take its priority and place in line, so its fans run before the next release at
+ * that priority (vertical). A seed list's fans wait at SEED_FANS, behind every seed list
+ * (horizontal, decisions §5). Either way they keep page order (`offset` is where this page
+ * starts) until they're ranked.
  */
 async function recordSupporters(
   ctx: StepContext,
@@ -142,10 +148,12 @@ async function recordSupporters(
 ): Promise<void> {
   const fans = await upsertSupporterFans(ctx.db, supporters, ctx.now);
   await addSupporterOwnership(ctx.db, release, supporters);
+  const seed = job.priority === SEED;
+  const at = seed ? 0 : job.nextAttemptAt;
   const stale = fans.flatMap((fan, i) =>
     needsFanScan(fan, ctx.now)
-      ? [{ spec: fanJob(fan.fanId, job.target), at: job.nextAttemptAt, rank: offset + i + 1 }]
+      ? [{ spec: fanJob(fan.fanId, job.target), at, rank: offset + i + 1 }]
       : [],
   );
-  await enqueueAt(ctx.db, stale, job.priority);
+  await enqueueAt(ctx.db, stale, seed ? SEED_FANS : job.priority);
 }

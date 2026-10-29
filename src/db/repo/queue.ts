@@ -129,6 +129,32 @@ export async function rankFanJobs(db: CraterDb, ranks: Map<number, number>): Pro
   });
 }
 
+/** Fans whose scan waits at `priority` and hasn't started, in queue order. */
+export async function waitingFans(db: CraterDb, priority: number): Promise<number[]> {
+  const jobs = await db.queue
+    .where('[priority+nextAttemptAt+rank]')
+    .between([priority, -Infinity, -Infinity], [priority, Infinity, Infinity])
+    .filter((job) => job.kind === 'fan' && job.cursor === null)
+    .toArray();
+  return jobs.map((job) => Number(job.target));
+}
+
+/** Whether a job of this kind at `priority` is due by `now`, leaving out the job `except`. */
+export async function hasDueJob(
+  db: CraterDb,
+  kind: QueueJob['kind'],
+  priority: number,
+  now: number,
+  except?: number,
+): Promise<boolean> {
+  const job = await db.queue
+    .where('[priority+nextAttemptAt+rank]')
+    .between([priority, -Infinity, -Infinity], [priority, now, Infinity], true, true)
+    .filter((job) => job.kind === kind && job.id !== except)
+    .first();
+  return job !== undefined;
+}
+
 /**
  * Makes one release the foreground scan: its job and its supporters' jobs move to `priority`,
  * and jobs already at that priority (an earlier release's) move back to `otherwise`.

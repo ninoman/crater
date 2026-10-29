@@ -19,7 +19,9 @@ import { runFollowReleasesStep } from './followReleasesJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
 import { paceAfterRequest, paceAfterThrottle, paceWaitMs } from './pace';
+import { SEED } from './priority';
 import { runReleaseStep } from './releaseJob';
+import { rankSeedFansOnceListed } from './seedFans';
 import { pauseFor, type ScannerState, type ScannerStore } from './state';
 
 export interface SchedulerDeps {
@@ -157,6 +159,9 @@ async function handleFailure(
   const retryAt = failure.kind === 'transient' ? jobRetryAt(job.attempts, ctx.now) : null;
   console.warn(`crater: ${message}. ${retryAt === null ? 'Dropped' : 'Will retry'}.`, error);
   await failJob(ctx.db, job, retryAt);
+  // A seed list that's dropped or waiting on a retry no longer holds up the seed backlog.
+  if (job.kind === 'release' && job.priority === SEED)
+    await rankSeedFansOnceListed(ctx.db, ctx.now);
   if (retryAt === null) {
     if (job.kind === 'fan') await abandonFan(ctx, job);
     await deps.onStep(job, 'finished');

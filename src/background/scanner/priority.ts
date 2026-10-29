@@ -10,8 +10,13 @@ export const BACKGROUND = 2;
  * stays as it is.
  */
 export const LATELY_RESCAN = 2.5;
-/** Your own releases, queued after each sync of your collection, and their supporters. */
+/** Your own releases' supporter lists, queued after each sync of your collection. */
 export const SEED = 3;
+/**
+ * Their supporters' scans, after every seed list is in (decisions §5): horizontal, ranked across
+ * all your releases at once instead of release by release.
+ */
+export const SEED_FANS = 3.25;
 
 // Ranks order jobs within one priority and place in line (decisions §12). A release job is 0,
 // so its supporter list is in before any of its fans run; fans waiting for a profile hold their

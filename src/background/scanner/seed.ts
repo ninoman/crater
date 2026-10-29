@@ -12,6 +12,7 @@ import {
 } from '../../db';
 import { supportersAreFresh } from './freshness';
 import { SEED } from './priority';
+import { rankSeedFansOnceListed } from './seedFans';
 
 /** One release you own: the items whose supporters to list, and when you last bought into it. */
 export interface OwnRelease {
@@ -47,7 +48,8 @@ export function ownReleases(rows: OwnershipRecord[]): OwnRelease[] {
  * Queues a release job at SEED priority for each of your releases' supporter lists that isn't
  * fresh. With `only`, just the releases holding one of those items (what an incremental sync
  * added). Each job's place in line is its purchase time negated, so newer purchases go first,
- * across syncs too; any negative time is already due. Returns how many were queued.
+ * across syncs too; any negative time is already due. With no list to read, the fans already
+ * waiting are ranked now (after the v20 upgrade, say). Returns how many were queued.
  */
 export async function seedOwnReleases(
   db: CraterDb,
@@ -73,6 +75,7 @@ export async function seedOwnReleases(
     }),
   );
   await enqueueAt(db, entries, SEED);
+  await rankSeedFansOnceListed(db, now);
   return entries.length;
 }
 

@@ -53,22 +53,10 @@ export async function gatherPassZero(
           .filter((id) => id !== releaseId),
       );
 
-      const ids = [...new Set([...mine, ...sellerCatalog])];
-      const [items, owners] = await Promise.all([
-        getItemFields(db, ids.map(keyFromNumber)),
-        db.matchOwners.bulkGet(ids),
-      ]);
-      const counts = new Map(
-        ids.map((id, i) => [
-          id,
-          { bandcamp: items[i]?.supporterCount ?? null, known: owners[i]?.owners ?? 0 },
-        ]),
-      );
-
       return {
         mine,
         sellerCatalog,
-        counts,
+        counts: await matchCounts(db, [...new Set([...mine, ...sellerCatalog])]),
         release: releaseId,
         supporters: list.fanIds.map((fanId, i) => ({
           fanId,
@@ -76,5 +64,51 @@ export async function gatherPassZero(
         })),
       };
     },
+  );
+}
+
+/** What the seed backlog is ranked by across all your releases (decisions §5). */
+export interface SeedFansBasis {
+  /** Your collection's match ids. */
+  mine: Set<number>;
+  /** Bandcamp's supporter count and the owners we've seen, per id in `mine`. */
+  counts: Map<number, { bandcamp: number | null; known: number }>;
+  /** In the order given, with what each is known to own so far. */
+  fans: { fanId: number; matchIds: Float64Array }[];
+}
+
+/** Your collection, its supporter counts and what each of these fans is known to own. */
+export async function gatherSeedFans(
+  db: CraterDb,
+  meFanId: number | null,
+  fanIds: number[],
+): Promise<SeedFansBasis> {
+  return db.transaction('r', [db.items, db.fanMatches, db.matchOwners], async () => {
+    const [mineRecord, lists] = await Promise.all([
+      meFanId === null ? undefined : db.fanMatches.get(meFanId),
+      db.fanMatches.bulkGet(fanIds),
+    ]);
+    const mine = new Set(mineRecord?.matchIds ?? EMPTY);
+    return {
+      mine,
+      counts: await matchCounts(db, [...mine]),
+      fans: fanIds.map((fanId, i) => ({ fanId, matchIds: lists[i]?.matchIds ?? EMPTY })),
+    };
+  });
+}
+
+async function matchCounts(
+  db: CraterDb,
+  ids: number[],
+): Promise<Map<number, { bandcamp: number | null; known: number }>> {
+  const [items, owners] = await Promise.all([
+    getItemFields(db, ids.map(keyFromNumber)),
+    db.matchOwners.bulkGet(ids),
+  ]);
+  return new Map(
+    ids.map((id, i) => [
+      id,
+      { bandcamp: items[i]?.supporterCount ?? null, known: owners[i]?.owners ?? 0 },
+    ]),
   );
 }

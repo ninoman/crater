@@ -152,7 +152,7 @@ Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match i
 6. [x] On other fans' profiles, show a badge such as "your #4 crate mate · 37 in common".
 7. [x] "Add release to queue" button, so you can deliberately grow the dataset.
 
-Also added: the scanner seeds itself from your own collection. After each sync, your owned releases' supporters are queued at a third, lowest priority, newest purchase first, with a setting to turn it off and "N / M your releases scanned" in the popup (decisions §5).
+Also added: the scanner seeds itself from your own collection. After each sync, your owned releases' supporters are queued at a third, lowest priority, newest purchase first, with a setting to turn it off and "N / M your releases scanned" in the popup (decisions §5). Since 2026-10-29 the seed backlog runs horizontally: every seed supporter list first, then their fans ranked across all your releases (decisions §5).
 
 **Done when:** the leaderboard loads on reload or a direct `#crate-mates` link, and the top 10 feel like real taste matches, not label subscribers.
 
