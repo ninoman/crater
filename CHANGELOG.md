@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/ninoman/crater/compare/v0.8.1...v0.9.0) (2026-10-29)
+
+
+### Features
+
+* **popup:** move backups, CSV export and clear data to a Data tab ([#25](https://github.com/ninoman/crater/issues/25)) ([4eb8bc9](https://github.com/ninoman/crater/commit/4eb8bc977d99f111ece64e6205950938c376451b))
+
 ## [0.8.1](https://github.com/ninoman/crater/compare/v0.8.0...v0.8.1) (2026-10-29)
 
 
