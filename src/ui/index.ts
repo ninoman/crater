@@ -24,7 +24,13 @@ export {
 } from './icons';
 export { Menu, type MenuItem, type MenuProps } from './Menu';
 export { NowPlaying, type NowPlayingProps } from './NowPlaying';
-export { Notice, NoticeStack, type NoticeItem, type NoticeProps } from './Notice';
+export {
+  Notice,
+  NoticeStack,
+  type NoticeAction,
+  type NoticeItem,
+  type NoticeProps,
+} from './Notice';
 export { LoadMore, type LoadMoreProps } from './LoadMore';
 export { NumberField, type NumberFieldProps } from './NumberField';
 export { Panel, type PanelProps } from './Panel';

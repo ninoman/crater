@@ -20,7 +20,7 @@ import {
   paceWaitMs,
   SPEED_UP_AFTER,
 } from './pace';
-import { INITIAL_SCANNER_STATE, pauseFor } from './state';
+import { INITIAL_SCANNER_STATE, pauseFor, resumePatch } from './state';
 
 // Local wall-clock times, so these hold in any time zone.
 const EVENING = new Date(2026, 9, 20, 23, 59, 30).getTime();
@@ -123,6 +123,21 @@ describe('pauseFor', () => {
         now,
       ),
     ).toEqual({ reason: 'offline', until: now + 1 });
+  });
+
+  it('drops a no-answer back-off on resume, but not one Bandcamp asked for', () => {
+    const backoff = { until: Date.now() + 1, failures: 3 };
+    const unanswered = {
+      ...INITIAL_SCANNER_STATE,
+      paused: true,
+      backoff,
+      offline: true,
+      networkFailures: 7,
+    };
+    expect(resumePatch(unanswered)).toEqual({ paused: false, backoff: null, offline: false });
+    expect(resumePatch({ ...INITIAL_SCANNER_STATE, paused: true, backoff })).toEqual({
+      paused: false,
+    });
   });
 });
 

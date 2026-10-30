@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { releaseProgress } from './progress';
 import { drainQueue, type SchedulerDeps } from './scheduler';
-import { INITIAL_SCANNER_STATE, type ScannerState, type ScannerStore } from './state';
+import { INITIAL_SCANNER_STATE, resumePatch, type ScannerState, type ScannerStore } from './state';
 
 const SMALL_ALBUM_URL = 'https://doorsdarkmancollective.bandcamp.com/album/summers-fault';
 const smallAlbum = parseReleasePage(fixtureText('album-page-small.html'));
@@ -246,6 +246,31 @@ describe('drainQueue', () => {
     await drainQueue(deps());
     expect(store.state.backoff).toBeNull();
     expect(store.state.offline).toBe(false);
+  });
+
+  it('retries at once on resume, and a failed try costs no job a retry', async () => {
+    const bandcamp = fakeBandcamp({ 7: 1 });
+    store.state = {
+      ...store.state,
+      backoff: { failures: 6, until: START + 3_600_000 },
+      offline: true,
+      networkFailures: 9,
+    };
+    await queue([fanJob(7)]);
+    expect(await drainQueue(deps())).toBe('paused');
+
+    bandcamp.interrupt.push('offline');
+    await store.save(resumePatch(store.state));
+    await drainQueue(deps());
+    expect(store.state.backoff).toEqual({ failures: 1, until: START + 60_000 });
+    expect(store.state.offline).toBe(true);
+    expect((await db.queue.toArray())[0]?.attempts).toBe(0);
+
+    await store.save(resumePatch(store.state));
+    await drainQueue(deps());
+    expect(await db.ownership.where('fanId').equals(7).count()).toBe(1);
+    expect(store.state.offline).toBe(false);
+    expect(store.state.networkFailures).toBe(0);
   });
 
   it('stops at the daily budget and carries on after local midnight', async () => {

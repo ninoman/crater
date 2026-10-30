@@ -7,6 +7,8 @@ export type ScannerNotice =
   | { kind: 'parser-broken' }
   /** `retryAt` is null when the browser says it's offline but no request has failed yet. */
   | { kind: 'offline'; retryAt: number | null }
+  /** Requests go unanswered though the browser says it's online, so we can't tell why. */
+  | { kind: 'unreachable'; retryAt: number }
   | { kind: 'backoff'; until: number }
   | { kind: 'budget'; until: number; limit: number }
   | { kind: 'paused-by-you' };
@@ -21,8 +23,10 @@ export function scannerNotices(status: ScannerStatus): ScannerNotice[] {
 
   const retryAt = pause?.reason === 'offline' || pause?.reason === 'backoff' ? pause.until : null;
   // Offline, any back-off is ours, not Bandcamp asking.
-  if (!online || pause?.reason === 'offline') notices.push({ kind: 'offline', retryAt });
-  else if (pause?.reason === 'backoff') notices.push({ kind: 'backoff', until: pause.until });
+  if (!online) notices.push({ kind: 'offline', retryAt });
+  else if (pause?.reason === 'offline') {
+    notices.push({ kind: 'unreachable', retryAt: pause.until });
+  } else if (pause?.reason === 'backoff') notices.push({ kind: 'backoff', until: pause.until });
 
   if (pause?.reason === 'budget') {
     notices.push({ kind: 'budget', until: pause.until, limit: dailyBudget });
@@ -62,6 +66,13 @@ export function describeScannerNotice(notice: ScannerNotice, now: number): Scann
           notice.retryAt === null
             ? 'Scanning carries on once you’re back online.'
             : `Scanning carries on once you’re back online. Next try at ${resumes(notice.retryAt, now)}.`,
+      };
+    case 'unreachable':
+      return {
+        id,
+        tone: 'warning',
+        title: 'Requests aren’t getting through.',
+        detail: `Next try at ${resumes(notice.retryAt, now)}.`,
       };
     case 'backoff':
       return {

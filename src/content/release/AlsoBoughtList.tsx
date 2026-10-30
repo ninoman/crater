@@ -16,7 +16,7 @@ export interface AlsoBoughtListProps {
   /** A notice above says why the scanner isn't running. */
   scanStopped: boolean;
   /** The first wait is over: during the warm-up, show the picks so far instead of the loader. */
-  showEarly: boolean;
+  firstWaitOver: boolean;
   actions: RowActions;
   /** Heard releases are left out (decisions §22). The switch shows in every state. */
   hideHeard: boolean;
@@ -30,11 +30,13 @@ export function AlsoBoughtList({
   view,
   progress,
   scanStopped,
-  showEarly,
+  firstWaitOver,
   actions,
   hideHeard,
   onHideHeardChange,
 }: AlsoBoughtListProps) {
+  // The first wait lets a running scan bring in more. A stopped one won't, so don't hold picks back.
+  const showEarly = firstWaitOver || scanStopped;
   const shown = shownRows(view, showEarly);
   const player = useListPlayer(shown?.rows ?? NO_ROWS, (matchKey) =>
     actions.setHeard(matchKey, true, false),

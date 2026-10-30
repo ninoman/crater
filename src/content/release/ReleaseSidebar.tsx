@@ -50,7 +50,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
   const { view, ...actions } = useAlsoBought(item.itemKey, releaseSaved, hideHeard);
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
-  const showEarly = useTimePassed(EARLY_PICKS_AFTER_MS);
+  const firstWaitOver = useTimePassed(EARLY_PICKS_AFTER_MS);
 
   return (
     <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
@@ -72,7 +72,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 view={view}
                 progress={progress}
                 scanStopped={notices.length > 0}
-                showEarly={showEarly}
+                firstWaitOver={firstWaitOver}
                 actions={actions}
                 hideHeard={hideHeard}
                 onHideHeardChange={setHideHeard}

@@ -39,7 +39,7 @@ import { BACKGROUND, FOLLOW_RELEASES, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { withImportPause } from './importPause';
-import { chromeScannerStore, pauseFor } from './state';
+import { chromeScannerStore, pauseFor, resumePatch } from './state';
 import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
 
 export const SCANNER_ALARM = 'scanner';
@@ -210,7 +210,7 @@ export async function pauseScanner(): Promise<void> {
 }
 
 export async function resumeScanner(): Promise<void> {
-  await chromeScannerStore.save({ paused: false });
+  await chromeScannerStore.save(resumePatch(await chromeScannerStore.load()));
   kickScanner();
 }
 

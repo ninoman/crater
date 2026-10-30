@@ -1,4 +1,5 @@
 import { useScannerControls } from '../hooks/useScannerControls';
+import { withRetry } from '../hooks/useScannerNotices';
 import { useScannerStatus } from '../hooks/useScannerStatus';
 import type { ScannerStatus } from '../shared/scan';
 import { describeScannerNotice, scannerNotices } from '../shared/scannerNotices';
@@ -31,7 +32,7 @@ function Ready({ status }: { status: ScannerStatus }) {
   // Your own pause has its Resume button right here, so it needs no notice.
   const notices = scannerNotices(status)
     .filter(({ kind }) => kind !== 'paused-by-you')
-    .map((notice) => describeScannerNotice(notice, now));
+    .map((notice) => withRetry(describeScannerNotice(notice, now), controls));
 
   return (
     <>

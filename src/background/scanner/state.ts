@@ -70,6 +70,15 @@ export const chromeScannerStore: ScannerStore = {
   },
 };
 
+/**
+ * Resuming is a fresh try, so a back-off from unanswered requests goes with it. One that Bandcamp
+ * asked for stays: resuming can't skip Retry-After. `networkFailures` stays too, so if the try
+ * fails it pauses again at once, instead of a run of failures using up jobs' retries.
+ */
+export function resumePatch(state: ScannerState): Partial<ScannerState> {
+  return state.offline ? { paused: false, backoff: null, offline: false } : { paused: false };
+}
+
 /** Your own pause comes first. Back-off wins over the budget, since it's Bandcamp asking. */
 export function pauseFor(
   state: ScannerState,
