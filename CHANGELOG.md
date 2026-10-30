@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/ninoman/crater/compare/v0.9.0...v0.9.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **scanner:** stop calling failed requests offline, and add Try again ([#27](https://github.com/ninoman/crater/issues/27)) ([4393115](https://github.com/ninoman/crater/commit/4393115b36719aefa3877a42cef40203192e1e2a))
+
 ## [0.9.0](https://github.com/ninoman/crater/compare/v0.8.1...v0.9.0) (2026-10-29)
 
 
