@@ -48,7 +48,7 @@ function render(
   result: AlsoBoughtResult,
   progress: ScanProgressView = listed,
   stopped = false,
-  showEarly = false,
+  firstWaitOver = false,
 ) {
   const view: AlsoBoughtView = { state: 'ready', result };
   act(() =>
@@ -57,7 +57,7 @@ function render(
         view={view}
         progress={progress}
         scanStopped={stopped}
-        showEarly={showEarly}
+        firstWaitOver={firstWaitOver}
         actions={{ hide: () => {}, setHeard: () => {} }}
         hideHeard={false}
         onHideHeardChange={() => {}}
@@ -79,6 +79,19 @@ describe('AlsoBoughtList', () => {
     expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Early picks');
     expect(container.textContent).toContain('More from this artist');
     expect(container.querySelector('.dh-skeleton')).toBeNull();
+  });
+
+  it("doesn't hold early picks back while the scanner is stopped", () => {
+    const rows = [row('a3', { kind: 'co-owned', owners: 2, crateMates: 0 })];
+    const notListed: ScanProgressView = {
+      state: 'ready',
+      progress: { releaseKey: 'a1', scanned: 0, total: 0, listed: false },
+    };
+    render({ releaseKey: 'a1', warmup, rows }, notListed, true);
+
+    expect(container.querySelector('.dh-warmup__title')?.textContent).toBe('Early picks');
+    expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Early picks');
+    expect(container.textContent).not.toContain('No recommendations yet');
   });
 
   it('keeps the loader after the first wait while there are no picks', () => {
@@ -117,7 +130,7 @@ describe('AlsoBoughtList', () => {
           view={{ state: 'loading' }}
           progress={listed}
           scanStopped={false}
-          showEarly={false}
+          firstWaitOver={false}
           actions={{ hide: () => {}, setHeard: () => {} }}
           hideHeard={false}
           onHideHeardChange={() => {}}

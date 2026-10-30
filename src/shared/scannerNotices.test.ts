@@ -31,7 +31,7 @@ describe('scannerNotices', () => {
       { kind: 'backoff', until: NOW + 1 },
     ]);
     expect(scannerNotices(status({ pause: { reason: 'offline', until: NOW + 1 } }))).toEqual([
-      { kind: 'offline', retryAt: NOW + 1 },
+      { kind: 'unreachable', retryAt: NOW + 1 },
     ]);
     expect(scannerNotices(status({ pause: { reason: 'budget', until: MIDNIGHT } }))).toEqual([
       { kind: 'budget', until: MIDNIGHT, limit: 3000 },
@@ -48,6 +48,12 @@ describe('scannerNotices', () => {
   it("treats a back-off while offline as ours, not Bandcamp's", () => {
     expect(
       scannerNotices(status({ online: false, pause: { reason: 'backoff', until: NOW + 1 } })),
+    ).toEqual([{ kind: 'offline', retryAt: NOW + 1 }]);
+  });
+
+  it('only says offline when the browser does', () => {
+    expect(
+      scannerNotices(status({ online: false, pause: { reason: 'offline', until: NOW + 1 } })),
     ).toEqual([{ kind: 'offline', retryAt: NOW + 1 }]);
   });
 
@@ -82,6 +88,15 @@ describe('describeScannerNotice', () => {
     expect(describeScannerNotice({ kind: 'offline', retryAt: NOW + 90_000 }, NOW).detail).toContain(
       '(in 2 minutes)',
     );
+  });
+
+  it("doesn't blame your connection when requests fail while online", () => {
+    const { title, detail } = describeScannerNotice(
+      { kind: 'unreachable', retryAt: NOW + 90_000 },
+      NOW,
+    );
+    expect(title).not.toContain('offline');
+    expect(detail).toContain('(in 2 minutes)');
   });
 
   it('names the budget and the time until midnight', () => {

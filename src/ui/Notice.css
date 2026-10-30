@@ -19,6 +19,10 @@
   font-weight: var(--dh-weight-bold);
 }
 
+.dh-notice__action {
+  margin-top: var(--dh-space-2);
+}
+
 .dh-notice-stack {
   display: flex;
   flex-direction: column;
