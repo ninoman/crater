@@ -100,7 +100,12 @@ function Body({ view, progress, scanStopped, showEarly, children }: BodyProps) {
     if (!listed && !early) return <Waiting progress={progress} scanStopped={scanStopped} />;
     return (
       <>
-        <WarmupProgress warmup={warmup} scanStopped={scanStopped} early={early} />
+        <WarmupProgress
+          warmup={warmup}
+          scanTotal={progress.state === 'ready' ? progress.progress.total : null}
+          scanStopped={scanStopped}
+          early={early}
+        />
         {early && children}
       </>
     );

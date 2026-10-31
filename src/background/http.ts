@@ -1,4 +1,4 @@
-import { isBandcampUrl, type BandcampRequest } from '../bandcamp';
+import type { BandcampRequest } from '../bandcamp';
 
 /** A hung request would hold the scan loop, and its lock, forever. */
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -24,13 +24,13 @@ export class NetworkError extends Error {
 }
 
 /**
- * A custom domain (e.g. music.artist.com) 303s to the band's subdomain, and without host
- * permission for it the redirect fails CORS. It looks like being offline but never recovers.
+ * A release on a custom domain (e.g. music.artist.com) we can't look up: fetching the domain
+ * fails CORS, and the mobile API needs the selling account, which we don't know.
  */
 export class BlockedHostError extends Error {
   override name = 'BlockedHostError';
-  constructor(url: string, cause: unknown) {
-    super(`Can't reach ${url} (not a bandcamp.com host): ${String(cause)}`, { cause });
+  constructor(url: string, cause: string) {
+    super(`Can't reach ${url}: ${String(cause)}`);
   }
 }
 
@@ -39,7 +39,6 @@ async function send({ url, init }: BandcampRequest): Promise<Response> {
   try {
     response = await fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   } catch (error) {
-    if (!isBandcampUrl(url)) throw new BlockedHostError(url, error);
     throw new NetworkError(url, error);
   }
   if (!response.ok) throw new HttpError(response.status, url, response.headers.get('Retry-After'));

@@ -10,7 +10,7 @@ import type {
   StoredItem,
 } from '../schema';
 import type { SupporterList } from '../../scoring/alsoBought';
-import { releaseBuyers } from '../../scoring/releaseBuyers';
+import { type BuyerPage, releaseBuyers } from '../../scoring/releaseBuyers';
 import { readItemFields, readOwnership } from '../storage';
 import { fanRows } from './fanRows';
 import { collectionRead } from './fans';
@@ -63,22 +63,10 @@ export async function gatherAlsoBought(
       db.releaseSupporters,
     ],
     async () => {
-      const [release] = await getItemFields(db, [releaseKey]);
-      const matchKey = release?.albumKey ?? releaseKey;
-      const album = matchKey === releaseKey ? undefined : (await getItemFields(db, [matchKey]))[0];
-      const compilation = release?.compilation === true || album?.compilation === true;
-
-      // The matchKey index finds track buyers and album buyers alike.
-      const [matchRows, list] = await Promise.all([
-        db.ownership.where('matchKey').equals(matchKey).toArray(),
-        db.releaseSupporters.get(releaseKey),
-      ]);
-      const weights = releaseBuyers(
-        { releaseKey, matchKey, compilation },
-        matchRows.map(readOwnership).filter((row) => row.source === 'collection'),
-        list?.fanIds ?? [],
-      );
-      if (meFanId !== null) weights.delete(meFanId);
+      const { release, album, page } = await readBuyerPage(db, releaseKey);
+      const { matchKey } = page;
+      const list = await db.releaseSupporters.get(releaseKey);
+      const weights = await buyerWeights(db, page, list?.fanIds ?? [], meFanId);
       const ownerIds = [...weights.keys()];
       const fans = await db.fans.bulkGet(ownerIds);
       const readFans = fans.filter(
@@ -128,6 +116,45 @@ export async function gatherAlsoBought(
       };
     },
   );
+}
+
+/** Fans other than you whose buys count for this page, scanned or not. */
+export async function getReleaseBuyers(
+  db: CraterDb,
+  releaseKey: ItemKey,
+  listed: readonly number[],
+  meFanId: number | null,
+): Promise<number[]> {
+  return db.transaction('r', [db.items, db.ownership], async () => {
+    const { page } = await readBuyerPage(db, releaseKey);
+    return [...(await buyerWeights(db, page, listed, meFanId)).keys()];
+  });
+}
+
+async function readBuyerPage(db: CraterDb, releaseKey: ItemKey) {
+  const [release] = await getItemFields(db, [releaseKey]);
+  const matchKey = release?.albumKey ?? releaseKey;
+  const album = matchKey === releaseKey ? undefined : (await getItemFields(db, [matchKey]))[0];
+  const compilation = release?.compilation === true || album?.compilation === true;
+  const page: BuyerPage = { releaseKey, matchKey, compilation };
+  return { release, album, page };
+}
+
+async function buyerWeights(
+  db: CraterDb,
+  page: BuyerPage,
+  listed: readonly number[],
+  meFanId: number | null,
+): Promise<Map<number, number>> {
+  // The matchKey index finds track buyers and album buyers alike.
+  const rows = await db.ownership.where('matchKey').equals(page.matchKey).toArray();
+  const weights = releaseBuyers(
+    page,
+    rows.map(readOwnership).filter((row) => row.source === 'collection'),
+    listed,
+  );
+  if (meFanId !== null) weights.delete(meFanId);
+  return weights;
 }
 
 /** Other releases sold from the same Bandcamp account or on the same label. */

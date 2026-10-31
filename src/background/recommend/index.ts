@@ -1,7 +1,7 @@
 // Keeps Also-bought and crate-mates-who-own-this lists fresh for releases open in a tab, answers the
 // sidebar's requests, and keeps the crate-mates leaderboard up to date.
 
-import { RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
+import { FAN_PAGE_PATTERNS, RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { countReadFans, db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult } from '../../shared/alsoBought';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
@@ -11,6 +11,7 @@ import type { CrateMatesLatestResult } from '../../shared/crateMatesLatest';
 import { broadcastToTabs } from '../../shared/messages';
 import type { ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
+import { keepAliveWhile } from '../keepAlive';
 import { computeAlsoBought } from './alsoBought';
 import { computeDeepCuts } from './deepCuts';
 import { computeForYou } from './forYou';
@@ -20,6 +21,7 @@ import { readCrateMatesResult } from './crateMateRows';
 import { computeCrateMates } from './crateMates';
 import { computeCrateMatesLatest } from './crateMatesLatest';
 import { chromeCrateMatesBasisStore, recomputeDue } from './crateMatesBasis';
+import { crateMatesOnOpen } from './crateMatesOnOpen';
 
 export { getCrateMateStanding, getCrateMateStandings } from './crateMateStanding';
 
@@ -81,15 +83,20 @@ export async function getCrateMatesLatest(hideHeard: boolean): Promise<CrateMate
 
 /**
  * Both crate mates leaderboards for the Crate mates tab on your profile. Fans read since the last
- * recompute are folded in first, so the tab never shows a list older than its fans count.
+ * recompute are folded in behind the stored board, and `crateMatesRecomputed` tells the tab.
  */
-export async function getCrateMatesResult(): Promise<CrateMatesResult> {
-  const [fansRead, atLastRecompute] = await Promise.all([
-    countReadFans(db),
-    chromeCrateMatesBasisStore.load(),
-  ]);
-  if (fansRead !== atLastRecompute) await refreshCrateMates();
-  return readCrateMatesResult(db, (await loadSettings()).latelyHalfLifeMonths);
+export function getCrateMatesResult(): Promise<CrateMatesResult> {
+  return crateMatesOnOpen({
+    stale: async () => {
+      const [fansRead, atLastRecompute] = await Promise.all([
+        countReadFans(db),
+        chromeCrateMatesBasisStore.load(),
+      ]);
+      return fansRead !== atLastRecompute;
+    },
+    read: async () => readCrateMatesResult(db, (await loadSettings()).latelyHalfLifeMonths),
+    refresh: refreshCrateMates,
+  });
 }
 
 export function getReleaseCrateMates(releaseKey: ItemKey): Promise<ReleaseCrateMatesResult> {
@@ -129,24 +136,37 @@ export function refreshCrateMates(): Promise<void> {
     crateMatesAgain = true;
     return crateMatesRun;
   }
-  crateMatesRun = (async () => {
-    do {
-      crateMatesAgain = false;
-      const me = await getMe(db);
-      if (!me) return;
-      const fansRead = await countReadFans(db);
-      await computeCrateMates(
-        { db, settings: await loadSettings(), now: Date.now(), yieldNow: yieldToEvents },
-        me.fanId,
-      );
-      await chromeCrateMatesBasisStore.save(fansRead);
-    } while (crateMatesAgain);
-  })()
+  let recomputed = false;
+  // Nothing else may hold the worker awake: the tab no longer waits on this.
+  crateMatesRun = keepAliveWhile(
+    (async () => {
+      do {
+        crateMatesAgain = false;
+        const me = await getMe(db);
+        if (!me) return;
+        const fansRead = await countReadFans(db);
+        await computeCrateMates(
+          { db, settings: await loadSettings(), now: Date.now(), yieldNow: yieldToEvents },
+          me.fanId,
+        );
+        await chromeCrateMatesBasisStore.save(fansRead);
+        recomputed = true;
+      } while (crateMatesAgain);
+    })(),
+  )
     .catch((error: unknown) => console.error('crater: crate mates recompute failed', error))
     .finally(() => {
       crateMatesRun = null;
+      if (recomputed) announceCrateMates();
     });
   return crateMatesRun;
+}
+
+/** Only after a pass that stored a board, so a failing recompute can't make tabs ask in a loop. */
+function announceCrateMates(): void {
+  broadcastToTabs(FAN_PAGE_PATTERNS, 'crateMatesRecomputed', {}).catch((error: unknown) =>
+    console.warn('crater: could not announce crate mates', error),
+  );
 }
 
 /** A fan's collection scan ended. Every few fans read, the leaderboard catches up. */

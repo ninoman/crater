@@ -23,11 +23,20 @@ export { isPurchaseConfirmationUrl } from './purchase';
 export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
 export { findReleaseLinks, releaseUrl, type PageReleaseLink } from './pageLinks';
 export { parsePageDesign } from './pageDesign';
+export { onPagePlayerStart, pausePagePlayers } from './pagePlayer';
 export { fetchReleasePreview, parseReleasePreview } from './preview';
+export {
+  fetchApiRelease,
+  fetchApiReleasePreview,
+  parseApiRelease,
+  parseApiReleasePreview,
+  type ApiRelease,
+} from './apiRelease';
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
 export { FAN_PAGE_DOM } from './fanPageDom';
+export { cardWishlistChange, readFanItemCard } from './fanItemCard';
 export { isOwnFanPage, parseViewer } from './viewer';
 export {
   actionChange,

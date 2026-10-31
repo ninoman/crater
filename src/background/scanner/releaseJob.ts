@@ -3,10 +3,12 @@
 
 import {
   ParserError,
-  fetchReleaseDetails,
+  SUPPORTERS_FIRST_TOKEN,
+  fetchApiRelease,
   fetchReleasePage,
   isBandcampUrl,
   fetchSupportersPage,
+  type ApiRelease,
   type ItemKey,
   type ReleaseInfo,
   type Supporter,
@@ -17,6 +19,7 @@ import {
   enqueueAt,
   fanJob,
   getItem,
+  releaseSeller,
   saveReleaseSupporters,
   supportersFetchedAt,
   upsertReleasePageItem,
@@ -24,6 +27,7 @@ import {
   type ReleaseCursor,
   type ReleaseJob,
 } from '../../db';
+import { BlockedHostError } from '../http';
 import type { StepContext } from './context';
 import { needsFanScan, supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
@@ -42,12 +46,9 @@ export async function runReleaseStep(
 }
 
 async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCursor | null> {
-  const page = await fetchReleasePage(ctx.fetchText, await bandcampUrl(ctx, job));
-  if (page.item.itemKey !== job.target) {
-    throw new ParserError('release page', `expected ${job.target}, got ${page.item.itemKey}`);
-  }
-  await upsertReleasePageItem(ctx.db, page.item);
-  if (job.priority === SEED && page.album) await queueOwnTrackAlbum(ctx, job, page.album);
+  if (!isBandcampUrl(job.url)) return firstPageFromApi(ctx, job);
+  const page = await fetchReleasePage(ctx.fetchText, job.url);
+  await saveRelease(ctx, job, page);
   const supporters = page.supporters.slice(0, ctx.settings.supportersPerReleaseCap);
   await saveReleaseSupporters(
     ctx.db,
@@ -67,14 +68,31 @@ async function firstPage(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCurs
 }
 
 /**
- * A custom domain 303s to the band's subdomain, and that redirect fails CORS without host
- * permission for the domain. The mobile API knows the subdomain URL, so ask it first.
+ * A custom domain's page can't be fetched (decisions §5), so this reads the release from the
+ * mobile API, and the supporters the page would embed start from the first token instead.
  */
-async function bandcampUrl(ctx: StepContext, job: ReleaseJob): Promise<string> {
-  if (isBandcampUrl(job.url)) return job.url;
-  const item = await getItem(ctx.db, job.target);
-  if (!item) return job.url;
-  return (await fetchReleaseDetails(ctx.fetchJson, item.bandId, job.target)).url;
+async function firstPageFromApi(ctx: StepContext, job: ReleaseJob): Promise<ReleaseCursor | null> {
+  const seller = await releaseSeller(ctx.db, job.target);
+  if (seller === null) throw new BlockedHostError(job.url, 'its seller is unknown');
+  await saveRelease(ctx, job, await fetchApiRelease(ctx.fetchJson, seller, job.target));
+  await saveReleaseSupporters(ctx.db, job.target, [], ctx.now);
+  return carryOn(ctx, job, {
+    thumbsToken: SUPPORTERS_FIRST_TOKEN,
+    reviewsToken: SUPPORTERS_FIRST_TOKEN,
+    collected: 0,
+  });
+}
+
+async function saveRelease(
+  ctx: StepContext,
+  job: ReleaseJob,
+  { item, album }: ApiRelease,
+): Promise<void> {
+  if (item.itemKey !== job.target) {
+    throw new ParserError('release page', `expected ${job.target}, got ${item.itemKey}`);
+  }
+  await upsertReleasePageItem(ctx.db, item);
+  if (job.priority === SEED && album) await queueOwnTrackAlbum(ctx, job, album);
 }
 
 /**

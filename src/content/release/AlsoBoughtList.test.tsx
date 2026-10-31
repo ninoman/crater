@@ -75,7 +75,8 @@ describe('AlsoBoughtList', () => {
     render({ releaseKey: 'a1', warmup, rows }, listed, false, true);
 
     expect(container.querySelector('.dh-warmup__title')?.textContent).toBe('Early picks');
-    expect(container.textContent).toContain('12 of 20 supporters read');
+    expect(container.textContent).toContain('3 of 5 strong picks');
+    expect(container.querySelector('[role="progressbar"]')).toBeNull();
     expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Early picks');
     expect(container.textContent).toContain('More from this artist');
     expect(container.querySelector('.dh-skeleton')).toBeNull();
@@ -107,11 +108,9 @@ describe('AlsoBoughtList', () => {
     render({ releaseKey: 'a1', warmup, rows: [row('a2', { kind: 'same-artist' })] });
 
     const status = container.querySelector('[role="status"]');
-    expect(status?.textContent).toContain('12 of 20 supporters read · 3 of 5 strong picks');
+    expect(status?.textContent).toContain('3 of 5 strong picks');
     expect(status?.getAttribute('aria-busy')).toBe('true');
-    expect(container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe(
-      '15',
-    );
+    expect(container.querySelector('[role="progressbar"]')).toBeNull();
     expect(container.querySelectorAll('.dh-skeleton__row')).toHaveLength(4);
     expect(container.textContent).not.toContain('More from this artist');
   });
