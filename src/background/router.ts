@@ -6,7 +6,7 @@ import { backupHandlers } from './backupHandlers';
 import { followingHandlers } from './followingHandlers';
 import { hideHeardHandlers } from './hideHeardHandlers';
 import { followsHandlers } from './follows/handlers';
-import { fetchText } from './http';
+import { fetchJson, fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import { getPageBadges } from './pageBadges';
 import {
@@ -53,7 +53,7 @@ export const handlers: MessageHandlers = {
   getForYou: ({ mode, hideHeard }) => getForYou(mode, hideHeard),
   getCrateMatesLatest: ({ hideHeard }) => getCrateMatesLatest(hideHeard),
   ...followingHandlers(db),
-  ...itemListHandlers(db, async () => (await loadSettings()).topCrateMatesK),
+  ...itemListHandlers(db, async () => (await loadSettings()).topCrateMatesK, fetchJson),
   ...backupHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();

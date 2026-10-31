@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
 import type { Tag } from '../../shared/following';
 import { mountShadow } from './mountShadow';
-import { FollowRecorder, WishlistTagPrompt } from './TagPrompt';
+import { FanCardTagPrompt, FollowRecorder, WishlistTagPrompt } from './TagPrompt';
 
 const TAGS: Tag[] = [{ id: 1, name: 'dub', nameKey: 'dub' }];
 let sent: { type: string; payload: unknown }[];
@@ -31,8 +31,12 @@ function answer(message: { type: string; payload: Record<string, unknown> }): un
       followed = false;
       return null;
     case 'markWishlisted':
+    case 'markCardWishlisted':
       wishlisted = true;
       return true;
+    case 'markUnwishlisted':
+      wishlisted = false;
+      return null;
     default:
       throw new Error(`not faked: ${message.type}`);
   }
@@ -158,5 +162,69 @@ describe('WishlistTagPrompt', () => {
 
     expect(sent.some((m) => m.type === 'markWishlisted')).toBe(true);
     expect(picker()).toBeFalsy();
+  });
+});
+
+describe('FanCardTagPrompt', () => {
+  const ACTIONS = '#collection-item-container_104837503 .collection-item-actions';
+  let unmount: () => void;
+  const actions = () => document.querySelector(ACTIONS);
+  /** The way Bandcamp's jQuery does it: two class writes in one go. */
+  const swap = (from: string, to: string) => {
+    actions()?.classList.add(to);
+    actions()?.classList.remove(from);
+  };
+
+  beforeEach(async () => {
+    const page = new DOMParser().parseFromString(
+      fixtureText('fan-page-in-common.html'),
+      'text/html',
+    );
+    document.body.innerHTML = page.getElementById('grids')?.outerHTML ?? '';
+    await act(async () => {
+      unmount = mountShadow(document.body, <FanCardTagPrompt />);
+    });
+  });
+
+  // It watches the whole body, so one left mounted would also answer the next test's clicks.
+  afterEach(() => act(async () => unmount()));
+
+  it('saves a heart once and opens the picker', async () => {
+    swap('wishlist', 'wishlisted');
+    await settle();
+
+    const saves = sent.filter((m) => m.type === 'markCardWishlisted');
+    expect(saves).toHaveLength(1);
+    expect(saves[0]?.payload).toMatchObject({ card: { itemKey: 't104837503', bandId: 675327826 } });
+    expect(picker()?.textContent).toContain('Tag Reeko & Claudio PRC – Claudio PRC - Grainphase');
+  });
+
+  it('keeps the picker shut when the setting is off', async () => {
+    promptSetting = false;
+    swap('wishlist', 'wishlisted');
+    await settle();
+
+    expect(sent.some((m) => m.type === 'markCardWishlisted')).toBe(true);
+    expect(picker()).toBeFalsy();
+  });
+
+  it('marks an un-heart once and closes the picker', async () => {
+    swap('wishlist', 'wishlisted');
+    await settle();
+    swap('wishlisted', 'wishlist');
+    await settle();
+
+    expect(sent.filter((m) => m.type === 'markUnwishlisted')).toHaveLength(1);
+    expect(picker()).toBeFalsy();
+  });
+
+  it('does nothing for a card added already wishlisted', async () => {
+    const card = document.createElement('li');
+    card.className = 'collection-item-container';
+    card.innerHTML = '<div class="collection-item-actions wishlisted"></div>';
+    document.querySelector('ol.collection-grid')?.append(card);
+    await settle();
+
+    expect(sent.some((m) => m.type.startsWith('mark'))).toBe(false);
   });
 });
