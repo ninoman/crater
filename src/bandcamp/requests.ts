@@ -89,6 +89,9 @@ export const RELEASE_PAGE_PATTERNS = [
   'https://*.bandcamp.com/track/*',
 ];
 
+/** Tab URL pattern for fan pages, your profile among them. */
+export const FAN_PAGE_PATTERNS = ['https://bandcamp.com/*'];
+
 /** Release pages live on artist subdomains of bandcamp.com (a custom domain 303s to one). */
 export function isBandcampUrl(url: string): boolean {
   try {
