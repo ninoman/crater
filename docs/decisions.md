@@ -915,7 +915,8 @@ Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `sc
 - **Why 30 s:** it's the threshold streaming services count a play at, long enough that a mis-click or a quick skim doesn't count, short enough that sampling a release does. A 10-second preview proves little either way, which is why heard is a state and not a verdict.
 - **Our preview player** (`usePreviewPlayer`) sends `markHeard` itself, so every preview counts, wishlist cards included; lists also flag the row at once.
 - **Bandcamp's player** on release pages: `useBandcampPlays` listens on `document` in the capture phase, since media events don't bubble. Our own preview's audio element isn't in the page and our shadow roots' events aren't composed, so only Bandcamp's player reaches it. Mounted with the tag prompts, which never collapse.
-- **Gap, untested live:** if Bandcamp's player keeps its `<audio>` out of the document, no events reach us. Then we'd need a main-world script hooking `HTMLMediaElement.prototype.play`.
+- **Gap, untested live:** if Bandcamp's player keeps its `<audio>` out of the document, no events reach us. Then we'd need a main-world script hooking `HTMLMediaElement.prototype.play`. Checked on an album page 2026-10-31: its `<audio>` elements are children of `body`, so this doesn't apply there. Fan and discover pages are unchecked.
+- **One thing playing at a time (added 2026-10-31):** when a preview starts or resumes, `usePreviewPlayer` pauses every `<audio>` in the page (`bandcamp/pagePlayer.ts`). Bandcamp's play button follows the `pause` event, checked live, so its UI stays right. The other way round, a `play` event from the page pauses the preview, which stays open and resumes from its Play button.
 
 ### Play through a list
 

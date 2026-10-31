@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ItemKey, PreviewTrack } from '../bandcamp';
+import { type ItemKey, onPagePlayerStart, pausePagePlayers, type PreviewTrack } from '../bandcamp';
 import {
   isHeard,
   type Listening,
@@ -38,8 +38,8 @@ type Load =
  * Plays a release's preview in our own audio element, so it starts on the click that opened it
  * and can be seeked. Starts at the featured track and moves on to the next when one ends. A
  * null `url` is stopped; a new one switches release in the same element. Listening past the
- * heard threshold marks the release heard (decisions §22). Stops and lets go of the stream when
- * the component unmounts.
+ * heard threshold marks the release heard (decisions §22). Playing pauses Bandcamp's own player,
+ * and it starting pauses this one. Stops and lets go of the stream when the component unmounts.
  */
 export function usePreviewPlayer(
   url: string | null,
@@ -110,7 +110,11 @@ export function usePreviewPlayer(
       markIfHeard();
     };
     const onDuration = () => setMediaDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
-    const onPlay = () => setPlaying(true);
+    const onPlay = () => {
+      setPlaying(true);
+      // On every play, not just on opening: resuming a preview mustn't talk over Bandcamp either.
+      pausePagePlayers();
+    };
     const onPause = () => {
       setPlaying(false);
       listening.current = stoppedListening(listening.current);
@@ -154,6 +158,8 @@ export function usePreviewPlayer(
     // src) just leaves it paused for the Play button.
     audio.play().catch(() => undefined);
   }, [audio, track]);
+
+  useEffect(() => onPagePlayerStart(() => audio.pause()), [audio]);
 
   useEffect(
     () => () => {
