@@ -24,6 +24,13 @@ export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './k
 export { findReleaseLinks, releaseUrl, type PageReleaseLink } from './pageLinks';
 export { parsePageDesign } from './pageDesign';
 export { fetchReleasePreview, parseReleasePreview } from './preview';
+export {
+  fetchApiRelease,
+  fetchApiReleasePreview,
+  parseApiRelease,
+  parseApiReleasePreview,
+  type ApiRelease,
+} from './apiRelease';
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
