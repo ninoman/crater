@@ -8,7 +8,7 @@ export interface GatheringProps {
   paused?: boolean;
   /** Off once real rows show below, so only the status line stays. */
   placeholders?: boolean;
-  /** Extra detail under the description, such as a progress bar. */
+  /** Extra detail under the description. */
   children?: ReactNode;
 }
 
