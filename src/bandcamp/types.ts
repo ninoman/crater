@@ -72,6 +72,18 @@ export interface CollectionPage {
   nextToken: string | null;
 }
 
+/** What a fan page's item card says about a release (decisions §21). */
+export interface FanItemCard {
+  itemKey: ItemKey;
+  /** Selling account. */
+  bandId: number;
+  title: string;
+  artist: string;
+  /** The album's page for a track on an album: cards link to the album. */
+  url: string;
+  artId: number | null;
+}
+
 /** A fan's profile page as pass 1 reads it (decisions §12). */
 export interface FanProfile {
   fanId: number;

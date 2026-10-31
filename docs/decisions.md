@@ -870,6 +870,15 @@ Before this, tags on a new follow or heart only showed after the next sync (§8,
 - **No picker on Follow** (changed 2026-10-23). After a band follow Bandcamp often opens its mailing-list dialog, which takes focus and closed our picker. Waiting until nothing covered the button didn't hold up live, so a follow is only saved: the page's own tag line ("You follow …" and "+ tag") shows at once, and you tag from there.
 - **Setting:** *Ask for tags when you wishlist*, under *On Bandcamp pages*, on by default. Off, the heart is still saved; only the picker stays shut.
 
+### Hearts on someone else's profile
+
+Added 2026-10-31. Code: `bandcamp/fanItemCard.ts`, `hooks/useFanCardWishlistChange.ts`, `hooks/useFanCardTagPrompt.ts`, `background/releaseFromCard.ts`. Tested on the signed-in fixture `fan-page-in-common.html`; the class changes are read from Bandcamp's `Fanpage.collectItem` / `uncollectItem`, not yet tried logged in on a live page.
+
+- **The control:** each item card in a fan's collection and wishlist grids has its own `.collection-item-actions`, and Bandcamp swaps `wishlist` ↔ `wishlisted` on it, as on the release page's heart. Your own profile has neither class and is never watched.
+- **Watching differs from the release page:** there are many cards and they arrive as you page, so reading one element's state doesn't work. One observer reads the old class of each changed card (`attributeOldValue`), so a newly rendered card is never a change. Bandcamp's add and remove are two class writes; only a card's first old value in a batch counts.
+- **Saving differs too:** the release may not be in `items`, because no page of it was opened. `markCardWishlisted` adds a row from the card. A card doesn't carry the album of a track, and links to the album, so an unknown release gets its `albumKey` and URL from `tralbum_details`. If that fails, the heart is saved as a standalone release and the next sync corrects it.
+- **The picker anchors to the card**, not the control, which Bandcamp may hide when the pointer leaves the card. One picker is open at a time; a heart on another card replaces it.
+
 ## 22. Hide, heard and play-through
 
 Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `scoring/exclusions.ts`, `db/repo/hidden.ts`, `heard.ts`, `sellers.ts`, `background/hideHeardHandlers.ts`, `background/recommend/hideScopes.ts`, `shared/heard.ts`, `shared/playQueue.ts`, `hooks/useListPlayer.ts`, `useBandcampPlays.ts`, `rowActions.ts`, `src/ui/Menu`, `HeardBadge`, `PlayQueueBar`, `popup/HiddenList.tsx`. Tested on synthetic data and the fixtures (jsdom); not yet tried live.
