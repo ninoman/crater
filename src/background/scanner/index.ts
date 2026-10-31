@@ -147,7 +147,6 @@ export async function requestRelease(
   itemKey: ItemKey,
   url: string,
 ): Promise<{ status: QueueReleaseStatus }> {
-  if (!isBandcampUrl(url)) throw new Error(`Not a bandcamp.com release: ${url}`);
   const status = await queueRelease(db, itemKey, url, Date.now());
   if (status !== 'fresh') kickScanner();
   return { status };

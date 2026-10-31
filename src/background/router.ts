@@ -1,4 +1,3 @@
-import { fetchReleasePreview } from '../bandcamp';
 import { db } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { loadSettings } from '../shared/settings';
@@ -9,6 +8,7 @@ import { followsHandlers } from './follows/handlers';
 import { fetchJson, fetchText } from './http';
 import { getSyncStatus, onPageSeen, startSync } from './meSync';
 import { getPageBadges } from './pageBadges';
+import { getReleasePreview } from './preview';
 import {
   getAlsoBought,
   getForYou,
@@ -43,7 +43,7 @@ export const handlers: MessageHandlers = {
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
   getAlsoBought: ({ itemKey, hideHeard }) => getAlsoBought(itemKey, hideHeard),
-  getPreview: ({ url }) => fetchReleasePreview(fetchText, url),
+  getPreview: ({ url }) => getReleasePreview(db, { fetchJson, fetchText }, url),
   ...hideHeardHandlers(db),
   getCrateMates: () => getCrateMatesResult(),
   getCrateMateStanding: ({ fanId }) => getCrateMateStanding(db, fanId),
