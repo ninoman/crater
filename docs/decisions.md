@@ -157,6 +157,7 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
 - **Your own sync and the scanner take turns.** The scanner waits while your own sync runs, so only one request is in flight. Your own sync still doesn't count against the budget (§4).
 - **Progress:** progress is sent only for **releases open in a tab** (the last 20 opened, kept in `chrome.storage.session`) and only when a fan finishes, to keep the per-fan cost low. It goes to Bandcamp tabs with `chrome.tabs.query({url})` (host permission, no `tabs` permission needed) and `chrome.tabs.sendMessage`.
   - `scanned` counts every supporter with a final status, including `private` and `error`.
+  - Known buyers count too (2026-10-31): fans not on the supporter list whose scan has ended and who own the release, found through other scans (same fans as Also bought, `releaseBuyers`), are added to both `scanned` and `total`, without duplicates. Why: the list holds only the newest buyers, so a row could say "26 supporters" under "11 / 80 scanned". Off-list fans still queued stay out: they may wait at seed priority, and the bar has to be able to finish when the listed fans are done.
   - The event carries one field more than the spec, `listed`, so the UI can tell "not fetched yet" (0 / 0, false) from "no supporters" (0 / 0, true).
 - **Known limitation:** a re-scan after 30 days adds new items but doesn't remove items a fan no longer has. That's rare, and harmless for scoring at this scale.
 
