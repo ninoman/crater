@@ -28,6 +28,7 @@ export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
 export { fetchSupportersPage, parseSupportersPage } from './supporters';
 export { FAN_PAGE_DOM } from './fanPageDom';
+export { cardWishlistChange, readFanItemCard } from './fanItemCard';
 export { isOwnFanPage, parseViewer } from './viewer';
 export {
   actionChange,
