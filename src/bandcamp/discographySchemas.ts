@@ -42,3 +42,30 @@ export const rawTralbumDetailsResponse = z.union([
     is_preorder: z.boolean().nullish(),
   }),
 ]);
+
+const rawApiTrack = z.object({
+  track_id: z.number(),
+  title: z.string(),
+  duration: z.number().nullish(),
+  band_name: z.string().nullish(),
+  streaming_url: z.object({ 'mp3-128': z.string().nullish() }).nullish(),
+});
+
+/** What the mobile API says of a release in place of its page. */
+export const rawApiReleaseResponse = z.union([
+  apiError,
+  z.object({
+    id: z.number(),
+    type: z.enum(['a', 't']),
+    title: z.string(),
+    bandcamp_url: z.string(),
+    art_id: z.number().nullish(),
+    tralbum_artist: z.string(),
+    band: z.object({ band_id: z.number() }),
+    album_id: z.number().nullish(),
+    album_title: z.string().nullish(),
+    featured_track_id: z.number().nullish(),
+    tags: z.array(z.object({ name: z.string() })).nullish(),
+    tracks: z.array(rawApiTrack).nullish(),
+  }),
+]);

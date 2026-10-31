@@ -115,6 +115,7 @@ Parsers must check for `error: true` on 200 responses, not just the HTTP status.
 Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. Decided 2026-10-20.
 
 - **All network goes through the service worker.** Content-script fetches fail CORS on artist subdomains, so content scripts only send messages.
+- **Custom-domain releases are read from `bandcamp.com`, never fetched** (changed 2026-10-31). A custom domain 303s to the band's subdomain, and without host permission for the domain that redirect fails CORS. The mobile API can't name the subdomain: its `bandcamp_url` is the custom domain too. So a release whose URL isn't on `bandcamp.com` takes its item from `tralbum_details` (one job run), and its supporters from `tralbumcollectors` starting at `1:9999999999:a::`, thumbs then reviews, where the page would have embedded the first ones. Previews read `streaming_url` from the same response. `tralbum_details` needs the selling band: the stored item's `bandId`, or for an album only known from a track, the track's. With neither the job is dropped without a request. The artist on a track's response is the account, not the track's artist.
 - **One request per job run.** A `release` job and a `fan` job each send exactly one request per run and save a `cursor` (the next token) in their `queue` row. Effects:
   - A killed worker loses at most one request. The job resumes from its cursor rather than starting over.
   - A release page opened mid-scan gets the very next request, instead of waiting for a 2,000-item fan to finish.
