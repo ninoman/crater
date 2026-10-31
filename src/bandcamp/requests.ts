@@ -92,6 +92,9 @@ export const RELEASE_PAGE_PATTERNS = [
   'https://*.bandcamp.com/track/*',
 ];
 
+/** Tab URL pattern for fan pages, your profile among them. */
+export const FAN_PAGE_PATTERNS = ['https://bandcamp.com/*'];
+
 /**
  * Release pages live on artist subdomains of bandcamp.com. A custom domain 303s to one, but the
  * redirect fails CORS, so anything else is read through the mobile API (decisions §5).

@@ -219,6 +219,8 @@ export interface EventMap {
   alsoBought: AlsoBoughtResult;
   /** Sent with `alsoBought`: the crate mates owning that release, after the same scans. */
   releaseCrateMates: ReleaseCrateMatesResult;
+  /** New leaderboards are stored. The tab asks for them, so a board isn't sent to every fan page. */
+  crateMatesRecomputed: NoPayload;
 }
 
 export type EventType = keyof EventMap;
