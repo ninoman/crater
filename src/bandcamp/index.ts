@@ -23,6 +23,7 @@ export { isPurchaseConfirmationUrl } from './purchase';
 export { itemKey, keyFromNumber, keyToNumber, matchKey, parseItemKey } from './keys';
 export { findReleaseLinks, releaseUrl, type PageReleaseLink } from './pageLinks';
 export { parsePageDesign } from './pageDesign';
+export { onPagePlayerStart, pausePagePlayers } from './pagePlayer';
 export { fetchReleasePreview, parseReleasePreview } from './preview';
 export { fetchReleasePage, parseReleasePage, type FetchText } from './release';
 export * from './requests';
