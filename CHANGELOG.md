@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.0](https://github.com/ninoman/crater/compare/v0.10.0...v0.11.0) (2026-11-02)
+
+
+### Features
+
+* add a Firefox build ([#36](https://github.com/ninoman/crater/issues/36)) ([d1e7488](https://github.com/ninoman/crater/commit/d1e7488d7538b72aa7e9a40163618737123927c8))
+
+
+### Bug Fixes
+
+* **ui:** stop the skeleton shimmer jumping when it loops ([#37](https://github.com/ninoman/crater/issues/37)) ([48a2e92](https://github.com/ninoman/crater/commit/48a2e9207fe4757b4d7cc120f45075e56fc00a67))
+
 ## [0.10.0](https://github.com/ninoman/crater/compare/v0.9.1...v0.10.0) (2026-11-02)
 
 
