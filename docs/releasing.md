@@ -18,6 +18,7 @@ The manifest reads its version from `package.json`, so there is nothing else to 
 ## One-time setup
 
 - **Actions permission.** In GitHub → Settings → Actions → General, enable *Allow GitHub Actions to create and approve pull requests*, or release-please can't open its PR.
+- **Pages source.** In GitHub → Settings → Pages, set *Source* to *GitHub Actions*, so only `site/` is published ([workflow](../.github/workflows/pages.yml)). Deploying from the `/docs` branch folder would publish these internal notes.
 
 ## Quick patch: Bandcamp broke a parser
 
