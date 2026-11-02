@@ -1078,4 +1078,5 @@ Added on 2026-11-02. One codebase, two builds: `pnpm build` (Chrome, `dist/`) an
 - **Minimum version 142.** AMO requires `data_collection_permissions` on new listings, and 142 is the first version (desktop and Android) that reads it. We declare `required: ['none']`.
 - **Gecko ID `crater@ninoman`.** AMO ties a listing to it forever, so it must not change after the first upload.
 - **Host access can be withdrawn.** Firefox users can take away bandcamp.com access in the add-ons manager, which stops every scan. The popup shows a "No access to Bandcamp" notice with an Allow button when that happens (Chrome's "Site access" setting triggers it too).
+- **No Chrome-only query options.** Firefox validates API arguments strictly and rejects a call with a property it doesn't know. `tabs.query({ frozen: false })` (Chrome 132+) failed every scan-progress broadcast, so `broadcastToTabs` now filters `tab.frozen` itself; Firefox tabs don't have the field and are kept.
 - **Known `web-ext lint` warnings**, all from dependencies: React's `innerHTML` writes, and zod's `Function('')` probe, which fails under the extension CSP and falls back to non-JIT parsing.

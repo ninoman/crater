@@ -5,10 +5,14 @@ import type { ScanProgress } from './scan';
 const PATTERNS = ['*://*.bandcamp.com/*'];
 const progress: ScanProgress = { releaseKey: 'a123', scanned: 0, total: 0, listed: false };
 
-function stubTabs(tabs: { id?: number }[], sendMessage: (id: number) => Promise<unknown>) {
+function stubTabs(
+  tabs: { id?: number; frozen?: boolean }[],
+  sendMessage: (id: number) => Promise<unknown>,
+) {
   const query = vi.fn(async () => tabs);
-  vi.stubGlobal('chrome', { tabs: { query, sendMessage: vi.fn(sendMessage) } });
-  return query;
+  const send = vi.fn(sendMessage);
+  vi.stubGlobal('chrome', { tabs: { query, sendMessage: send } });
+  return { query, send };
 }
 
 describe('broadcastToTabs', () => {
@@ -18,10 +22,18 @@ describe('broadcastToTabs', () => {
     vi.unstubAllGlobals();
   });
 
-  it('asks only for tabs that can run our listener', async () => {
-    const query = stubTabs([], async () => undefined);
+  it('asks only for tabs that can run our listener, in a query Firefox accepts', async () => {
+    const { query } = stubTabs([], async () => undefined);
     await broadcastToTabs(PATTERNS, 'scanProgress', progress);
-    expect(query).toHaveBeenCalledWith({ url: PATTERNS, frozen: false, discarded: false });
+    expect(query).toHaveBeenCalledWith({ url: PATTERNS, discarded: false });
+  });
+
+  it('skips frozen tabs, and tabs that say nothing about it (Firefox)', async () => {
+    const { send } = stubTabs([{ id: 1, frozen: true }, { id: 2, frozen: false }, { id: 3 }], () =>
+      Promise.resolve(),
+    );
+    await broadcastToTabs(PATTERNS, 'scanProgress', progress);
+    expect(send.mock.calls.map(([id]) => id)).toEqual([2, 3]);
   });
 
   it('gives up on a tab that never answers', async () => {
