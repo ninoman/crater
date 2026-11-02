@@ -90,4 +90,4 @@ None. All code ships in the package.
 - **Data collected:** website content (Bandcamp release and public fan/collection data); personally identifiable information in the form of Bandcamp fan ids and usernames; web history in the sense of the user's Bandcamp purchases. All of it is stored locally only.
 - **Not collected:** health, financial or payment info, authentication information (cookies are not read or stored), personal communications, location, user activity beyond the pages above.
 - **Certifications:** data is not sold; not used for anything unrelated to the single purpose; not used for creditworthiness or lending.
-- **Privacy policy URL:** host `docs/privacy.html` (e.g. GitHub Pages) and enter its address here.
+- **Privacy policy URL:** https://ninoman.github.io/crater/privacy.html, published from `site/privacy.html` by the [Pages workflow](../.github/workflows/pages.yml). Keep it in step with `docs/privacy.md`.
