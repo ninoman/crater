@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/ninoman/crater/compare/v0.9.1...v0.10.0) (2026-11-02)
+
+
+### Features
+
+* combine pending PRs [#29](https://github.com/ninoman/crater/issues/29)–[#33](https://github.com/ninoman/crater/issues/33) ([#34](https://github.com/ninoman/crater/issues/34)) ([95f1326](https://github.com/ninoman/crater/commit/95f1326594f162fd4cc575b3a0ca8301b01da837))
+
 ## [0.9.1](https://github.com/ninoman/crater/compare/v0.9.0...v0.9.1) (2026-10-30)
 
 
