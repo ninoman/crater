@@ -21,6 +21,13 @@ export const PACE_FACTOR_MAX = 4;
 export const SPEED_UP_AFTER = 100;
 const SPEED_UP_STEP = 0.9;
 /**
+ * Getting back to the configured pace after a throttle is quicker: that pace is one the user
+ * chose, not a guess at Bandcamp's limit. From the slowest factor it takes 140 requests, about
+ * 8 minutes at the default pace, where the 100-request rule took over an hour (decisions §5).
+ */
+export const RECOVER_AFTER = 20;
+const RECOVER_STEP = 0.8;
+/**
  * However fast the factor gets, the wait never drops below this. It's under the settings' 1 s
  * floor on purpose: only a long calm stretch earns it, and one throttle doubles the wait again.
  */
@@ -47,11 +54,18 @@ export function paceWaitMs(
   return Math.max(0, lastRequestAt + paceDelayMs(pace, random, factor) - now);
 }
 
-/** One more request sent; every SPEED_UP_AFTER of them without a throttle speeds up by 10 %. */
+/**
+ * One more request sent. Slower than configured, every RECOVER_AFTER calm requests speed up by
+ * 20 %, stopping at the configured pace; from there, every SPEED_UP_AFTER speed up by 10 %.
+ */
 export function paceAfterRequest({ factor, calmRequests }: AdaptivePace): AdaptivePace {
   const calm = calmRequests + 1;
-  if (calm < SPEED_UP_AFTER) return { factor, calmRequests: calm };
-  return { factor: Math.max(PACE_FACTOR_MIN, factor * SPEED_UP_STEP), calmRequests: 0 };
+  const recovering = factor > 1;
+  if (calm < (recovering ? RECOVER_AFTER : SPEED_UP_AFTER)) return { factor, calmRequests: calm };
+  const next = recovering
+    ? Math.max(1, factor * RECOVER_STEP)
+    : Math.max(PACE_FACTOR_MIN, factor * SPEED_UP_STEP);
+  return { factor: next, calmRequests: 0 };
 }
 
 /** Bandcamp pushed back: wait twice as long between requests from now on. */

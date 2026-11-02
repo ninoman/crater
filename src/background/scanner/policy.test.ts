@@ -18,6 +18,7 @@ import {
   paceAfterThrottle,
   paceDelayMs,
   paceWaitMs,
+  RECOVER_AFTER,
   SPEED_UP_AFTER,
 } from './pace';
 import { INITIAL_SCANNER_STATE, pauseFor, resumePatch } from './state';
@@ -190,6 +191,28 @@ describe('pace', () => {
 
     for (let i = 0; i < SPEED_UP_AFTER * 20; i++) state = paceAfterRequest(state);
     expect(state.factor).toBe(PACE_FACTOR_MIN);
+  });
+
+  it(`recovers from a throttle by 20 % every ${RECOVER_AFTER} calm requests, to the configured pace`, () => {
+    let state = { factor: PACE_FACTOR_MAX, calmRequests: 0 };
+    for (let i = 1; i < RECOVER_AFTER; i++) state = paceAfterRequest(state);
+    expect(state).toEqual({ factor: PACE_FACTOR_MAX, calmRequests: RECOVER_AFTER - 1 });
+    state = paceAfterRequest(state);
+    expect(state.factor).toBeCloseTo(3.2);
+    expect(state.calmRequests).toBe(0);
+
+    // Lands on exactly 1 instead of overshooting, 140 requests from the slowest pace.
+    let requests = RECOVER_AFTER;
+    while (state.factor > 1) {
+      state = paceAfterRequest(state);
+      requests++;
+    }
+    expect(state).toEqual({ factor: 1, calmRequests: 0 });
+    expect(requests).toBe(RECOVER_AFTER * 7);
+
+    // Past the configured pace, the cautious rule takes over again.
+    for (let i = 0; i < RECOVER_AFTER; i++) state = paceAfterRequest(state);
+    expect(state.factor).toBe(1);
   });
 
   it('doubles the wait on a throttle, up to four times, and restarts the calm count', () => {
