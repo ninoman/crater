@@ -115,12 +115,14 @@
   margin-left: auto;
 }
 
+/* The highlight starts and ends fully outside the block, so the loop restarts on a plain
+   block instead of snapping the glow from the right edge back to the left. */
 @keyframes dh-skeleton-shimmer {
   from {
-    background-position: 150% 0;
+    background-position: 200% 0;
   }
   to {
-    background-position: -50% 0;
+    background-position: -100% 0;
   }
 }
 
