@@ -5,9 +5,9 @@ import type { ItemKey } from '../bandcamp';
 /** How far the scan of one release's supporters has got. Broadcast as fans finish. */
 export interface ScanProgress {
   releaseKey: ItemKey;
-  /** Supporters whose collection has been read (or found private). */
+  /** Supporters whose scan has ended, whether listed or found in other scans. */
   scanned: number;
-  /** Supporters listed so far, up to the per-release cap. */
+  /** Supporters listed so far, up to the per-release cap, plus scanned owners not on that list. */
   total: number;
   /** False until the release page itself has been fetched, so 0 / 0 means "not started". */
   listed: boolean;

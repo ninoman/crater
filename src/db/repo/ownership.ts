@@ -34,7 +34,7 @@ export async function putOwnership(
 }
 
 /**
- * Records a wishlist add made on the release page, before the next sync sees it (decisions §21).
+ * Records a wishlist add made on a Bandcamp page, before the next sync sees it (decisions §21).
  * An item you own stays owned, and one already wishlisted keeps its date.
  */
 export async function markWishlisted(
@@ -59,7 +59,7 @@ export async function markWishlisted(
 }
 
 /**
- * Records a wishlist removal made on the release page. Its tags stay, so a quick re-add loses
+ * Records a wishlist removal made on a Bandcamp page. Its tags stay, so a quick re-add loses
  * nothing; the next full sync drops them (decisions §14).
  */
 export async function markUnwishlisted(

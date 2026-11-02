@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { CollectionItem } from '../bandcamp';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import type { CollectionItem, FetchJson } from '../bandcamp';
 import {
   createTag,
   CraterDb,
@@ -32,11 +32,13 @@ const ITEM: CollectionItem = {
 
 let db: CraterDb;
 let h: ItemListHandlers;
+let fetchJson: Mock<FetchJson>;
 
 beforeEach(async () => {
   db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
-  h = itemListHandlers(db, async () => 30);
+  fetchJson = vi.fn<FetchJson>();
+  h = itemListHandlers(db, async () => 30, fetchJson);
   await upsertCollectionItems(db, [ITEM]);
   await putOwnership(db, ME, [ITEM], 'wishlist');
 });
@@ -84,5 +86,62 @@ describe('item list handlers', () => {
 
     await h.markUnwishlisted({ itemKey: 'a2' }, sender);
     expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toBeNull();
+  });
+
+  describe('hearts on a fan page card', () => {
+    const card = {
+      itemKey: 't5' as const,
+      bandId: 7,
+      title: 'Grainphase',
+      artist: 'Claudio PRC',
+      url: 'https://x.bandcamp.com/album/split',
+      artId: 9,
+    };
+
+    it('answers false before it knows you', async () => {
+      expect(await h.markCardWishlisted({ card }, sender)).toBe(false);
+      expect(fetchJson).not.toHaveBeenCalled();
+    });
+
+    it('saves an unknown release, with its album from Bandcamp', async () => {
+      await saveViewer(db, { fanId: ME, username: 'me' });
+      fetchJson.mockResolvedValue({
+        id: 5,
+        type: 't',
+        album_id: 6,
+        bandcamp_url: 'https://x.bandcamp.com/track/grainphase',
+      });
+
+      expect(await h.markCardWishlisted({ card }, sender)).toBe(true);
+
+      const row = (await h.listItems({ source: 'wishlist' }, sender)).find(
+        (item) => item.itemKey === 't5',
+      );
+      expect(row).toMatchObject({
+        title: 'Grainphase',
+        url: 'https://x.bandcamp.com/track/grainphase',
+      });
+      expect((await db.ownership.get([ME, 't5']))?.matchKey).toBe('a6');
+    });
+
+    it('saves it from the card alone when Bandcamp fails', async () => {
+      await saveViewer(db, { fanId: ME, username: 'me' });
+      fetchJson.mockRejectedValue(new Error('offline'));
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      expect(await h.markCardWishlisted({ card }, sender)).toBe(true);
+
+      expect(await h.getItemTags({ itemKey: 't5' }, sender)).toEqual([]);
+      const row = (await h.listItems({ source: 'wishlist' }, sender)).find(
+        (item) => item.itemKey === 't5',
+      );
+      expect(row?.url).toBe(card.url);
+    });
+
+    it('asks Bandcamp nothing about a release it knows', async () => {
+      await saveViewer(db, { fanId: ME, username: 'me' });
+      expect(await h.markCardWishlisted({ card: { ...card, itemKey: 'a1' } }, sender)).toBe(true);
+      expect(fetchJson).not.toHaveBeenCalled();
+    });
   });
 });

@@ -3,6 +3,7 @@ import type { ItemKey, ReleaseInfo } from '../../bandcamp';
 import type { QueryView } from '../../hooks/useFollowingQuery';
 import { useItemTags } from '../../hooks/useItemTags';
 import { type FollowedAccount, useRecordFollow } from '../../hooks/useRecordFollow';
+import { type FanCardPromptView, useFanCardTagPrompt } from '../../hooks/useFanCardTagPrompt';
 import { useTagPrompt } from '../../hooks/useTagPrompt';
 import { useTags } from '../../hooks/useTags';
 import { AnchoredTagPicker } from '../../ui';
@@ -26,11 +27,39 @@ export interface WishlistTagPromptProps {
 /** Opens the tag picker by Bandcamp's heart when you wishlist this release (decisions §21). */
 export function WishlistTagPrompt({ release, name }: WishlistTagPromptProps) {
   const prompt = useTagPrompt(document, release);
-  const own = useItemTags(release.itemKey);
-  const itemKeys: ItemKey[] = [release.itemKey];
+  return <ItemPromptPicker {...prompt} itemKey={release.itemKey} name={name} />;
+}
+
+/** Opens the tag picker by an item card when you wishlist it on someone's profile (§21). */
+export function FanCardTagPrompt() {
+  const { view, close } = useFanCardTagPrompt(document);
+  if (!view.open) return null;
+  // Keyed so a heart on another card never shows this one's tags.
+  return <FanCardPicker key={view.itemKey} view={view} close={close} />;
+}
+
+function FanCardPicker({
+  view,
+  close,
+}: {
+  view: Extract<FanCardPromptView, { open: true }>;
+  close: () => void;
+}) {
+  return <ItemPromptPicker view={view} close={close} itemKey={view.itemKey} name={view.name} />;
+}
+
+interface ItemPromptPickerProps extends ReturnType<typeof useTagPrompt> {
+  itemKey: ItemKey;
+  name: string;
+}
+
+function ItemPromptPicker({ view, close, itemKey, name }: ItemPromptPickerProps) {
+  const own = useItemTags(itemKey);
+  const itemKeys: ItemKey[] = [itemKey];
   return (
     <PromptPicker
-      {...prompt}
+      view={view}
+      close={close}
       own={own}
       title={`Tag ${name}`}
       handlers={(mutations, assigned, onError) =>

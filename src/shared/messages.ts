@@ -2,7 +2,7 @@
 // Add a message by extending MessageMap; both sides get checked types for free.
 // Worker-to-tab events go the other way and are listed in EventMap.
 
-import type { ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
+import type { FanItemCard, ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
 import type { AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouMode, ForYouResult } from './forYou';
@@ -138,6 +138,8 @@ export interface MessageMap {
     request: { release: Pick<ReleasePageItem, 'itemKey' | 'albumKey'> };
     response: boolean;
   };
+  /** A heart clicked on an item card on someone's profile; like `markWishlisted`. */
+  markCardWishlisted: { request: { card: FanItemCard }; response: boolean };
   markUnwishlisted: { request: { itemKey: ItemKey }; response: null };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
@@ -217,6 +219,8 @@ export interface EventMap {
   alsoBought: AlsoBoughtResult;
   /** Sent with `alsoBought`: the crate mates owning that release, after the same scans. */
   releaseCrateMates: ReleaseCrateMatesResult;
+  /** New leaderboards are stored. The tab asks for them, so a board isn't sent to every fan page. */
+  crateMatesRecomputed: NoPayload;
 }
 
 export type EventType = keyof EventMap;

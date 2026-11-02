@@ -30,6 +30,7 @@ Captured logged out with curl on 2026-10-19 (Phase 0). Every parser in `src/band
 | `band_details-label.json` | `band_details` with `{"band_id":3648395603}` (Peacefrog, a label): 127 releases, some sold from its artists' accounts (their `band_id`, `artist_name`) | `parseDiscography`: seller vs. followed account |
 | `band_details-unknown.json` | `band_details` with `band_id: 99999999999` | error shape: HTTP 200 `{"error":true,"error_message":…}` |
 | `tralbum_details.json` / `-track.json` | `POST .../api/mobile/24/tralbum_details` with `{"band_id","tralbum_type","tralbum_id"}`: the album *Mere Mortals*, and a Peacefrog single | `parseReleaseDetails`: `bandcamp_url`, `album_id`, `release_date` (unix s) |
+| `tralbum_details-custom-domain.json` / `-custom-domain-track.json` | The same request for a release on a custom domain (2026-10-31): *Sidewinder EP* and its first track, on `craigieknowes.com`. `bandcamp_url` is the custom domain, not the subdomain | `parseApiRelease`, `parseApiReleasePreview`, custom-domain jobs |
 | `page-actions.html` | Bandcamp's heart (`li#collect-item`) and follow (`#following-actions`) controls, copied from the rendered DOM of `https://floatingpoints.bandcamp.com/album/promises` logged out (2026-10-23), plus the server-rendered placeholder, the "Subscribed!" variant from Bandcamp's `fan/band_follow` template and the fan page's button from `fan-page.html`. One `<section>` per case | `bandcamp/pageActions.ts`, `TagPrompt` (decisions §21) |
 
 

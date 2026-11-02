@@ -1,7 +1,7 @@
 // Message handlers for your wishlist and collection lists and the tags on their items. The
 // rules live in the repos.
 
-import { artUrl, keyToNumber } from '../bandcamp';
+import { artUrl, type FetchJson, keyToNumber } from '../bandcamp';
 import {
   assignItemTag,
   getCrateMates,
@@ -19,10 +19,16 @@ import { topCrateMates } from '../scoring/forYou';
 import { crateMateOwnerCounts } from '../scoring/wishlistCrateMates';
 import type { ListedItem } from '../shared/itemList';
 import type { MessageHandlers } from '../shared/messages';
+import { releaseFromCard } from './releaseFromCard';
 
 export type ItemListHandlers = Pick<
   MessageHandlers,
-  'listItems' | 'getItemTags' | 'assignItemTag' | 'markWishlisted' | 'markUnwishlisted'
+  | 'listItems'
+  | 'getItemTags'
+  | 'assignItemTag'
+  | 'markWishlisted'
+  | 'markCardWishlisted'
+  | 'markUnwishlisted'
 >;
 
 /** How many of your top crate mates own each row's release, in row order. */
@@ -41,6 +47,7 @@ async function crateMateOwners(db: CraterDb, rows: readonly OwnedRow[], k: numbe
 export function itemListHandlers(
   db: CraterDb,
   topCrateMatesK: () => Promise<number>,
+  fetchJson: FetchJson,
 ): ItemListHandlers {
   return {
     // Before your first sync there's no `me`, so no lists yet.
@@ -78,6 +85,12 @@ export function itemListHandlers(
       const me = await getMe(db);
       if (!me) return false;
       await markWishlisted(db, me.fanId, release, Date.now());
+      return true;
+    },
+    markCardWishlisted: async ({ card }) => {
+      const me = await getMe(db);
+      if (!me) return false;
+      await markWishlisted(db, me.fanId, await releaseFromCard(db, fetchJson, card), Date.now());
       return true;
     },
     markUnwishlisted: async ({ itemKey }) => {

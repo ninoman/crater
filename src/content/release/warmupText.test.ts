@@ -1,15 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { formatWarmup, warmupFill } from './warmupText';
+import { formatWarmup } from './warmupText';
 
 const warmup = { read: 12, readTarget: 20, confident: 3, confidentTarget: 5 };
 
 describe('warm-up text', () => {
-  it('says how far both halves of the wait have got', () => {
-    expect(formatWarmup(warmup)).toBe('12 of 20 supporters read · 3 of 5 strong picks');
+  it('names the read target when it is short of the whole scan', () => {
+    expect(formatWarmup(warmup, 500)).toBe('3 of 5 strong picks · needs 20 supporters read');
   });
 
-  it('fills the bar only when both are met', () => {
-    expect(warmupFill(warmup)).toEqual({ value: 15, max: 25 });
-    expect(warmupFill({ ...warmup, read: 20 })).toEqual({ value: 23, max: 25 });
+  it('leaves the target out when the wait is for every supporter', () => {
+    expect(formatWarmup({ ...warmup, read: 4, readTarget: 7 }, 7)).toBe('3 of 5 strong picks');
+  });
+
+  it('leaves the target out once it is met', () => {
+    expect(formatWarmup({ ...warmup, read: 20 }, 500)).toBe('3 of 5 strong picks');
+  });
+
+  it('leaves the target out before the scan total is known', () => {
+    expect(formatWarmup(warmup, null)).toBe('3 of 5 strong picks');
   });
 });

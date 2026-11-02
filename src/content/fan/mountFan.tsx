@@ -1,6 +1,6 @@
 import { FAN_PAGE_DOM, fanProfileUrl, ParserError, parseViewedFanId } from '../../bandcamp';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
-import { FollowRecorder } from '../shared/TagPrompt';
+import { FanCardTagPrompt, FollowRecorder } from '../shared/TagPrompt';
 import { pageTagsStyles } from '../shared/tagStyles';
 import { mountShadow } from '../shared/mountShadow';
 import fanCss from './Fan.css?inline';
@@ -8,7 +8,7 @@ import { CrateMateStandingBadge } from './CrateMateStandingBadge';
 
 /**
  * Adds the "your #N crate mate" badge and, for fans you follow, your tags under the name. A
- * follow made here is saved at once.
+ * follow made here is saved at once, and hearting one of the fan's items opens the tag picker.
  */
 export function mountFan(doc: Document): void {
   const pagedata = doc.getElementById('pagedata');
@@ -41,6 +41,7 @@ export function mountFan(doc: Document): void {
       <CrateMateStandingBadge fanId={fanId} />
       <FollowedAccountTags kind="fan" id={fanId} name={fanName} />
       <FollowRecorder account={account} />
+      <FanCardTagPrompt />
     </>,
     fanCss + pageTagsStyles,
   );

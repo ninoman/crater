@@ -67,10 +67,15 @@ function stubWorker() {
         if (message.type === 'getScannerStatus') return { ok: true, data: status };
         return { ok: false, error: `not faked: ${message.type}` };
       },
-      onMessage: { addListener: () => {}, removeListener: () => {} },
+      onMessage: {
+        addListener: (listener: (message: unknown) => void) => workerListeners.add(listener),
+        removeListener: (listener: (message: unknown) => void) => workerListeners.delete(listener),
+      },
     },
   });
 }
+
+const workerListeners = new Set<(message: unknown) => void>();
 
 let container: HTMLDivElement;
 let root: Root;
@@ -133,6 +138,24 @@ describe('CrateMatesTab', () => {
     status = scanner({ fansScanned: 41 });
     await poll();
     expect(crateMateFetches).toBe(2);
+  });
+
+  it('swaps in the new board after a recompute, without going back to loading', async () => {
+    board = { ...empty, rows: [mate], fansRead: 40 };
+    await render();
+
+    board = { ...board, rows: [{ ...mate, name: 'Newcomer' }] };
+    const pending = act(async () => {
+      for (const listener of workerListeners) {
+        listener({ event: 'crateMatesRecomputed', payload: {} });
+      }
+    });
+    expect(text()).not.toContain('Loading your crate mates');
+    await pending;
+    await act(async () => {});
+
+    expect(text()).toContain('Newcomer');
+    expect(text()).not.toContain('Ten');
   });
 
   it('leaves placeholders off a full board', async () => {

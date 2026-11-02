@@ -6,7 +6,7 @@ import {
 } from '../../bandcamp';
 import { itemFromCollection, itemFromReleasePage } from '../mappers';
 import type { BandRecord, CraterDb, ItemFields, ItemRecord, StoredItem } from '../schema';
-import { readItem, readItemFields, storeItem } from '../storage';
+import { readItem, readItemFields, releaseUrlHost, storeItem } from '../storage';
 
 /**
  * Item records for stored rows, URLs rebuilt from their bands' hosts (decisions §19). Call
@@ -162,6 +162,24 @@ export function itemsWhere(
   return db.transaction('r', [db.items, db.bands], async () =>
     readItems(db, await itemRowsWhere(db, index, values)),
   );
+}
+
+/**
+ * Items that may sit at these URLs: every release of the bands seen under their hosts. Each
+ * stored URL's host is in its band's `hosts` (decisions §19), so none is missed.
+ */
+export async function itemsAtUrls(db: CraterDb, urls: string[]): Promise<ItemRecord[]> {
+  const hosts = [...new Set(urls.flatMap((url) => releaseUrlHost(url) ?? []))];
+  if (hosts.length === 0) return [];
+  const bandIds = await db.bands.where('hosts').anyOf(hosts).primaryKeys();
+  return itemsWhere(db, 'bandId', [...new Set(bandIds)]);
+}
+
+/** The account selling a release. An album only known from a track of it goes by the track. */
+export async function releaseSeller(db: CraterDb, itemKey: ItemKey): Promise<number | null> {
+  const item =
+    (await db.items.get(itemKey)) ?? (await db.items.where('albumKey').equals(itemKey).first());
+  return item?.bandId ?? null;
 }
 
 /** Which of these match ids have a record flagged as a compilation (decisions §17). */

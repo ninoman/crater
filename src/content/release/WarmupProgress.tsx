@@ -1,10 +1,11 @@
 import type { AlsoBoughtWarmup } from '../../shared/alsoBought';
-import { Progress } from '../../ui';
 import { Gathering } from './Gathering';
-import { formatWarmup, warmupFill } from './warmupText';
+import { formatWarmup } from './warmupText';
 
 export interface WarmupProgressProps {
   warmup: AlsoBoughtWarmup;
+  /** Supporters the scan header counts up to, or null before it knows. */
+  scanTotal: number | null;
   /** A notice above says why the scanner isn't running. */
   scanStopped: boolean;
   /** Early picks show below, so this heads them instead of placeholders. */
@@ -12,8 +13,7 @@ export interface WarmupProgressProps {
 }
 
 /** Why trusted picks aren't showing yet, and how close they are. */
-export function WarmupProgress({ warmup, scanStopped, early }: WarmupProgressProps) {
-  const fill = warmupFill(warmup);
+export function WarmupProgress({ warmup, scanTotal, scanStopped, early }: WarmupProgressProps) {
   return (
     <Gathering
       title={early ? 'Early picks' : 'Reading supporters before picking'}
@@ -27,8 +27,7 @@ export function WarmupProgress({ warmup, scanStopped, early }: WarmupProgressPro
       paused={scanStopped}
       placeholders={!early}
     >
-      <Progress value={fill.value} max={fill.max} label="Also-bought warm-up" />
-      <p className="dh-warmup__line">{formatWarmup(warmup)}</p>
+      <p className="dh-warmup__line">{formatWarmup(warmup, scanTotal)}</p>
     </Gathering>
   );
 }

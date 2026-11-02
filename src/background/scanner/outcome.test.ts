@@ -11,10 +11,10 @@ describe('classifyFailure', () => {
     expect(classifyFailure(error, 0)).toEqual({ kind: 'network' });
   });
 
-  it('drops a job on a custom domain the redirect can’t leave', () => {
+  it('drops a job on a custom domain whose seller is unknown', () => {
     const error = new BlockedHostError(
       'https://music.example.com/track/x',
-      new TypeError('Failed to fetch'),
+      'its seller is unknown',
     );
     expect(classifyFailure(error, 0)).toEqual({ kind: 'permanent' });
   });

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { sendMessage } from '../shared/messages';
+import { onWorkerEvent, sendMessage } from '../shared/messages';
 import type { CrateMatesResult } from '../shared/crateMates';
 
 export type CrateMatesView =
@@ -9,8 +9,9 @@ export type CrateMatesView =
   | { state: 'unreachable'; error: string };
 
 /**
- * Fetches the crate-mates leaderboard on mount. `reload` asks again, e.g. after an error;
- * `refresh` asks again without going back to loading, e.g. while a scan fills it in.
+ * Fetches the crate-mates leaderboard on mount, and again in place after each recompute. `reload`
+ * asks again, e.g. after an error; `refresh` asks again without going back to loading, e.g. while
+ * a scan fills it in.
  */
 export function useCrateMates(): { view: CrateMatesView; reload: () => void; refresh: () => void } {
   const [view, setView] = useState<CrateMatesView>({ state: 'loading' });
@@ -26,6 +27,7 @@ export function useCrateMates(): { view: CrateMatesView; reload: () => void; ref
 
   useEffect(() => {
     void load();
+    return onWorkerEvent('crateMatesRecomputed', () => void load());
   }, [load]);
 
   const reload = useCallback(() => {

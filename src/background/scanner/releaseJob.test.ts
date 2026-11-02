@@ -1,9 +1,22 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixtureJson, fixtureText } from '../../../tests/fixtures';
-import { ParserError, type BandcampRequest } from '../../bandcamp';
-import { CraterDb, getItem, putFollowing, refreshFanMatches, type ReleaseJob } from '../../db';
+import {
+  ParserError,
+  SUPPORTERS_FIRST_TOKEN,
+  parseApiRelease,
+  type BandcampRequest,
+} from '../../bandcamp';
+import {
+  CraterDb,
+  getItem,
+  putFollowing,
+  refreshFanMatches,
+  upsertReleasePageItem,
+  type ReleaseJob,
+} from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
+import { BlockedHostError } from '../http';
 import type { StepContext } from './context';
 import { BACKGROUND, FOREGROUND, SEED, SEED_FANS } from './priority';
 import { runReleaseStep } from './releaseJob';
@@ -199,22 +212,76 @@ describe('runReleaseStep', () => {
       ParserError,
     );
   });
+});
 
-  it('asks the mobile API for the subdomain URL of a release on a custom domain', async () => {
-    await runReleaseStep(context(500), job());
-    const fetched: string[] = [];
-    const details = { ...(fixtureJson('tralbum_details.json') as object), bandcamp_url: job().url };
+describe('a release on a custom domain', () => {
+  const ALBUM = 'a450307620';
+  const TRACK = 't1348592118';
+  const fetched = () => {
+    const urls: string[] = [];
     const ctx: StepContext = {
       ...context(500),
-      fetchText: async (request: BandcampRequest) => {
-        fetched.push(request.url);
-        return fixtureText('album-page.html');
+      fetchText: async ({ url }) => {
+        urls.push(url);
+        throw new TypeError('Failed to fetch');
       },
-      fetchJson: async () => details,
+      fetchJson: async ({ url, init }) => {
+        urls.push(url);
+        if (url.endsWith('/thumbs') || url.endsWith('/reviews')) {
+          return { results: [], more_available: false };
+        }
+        const { tralbum_type: type } = JSON.parse(init.body as string) as { tralbum_type: string };
+        return fixtureJson(`tralbum_details-custom-domain${type === 't' ? '-track' : ''}.json`);
+      },
     };
+    return { ctx, urls };
+  };
+  const domainJob = (target: string, priority = 1): ReleaseJob => ({
+    ...job(),
+    target: target as ReleaseJob['target'],
+    url: 'https://craigieknowes.com/album/sidewinder-ep',
+    priority,
+  });
+  const storeRelease = (fixture: string) =>
+    upsertReleasePageItem(db, parseApiRelease(fixtureJson(fixture)).item);
 
-    await runReleaseStep(ctx, { ...job(), url: 'https://music.floatingpoints.com/album/promises' });
-    expect(fetched).toEqual([job().url]);
+  it('reads it from the API and pages its supporters from the start, never the domain', async () => {
+    await storeRelease('tralbum_details-custom-domain.json');
+    const { ctx, urls } = fetched();
+
+    const cursor = await runReleaseStep(ctx, domainJob(ALBUM));
+    expect(cursor).toEqual({
+      thumbsToken: SUPPORTERS_FIRST_TOKEN,
+      reviewsToken: SUPPORTERS_FIRST_TOKEN,
+      collected: 0,
+    });
+    await runReleaseStep(ctx, { ...domainJob(ALBUM), cursor });
+
+    expect(urls).toEqual([
+      'https://bandcamp.com/api/mobile/24/tralbum_details',
+      'https://bandcamp.com/api/tralbumcollectors/2/thumbs',
+    ]);
+    expect((await getItem(db, ALBUM))?.tags).toContain('acid');
+  });
+
+  it("finds an album's seller through a track of it, and queues the album from a seed track", async () => {
+    await storeRelease('tralbum_details-custom-domain-track.json');
+    const { ctx, urls } = fetched();
+
+    await runReleaseStep(ctx, domainJob(TRACK, SEED));
+    expect((await db.queue.toArray()).map((queued) => queued.target)).toContain(ALBUM);
+    await db.queue.clear();
+    await runReleaseStep(ctx, { ...domainJob(ALBUM), url: 'https://craigieknowes.com' });
+
+    expect(urls.every((url) => url.startsWith('https://bandcamp.com/api/'))).toBe(true);
+    expect((await getItem(db, ALBUM))?.url).toBe('https://craigieknowes.com/album/sidewinder-ep');
+  });
+
+  it('drops the job without a request when its seller is unknown', async () => {
+    const { ctx, urls } = fetched();
+
+    await expect(runReleaseStep(ctx, domainJob(ALBUM))).rejects.toThrow(BlockedHostError);
+    expect(urls).toEqual([]);
   });
 });
 

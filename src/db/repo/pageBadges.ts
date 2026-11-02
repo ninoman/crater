@@ -2,10 +2,9 @@
 
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { PageBadge, ReleaseRef } from '../../shared/pageBadges';
-import type { CraterDb, ItemFields, ItemRecord, OwnershipRecord } from '../schema';
-import { releaseUrlHost } from '../storage';
+import type { CraterDb, ItemFields, OwnershipRecord } from '../schema';
 import { fanRows } from './fanRows';
-import { getItemFields, itemsWhere } from './items';
+import { getItemFields, itemsAtUrls } from './items';
 import { getCrateMates } from './crateMates';
 
 interface Release {
@@ -25,17 +24,6 @@ function contains(sorted: Float64Array, value: number): boolean {
     else hi = mid - 1;
   }
   return false;
-}
-
-/**
- * Items that may sit at these URLs: every release of the bands seen under their hosts. Each
- * stored URL's host is in its band's `hosts` (decisions §19), so none is missed.
- */
-async function itemsAtUrls(db: CraterDb, urls: string[]): Promise<ItemRecord[]> {
-  const hosts = [...new Set(urls.flatMap((url) => releaseUrlHost(url) ?? []))];
-  if (hosts.length === 0) return [];
-  const bandIds = await db.bands.where('hosts').anyOf(hosts).primaryKeys();
-  return itemsWhere(db, 'bandId', [...new Set(bandIds)]);
 }
 
 /** Each ref's release: its item record when we have one, else its id alone. Null when unknown. */

@@ -34,6 +34,20 @@ export const FAN_PAGE_DOM = {
   /** In either holder: Bandcamp's own lists and "view all", hidden while ours stands in (§14). */
   itemsNativeList: 'ol.collection-grid',
   itemsExpand: '.expand-container',
+  /** An item card in a fan's collection or wishlist, with the release's ids as data attributes. */
+  itemCard: 'li.collection-item-container',
+  /**
+   * The card's wishlist control. Bandcamp swaps these classes on it when you click, and `purchased`
+   * replaces them on what you own (fan-page-in-common.html, decisions §21).
+   */
+  itemActions: '.collection-item-actions',
+  itemActionsOn: 'wishlisted',
+  itemActionsOff: 'wishlist',
+  /** The card's second copy of its title, without the first's hidden "(gift given)" note. */
+  itemTitle: '.item-link-alt .collection-item-title',
+  itemArtist: '.item-link-alt .collection-item-artist',
+  itemLink: 'a.item-link',
+  itemArt: 'img.collection-item-art',
   /** Bandcamp's following tab; it has `active` while open (me-following-tab.html). */
   followingGrid: '#following-grid',
   /** The sub-tabs inside it: artists & labels, fans, genres. `active` marks the open one. */

@@ -67,6 +67,9 @@ export function followingRequest(
   });
 }
 
+/** A token that starts a release's supporters from the newest buyer, for albums and tracks. */
+export const SUPPORTERS_FIRST_TOKEN = '1:9999999999:a::';
+
 /** Next page of a release's supporters, after the last token seen. */
 export function supportersRequest(
   kind: 'thumbs' | 'reviews',
@@ -89,7 +92,13 @@ export const RELEASE_PAGE_PATTERNS = [
   'https://*.bandcamp.com/track/*',
 ];
 
-/** Release pages live on artist subdomains of bandcamp.com (a custom domain 303s to one). */
+/** Tab URL pattern for fan pages, your profile among them. */
+export const FAN_PAGE_PATTERNS = ['https://bandcamp.com/*'];
+
+/**
+ * Release pages live on artist subdomains of bandcamp.com. A custom domain 303s to one, but the
+ * redirect fails CORS, so anything else is read through the mobile API (decisions §5).
+ */
 export function isBandcampUrl(url: string): boolean {
   try {
     const { protocol, hostname } = new URL(url);
