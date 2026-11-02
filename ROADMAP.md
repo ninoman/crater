@@ -414,12 +414,21 @@ Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate 
 
 Also added: full database export and import on the popup's Settings tab (backup, or moving to a new machine). Import replaces everything and keeps settings, pause and budget (decisions §10).
 
+## Firefox (not MVP)
+
+Same code, a second build (decisions §26).
+
+1. [x] Per-browser manifest (`manifestFor`), `pnpm build:firefox` into `dist-firefox/`, and `web-ext` scripts to lint and run it.
+2. [x] Check the keep-alive in Firefox's event page (it holds, decisions §26).
+3. [x] Popup notice when bandcamp.com access is withdrawn, and browser-neutral copy.
+4. [ ] Dogfood a full sync and scan in Firefox.
+5. [ ] First AMO listing: upload the zip and the source zip by hand, then add `web-ext sign` to CI.
+
 ---
 
 ## Post-MVP backlog (roughly by value)
 
 - Export picks as M3U-style text for DJ library tools (CSV is done: *Wishlist and collection tools*)
-- Firefox port (MV3 in Firefox, with `browser.*` polyfill)
 
 ---
 

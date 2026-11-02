@@ -5,6 +5,7 @@
     "includes": [
       "**",
       "!dist",
+      "!dist-firefox",
       "!spikes",
       "!scripts",
       "!tests/fixtures",

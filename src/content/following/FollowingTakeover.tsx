@@ -149,7 +149,7 @@ export function FollowingTakeover({ taken, open }: { taken: TakenList; open: boo
           <EmptyState
             tone="error"
             title="Couldn't load your follows"
-            description="Crater's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from chrome://extensions."
+            description="Crater's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from your browser’s extensions page."
             action={<Button onClick={notifyFollowingChanged}>Try again</Button>}
           />
         );

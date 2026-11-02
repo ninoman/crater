@@ -247,11 +247,12 @@ export async function broadcastToTabs<K extends EventType>(
   payload: EventMap[K],
 ): Promise<void> {
   const envelope: EventEnvelope<K> = { event, payload };
-  // Frozen and discarded tabs can't run our listener anyway.
-  const tabs = await chrome.tabs.query({ url: urlPatterns, frozen: false, discarded: false });
+  // Frozen and discarded tabs can't run our listener anyway. `frozen` is filtered here, not in
+  // the query: Firefox has no such tab property and rejects the whole query (decisions §26).
+  const tabs = await chrome.tabs.query({ url: urlPatterns, discarded: false });
   await Promise.all(
-    tabs.map(async ({ id }) => {
-      if (id === undefined) return;
+    tabs.map(async ({ id, frozen }) => {
+      if (id === undefined || frozen) return;
       // A tab opened before the extension loaded has no listener; that's fine. The timeout
       // covers a tab that freezes between the query and the send.
       await Promise.race([

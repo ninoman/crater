@@ -113,7 +113,7 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
           <EmptyState
             tone="error"
             title={`Couldn't load your ${noun}`}
-            description="Crater's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from chrome://extensions."
+            description="Crater's background worker didn't answer, so Bandcamp's own list is below. Try again, or reload the extension from your browser’s extensions page."
             action={<Button onClick={notifyFollowingChanged}>Try again</Button>}
           />
         );

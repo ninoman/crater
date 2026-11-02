@@ -1,6 +1,7 @@
 // Chrome stops an MV3 worker about 30 s after its last extension event or API call, and
 // IndexedDB work doesn't count, so a long upgrade or import was cut off and rolled back on
 // every wake-up (decisions §19). While such work runs, a cheap API call every 20 s keeps it.
+// Firefox's event page has the same 30 s limit, and the same ping holds it (decisions §26).
 
 export const KEEP_ALIVE_MS = 20_000;
 

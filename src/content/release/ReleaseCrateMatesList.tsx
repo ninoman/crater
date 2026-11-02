@@ -11,7 +11,7 @@ export function ReleaseCrateMatesList({ view }: { view: ReleaseCrateMatesView })
       <EmptyState
         tone="error"
         title="Background worker unreachable"
-        description="Try reloading the extension from chrome://extensions."
+        description="Try reloading the extension from your browser’s extensions page."
       />
     );
   }
