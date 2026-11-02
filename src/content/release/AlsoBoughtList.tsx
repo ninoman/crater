@@ -88,7 +88,7 @@ function Body({ view, progress, scanStopped, showEarly, children }: BodyProps) {
       <EmptyState
         tone="error"
         title="Background worker unreachable"
-        description="Try reloading the extension from chrome://extensions."
+        description="Try reloading the extension from your browser’s extensions page."
       />
     );
   }

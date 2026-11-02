@@ -29,7 +29,7 @@ export function EmptyFollowing({
       <EmptyState
         tone="error"
         title="Couldn't check your sync"
-        description={`Crater's background worker didn't answer. Reload the extension from chrome://extensions. ${BELOW}`}
+        description={`Crater's background worker didn't answer. Reload the extension from your browser’s extensions page. ${BELOW}`}
       />
     );
   }

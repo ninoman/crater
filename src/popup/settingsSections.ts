@@ -9,7 +9,7 @@ export type SettingEntry =
   | { kind: 'speed' }
   /** Lately re-reads on or off; the count and interval are in Advanced. */
   | { kind: 'lately-rescan' }
-  /** Notifications for new releases from your follows, behind Chrome's permission prompt. */
+  /** Notifications for new releases from your follows, behind the browser's permission prompt. */
   | { kind: 'follow-notifications' };
 
 export interface SettingSection {

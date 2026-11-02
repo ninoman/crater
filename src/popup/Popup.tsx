@@ -5,6 +5,7 @@ import { ClearData } from './ClearData';
 import { CsvExport } from './CsvExport';
 import { DatabaseBackup } from './DatabaseBackup';
 import { HiddenList } from './HiddenList';
+import { HostAccessNotice } from './HostAccessNotice';
 import { TagBackup } from './TagBackup';
 import { ScannerSummary } from './ScannerSummary';
 import { SettingsPanel } from './SettingsPanel';
@@ -21,7 +22,7 @@ function SyncBody() {
         <EmptyState
           tone="error"
           title="Background worker unreachable"
-          description="Try reloading the extension from chrome://extensions."
+          description="Try reloading the extension from your browser’s extensions page."
         />
       );
     case 'ready':
@@ -79,6 +80,7 @@ export function Popup() {
           {worker.state === 'unreachable' && <StatusDot tone="error">Worker unreachable</StatusDot>}
         </span>
       </header>
+      <HostAccessNotice />
       <Tabs
         label="Crater"
         items={[

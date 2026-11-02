@@ -1,42 +1,60 @@
 import { defineManifest } from '@crxjs/vite-plugin';
 import pkg from '../package.json' with { type: 'json' };
+import { BANDCAMP_MATCHES } from './shared/bandcampHosts';
 
-// Custom-domain Bandcamp sites (e.g. music.koansound.com) are out of scope for the MVP:
-// matching them needs optional host permissions requested per domain.
-const BANDCAMP_MATCHES = ['https://bandcamp.com/*', 'https://*.bandcamp.com/*'];
+export type Browser = 'chrome' | 'firefox';
 
-export default defineManifest({
-  manifest_version: 3,
-  name: 'Crater – Music discovery for Bandcamp',
-  description: 'Purchase-based discovery for Bandcamp. Everything stays in your browser.',
-  version: pkg.version,
-  icons: {
-    16: 'icons/icon-16.png',
-    32: 'icons/icon-32.png',
-    48: 'icons/icon-48.png',
-    128: 'icons/icon-128.png',
-  },
-  permissions: ['storage', 'alarms'],
-  // Asked for from the popup when you turn on notifications for your follows (decisions §23).
-  optional_permissions: ['notifications'],
-  host_permissions: BANDCAMP_MATCHES,
-  background: {
-    service_worker: 'src/background/index.ts',
-    type: 'module',
-  },
-  content_scripts: [
-    {
-      matches: BANDCAMP_MATCHES,
-      js: ['src/content/index.tsx'],
-      run_at: 'document_idle',
+const WORKER = 'src/background/index.ts';
+
+// Firefox MV3 has no extension service workers, only event pages (decisions §26).
+// 142 is the first version (desktop and Android) that reads data_collection_permissions,
+// which AMO requires on new listings.
+const firefox = {
+  background: { scripts: [WORKER] },
+  browser_specific_settings: {
+    gecko: {
+      // Permanent once listed on AMO.
+      id: 'crater@ninoman',
+      strict_min_version: '142.0',
+      data_collection_permissions: { required: ['none' as const] },
     },
-  ],
-  action: {
-    default_popup: 'src/popup/index.html',
-    default_title: 'Crater',
-    default_icon: {
+  },
+};
+
+const chrome = {
+  background: { service_worker: WORKER, type: 'module' },
+};
+
+export const manifestFor = (browser: Browser) =>
+  defineManifest({
+    manifest_version: 3,
+    name: 'Crater – Music discovery for Bandcamp',
+    description: 'Purchase-based discovery for Bandcamp. Everything stays in your browser.',
+    version: pkg.version,
+    icons: {
       16: 'icons/icon-16.png',
       32: 'icons/icon-32.png',
+      48: 'icons/icon-48.png',
+      128: 'icons/icon-128.png',
     },
-  },
-});
+    permissions: ['storage', 'alarms'],
+    // Asked for from the popup when you turn on notifications for your follows (decisions §23).
+    optional_permissions: ['notifications'],
+    host_permissions: BANDCAMP_MATCHES,
+    content_scripts: [
+      {
+        matches: BANDCAMP_MATCHES,
+        js: ['src/content/index.tsx'],
+        run_at: 'document_idle',
+      },
+    ],
+    action: {
+      default_popup: 'src/popup/index.html',
+      default_title: 'Crater',
+      default_icon: {
+        16: 'icons/icon-16.png',
+        32: 'icons/icon-32.png',
+      },
+    },
+    ...(browser === 'firefox' ? firefox : chrome),
+  });

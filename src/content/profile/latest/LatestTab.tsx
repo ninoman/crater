@@ -70,7 +70,7 @@ function LatestBody({ view, reload, activity, actions, onShowHeard }: LatestBody
         <EmptyState
           tone="error"
           title="Couldn't load Crate mates' latest"
-          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from your browser’s extensions page."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNotificationPermission } from '../hooks/useNotificationPermission';
+import { NOTIFICATIONS, usePermission } from '../hooks/usePermission';
 import { useSettings } from '../hooks/useSettings';
 import { DEFAULT_SETTINGS, SETTING_LIMITS, type Settings } from '../shared/settings';
 import { applySpeedPreset, type SpeedPreset, speedPresetOf } from '../shared/settingsPresets';
@@ -121,7 +121,7 @@ function Entry({ entry, view, setDraft }: EntryProps) {
   }
 }
 
-/** Turning it on asks Chrome for the notifications permission first; it stays off if that's refused. */
+/** Turning it on asks the browser for the notifications permission first; it stays off if that's refused. */
 function FollowNotificationsToggle({
   checked,
   onChange,
@@ -129,14 +129,14 @@ function FollowNotificationsToggle({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
-  const { granted, request } = useNotificationPermission();
+  const { granted, request } = usePermission(NOTIFICATIONS);
   const blocked = checked && granted === false;
   return (
     <Toggle
       label="Notify me about new releases"
       description={
         blocked
-          ? 'Chrome isn’t letting Crater show notifications. Turn this off and on to ask again.'
+          ? 'Your browser isn’t letting Crater show notifications. Turn this off and on to ask again.'
           : 'One notification when Crater’s weekly check finds new releases from artists and labels you follow.'
       }
       checked={checked}

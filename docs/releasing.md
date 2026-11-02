@@ -4,7 +4,7 @@ Releases are driven by [release-please](https://github.com/googleapis/release-pl
 
 1. Push `feat:` / `fix:` commits to `main` as usual. release-please keeps a release PR open that bumps `package.json` and updates `CHANGELOG.md`.
 2. Merge the release PR when you want to ship. That tags `vX.Y.Z` and creates a GitHub release.
-3. The `publish` job then lints, tests and builds, and attaches the zip to the GitHub release.
+3. The `publish` job then lints, tests and builds, and attaches three zips to the GitHub release: Chrome, Firefox (`-firefox`) and the source (`-source`).
 4. Download that zip and upload it in the [developer dashboard](https://chrome.google.com/webstore/devconsole): Crater → Package → Upload new package, then Submit for review. The store publishes it once review passes.
 
 The upload stays manual on purpose: the Web Store API needs a Google OAuth client and refresh token, which isn't worth it for a step that takes a minute.
@@ -14,6 +14,19 @@ The manifest reads its version from `package.json`, so there is nothing else to 
 - `feat` bumps minor, `fix` bumps patch. While we're below 1.0, a breaking change (`feat!:` or `BREAKING CHANGE:`) also bumps minor.
 - Never use pre-release versions such as `0.2.0-beta.1`. Chrome only accepts 1–4 dot-separated integers.
 - Commits before `bootstrap-sha` in [release-please-config.json](../release-please-config.json) are treated as already released as 0.1.0.
+
+### Firefox (AMO)
+
+Upload `crater-vX.Y.Z-firefox.zip` in the [AMO developer hub](https://addons.mozilla.org/developers/): Crater → Upload new version. When it asks for source code, upload `crater-vX.Y.Z-source.zip` and paste these build steps:
+
+```
+pnpm install --frozen-lockfile
+pnpm build:firefox   # output in dist-firefox/
+```
+
+Before the first upload, check that `crater@ninoman` in `src/manifest.ts` is the Gecko ID you want: AMO ties the listing to it for good (decisions §26). Automating this with `web-ext sign` needs AMO API keys as repository secrets; it's on the roadmap, not done.
+
+To try a build locally: `pnpm build:firefox && pnpm start:firefox`.
 
 ## One-time setup
 

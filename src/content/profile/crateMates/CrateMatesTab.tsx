@@ -29,7 +29,7 @@ export function CrateMatesTab() {
         <EmptyState
           tone="error"
           title="Couldn't load your crate mates"
-          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from your browser’s extensions page."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );

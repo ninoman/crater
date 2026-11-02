@@ -8,6 +8,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
+    "build:firefox": "tsc --noEmit && BROWSER=firefox vite build",
+    "lint:firefox": "web-ext lint --source-dir dist-firefox",
+    "start:firefox": "web-ext run --source-dir dist-firefox --start-url https://bandcamp.com",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check .",
@@ -45,7 +48,8 @@
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vite": "8.3.4",
-    "vitest": "5.0.5"
+    "vitest": "5.0.5",
+    "web-ext": "10.8.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

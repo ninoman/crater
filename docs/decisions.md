@@ -1067,3 +1067,15 @@ Built and removed on 2026-10-24. A filter bar (genre, release year, name your pr
 - v17 stays declared, as released versions must, but no longer fills anything in. Facts already written to `items` (`year`, `nyp`, `physical`) and `bands` (`genre`, `location`) are left as unread fields: rewriting every item would make the upgrade take minutes (§19), and a rescan writes each row afresh.
 - If filters come back, start from the commits of that day (`feat(filters)`), and from the notes there on what Bandcamp sends: `band_location` is null logged out, and "name your price" isn't "free".
 
+
+## 26. Firefox build
+
+Added on 2026-11-02. One codebase, two builds: `pnpm build` (Chrome, `dist/`) and `pnpm build:firefox` (`dist-firefox/`). `src/manifest.ts` differs only in the background entry and the Gecko settings; CRXJS's `browser: 'firefox'` option handles the rest.
+
+- **No polyfill.** Firefox MV3 exposes `chrome.*` with promises for every API Crater uses (`storage.local` and `session`, `alarms`, `runtime`, `tabs`, `permissions`, `notifications`).
+- **Event page, not a service worker.** Firefox MV3 has no extension service workers, so the background runs as `background.scripts`. The code doesn't care: it has no DOM access either way.
+- **Keep-alive holds.** Tested in Firefox 144 (headless, two throwaway extensions): with no events, the background page is stopped about 30 s after start; with `keepAliveWhile`'s `getPlatformInfo()` ping every 20 s it stayed up for the whole 96 s test. So §19's fix needs no Firefox variant.
+- **Minimum version 142.** AMO requires `data_collection_permissions` on new listings, and 142 is the first version (desktop and Android) that reads it. We declare `required: ['none']`.
+- **Gecko ID `crater@ninoman`.** AMO ties a listing to it forever, so it must not change after the first upload.
+- **Host access can be withdrawn.** Firefox users can take away bandcamp.com access in the add-ons manager, which stops every scan. The popup shows a "No access to Bandcamp" notice with an Allow button when that happens (Chrome's "Site access" setting triggers it too).
+- **Known `web-ext lint` warnings**, all from dependencies: React's `innerHTML` writes, and zod's `Function('')` probe, which fails under the extension CSP and falls back to non-JIT parsing.

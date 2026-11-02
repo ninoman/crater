@@ -83,7 +83,7 @@ function ForYouBody({ view, mode, reload, activity, actions, onShowHeard }: ForY
         <EmptyState
           tone="error"
           title="Couldn't load For you"
-          description="Crater's background worker didn't answer. Try again, or reload the extension from chrome://extensions."
+          description="Crater's background worker didn't answer. Try again, or reload the extension from your browser’s extensions page."
           action={<Button onClick={reload}>Try again</Button>}
         />
       );
