@@ -42,7 +42,7 @@ export const handlers: MessageHandlers = {
   releaseOpened: ({ item }) => openRelease(item),
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
-  getAlsoBought: ({ itemKey, hideHeard }) => getAlsoBought(itemKey, hideHeard),
+  getAlsoBought: ({ itemKey, ...prefs }) => getAlsoBought(itemKey, prefs),
   getPreview: ({ url }) => getReleasePreview(db, { fetchJson, fetchText }, url),
   ...hideHeardHandlers(db),
   getCrateMates: () => getCrateMatesResult(),

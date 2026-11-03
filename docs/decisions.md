@@ -216,6 +216,7 @@ Before, every page scored the whole matchKey (§3.8), so every track of an album
 - At full weight a comp's buyers, the same fans on every track, would usually outnumber the track's own and the lists would converge again. A fan who bought both counts fully.
 - The weight multiplies `voteWeight`, and N in the lift is Σ weights, so a half-weight fan is half a trial as well as half a vote. Weights are ≤ 1, so votes stay ≤ co and pruning stays valid. Crate mate boosts and the warm-up's "supporters read" count fans unweighted.
 - The release's matchKey is still what's excluded from the picks, so a track page never recommends its own album.
+- **"Count album buyers" switch (added 2026-11-03).** On a track of an album the sidebar shows a switch, on by default and remembered across pages. Off, only the track's own buyers count (its collection rows and listed supporters), for a list about this track rather than the album. Album pages ignore it. The scan and its progress header are unchanged: album buyers are still read, they just don't vote. The reason line reads "N buyers of this release have it", not "supporters", because N takes in owners found in other scans, beyond the page's supporter list.
 
 ### Small-release fallback
 
