@@ -6,7 +6,6 @@
       "**",
       "!dist",
       "!dist-firefox",
-      "!spikes",
       "!scripts",
       "!tests/fixtures",
       "!tests/golden/*.json",
