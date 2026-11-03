@@ -928,7 +928,7 @@ Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `sc
 - **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is.
 - **Keys while playing:** K play / pause, N next, P previous, Esc stop, on `document`, left alone while typing or with a modifier held. Space stays Bandcamp's.
 - **Autoplay:** moving on starts the next release without a click. Chrome allows it because the page has had a user gesture (the first play).
-- Lists: For you (every mode), Also bought, Crate mates' latest and, since the merge, New from your follows (§23). The wishlist and collection grids show `HeardBadge` and a dimmed `Cover` too (§24, "Heard on cards").
+- Lists: For you (every mode), Also bought, Crate mates' latest and, since the merge, New from your follows (§23). The wishlist and collection grids don't mark heard releases (§24, "Heard on cards").
 
 ### UI
 
@@ -1057,9 +1057,8 @@ Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Code: `s
 
 ### Heard on cards (merged 2026-10-24)
 
-- `listItems` answers `heard` per item, read from the heard store by matchKey (an album for its tracks), so wishlist and collection cards show `HeardBadge` and a dimmed cover like the recommendation rows (§22).
-- A card's preview marks the release heard in the worker after 30 s, as every preview does. The grid also flags the card at once (`onHeard` from `ReleasePreview`), instead of waiting for the next read of the list.
-- The cards have no Hide heard switch and no manual mark: the wishlist doubles as a to-listen list, and the badge is what that needs. Add either if it turns out to be missed.
+- **Removed 2026-11-03.** Wishlist and collection cards no longer show `HeardBadge` or a dimmed cover, and `listItems` no longer answers `heard`. A greyed-out card read as "done with this", which is wrong for releases you own or still want to buy.
+- A card's preview still marks the release heard in the worker after 30 s, as every preview does, so the recommendation lists see it.
 
 ## 25. Filters on recommendation lists (removed)
 

@@ -16,7 +16,6 @@ const item: ListedItem = {
   addedAt: Date.UTC(2026, 9, 3),
   tagIds: [1],
   crateMateOwners: 2,
-  heard: false,
 };
 const pick: ForYouRow = {
   matchKey: 'a5',

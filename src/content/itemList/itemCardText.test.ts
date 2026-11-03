@@ -12,7 +12,6 @@ const base: ListedItem = {
   addedAt: Date.UTC(2026, 9, 3, 12),
   tagIds: [],
   crateMateOwners: 0,
-  heard: false,
 };
 
 describe('addedText', () => {
