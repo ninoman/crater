@@ -28,6 +28,18 @@ describe('releaseBuyers', () => {
     expect(weights(releaseBuyers(page, rows, [4]))).toEqual({ 1: 1, 2: 1, 4: 1 });
   });
 
+  it("leaves the album's buyers out on a track page when asked", () => {
+    const page = { releaseKey: 't11', matchKey: 'a1', compilation: false } as const;
+
+    expect(weights(releaseBuyers(page, rows, [4], false))).toEqual({ 2: 1, 4: 1 });
+  });
+
+  it('ignores the album-buyers switch on an album page', () => {
+    const page = { releaseKey: 'a1', matchKey: 'a1', compilation: false } as const;
+
+    expect(weights(releaseBuyers(page, rows, [], false))).toEqual({ 1: 1, 2: 1, 3: 1 });
+  });
+
   it("counts a comp's buyers for less on its track pages", () => {
     const page = { releaseKey: 't11', matchKey: 'a1', compilation: true } as const;
 

@@ -60,6 +60,7 @@ function render(
         firstWaitOver={firstWaitOver}
         actions={{ hide: () => {}, setHeard: () => {} }}
         hideHeard={false}
+        albumBuyers={null}
         onHideHeardChange={() => {}}
       />,
     ),
@@ -132,6 +133,7 @@ describe('AlsoBoughtList', () => {
           firstWaitOver={false}
           actions={{ hide: () => {}, setHeard: () => {} }}
           hideHeard={false}
+          albumBuyers={null}
           onHideHeardChange={() => {}}
         />,
       ),
@@ -160,7 +162,7 @@ describe('AlsoBoughtList', () => {
     });
 
     expect(container.querySelector('ul')?.getAttribute('aria-label')).toBe('Also bought');
-    expect(container.textContent).toContain('6 supporters have this so far');
+    expect(container.textContent).toContain('6 buyers of this release have it');
     expect(container.querySelector('[role="status"]')).toBeNull();
   });
 });

@@ -3,7 +3,7 @@
 
 import { FAN_PAGE_PATTERNS, RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { countReadFans, db, getMe, type JobKind } from '../../db';
-import type { AlsoBoughtResult } from '../../shared/alsoBought';
+import type { AlsoBoughtResult, AlsoBoughtPrefs } from '../../shared/alsoBought';
 import type { ForYouMode, ForYouResult } from '../../shared/forYou';
 import type { ReleaseCrateMatesResult } from '../../shared/releaseCrateMates';
 import type { CrateMatesResult } from '../../shared/crateMates';
@@ -34,12 +34,13 @@ let crateMatesRun: Promise<void> | null = null;
 let crateMatesAgain = false;
 
 /**
- * `hideHeard` leaves out releases you've heard (decisions §22). Re-scores pushed to tabs keep
- * them in; a sidebar hiding them asks again.
+ * `hideHeard` leaves out releases you've heard (decisions §22); `albumBuyers: false` counts only
+ * a track's own buyers (§17). Re-scores pushed to tabs use the defaults; a sidebar that differs
+ * asks again.
  */
 export async function getAlsoBought(
   releaseKey: ItemKey,
-  hideHeard = false,
+  { hideHeard = false, albumBuyers = true }: AlsoBoughtPrefs = {},
 ): Promise<AlsoBoughtResult> {
   fansSinceScore.set(releaseKey, 0);
   const [me, settings] = await Promise.all([getMe(db), loadSettings()]);
@@ -47,6 +48,7 @@ export async function getAlsoBought(
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
     hideHeard,
+    albumBuyers,
   });
 }
 
@@ -117,7 +119,7 @@ export async function onScanStep(
   await broadcastToTabs(
     RELEASE_PAGE_PATTERNS,
     'alsoBought',
-    // Pushes keep heard releases in; a sidebar hiding them asks again (useAlsoBought).
+    // Pushes use the default view; a sidebar that differs asks again (useAlsoBought).
     await getAlsoBought(releaseKey),
   );
   await broadcastToTabs(
