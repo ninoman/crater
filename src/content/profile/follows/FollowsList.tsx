@@ -74,12 +74,13 @@ export function FollowsList({
     });
   }, [listed, filter, accounts]);
   const shown = listed.filter((row) => visible.has(row.itemKey)).slice(0, limit);
-  const fresh = shown.filter((row) => row.isNew);
-  const earlier = shown.filter((row) => !row.isNew);
   // One player over the rows as shown, new ones first, so playing through follows the page.
-  const player = useListPlayer([...fresh, ...earlier], (matchKey) =>
-    actions.setHeard(matchKey, true, false),
+  const player = useListPlayer(
+    [...shown.filter((row) => row.isNew), ...shown.filter((row) => !row.isNew)],
+    (matchKey) => actions.setHeard(matchKey, true, false),
   );
+  const fresh = player.rows.filter((row) => row.isNew);
+  const earlier = player.rows.filter((row) => !row.isNew);
   const muted = result.accounts.filter((account) => account.muted);
 
   const list = (rows: FollowsDigestRow[], label: string) => (

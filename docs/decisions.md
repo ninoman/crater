@@ -926,7 +926,7 @@ Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `sc
 ### Play through a list
 
 - **One player per list** (`useListPlayer`): the pure queue (`shared/playQueue.ts`) over the visible rows, and one `usePreviewPlayer` whose URL is the current row's. A cover starts the queue at that row; a release's last track ending moves on to the next row, and the last row stops it. *Play all* starts at the top.
-- **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is.
+- **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is. *Changed 2026-11-03:* a reload that leaves out the playing release (it was just marked heard and *Hide heard* is on, or it fell out of the re-score) keeps its row in place until something else plays (`withHeld`). Without this, the 30 s heard mark skipped every release mid-play. Only a hide that covers it moves on.
 - **Keys while playing:** K play / pause, N next, P previous, Esc stop, on `document`, left alone while typing or with a modifier held. Space stays Bandcamp's.
 - **Autoplay:** moving on starts the next release without a click. Chrome allows it because the page has had a user gesture (the first play).
 - Lists: For you (every mode), Also bought, Crate mates' latest and, since the merge, New from your follows (§23). The wishlist and collection grids show `HeardBadge` and a dimmed `Cover` too (§24, "Heard on cards").

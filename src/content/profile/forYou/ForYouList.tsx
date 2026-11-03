@@ -46,7 +46,7 @@ export function ForYouList({ rows, limit, mode, now, actions, moreComing }: ForY
       </Toolbar>
       <div className="dh-profile__list">
         <RowList label={LIST_LABELS[mode]}>
-          {rows.map((row, i) => (
+          {player.rows.map((row, i) => (
             <ReleaseRow
               key={row.matchKey}
               release={row}

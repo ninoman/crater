@@ -63,7 +63,7 @@ export function AlsoBoughtList({
       <Body view={view} progress={progress} scanStopped={scanStopped} showEarly={showEarly}>
         {shown && (
           <RowList label={shown.label}>
-            {shown.rows.map((row) => (
+            {player.rows.map((row) => (
               <AlsoBoughtRow key={row.matchKey} row={row} {...rowControls(row, player, actions)} />
             ))}
           </RowList>

@@ -36,7 +36,9 @@ export function rowControls(
     hideScopes: hideScopeNames(row.hide),
     onHide: (scope) => {
       const target = hideTargetFor(row, scope);
-      if (target) actions.hide(target);
+      if (!target) return;
+      player.hidden(target);
+      actions.hide(target);
     },
   };
 }
