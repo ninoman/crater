@@ -59,3 +59,24 @@ function carriedOver(state: PlayQueue, keys: readonly ItemKey[]): ItemKey | null
 export function queuePosition(state: PlayQueue): number | null {
   return state.current === null ? null : state.keys.indexOf(state.current) + 1;
 }
+
+/** The playing row and its place, as last shown. */
+export interface HeldRow<R> {
+  row: R;
+  index: number;
+}
+
+/**
+ * The rows to show: `rows`, with the playing release put back in its place if a reload left it
+ * out. Listening marks it heard, and with *Hide heard* on the next reload would drop it mid-play
+ * and skip on. It goes once something else plays, or when it's hidden (the caller lets go).
+ */
+export function withHeld<R extends { matchKey: ItemKey }>(
+  rows: readonly R[],
+  current: ItemKey | null,
+  held: HeldRow<R> | null,
+): readonly R[] {
+  if (current === null || held === null || held.row.matchKey !== current) return rows;
+  if (rows.some((row) => row.matchKey === current)) return rows;
+  return [...rows.slice(0, held.index), held.row, ...rows.slice(held.index)];
+}
