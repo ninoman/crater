@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { type ReleasePageItem, readBandHeader } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
 import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
@@ -11,6 +11,7 @@ import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
 import { AlsoBoughtList } from './AlsoBoughtList';
 import { ReleaseCrateMatesList } from './ReleaseCrateMatesList';
+import { ReorderButton } from './ReorderButton';
 import { ScanHeader } from './ScanHeader';
 import { useCurrentRelease } from './useCurrentRelease';
 import { WishlistItemTags } from './WishlistItemTags';
@@ -49,15 +50,20 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const releaseSaved = progress.state !== 'loading';
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
   const [albumBuyers, setAlbumBuyers] = useStoredFlag('albumBuyers.alsoBought', true);
-  const { view, ...actions } = useAlsoBought(item.itemKey, releaseSaved, {
+  const { view, reorder, holdOrder, ...actions } = useAlsoBought(item.itemKey, releaseSaved, {
     hideHeard,
     albumBuyers,
   });
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const firstWaitOver = useTimePassed(EARLY_PICKS_AFTER_MS);
+  const [tab, setTab] = useState('also-bought');
 
   return (
-    <SidebarShell subtitle={`${item.artist} – ${item.title}`}>
+    <SidebarShell
+      subtitle={`${item.artist} – ${item.title}`}
+      actions={reorder && <ReorderButton onClick={reorder} />}
+      onBodyScroll={tab === 'also-bought' ? holdOrder : undefined}
+    >
       <FollowedAccountTags
         kind="band"
         id={item.bandId}
@@ -67,6 +73,8 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
       <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"
+        value={tab}
+        onValueChange={setTab}
         items={[
           {
             value: 'also-bought',
@@ -83,6 +91,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 albumBuyers={
                   item.albumKey === null ? null : { checked: albumBuyers, onChange: setAlbumBuyers }
                 }
+                onPlay={holdOrder}
               />
             ),
           },
@@ -97,8 +106,16 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   );
 }
 
+interface SidebarShellProps {
+  subtitle?: string;
+  /** Header controls before the collapse button. The header stays put while the list scrolls. */
+  actions?: ReactNode;
+  onBodyScroll?: () => void;
+  children: ReactNode;
+}
+
 /** The docked panel, or the tab that brings it back. Open or collapsed holds across pages. */
-function SidebarShell({ subtitle, children }: { subtitle?: string; children: ReactNode }) {
+function SidebarShell({ subtitle, actions, onBodyScroll, children }: SidebarShellProps) {
   const [open, setOpen] = useStoredFlag('sidebarOpen', true);
   const worker = useWorkerStatus();
 
@@ -115,11 +132,15 @@ function SidebarShell({ subtitle, children }: { subtitle?: string; children: Rea
       title="Fans of this also bought"
       subtitle={subtitle}
       actions={
-        <Button variant="ghost" icon aria-label="Collapse Crater" onClick={() => setOpen(false)}>
-          ×
-        </Button>
+        <>
+          {actions}
+          <Button variant="ghost" icon aria-label="Collapse Crater" onClick={() => setOpen(false)}>
+            ×
+          </Button>
+        </>
       }
       footer={<WorkerFooter status={worker} />}
+      onBodyScroll={onBodyScroll}
     >
       {children}
     </Panel>

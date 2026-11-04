@@ -20,6 +20,7 @@ export {
   PauseIcon,
   PlayIcon,
   QueueIcon,
+  ReorderIcon,
   StopIcon,
 } from './icons';
 export { Menu, type MenuItem, type MenuProps } from './Menu';

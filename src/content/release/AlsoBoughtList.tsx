@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import type { RowActions } from '../../hooks/rowActions';
 import type { AlsoBoughtView } from '../../hooks/useAlsoBought';
 import { useListPlayer } from '../../hooks/useListPlayer';
@@ -23,6 +23,8 @@ export interface AlsoBoughtListProps {
   onHideHeardChange: (hideHeard: boolean) => void;
   /** On a track of an album, whether the album's buyers count too (decisions §17); else null. */
   albumBuyers: { checked: boolean; onChange: (albumBuyers: boolean) => void } | null;
+  /** A row started playing: from now on the list keeps its order. */
+  onPlay: () => void;
 }
 
 const NO_ROWS: readonly RowData[] = [];
@@ -37,6 +39,7 @@ export function AlsoBoughtList({
   hideHeard,
   onHideHeardChange,
   albumBuyers,
+  onPlay,
 }: AlsoBoughtListProps) {
   // The first wait lets a running scan bring in more. A stopped one won't, so don't hold picks back.
   const showEarly = firstWaitOver || scanStopped;
@@ -44,6 +47,10 @@ export function AlsoBoughtList({
   const player = useListPlayer(shown?.rows ?? NO_ROWS, (matchKey) =>
     actions.setHeard(matchKey, true, false),
   );
+  const playing = player.current !== null;
+  useEffect(() => {
+    if (playing) onPlay();
+  }, [playing, onPlay]);
 
   return (
     <>

@@ -62,6 +62,7 @@ function render(
         hideHeard={false}
         albumBuyers={null}
         onHideHeardChange={() => {}}
+        onPlay={() => {}}
       />,
     ),
   );
@@ -135,6 +136,7 @@ describe('AlsoBoughtList', () => {
           hideHeard={false}
           albumBuyers={null}
           onHideHeardChange={() => {}}
+          onPlay={() => {}}
         />,
       ),
     );
