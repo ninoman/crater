@@ -12,7 +12,7 @@ export type ForYouView =
 /**
  * Fetches For you in `mode`, again whenever the mode or `hideHeard` changes. `hide` drops the
  * rows it covers and re-fetches, so the next picks move up; `reload` asks again, e.g. after an
- * error; `refresh` asks again without going back to loading.
+ * error; `refresh` asks again without going back to loading, once any request in flight answers.
  */
 export function useForYou(
   mode: ForYouMode,
@@ -21,17 +21,34 @@ export function useForYou(
   const [view, setView] = useState<ForYouView>({ state: 'loading' });
   // Only the newest request may set the view, so a slow answer for the old mode can't win.
   const latest = useRef(0);
+  const inFlight = useRef(false);
+  const refreshQueued = useRef(false);
 
-  const load = useCallback(() => {
-    const request = ++latest.current;
-    const settle = (next: ForYouView) => {
-      if (request === latest.current) setView(next);
-    };
-    sendMessage('getForYou', { mode, hideHeard }).then(
-      (result) => settle({ state: 'ready', result, loadedAt: Date.now() }),
-      (error: unknown) => settle({ state: 'unreachable', error: String(error) }),
-    );
-  }, [mode, hideHeard]);
+  const load = useCallback(
+    function load() {
+      const request = ++latest.current;
+      inFlight.current = true;
+      refreshQueued.current = false;
+      const settle = (next: ForYouView) => {
+        if (request !== latest.current) return;
+        inFlight.current = false;
+        setView(next);
+        if (refreshQueued.current) load();
+      };
+      sendMessage('getForYou', { mode, hideHeard }).then(
+        (result) => settle({ state: 'ready', result, loadedAt: Date.now() }),
+        (error: unknown) => settle({ state: 'unreachable', error: String(error) }),
+      );
+    },
+    [mode, hideHeard],
+  );
+
+  // Scan progress refreshes every few seconds. Superseding a slower request each time would
+  // drop every answer and leave the tab loading for as long as the scan runs.
+  const refresh = useCallback(() => {
+    if (inFlight.current) refreshQueued.current = true;
+    else load();
+  }, [load]);
 
   useEffect(() => {
     setView({ state: 'loading' });
@@ -49,5 +66,5 @@ export function useForYou(
   );
   const actions = useRowActions(setView, load, fail);
 
-  return { view, reload, refresh: load, ...actions };
+  return { view, reload, refresh, ...actions };
 }
