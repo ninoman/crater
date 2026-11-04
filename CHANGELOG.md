@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.13.0](https://github.com/ninoman/crater/compare/v0.12.0...v0.13.0) (2026-11-04)
+
+
+### Features
+
+* **deep-cuts:** lower the default supporter cap to 15 ([#50](https://github.com/ninoman/crater/issues/50)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+* **player:** add previous / next track and start on the most-bought track ([#48](https://github.com/ninoman/crater/issues/48)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+* **profile:** play every profile tab in one docked player ([#52](https://github.com/ninoman/crater/issues/52)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+* **scanner:** screen seed fans by profile and drop closed releases from the queue ([#53](https://github.com/ninoman/crater/issues/53)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+
+
+### Bug Fixes
+
+* **for-you:** stop scan refreshes from leaving the tab loading ([#51](https://github.com/ninoman/crater/issues/51)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+* **ui:** enlarge the play/stop icon on collection covers ([#49](https://github.com/ninoman/crater/issues/49)) ([95a6d8b](https://github.com/ninoman/crater/commit/95a6d8b737a1f59aa76b282a0224fb77fbb03366))
+
 ## [0.12.0](https://github.com/ninoman/crater/compare/v0.11.0...v0.12.0) (2026-11-04)
 
 
