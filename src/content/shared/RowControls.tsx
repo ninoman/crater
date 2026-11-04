@@ -28,6 +28,8 @@ export function rowControls(
         label={name}
         onToggle={player.toggle}
         onSeek={player.seek}
+        onPreviousTrack={player.previousTrack}
+        onNextTrack={player.nextTrack}
       />
     ),
     onPreview: (open) => (open ? player.play(row.matchKey) : player.stop()),

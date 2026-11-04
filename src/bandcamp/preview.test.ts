@@ -11,6 +11,7 @@ describe('parseReleasePreview', () => {
     expect(preview.startIndex).toBe(0);
     expect(preview.matchKey).toMatch(/^a\d+$/);
     expect(preview.tracks[0]).toEqual({
+      itemKey: 't3961474810',
       title: 'Movement 1',
       duration: 384.152,
       streamUrl: expect.stringMatching(

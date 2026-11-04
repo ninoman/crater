@@ -13,12 +13,24 @@ export type PreviewPlayerView =
   | { state: 'idle' }
   | { state: 'loading' }
   | { state: 'error'; error: string }
-  | { state: 'ready'; track: PreviewTrack; playing: boolean; position: number; duration: number };
+  | {
+      state: 'ready';
+      track: PreviewTrack;
+      /** 0-based place of the track in the release, and how many tracks it has. */
+      trackIndex: number;
+      trackCount: number;
+      playing: boolean;
+      position: number;
+      duration: number;
+    };
 
 export interface PreviewPlayer {
   view: PreviewPlayerView;
   toggle: () => void;
   seek: (seconds: number) => void;
+  /** Jump to the release's previous or next track. Does nothing past either end. */
+  previousTrack: () => void;
+  nextTrack: () => void;
 }
 
 export interface PreviewPlayerOptions {
@@ -183,6 +195,19 @@ export function usePreviewPlayer(
     [audio],
   );
 
+  const trackCount = tracks?.length ?? 0;
+  const skipTo = useCallback(
+    (target: number) => {
+      if (target < 0 || target >= trackCount) return;
+      // Changing src doesn't fire `pause`, so close the listening step here.
+      listening.current = stoppedListening(listening.current);
+      setIndex(target);
+    },
+    [trackCount],
+  );
+  const previousTrack = useCallback(() => skipTo(index - 1), [skipTo, index]);
+  const nextTrack = useCallback(() => skipTo(index + 1), [skipTo, index]);
+
   let view: PreviewPlayerView;
   if (load.state !== 'ready') view = load;
   else if (failed || !track)
@@ -191,10 +216,12 @@ export function usePreviewPlayer(
     view = {
       state: 'ready',
       track,
+      trackIndex: index,
+      trackCount,
       playing,
       position,
       duration: mediaDuration || track.duration,
     };
   }
-  return { view, toggle, seek };
+  return { view, toggle, seek, previousTrack, nextTrack };
 }

@@ -92,6 +92,20 @@ export async function collectorsOf(db: CraterDb, releaseKey: ItemKey): Promise<S
   });
 }
 
+/** How many fans have each single track of a release in their collection. */
+export async function trackBuyerCounts(
+  db: CraterDb,
+  releaseKey: ItemKey,
+): Promise<Map<ItemKey, number>> {
+  const rows = await db.ownership.where('matchKey').equals(releaseKey).toArray();
+  const counts = new Map<ItemKey, number>();
+  for (const row of rows.map(readOwnership)) {
+    if (row.source !== 'collection' || !row.itemKey.startsWith('t')) continue;
+    counts.set(row.itemKey, (counts.get(row.itemKey) ?? 0) + 1);
+  }
+  return counts;
+}
+
 /** Item keys a fan has in their collection or wishlist. */
 export async function ownedItemKeys(
   db: CraterDb,
