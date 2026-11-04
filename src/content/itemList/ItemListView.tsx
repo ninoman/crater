@@ -194,7 +194,6 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
             <NowPlaying
               name={`${nowPlaying.artist} – ${nowPlaying.title}`}
               href={nowPlaying.url}
-              layout="docked"
               onStop={() => setPreviewing(null)}
             >
               {/* Keyed so a new release remounts the player, which starts it playing. */}

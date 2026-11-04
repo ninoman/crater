@@ -4,6 +4,7 @@ import type { CrateMateBuy, CrateMateRow, CrateMatesResult } from '../../../shar
 import {
   Badge,
   Button,
+  Dock,
   EmptyState,
   Identity,
   NowPlaying,
@@ -254,20 +255,21 @@ export function CrateMatesBoard({
         />
       )}
       {playing && (
-        <NowPlaying
-          name={`${playing.buy.artist} – ${playing.buy.title}`}
-          href={playing.buy.url}
-          detail={`bought by ${playing.crateMateName}`}
-          layout="sticky"
-          onStop={() => setPlaying(null)}
-        >
-          {/* Keyed so a new release remounts the player, which starts it playing. */}
-          <ReleasePreview
-            key={playing.buy.url}
-            url={playing.buy.url}
+        <Dock>
+          <NowPlaying
             name={`${playing.buy.artist} – ${playing.buy.title}`}
-          />
-        </NowPlaying>
+            href={playing.buy.url}
+            detail={`bought by ${playing.crateMateName}`}
+            onStop={() => setPlaying(null)}
+          >
+            {/* Keyed so a new release remounts the player, which starts it playing. */}
+            <ReleasePreview
+              key={playing.buy.url}
+              url={playing.buy.url}
+              name={`${playing.buy.artist} – ${playing.buy.title}`}
+            />
+          </NowPlaying>
+        </Dock>
       )}
       <p className="dh-profile__note">
         {board === 'all' ? (

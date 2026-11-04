@@ -2,7 +2,7 @@ import type { RowActions } from '../../../hooks/rowActions';
 import { useListPlayer } from '../../../hooks/useListPlayer';
 import type { CrateMatesLatestResult } from '../../../shared/crateMatesLatest';
 import { ReleaseRow, RowList, SkeletonRows, Toolbar } from '../../../ui';
-import { PlayThrough, rowControls } from '../../shared/RowControls';
+import { ListNowPlaying, PlayThrough, rowControls } from '../../shared/RowControls';
 import { formatLatestReason } from './latestText';
 
 export interface LatestListProps {
@@ -30,12 +30,13 @@ export function LatestList({ result, now, actions, moreComing }: LatestListProps
               key={row.matchKey}
               release={row}
               reason={formatLatestReason(row, now)}
-              {...rowControls(row, player, actions)}
+              {...rowControls(row, player, actions, 'docked')}
             />
           ))}
         </RowList>
         {moreComing && result.rows.length < result.limit && <SkeletonRows count={3} />}
       </div>
+      <ListNowPlaying player={player} />
       <p className="dh-profile__note">
         What your top crate mates on the Lately board, then the all-time one, bought recently and
         you don&apos;t own. Crater re-reads your closest lately crate mates every week, everyone

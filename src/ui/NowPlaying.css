@@ -4,16 +4,8 @@
   border-radius: var(--dh-radius-md);
   background: var(--dh-color-bg);
   box-shadow: var(--dh-shadow-panel);
-}
-
-.dh-now-playing--docked {
+  /* Spans the Dock's width. */
   align-self: stretch;
-}
-
-.dh-now-playing--sticky {
-  position: sticky;
-  bottom: 0;
-  margin-top: var(--dh-space-2);
 }
 
 .dh-now-playing__head {
