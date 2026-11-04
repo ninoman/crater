@@ -92,3 +92,9 @@ export const PreviousIcon = () => (
     <path d="M4 3.5v9" />
   </Icon>
 );
+
+export const ReorderIcon = () => (
+  <Icon>
+    <path d="M5 13V3M2.5 5.5 5 3l2.5 2.5M11 3v10M8.5 10.5 11 13l2.5-2.5" />
+  </Icon>
+);
