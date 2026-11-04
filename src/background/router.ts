@@ -39,7 +39,7 @@ export const handlers: MessageHandlers = {
     void startSync('full');
     return null;
   },
-  releaseOpened: ({ item }) => openRelease(item),
+  releaseOpened: ({ item }, sender) => openRelease(item, sender.tab?.id),
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
   getAlsoBought: ({ itemKey, ...prefs }) => getAlsoBought(itemKey, prefs),

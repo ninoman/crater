@@ -17,6 +17,11 @@ export async function watchRelease(itemKey: ItemKey): Promise<void> {
   await chrome.storage.session.set({ [STORAGE_KEY]: next });
 }
 
+export async function unwatchRelease(itemKey: ItemKey): Promise<void> {
+  const current = await watchedReleases();
+  await chrome.storage.session.set({ [STORAGE_KEY]: current.filter((key) => key !== itemKey) });
+}
+
 export async function clearWatchedReleases(): Promise<void> {
   await chrome.storage.session.remove(STORAGE_KEY);
 }

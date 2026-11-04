@@ -112,3 +112,16 @@ async function matchCounts(
     ]),
   );
 }
+
+/** Your number of releases, and how many of them a fan is known to own so far. */
+export async function seedFanBasis(
+  db: CraterDb,
+  meFanId: number,
+  fanId: number,
+): Promise<{ yours: number; shared: number }> {
+  const [mine, theirs] = await db.fanMatches.bulkGet([meFanId, fanId]);
+  const own = new Set(mine?.matchIds ?? EMPTY);
+  let shared = 0;
+  for (const id of theirs?.matchIds ?? EMPTY) if (own.has(id)) shared += 1;
+  return { yours: own.size, shared };
+}

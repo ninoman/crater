@@ -13,6 +13,7 @@ import { onSynced, startSync } from './meSync';
 import { refreshCrateMates } from './recommend';
 import { handlers } from './router';
 import {
+  closeReleaseTab,
   ensureScannerAlarm,
   kickScanner,
   queueFollowReleases,
@@ -43,6 +44,12 @@ chrome.runtime.onStartup.addListener(() => {
 // An update may change how crate mates are scored, so don't wait for the next sync to see it.
 chrome.runtime.onInstalled.addListener(() => {
   refreshCrateMates();
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  closeReleaseTab(tabId).catch((error: unknown) =>
+    console.warn('crater: could not drop a closed release', error),
+  );
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
