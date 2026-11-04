@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { Button } from './Button';
-import { cx } from './cx';
 import { StopIcon } from './icons';
 import { Tooltip } from './Tooltip';
 
@@ -11,23 +10,15 @@ export interface NowPlayingProps {
   href: string;
   /** A muted line after the name, e.g. "bought by Sam". */
   detail?: ReactNode;
-  /**
-   * `docked`: spans its Dock's width. `sticky`: full width, sticking to the bottom of the
-   * window while its container scrolls under it.
-   */
-  layout: 'docked' | 'sticky';
   onStop: () => void;
   /** The player itself. */
   children: ReactNode;
 }
 
-/** The open preview: what's playing, a stop button, and the player under them. */
-export function NowPlaying({ name, href, detail, layout, onStop, children }: NowPlayingProps) {
+/** The open preview: what's playing, a stop button, and the player under them. Lives in a `Dock`. */
+export function NowPlaying({ name, href, detail, onStop, children }: NowPlayingProps) {
   return (
-    <section
-      className={cx('dh-now-playing', `dh-now-playing--${layout}`)}
-      aria-label="Now previewing"
-    >
+    <section className="dh-now-playing" aria-label="Now previewing">
       <div className="dh-now-playing__head">
         <span className="dh-now-playing__text">
           <a className="dh-now-playing__title" href={href} title={name}>

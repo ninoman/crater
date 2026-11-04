@@ -71,7 +71,11 @@ export function AlsoBoughtList({
         {shown && (
           <RowList label={shown.label}>
             {player.rows.map((row) => (
-              <AlsoBoughtRow key={row.matchKey} row={row} {...rowControls(row, player, actions)} />
+              <AlsoBoughtRow
+                key={row.matchKey}
+                row={row}
+                {...rowControls(row, player, actions, 'inline')}
+              />
             ))}
           </RowList>
         )}
