@@ -251,17 +251,43 @@ describe('pass 1: profile pages', () => {
     expect((await db.fans.get(11))?.inCommon).toBeNull();
   });
 
-  it('skips profiles logged out and for seed scans', async () => {
-    const requests = fakeBandcamp({ 11: { inCommon: 3, items: 5 } });
+  it('skips profiles logged out, for seed scans too', async () => {
+    const requests = fakeBandcamp({ 11: { inCommon: 3, items: 5 }, 21: { inCommon: 3, items: 5 } });
     await listSupporters([11]);
     await drainQueue(deps());
-    expect(requests).toEqual([expect.stringMatching(/^fan 11 /)]);
-
-    await signIn();
-    const seed = fakeBandcamp({ 21: { inCommon: 3, items: 5 } });
     await listSupporters([21], SEED);
     await drainQueue(deps());
-    expect(seed).toEqual([expect.stringMatching(/^fan 21 /)]);
+    expect(requests.map((r) => r.split(' ').slice(0, 2).join(' '))).toEqual(['fan 11', 'fan 21']);
+  });
+
+  it('reads a seed fan in full only when they share enough with you', async () => {
+    await signIn();
+    // Already known to own your release, so no profile is needed.
+    await db.ownership.put({
+      fanId: 23,
+      itemKey: 'a1',
+      matchKey: 'a1',
+      source: 'collection',
+      addedAt: null,
+    });
+    await refreshFanMatches(db, [23]);
+    const requests = fakeBandcamp({
+      21: { inCommon: 0, items: 5 },
+      22: { inCommon: 3, items: 5 },
+      23: { inCommon: 1, items: 5 },
+    });
+    await listSupporters([21, 22, 23], SEED);
+
+    expect(await drainQueue(deps())).toBe('idle');
+
+    expect(requests.map((r) => r.split(' ').slice(0, 2).join(' '))).toEqual([
+      'profile 21',
+      'profile 22',
+      'fan 22',
+      'fan 23',
+    ]);
+    expect(await db.fans.get(21)).toMatchObject({ inCommon: 0, status: 'queued' });
+    expect(await db.queue.count()).toBe(0);
   });
 
   it('carries on without a profile that is gone or unreadable, flagging the parser', async () => {

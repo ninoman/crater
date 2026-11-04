@@ -4,6 +4,7 @@ import { CraterDb } from '../schema';
 import {
   completeJob,
   countJobs,
+  dropRelease,
   enqueue,
   enqueueAt,
   failJob,
@@ -178,5 +179,28 @@ describe('queue', () => {
     await focusRelease(db, 'a2', [20], 1, 2);
 
     expect(await order()).toEqual(['20', 'a2', 'a1', '10', '11']);
+  });
+});
+
+describe('dropRelease', () => {
+  const url = 'https://a.bandcamp.com/album/x';
+
+  it("removes a release's job and the fans its list queued, up to a priority", async () => {
+    await enqueue(db, [{ kind: 'release', target: 'a1', url }], 1, 0);
+    await enqueue(db, [fanJob(1, 'a1'), fanJob(2, 'a1'), fanJob(3, 'a2')], 2, 0);
+    await enqueue(db, [fanJob(4, 'a1')], 3, 0);
+
+    expect(await dropRelease(db, 'a1', 2, new Set())).toBe(3);
+
+    const left = await db.queue.toArray();
+    expect(left.map((job) => job.target).sort()).toEqual(['3', '4']);
+  });
+
+  it('keeps fans another release still needs', async () => {
+    await enqueue(db, [fanJob(1, 'a1'), fanJob(2, 'a1')], 2, 0);
+
+    await dropRelease(db, 'a1', 2, new Set([2]));
+
+    expect((await db.queue.toArray()).map((job) => job.target)).toEqual(['2']);
   });
 });

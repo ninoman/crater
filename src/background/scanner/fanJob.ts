@@ -7,6 +7,7 @@ import { fanIdOf } from './fanId';
 import { fullStep, quickStep } from './fanCollectionStep';
 import { latestStep } from './fanLatestStep';
 import { profileStep } from './fanProfileStep';
+import { seedFirstStep } from './seedFanStep';
 import { SEED } from './priority';
 
 export { fanIdOf };
@@ -26,11 +27,11 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<StepRes
 }
 
 /**
- * Seed scans fill crate mates, not a page you're looking at, so they go straight to the full scan.
- * Logged out, the profile has no count, so the quick read comes first.
+ * Seed scans fill crate mates, not a page you're looking at, so they skip the quick read and are
+ * screened instead. Logged out, the profile has no count, so the quick read comes first.
  */
 async function firstStep(ctx: StepContext, job: FanJob): Promise<StepResult> {
-  if (job.priority >= SEED) return fullStep(ctx, job, null);
+  if (job.priority >= SEED) return seedFirstStep(ctx, job);
   if (!(await getMe(ctx.db))) return quickStep(ctx, job);
   return profileStep(ctx, job);
 }

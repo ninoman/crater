@@ -180,6 +180,28 @@ export async function focusRelease(
   });
 }
 
+/**
+ * Takes a release off the queue: its job and the fan scans its supporter list queued, wherever
+ * they wait at `upTo` or more urgent. Fans in `keep` stay, since another open release needs them.
+ * Returns how many jobs were removed.
+ */
+export function dropRelease(
+  db: CraterDb,
+  release: ItemKey,
+  upTo: number,
+  keep: ReadonlySet<number>,
+): Promise<number> {
+  return db.queue
+    .where('[priority+nextAttemptAt+rank]')
+    .between([-Infinity, -Infinity, -Infinity], [upTo, Infinity, Infinity], true, true)
+    .filter((job) =>
+      job.kind === 'release'
+        ? job.target === release
+        : job.kind === 'fan' && job.via === release && !keep.has(Number(job.target)),
+    )
+    .delete();
+}
+
 function jobsOfKind(db: CraterDb, kind: QueueJob['kind']) {
   return db.queue.where('[kind+target]').between([kind, ''], [kind, '￿']);
 }

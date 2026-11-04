@@ -88,3 +88,16 @@ export function inCommonSimilarity(inCommon: number, yours: number, theirs: numb
 export function readsAhead(similarity: number, best: number): boolean {
   return similarity > 0 && similarity >= best / 2;
 }
+
+/** One item in common is asked for per this many of your releases (decisions §5). */
+export const RELEASES_PER_ITEM_IN_COMMON = 180;
+/** The most items in common a seed fan needs, the bar a 908-release collection was measured at. */
+export const MAX_SEED_IN_COMMON = 5;
+
+/**
+ * The fewest items in common with you for a seed fan to be read in full. Chance overlap with a
+ * stranger grows with your collection, so the bar does too, from 1 up to MAX_SEED_IN_COMMON.
+ */
+export function seedInCommonCutoff(yours: number): number {
+  return Math.min(MAX_SEED_IN_COMMON, Math.max(1, Math.ceil(yours / RELEASES_PER_ITEM_IN_COMMON)));
+}
