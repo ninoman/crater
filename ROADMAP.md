@@ -266,7 +266,7 @@ Design: decisions §12. The scoring half (confidence bound, omnivore damping, wa
 
 **Goal:** a For you mode that surfaces releases few people own but your closest crate mates do, with an honest "only N owners" reason.
 
-Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ crate mate scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 50).
+Design: [decisions §18](docs/decisions.md), research in [docs/research/deep-cuts.md](docs/research/deep-cuts.md). Score = Σ crate mate scores × t/(t + 2) × n^−0.6, limited to releases with at most N Bandcamp owners, where N is a setting (`deepCutMaxSupporters`, default 15).
 
 1. [x] `scoring/deepCuts.ts` (the cap passed in), plus the constants and `nichePenalty` in `weights.ts`, and the `deepCutMaxSupporters` setting (default 50, 5–1000) in `shared/settings.ts`, with the synthetic test set (niche beats staple, cap, agreement shrink, no-count skip, ceiling safety).
 2. [x] `computeDeepCuts` in `background/recommend/`, with K = 100 crate mates and ceiling pruning; `pnpm perf` with a 100-crate-mate board. Add the `items.supporterCount` index only if it's over budget.
