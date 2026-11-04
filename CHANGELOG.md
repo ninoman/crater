@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.12.0](https://github.com/ninoman/crater/compare/v0.11.0...v0.12.0) (2026-11-04)
+
+
+### Features
+
+* **also-bought:** add a "Count album buyers" switch and clearer reason line ([#43](https://github.com/ninoman/crater/issues/43)) ([ca2a9f1](https://github.com/ninoman/crater/commit/ca2a9f1eb5055944d465df886acaf6d96a9b1e1f))
+* **sidebar:** keep Also bought's order through re-scores ([#47](https://github.com/ninoman/crater/issues/47)) ([e133c1e](https://github.com/ninoman/crater/commit/e133c1e961bd0656ca6784394dd116ecafd1d624))
+
+
+### Bug Fixes
+
+* **lists:** stop marking heard releases in your collection and wishlist ([#46](https://github.com/ninoman/crater/issues/46)) ([1bb4970](https://github.com/ninoman/crater/commit/1bb49705cada96e63a4037fd63f4a1baa3be7c66))
+* **player:** keep the playing release in place when a reload drops it ([#45](https://github.com/ninoman/crater/issues/45)) ([29e44f3](https://github.com/ninoman/crater/commit/29e44f3f5211cdd7ed2ff22cb087fb64ad290acc))
+
 ## [0.11.0](https://github.com/ninoman/crater/compare/v0.10.0...v0.11.0) (2026-11-02)
 
 
