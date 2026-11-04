@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// Re-scores keep Also bought's rows in place until the new order is asked for.
+// Re-scores re-sort Also bought until its order is held, then wait for the new order to be asked for.
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
@@ -63,10 +63,17 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it('keeps the shown order through a re-score and applies the new one on reorder', () => {
+it('re-sorts on re-scores until the order is held', () => {
+  act(() => listener({ event: 'alsoBought', payload: result('a3', 'a2') }));
+  expect(shown()).toEqual(['a3', 'a2']);
+  expect(latest.reorder).toBeNull();
+});
+
+it('once held, keeps the shown order through a re-score and applies the new one on reorder', () => {
   expect(shown()).toEqual(['a2', 'a3']);
   expect(latest.reorder).toBeNull();
 
+  act(() => latest.holdOrder());
   act(() => listener({ event: 'alsoBought', payload: result('a4', 'a3', 'a2') }));
   expect(shown()).toEqual(['a2', 'a3', 'a4']);
 

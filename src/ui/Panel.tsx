@@ -7,11 +7,21 @@ export interface PanelProps {
   /** Controls shown at the right of the header, e.g. a collapse button. */
   actions?: ReactNode;
   footer?: ReactNode;
+  /** The body scrolled, e.g. the reader is moving through a list. */
+  onBodyScroll?: () => void;
   className?: string;
   children: ReactNode;
 }
 
-export function Panel({ title, subtitle, actions, footer, className, children }: PanelProps) {
+export function Panel({
+  title,
+  subtitle,
+  actions,
+  footer,
+  onBodyScroll,
+  className,
+  children,
+}: PanelProps) {
   return (
     <section className={cx('dh-panel', className)}>
       <header className="dh-panel__header">
@@ -21,7 +31,9 @@ export function Panel({ title, subtitle, actions, footer, className, children }:
         </div>
         {actions}
       </header>
-      <div className="dh-panel__body">{children}</div>
+      <div className="dh-panel__body" onScroll={onBodyScroll}>
+        {children}
+      </div>
       {footer && <footer className="dh-panel__footer">{footer}</footer>}
     </section>
   );

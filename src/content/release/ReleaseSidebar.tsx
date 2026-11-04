@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { type ReleasePageItem, readBandHeader } from '../../bandcamp';
 import { useAlsoBought } from '../../hooks/useAlsoBought';
 import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
@@ -49,14 +49,20 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
-  const { view, reorder, ...actions } = useAlsoBought(item.itemKey, releaseSaved, hideHeard);
+  const { view, reorder, holdOrder, ...actions } = useAlsoBought(
+    item.itemKey,
+    releaseSaved,
+    hideHeard,
+  );
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const firstWaitOver = useTimePassed(EARLY_PICKS_AFTER_MS);
+  const [tab, setTab] = useState('also-bought');
 
   return (
     <SidebarShell
       subtitle={`${item.artist} – ${item.title}`}
       actions={reorder && <ReorderButton onClick={reorder} />}
+      onBodyScroll={tab === 'also-bought' ? holdOrder : undefined}
     >
       <FollowedAccountTags
         kind="band"
@@ -67,6 +73,8 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
       <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"
+        value={tab}
+        onValueChange={setTab}
         items={[
           {
             value: 'also-bought',
@@ -80,6 +88,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 actions={actions}
                 hideHeard={hideHeard}
                 onHideHeardChange={setHideHeard}
+                onPlay={holdOrder}
               />
             ),
           },
@@ -98,11 +107,12 @@ interface SidebarShellProps {
   subtitle?: string;
   /** Header controls before the collapse button. The header stays put while the list scrolls. */
   actions?: ReactNode;
+  onBodyScroll?: () => void;
   children: ReactNode;
 }
 
 /** The docked panel, or the tab that brings it back. Open or collapsed holds across pages. */
-function SidebarShell({ subtitle, actions, children }: SidebarShellProps) {
+function SidebarShell({ subtitle, actions, onBodyScroll, children }: SidebarShellProps) {
   const [open, setOpen] = useStoredFlag('sidebarOpen', true);
   const worker = useWorkerStatus();
 
@@ -127,6 +137,7 @@ function SidebarShell({ subtitle, actions, children }: SidebarShellProps) {
         </>
       }
       footer={<WorkerFooter status={worker} />}
+      onBodyScroll={onBodyScroll}
     >
       {children}
     </Panel>

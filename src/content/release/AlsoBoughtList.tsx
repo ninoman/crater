@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import type { RowActions } from '../../hooks/rowActions';
 import type { AlsoBoughtView } from '../../hooks/useAlsoBought';
 import { useListPlayer } from '../../hooks/useListPlayer';
@@ -21,6 +21,8 @@ export interface AlsoBoughtListProps {
   /** Heard releases are left out (decisions §22). The switch shows in every state. */
   hideHeard: boolean;
   onHideHeardChange: (hideHeard: boolean) => void;
+  /** A row started playing: from now on the list keeps its order. */
+  onPlay: () => void;
 }
 
 const NO_ROWS: readonly RowData[] = [];
@@ -34,6 +36,7 @@ export function AlsoBoughtList({
   actions,
   hideHeard,
   onHideHeardChange,
+  onPlay,
 }: AlsoBoughtListProps) {
   // The first wait lets a running scan bring in more. A stopped one won't, so don't hold picks back.
   const showEarly = firstWaitOver || scanStopped;
@@ -41,6 +44,10 @@ export function AlsoBoughtList({
   const player = useListPlayer(shown?.rows ?? NO_ROWS, (matchKey) =>
     actions.setHeard(matchKey, true, false),
   );
+  const playing = player.current !== null;
+  useEffect(() => {
+    if (playing) onPlay();
+  }, [playing, onPlay]);
 
   return (
     <>

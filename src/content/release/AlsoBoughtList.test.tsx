@@ -61,6 +61,7 @@ function render(
         actions={{ hide: () => {}, setHeard: () => {} }}
         hideHeard={false}
         onHideHeardChange={() => {}}
+        onPlay={() => {}}
       />,
     ),
   );
@@ -133,6 +134,7 @@ describe('AlsoBoughtList', () => {
           actions={{ hide: () => {}, setHeard: () => {} }}
           hideHeard={false}
           onHideHeardChange={() => {}}
+          onPlay={() => {}}
         />,
       ),
     );
