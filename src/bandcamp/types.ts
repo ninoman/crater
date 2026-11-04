@@ -165,6 +165,8 @@ export interface FollowingList {
 
 /** One streamable track, for the preview player. */
 export interface PreviewTrack {
+  /** The track's own key, or null when the page doesn't name it. */
+  itemKey: ItemKey | null;
   title: string;
   /** Seconds. */
   duration: number;
@@ -176,7 +178,7 @@ export interface ReleasePreview {
   /** What a play of it marks heard: the album for an album's track (decisions §3.8, §22). */
   matchKey: ItemKey | null;
   tracks: PreviewTrack[];
-  /** The track Bandcamp features on the page, where playback starts. */
+  /** Where playback starts: the page's featured track, until the worker picks a better one. */
   startIndex: number;
 }
 

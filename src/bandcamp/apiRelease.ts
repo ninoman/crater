@@ -50,14 +50,22 @@ export function parseApiReleasePreview(json: unknown): ReleasePreview {
   const tracks = (data.tracks ?? []).flatMap((track) => {
     const streamUrl = track.streaming_url?.['mp3-128'];
     if (!streamUrl) return [];
-    return [{ id: track.track_id, title: track.title, duration: track.duration ?? 0, streamUrl }];
+    return [
+      {
+        itemKey: itemKey('t', track.track_id),
+        title: track.title,
+        duration: track.duration ?? 0,
+        streamUrl,
+      },
+    ];
   });
+  const featured = data.featured_track_id;
   return {
     matchKey: itemKey(data.album_id == null ? data.type : 'a', data.album_id ?? data.id),
-    tracks: tracks.map(({ id: _id, ...track }) => track),
+    tracks,
     startIndex: Math.max(
       0,
-      tracks.findIndex((track) => track.id === data.featured_track_id),
+      tracks.findIndex((track) => featured != null && track.itemKey === itemKey('t', featured)),
     ),
   };
 }

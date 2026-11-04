@@ -11,9 +11,16 @@ export interface ReleasePreviewProps {
 
 /** An open preview under a release row. Mount it only while previewing: it plays on mount. */
 export function ReleasePreview({ url, name, onHeard }: ReleasePreviewProps) {
-  const { view, toggle, seek } = usePreviewPlayer(url, { onHeard });
+  const { view, toggle, seek, previousTrack, nextTrack } = usePreviewPlayer(url, { onHeard });
   return (
-    <AudioPlayer state={previewPlayerState(view)} label={name} onToggle={toggle} onSeek={seek} />
+    <AudioPlayer
+      state={previewPlayerState(view)}
+      label={name}
+      onToggle={toggle}
+      onSeek={seek}
+      onPreviousTrack={previousTrack}
+      onNextTrack={nextTrack}
+    />
   );
 }
 
@@ -29,6 +36,8 @@ export function previewPlayerState(view: PreviewPlayerView): AudioPlayerState {
       return {
         kind: 'ready',
         title: view.track.title,
+        trackIndex: view.trackIndex,
+        trackCount: view.trackCount,
         playing: view.playing,
         position: view.position,
         duration: view.duration,
