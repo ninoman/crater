@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { ItemKey } from '../bandcamp';
-import { playQueue, queuePosition } from '../shared/playQueue';
+import type { HideTarget } from '../shared/hide';
+import { type HeldRow, playQueue, queuePosition, withHeld } from '../shared/playQueue';
+import { type ActionableRow, coveredBy } from './rowActions';
 import { type PreviewPlayerView, usePreviewPlayer } from './usePreviewPlayer';
 
-export interface ListPlayerRow {
-  matchKey: ItemKey;
+export interface ListPlayerRow extends ActionableRow {
   url: string;
 }
 
-export interface ListPlayer {
+export interface ListPlayer<R extends ListPlayerRow = ListPlayerRow> {
+  /** The rows to show: the list's, with the playing one kept in place while it plays. */
+  rows: readonly R[];
   /** The row playing, or null while stopped. */
   current: ItemKey | null;
   /** 1-based place of `current`, or null while stopped. */
@@ -22,28 +25,41 @@ export interface ListPlayer {
   previous: () => void;
   toggle: () => void;
   seek: (seconds: number) => void;
+  /** A hide is about to take rows out: a playing one covered by it goes, rather than stays. */
+  hidden: (target: HideTarget) => void;
 }
 
 /**
  * Plays a list's visible rows through, one release after another, in one audio element
  * (decisions §22): a cover starts the queue there, each release moves on to the next when it
- * ends, and the list's keys step through it. `onHeard` hears of each release played past the
+ * ends, and the list's keys step through it. The playing row stays in place when a reload leaves
+ * it out, so the heard mark it just got doesn't skip it under *Hide heard*. `onHeard` hears of each release played past the
  * heard threshold, which the player has already saved, so the row can show it at once.
  */
-export function useListPlayer(
-  rows: readonly ListPlayerRow[],
+export function useListPlayer<R extends ListPlayerRow>(
+  rows: readonly R[],
   onHeard: (matchKey: ItemKey) => void,
-): ListPlayer {
-  const keys = useMemo(() => rows.map((row) => row.matchKey), [rows]);
-  const [queue, dispatch] = useReducer(playQueue, { keys, current: null });
-  const keyList = keys.join(' ');
+): ListPlayer<R> {
+  const [queue, dispatch] = useReducer(playQueue, {
+    keys: rows.map((row) => row.matchKey),
+    current: null,
+  });
+  const current = queue.current;
+  // Read while rendering, written after: where the playing row was last shown.
+  const held = useRef<HeldRow<R> | null>(null);
+  const shown = useMemo(() => withHeld(rows, current, held.current), [rows, current]);
+  useEffect(() => {
+    const index = shown.findIndex((row) => row.matchKey === current);
+    const row = shown[index];
+    held.current = row ? { row, index } : null;
+  });
+  const keyList = shown.map((row) => row.matchKey).join(' ');
 
   useEffect(() => {
     dispatch({ type: 'rows', keys: keyList === '' ? [] : (keyList.split(' ') as ItemKey[]) });
   }, [keyList]);
 
-  const current = queue.current;
-  const url = rows.find((row) => row.matchKey === current)?.url ?? null;
+  const url = shown.find((row) => row.matchKey === current)?.url ?? null;
   const heardRef = useRef(onHeard);
   useEffect(() => {
     heardRef.current = onHeard;
@@ -60,13 +76,17 @@ export function useListPlayer(
   const next = useCallback(() => dispatch({ type: 'next' }), []);
   const previous = useCallback(() => dispatch({ type: 'previous' }), []);
   const playAll = useCallback(() => {
-    const [first] = keys;
-    if (first) dispatch({ type: 'play', key: first });
-  }, [keys]);
+    const [first] = shown;
+    if (first) dispatch({ type: 'play', key: first.matchKey });
+  }, [shown]);
+  const hidden = useCallback((target: HideTarget) => {
+    if (held.current && coveredBy(target, held.current.row)) held.current = null;
+  }, []);
 
   usePlayerKeys(current !== null, { toggle: player.toggle, next, previous, stop });
 
   return {
+    rows: shown,
     current,
     position: queuePosition(queue),
     total: queue.keys.length,
@@ -78,6 +98,7 @@ export function useListPlayer(
     previous,
     toggle: player.toggle,
     seek: player.seek,
+    hidden,
   };
 }
 

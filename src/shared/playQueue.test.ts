@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { ItemKey } from '../bandcamp';
-import { type PlayQueue, type PlayQueueAction, playQueue, queuePosition } from './playQueue';
+import {
+  type PlayQueue,
+  type PlayQueueAction,
+  playQueue,
+  queuePosition,
+  withHeld,
+} from './playQueue';
 
 const keys: ItemKey[] = ['a1', 'a2', 'a3'];
 const stopped: PlayQueue = { keys, current: null };
@@ -50,5 +56,26 @@ describe('playQueue', () => {
   it('says where it has got to', () => {
     expect(queuePosition(stopped)).toBeNull();
     expect(queuePosition(run(stopped, { type: 'play', key: 'a3' }))).toBe(3);
+  });
+});
+
+describe('withHeld', () => {
+  const rows = keys.map((matchKey) => ({ matchKey }));
+  const held = { row: { matchKey: 'a2' as ItemKey }, index: 1 };
+
+  it('puts the playing row back in its place when a reload leaves it out', () => {
+    const reloaded = [rows[0], rows[2]].flatMap((row) => row ?? []);
+    expect(withHeld(reloaded, 'a2', held).map((row) => row.matchKey)).toEqual(keys);
+  });
+
+  it('leaves the rows as they are when the playing one is still there', () => {
+    expect(withHeld(rows, 'a2', held)).toBe(rows);
+  });
+
+  it('lets the row go once something else plays, or nothing does', () => {
+    const reloaded = rows.filter((row) => row.matchKey !== 'a2');
+    expect(withHeld(reloaded, 'a3', held)).toBe(reloaded);
+    expect(withHeld(reloaded, null, held)).toBe(reloaded);
+    expect(withHeld(reloaded, 'a2', null)).toBe(reloaded);
   });
 });

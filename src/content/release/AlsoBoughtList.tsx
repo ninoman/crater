@@ -4,7 +4,7 @@ import type { AlsoBoughtView } from '../../hooks/useAlsoBought';
 import { useListPlayer } from '../../hooks/useListPlayer';
 import type { ScanProgressView } from '../../hooks/useScanProgress';
 import type { AlsoBoughtRow as RowData } from '../../shared/alsoBought';
-import { EmptyState, RowList, Toolbar } from '../../ui';
+import { Checkbox, EmptyState, RowList, Toolbar, ToolbarGroup } from '../../ui';
 import { HideHeardToggle, PlayThrough, rowControls } from '../shared/RowControls';
 import { AlsoBoughtRow } from './AlsoBoughtRow';
 import { Gathering } from './Gathering';
@@ -21,6 +21,8 @@ export interface AlsoBoughtListProps {
   /** Heard releases are left out (decisions §22). The switch shows in every state. */
   hideHeard: boolean;
   onHideHeardChange: (hideHeard: boolean) => void;
+  /** On a track of an album, whether the album's buyers count too (decisions §17); else null. */
+  albumBuyers: { checked: boolean; onChange: (albumBuyers: boolean) => void } | null;
   /** A row started playing: from now on the list keeps its order. */
   onPlay: () => void;
 }
@@ -36,6 +38,7 @@ export function AlsoBoughtList({
   actions,
   hideHeard,
   onHideHeardChange,
+  albumBuyers,
   onPlay,
 }: AlsoBoughtListProps) {
   // The first wait lets a running scan bring in more. A stopped one won't, so don't hold picks back.
@@ -53,12 +56,21 @@ export function AlsoBoughtList({
     <>
       <Toolbar>
         {shown && <PlayThrough player={player} />}
-        <HideHeardToggle checked={hideHeard} onChange={onHideHeardChange} />
+        <ToolbarGroup>
+          {albumBuyers && (
+            <Checkbox
+              label="Count album buyers"
+              checked={albumBuyers.checked}
+              onChange={albumBuyers.onChange}
+            />
+          )}
+          <HideHeardToggle checked={hideHeard} onChange={onHideHeardChange} />
+        </ToolbarGroup>
       </Toolbar>
       <Body view={view} progress={progress} scanStopped={scanStopped} showEarly={showEarly}>
         {shown && (
           <RowList label={shown.label}>
-            {shown.rows.map((row) => (
+            {player.rows.map((row) => (
               <AlsoBoughtRow key={row.matchKey} row={row} {...rowControls(row, player, actions)} />
             ))}
           </RowList>

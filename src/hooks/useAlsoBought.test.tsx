@@ -31,7 +31,7 @@ function result(...keys: ItemKey[]): AlsoBoughtResult {
 }
 
 function Probe() {
-  latest = useAlsoBought('a1', true, false);
+  latest = useAlsoBought('a1', true, { hideHeard: false, albumBuyers: true });
   return null;
 }
 

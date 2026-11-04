@@ -19,7 +19,6 @@ function item(over: Partial<ListedItem> = {}): ListedItem {
     addedAt: Date.UTC(2026, 9, 3, 12),
     tagIds: [1, 2],
     crateMateOwners: 3,
-    heard: false,
     ...over,
   };
 }

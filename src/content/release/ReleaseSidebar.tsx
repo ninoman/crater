@@ -49,11 +49,11 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const notices = useScannerNotices(SCANNER_POLL_MS);
   const releaseSaved = progress.state !== 'loading';
   const [hideHeard, setHideHeard] = useStoredFlag('hideHeard.alsoBought', false);
-  const { view, reorder, holdOrder, ...actions } = useAlsoBought(
-    item.itemKey,
-    releaseSaved,
+  const [albumBuyers, setAlbumBuyers] = useStoredFlag('albumBuyers.alsoBought', true);
+  const { view, reorder, holdOrder, ...actions } = useAlsoBought(item.itemKey, releaseSaved, {
     hideHeard,
-  );
+    albumBuyers,
+  });
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const firstWaitOver = useTimePassed(EARLY_PICKS_AFTER_MS);
   const [tab, setTab] = useState('also-bought');
@@ -88,6 +88,9 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
                 actions={actions}
                 hideHeard={hideHeard}
                 onHideHeardChange={setHideHeard}
+                albumBuyers={
+                  item.albumKey === null ? null : { checked: albumBuyers, onChange: setAlbumBuyers }
+                }
                 onPlay={holdOrder}
               />
             ),

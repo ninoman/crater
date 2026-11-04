@@ -5,7 +5,6 @@ import {
   Card,
   Checkbox,
   ExternalIcon,
-  HeardBadge,
   LinkButton,
   PlayableCover,
   type TagOption,
@@ -22,8 +21,6 @@ export interface ItemCardProps {
   mutations: TagMutations;
   selected: boolean;
   previewing: boolean;
-  /** Heard, by the worker's last read or a preview since. */
-  heard: boolean;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
   onError: (message: string) => void;
@@ -40,7 +37,6 @@ export const ItemCard = memo(function ItemCard({
   mutations,
   selected,
   previewing,
-  heard,
   onSelect,
   onPreview,
   onError,
@@ -54,7 +50,6 @@ export const ItemCard = memo(function ItemCard({
           src={item.coverUrl}
           size="fill"
           playing={previewing}
-          dimmed={heard}
           label={name}
           onToggle={() => onPreview(item.itemKey, !previewing)}
         />
@@ -87,12 +82,7 @@ export const ItemCard = memo(function ItemCard({
         </a>
       }
       meta={cardMeta(item, source)}
-      badges={
-        <>
-          {heard && <HeardBadge />}
-          <TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />
-        </>
-      }
+      badges={<TagEditor tags={tags} assignedIds={item.tagIds} name={name} {...handlers} />}
     />
   );
 });

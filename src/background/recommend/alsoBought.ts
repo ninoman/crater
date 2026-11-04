@@ -54,16 +54,23 @@ export interface AlsoBoughtOptions {
   ignoreCompilations?: boolean;
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard?: boolean;
+  /** On a track page, count the album's buyers too (decisions §17). */
+  albumBuyers?: boolean;
 }
 
 export async function computeAlsoBought(
   db: CraterDb,
   releaseKey: ItemKey,
   meFanId: number | null,
-  { followingBoost = true, ignoreCompilations = true, hideHeard = false }: AlsoBoughtOptions = {},
+  {
+    followingBoost = true,
+    ignoreCompilations = true,
+    hideHeard = false,
+    albumBuyers = true,
+  }: AlsoBoughtOptions = {},
 ): Promise<AlsoBoughtResult> {
   const [data, followed] = await Promise.all([
-    gatherAlsoBought(db, releaseKey, meFanId),
+    gatherAlsoBought(db, releaseKey, meFanId, albumBuyers),
     loadFollowedReleases(db, followingBoost),
   ]);
   const excluded = exclusions(data.mine, data.hidden, {

@@ -12,3 +12,10 @@
 .dh-toolbar > :only-child {
   margin-left: auto;
 }
+
+.dh-toolbar__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dh-space-3);
+}

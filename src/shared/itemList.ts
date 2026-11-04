@@ -20,8 +20,6 @@ export interface ListedItem {
   tagIds: number[];
   /** Wishlist only: how many of your top crate mates own it. */
   crateMateOwners: number;
-  /** You've heard it, or a track of it (decisions §22). */
-  heard: boolean;
 }
 
 /** Whether two reads of the same item would render the same card. */
@@ -36,7 +34,6 @@ export function sameListedItem(a: ListedItem, b: ListedItem): boolean {
     a.addedAt === b.addedAt &&
     a.tagIds.length === b.tagIds.length &&
     a.tagIds.every((id, i) => id === b.tagIds[i]) &&
-    a.crateMateOwners === b.crateMateOwners &&
-    a.heard === b.heard
+    a.crateMateOwners === b.crateMateOwners
   );
 }

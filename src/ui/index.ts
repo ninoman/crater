@@ -74,6 +74,6 @@ export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { type PageColors, type ThemeVariables, themeVariables } from './theme';
 export { Toggle, type ToggleProps } from './Toggle';
 export { WorkingState, type WorkingStateProps } from './WorkingState';
-export { Toolbar } from './Toolbar';
+export { Toolbar, ToolbarGroup } from './Toolbar';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export { TruncatedText, type TruncatedTextProps } from './TruncatedText';

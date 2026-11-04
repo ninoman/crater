@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ItemKey } from '../bandcamp';
-import type { AlsoBoughtResult, AlsoBoughtRow } from '../shared/alsoBought';
+import type { AlsoBoughtPrefs, AlsoBoughtResult, AlsoBoughtRow } from '../shared/alsoBought';
 import { onWorkerEvent, sendMessage } from '../shared/messages';
 import { inRankOrder, isOutOfOrder, keepOrder } from './keptOrder';
 import { type RowActions, useRowActions, withRows } from './rowActions';
@@ -13,14 +13,14 @@ export type AlsoBoughtView =
 /**
  * Fetches the Also-bought list for a release and follows the worker's re-scores. Waits for
  * `enabled`, so the worker has saved the open release before the first score. Re-scores pushed
- * to tabs keep heard releases in, so while those are hidden the list is asked for again.
- * Until `holdOrder` (a row played or the list scrolled), re-scores re-sort the list. After it they keep the rows in
- * place, and `reorder`, null while they're in rank order, applies the latest.
+ * to tabs use the worker's defaults, so while the switches differ the list is asked for again.
+ * Until `holdOrder` (a row played or the list scrolled), re-scores re-sort the list. After it
+ * they keep the rows in place, and `reorder`, null while they're in rank order, applies the latest.
  */
 export function useAlsoBought(
   releaseKey: ItemKey,
   enabled: boolean,
-  hideHeard: boolean,
+  { hideHeard, albumBuyers }: Required<AlsoBoughtPrefs>,
 ): RowActions & { view: AlsoBoughtView; reorder: (() => void) | null; holdOrder: () => void } {
   const [view, setView] = useState<AlsoBoughtView>({ state: 'loading' });
   const [ranked, setRanked] = useState<readonly ItemKey[]>([]);
@@ -41,11 +41,11 @@ export function useAlsoBought(
 
   const refresh = useCallback(
     () =>
-      sendMessage('getAlsoBought', { itemKey: releaseKey, hideHeard }).then(
+      sendMessage('getAlsoBought', { itemKey: releaseKey, hideHeard, albumBuyers }).then(
         show,
         (error: unknown) => setView({ state: 'unreachable', error: String(error) }),
       ),
-    [releaseKey, hideHeard, show],
+    [releaseKey, hideHeard, albumBuyers, show],
   );
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export function useAlsoBought(
     let cancelled = false;
     const unsubscribe = onWorkerEvent('alsoBought', (result) => {
       if (cancelled || result.releaseKey !== releaseKey) return;
-      if (!hideHeard) show(result);
+      if (!hideHeard && albumBuyers) show(result);
       else void refresh();
     });
     void refresh();
@@ -61,7 +61,7 @@ export function useAlsoBought(
       cancelled = true;
       unsubscribe();
     };
-  }, [releaseKey, enabled, hideHeard, refresh, show]);
+  }, [releaseKey, enabled, hideHeard, albumBuyers, refresh, show]);
 
   const fail = useCallback(
     (error: unknown) => setView({ state: 'unreachable', error: String(error) }),

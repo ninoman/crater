@@ -49,6 +49,7 @@ export async function gatherAlsoBought(
   db: CraterDb,
   releaseKey: ItemKey,
   meFanId: number | null,
+  albumBuyers = true,
 ): Promise<AlsoBoughtData> {
   return db.transaction(
     'r',
@@ -66,7 +67,7 @@ export async function gatherAlsoBought(
       const { release, album, page } = await readBuyerPage(db, releaseKey);
       const { matchKey } = page;
       const list = await db.releaseSupporters.get(releaseKey);
-      const weights = await buyerWeights(db, page, list?.fanIds ?? [], meFanId);
+      const weights = await buyerWeights(db, page, list?.fanIds ?? [], meFanId, albumBuyers);
       const ownerIds = [...weights.keys()];
       const fans = await db.fans.bulkGet(ownerIds);
       const readFans = fans.filter(
@@ -145,6 +146,7 @@ async function buyerWeights(
   page: BuyerPage,
   listed: readonly number[],
   meFanId: number | null,
+  albumBuyers = true,
 ): Promise<Map<number, number>> {
   // The matchKey index finds track buyers and album buyers alike.
   const rows = await db.ownership.where('matchKey').equals(page.matchKey).toArray();
@@ -152,6 +154,7 @@ async function buyerWeights(
     page,
     rows.map(readOwnership).filter((row) => row.source === 'collection'),
     listed,
+    albumBuyers,
   );
   if (meFanId !== null) weights.delete(meFanId);
   return weights;

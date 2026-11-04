@@ -46,3 +46,11 @@ export interface AlsoBoughtResult {
   /** Null once co-owned rows show. */
   warmup: AlsoBoughtWarmup | null;
 }
+
+/** The sidebar's switches for the list. Left out, each takes the worker's default. */
+export interface AlsoBoughtPrefs {
+  /** Leave out releases you've heard (decisions §22). Default off. */
+  hideHeard?: boolean;
+  /** On a track page, count the album's buyers as well as the track's (§17). Default on. */
+  albumBuyers?: boolean;
+}

@@ -3,7 +3,7 @@
 // Worker-to-tab events go the other way and are listed in EventMap.
 
 import type { FanItemCard, ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
-import type { AlsoBoughtResult } from './alsoBought';
+import type { AlsoBoughtPrefs, AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
 import type { ForYouMode, ForYouResult } from './forYou';
 import type { HeardSource } from './heard';
@@ -54,7 +54,7 @@ export interface MessageMap {
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Scores Also bought for a release from what's in the database now. */
   getAlsoBought: {
-    request: { itemKey: ItemKey; hideHeard: boolean };
+    request: { itemKey: ItemKey } & Required<AlsoBoughtPrefs>;
     response: AlsoBoughtResult;
   };
   /** A release's streamable tracks, read fresh from its page because stream URLs expire. */

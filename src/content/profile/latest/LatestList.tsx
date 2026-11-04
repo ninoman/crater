@@ -25,7 +25,7 @@ export function LatestList({ result, now, actions, moreComing }: LatestListProps
       </Toolbar>
       <div className="dh-profile__list">
         <RowList label="Crate mates' latest">
-          {result.rows.map((row) => (
+          {player.rows.map((row) => (
             <ReleaseRow
               key={row.matchKey}
               release={row}

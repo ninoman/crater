@@ -2,14 +2,14 @@ import type { QueueReleaseState } from '../../hooks/useQueueRelease';
 import type { AlsoBoughtReason } from '../../shared/alsoBought';
 
 /**
- * The reason line under a recommendation, e.g. "7 supporters have this so far", plus how many
- * of them are your crate mates, since that's what lifted it in the ranking. "So far" because the
- * count grows as more supporters are scanned.
+ * The reason line under a recommendation, e.g. "7 buyers of this release have it", plus how many
+ * of them are your crate mates, since that's what lifted it in the ranking. "Buyers", not
+ * "supporters": the count takes in owners found in other scans, beyond the page's supporter list.
  */
 export function formatReason(reason: AlsoBoughtReason): string {
   switch (reason.kind) {
     case 'co-owned': {
-      const line = `${reason.owners} supporters have this so far`;
+      const line = `${reason.owners} buyers of this release have it`;
       if (reason.crateMates === 0) return line;
       return `${line}, ${reason.crateMates === 1 ? '1 is your crate mate' : `${reason.crateMates} are your crate mates`}`;
     }

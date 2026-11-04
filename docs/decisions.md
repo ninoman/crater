@@ -216,6 +216,7 @@ Before, every page scored the whole matchKey (§3.8), so every track of an album
 - At full weight a comp's buyers, the same fans on every track, would usually outnumber the track's own and the lists would converge again. A fan who bought both counts fully.
 - The weight multiplies `voteWeight`, and N in the lift is Σ weights, so a half-weight fan is half a trial as well as half a vote. Weights are ≤ 1, so votes stay ≤ co and pruning stays valid. Crate mate boosts and the warm-up's "supporters read" count fans unweighted.
 - The release's matchKey is still what's excluded from the picks, so a track page never recommends its own album.
+- **"Count album buyers" switch (added 2026-11-03).** On a track of an album the sidebar shows a switch, on by default and remembered across pages. Off, only the track's own buyers count (its collection rows and listed supporters), for a list about this track rather than the album. Album pages ignore it. The scan and its progress header are unchanged: album buyers are still read, they just don't vote. The reason line reads "N buyers of this release have it", not "supporters", because N takes in owners found in other scans, beyond the page's supporter list.
 
 ### Small-release fallback
 
@@ -926,10 +927,10 @@ Decided and built 2026-10-24. Roadmap: *Hide, heard and play-through*. Code: `sc
 ### Play through a list
 
 - **One player per list** (`useListPlayer`): the pure queue (`shared/playQueue.ts`) over the visible rows, and one `usePreviewPlayer` whose URL is the current row's. A cover starts the queue at that row; a release's last track ending moves on to the next row, and the last row stops it. *Play all* starts at the top.
-- **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is.
+- **The list changing under it** (a hide, a reload, *Hide heard*): the same release keeps playing if it's still there, else the next row that is. *Changed 2026-11-03:* a reload that leaves out the playing release (it was just marked heard and *Hide heard* is on, or it fell out of the re-score) keeps its row in place until something else plays (`withHeld`). Without this, the 30 s heard mark skipped every release mid-play. Only a hide that covers it moves on.
 - **Keys while playing:** K play / pause, N next, P previous, Esc stop, on `document`, left alone while typing or with a modifier held. Space stays Bandcamp's.
 - **Autoplay:** moving on starts the next release without a click. Chrome allows it because the page has had a user gesture (the first play).
-- Lists: For you (every mode), Also bought, Crate mates' latest and, since the merge, New from your follows (§23). The wishlist and collection grids show `HeardBadge` and a dimmed `Cover` too (§24, "Heard on cards").
+- Lists: For you (every mode), Also bought, Crate mates' latest and, since the merge, New from your follows (§23). The wishlist and collection grids don't mark heard releases (§24, "Heard on cards").
 
 ### UI
 
@@ -1058,9 +1059,8 @@ Decided and built 2026-10-24. Roadmap: *Wishlist and collection tools*. Code: `s
 
 ### Heard on cards (merged 2026-10-24)
 
-- `listItems` answers `heard` per item, read from the heard store by matchKey (an album for its tracks), so wishlist and collection cards show `HeardBadge` and a dimmed cover like the recommendation rows (§22).
-- A card's preview marks the release heard in the worker after 30 s, as every preview does. The grid also flags the card at once (`onHeard` from `ReleasePreview`), instead of waiting for the next read of the list.
-- The cards have no Hide heard switch and no manual mark: the wishlist doubles as a to-listen list, and the badge is what that needs. Add either if it turns out to be missed.
+- **Removed 2026-11-03.** Wishlist and collection cards no longer show `HeardBadge` or a dimmed cover, and `listItems` no longer answers `heard`. A greyed-out card read as "done with this", which is wrong for releases you own or still want to buy.
+- A card's preview still marks the release heard in the worker after 30 s, as every preview does, so the recommendation lists see it.
 
 ## 25. Filters on recommendation lists (removed)
 

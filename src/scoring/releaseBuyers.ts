@@ -29,11 +29,13 @@ export interface BuyerRow {
  *   buyers of the whole comp: a track's buyers came for that one artist.
  * - Track page: the album's buyers and this track's (its rows, plus `listed`, the track page's
  *   supporters). Buyers of other tracks drop out. On a comp, album buyers count COMP_BUYER_WEIGHT.
+ *   With `albumBuyers` off, only this track's buyers count.
  */
 export function releaseBuyers(
   page: BuyerPage,
   rows: readonly BuyerRow[],
   listed: readonly number[],
+  albumBuyers = true,
 ): Map<number, number> {
   const { releaseKey, matchKey, compilation } = page;
   const weights = new Map<number, number>();
@@ -47,7 +49,7 @@ export function releaseBuyers(
   const albumWeight = compilation ? COMP_BUYER_WEIGHT : 1;
   for (const row of rows) {
     if (row.itemKey === releaseKey) add(row.fanId, 1);
-    else if (row.itemKey === matchKey) add(row.fanId, albumWeight);
+    else if (albumBuyers && row.itemKey === matchKey) add(row.fanId, albumWeight);
   }
   for (const fanId of listed) add(fanId, 1);
   return weights;
