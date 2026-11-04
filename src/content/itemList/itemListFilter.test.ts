@@ -21,7 +21,6 @@ function wish(
     addedAt: null,
     tagIds,
     crateMateOwners: 0,
-    heard: false,
     ...extra,
   };
 }

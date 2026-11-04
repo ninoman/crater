@@ -33,7 +33,6 @@ function wish(n: number, tagIds: number[], extra: Partial<ListedItem> = {}): Lis
     addedAt: n * 1000,
     tagIds,
     crateMateOwners: 0,
-    heard: false,
     ...extra,
   };
 }
@@ -304,19 +303,6 @@ describe('the wishlist tab', () => {
     await act(async () => more?.click());
     expect(cards(doc)).toHaveLength(240);
   }, 20_000);
-
-  it('marks heard releases with a badge and a dimmed cover', async () => {
-    items = [wish(1, [], { heard: true }), wish(2, [])];
-    const doc = fanPage();
-    await openTab(doc);
-
-    const card = (title: string) => cards(doc).find((li) => li.textContent?.includes(title));
-    const heard = card('Title 1');
-    const fresh = card('Title 2');
-    expect(heard?.querySelector('.dh-heard-badge')).not.toBeNull();
-    expect(heard?.querySelector('.dh-cover--dimmed')).not.toBeNull();
-    expect(fresh?.querySelector('.dh-heard-badge')).toBeNull();
-  });
 });
 
 describe('the collection tab', () => {

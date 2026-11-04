@@ -8,7 +8,6 @@ import {
   getItemTags,
   getMe,
   getPurchaseLists,
-  heardKeys,
   listOwnedItems,
   markUnwishlisted,
   markWishlisted,
@@ -54,10 +53,7 @@ export function itemListHandlers(
     listItems: async ({ source }) => {
       const me = await getMe(db);
       if (!me) return [];
-      const [rows, heard] = await Promise.all([
-        listOwnedItems(db, me.fanId, source),
-        heardKeys(db),
-      ]);
+      const rows = await listOwnedItems(db, me.fanId, source);
       // Crate mates who own it only matters for what you might still buy.
       const owners =
         source === 'wishlist' ? await crateMateOwners(db, rows, await topCrateMatesK()) : [];
@@ -72,7 +68,6 @@ export function itemListHandlers(
           addedAt,
           tagIds,
           crateMateOwners: owners[i] ?? 0,
-          heard: heard.has(item.albumKey ?? item.itemKey),
         };
       });
     },
