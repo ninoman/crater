@@ -33,6 +33,12 @@
   width: 100%;
 }
 
+/* The row-sized glyph is lost on a grid-sized cover. */
+.dh-playable-cover--fill .dh-playable-cover__icon .dh-icon {
+  width: var(--dh-play-icon-lg);
+  height: var(--dh-play-icon-lg);
+}
+
 /* A dimmed cover comes back to full while it's pointed at, focused or playing. */
 .dh-playable-cover--playing .dh-cover--dimmed,
 .dh-playable-cover:hover .dh-cover--dimmed,

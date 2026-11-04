@@ -139,6 +139,23 @@ describe('runReleaseStep', () => {
     expect(queued.every((q) => q.priority === SEED_FANS && q.nextAttemptAt === 0)).toBe(true);
   });
 
+  it('leaves out seed fans a recent profile says share too little with you', async () => {
+    const seedJob = { ...job(), priority: SEED };
+    await runReleaseStep(context(86), seedJob);
+    const [first, second] = (await db.queue.toArray()).map((q) => Number(q.target));
+    await db.queue.clear();
+    await db.me.put({ id: 'self', fanId: 1, username: 'me', syncedAt: NOW });
+    await db.fans.update(first as number, { inCommon: 0, profiledAt: NOW - 1000 });
+    await db.fans.update(second as number, { inCommon: 1, profiledAt: NOW - 1000 });
+
+    await runReleaseStep(context(86), seedJob);
+
+    const queued = (await db.queue.toArray()).map((q) => Number(q.target));
+    expect(queued).toHaveLength(85);
+    expect(queued).not.toContain(first);
+    expect(queued).toContain(second);
+  });
+
   it('keeps page order, then ranks supporters by what they own of yours once the list is in', async () => {
     const ctx = context(86);
     await runReleaseStep(ctx, job());

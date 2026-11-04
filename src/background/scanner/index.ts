@@ -10,7 +10,9 @@ import {
   clearAllData,
   countJobs,
   countScannedFans,
+  collectionRows,
   db,
+  dropRelease,
   enqueue,
   focusRelease,
   getMe,
@@ -40,7 +42,8 @@ import { drainQueue, type SchedulerDeps } from './scheduler';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { withImportPause } from './importPause';
 import { chromeScannerStore, pauseFor, resumePatch } from './state';
-import { clearWatchedReleases, watchedReleases, watchRelease } from './watched';
+import { closeTab, releasesInTabs, showReleaseInTab } from './releaseTabs';
+import { clearWatchedReleases, unwatchRelease, watchedReleases, watchRelease } from './watched';
 
 export const SCANNER_ALARM = 'scanner';
 
@@ -124,10 +127,17 @@ export async function ensureScannerAlarm(): Promise<void> {
   }
 }
 
-export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> {
+export async function openRelease(
+  item: ReleasePageItem,
+  tabId: number | undefined,
+): Promise<ScanProgress> {
   const { itemKey, url } = item;
   if (!isBandcampUrl(url)) throw new Error(`Not a bandcamp.com release: ${url}`);
   const now = Date.now();
+  if (tabId !== undefined) {
+    const left = await showReleaseInTab(tabId, itemKey);
+    if (left) await dropOpenedRelease(left);
+  }
   // The open page already tells us about the release, so scoring needn't wait for its job.
   await upsertReleasePageItem(db, item);
   await watchRelease(itemKey);
@@ -141,6 +151,30 @@ export async function openRelease(item: ReleasePageItem): Promise<ScanProgress> 
   await focusRelease(db, itemKey, supporters?.fanIds ?? [], FOREGROUND, BACKGROUND);
   kickScanner();
   return releaseProgress(db, itemKey);
+}
+
+/** A tab closed: the release it showed leaves the queue unless another tab still shows it. */
+export async function closeReleaseTab(tabId: number): Promise<void> {
+  const left = await closeTab(tabId);
+  if (left) await dropOpenedRelease(left);
+}
+
+/**
+ * Takes a release no tab shows any more off the queue, with the fans its list queued. Your own
+ * releases stay, since the seed would only queue them again. Fans another open release lists
+ * stay too.
+ */
+async function dropOpenedRelease(release: ItemKey): Promise<void> {
+  await unwatchRelease(release);
+  const me = await getMe(db);
+  if (me) {
+    const own = (await collectionRows(db, me.fanId)).flatMap((row) => [row.itemKey, row.matchKey]);
+    if (own.includes(release)) return;
+  }
+  const others = (await releasesInTabs()).filter((key) => key !== release);
+  const lists = await Promise.all(others.map((key) => getReleaseSupporters(db, key)));
+  const keep = new Set(lists.flatMap((list) => list?.fanIds ?? []));
+  await dropRelease(db, release, BACKGROUND, keep);
 }
 
 export async function requestRelease(

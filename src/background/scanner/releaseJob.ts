@@ -16,14 +16,18 @@ import {
 import {
   addSupporterOwnership,
   appendReleaseSupporters,
+  collectionMatchCount,
   enqueueAt,
   fanJob,
+  followedFanIds,
   getItem,
+  getMe,
   releaseSeller,
   saveReleaseSupporters,
   supportersFetchedAt,
   upsertReleasePageItem,
   upsertSupporterFans,
+  type FanRecord,
   type ReleaseCursor,
   type ReleaseJob,
 } from '../../db';
@@ -33,6 +37,8 @@ import { needsFanScan, supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
 import { SEED, SEED_FANS } from './priority';
 import { rankSeedFansOnceListed } from './seedFans';
+import { profileRulesOut } from './seedScreen';
+import { seedInCommonCutoff } from '../../scoring/supporterRank';
 
 /** The site pages supporters 100 at a time too. */
 const SUPPORTERS_PAGE_SIZE = 100;
@@ -167,8 +173,8 @@ async function carryOn(
  * Saves the fans and what they own, and queues the ones not scanned recently. For a release you
  * opened they take its priority and place in line, so its fans run before the next release at
  * that priority (vertical). A seed list's fans wait at SEED_FANS, behind every seed list
- * (horizontal, decisions §5). Either way they keep page order (`offset` is where this page
- * starts) until they're ranked.
+ * (horizontal, decisions §5), except fans a recent profile says share too little with you.
+ * Either way they keep page order (`offset` is where this page starts) until they're ranked.
  */
 async function recordSupporters(
   ctx: StepContext,
@@ -181,10 +187,23 @@ async function recordSupporters(
   await addSupporterOwnership(ctx.db, release, supporters);
   const seed = job.priority === SEED;
   const at = seed ? 0 : job.nextAttemptAt;
+  const ruledOut = seed ? await seedRuledOut(ctx) : () => false;
   const stale = fans.flatMap((fan, i) =>
-    needsFanScan(fan, ctx.now)
+    needsFanScan(fan, ctx.now) && !ruledOut(fan)
       ? [{ spec: fanJob(fan.fanId, job.target), at, rank: offset + i + 1 }]
       : [],
   );
   await enqueueAt(ctx.db, stale, seed ? SEED_FANS : job.priority);
+}
+
+/** Whether a seed fan's recent profile already rules them out, so re-seeding doesn't re-queue them. */
+async function seedRuledOut(ctx: StepContext): Promise<(fan: FanRecord) => boolean> {
+  const me = await getMe(ctx.db);
+  if (!me) return () => false;
+  const [yours, followed] = await Promise.all([
+    collectionMatchCount(ctx.db, me.fanId),
+    followedFanIds(ctx.db),
+  ]);
+  const cutoff = seedInCommonCutoff(yours);
+  return (fan) => !followed.has(fan.fanId) && profileRulesOut(fan, cutoff, ctx.now);
 }

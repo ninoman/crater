@@ -25,6 +25,9 @@ export interface ListPlayer<R extends ListPlayerRow = ListPlayerRow> {
   previous: () => void;
   toggle: () => void;
   seek: (seconds: number) => void;
+  /** Within the playing release. */
+  previousTrack: () => void;
+  nextTrack: () => void;
   /** A hide is about to take rows out: a playing one covered by it goes, rather than stays. */
   hidden: (target: HideTarget) => void;
 }
@@ -98,6 +101,8 @@ export function useListPlayer<R extends ListPlayerRow>(
     previous,
     toggle: player.toggle,
     seek: player.seek,
+    previousTrack: player.previousTrack,
+    nextTrack: player.nextTrack,
     hidden,
   };
 }

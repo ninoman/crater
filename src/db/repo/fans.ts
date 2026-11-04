@@ -107,8 +107,10 @@ export async function saveFanProfile(
   db: CraterDb,
   fanId: number,
   profile: Pick<FanRecord, 'itemCount' | 'inCommon'>,
+  now: number,
 ): Promise<void> {
-  await db.fans.update(fanId, { itemCount: profile.itemCount, inCommon: profile.inCommon });
+  const { itemCount, inCommon } = profile;
+  await db.fans.update(fanId, { itemCount, inCommon, profiledAt: now });
 }
 
 /**

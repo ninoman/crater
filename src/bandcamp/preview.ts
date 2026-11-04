@@ -14,12 +14,12 @@ export function parseReleasePreview(html: string): ReleasePreview {
   const tralbum = validate(rawTralbumTracks, json, 'data-tralbum');
   const { featured_track_id: featured, trackinfo } = tralbum;
 
-  const tracks: (PreviewTrack & { id: number | null })[] = [];
+  const tracks: PreviewTrack[] = [];
   for (const raw of trackinfo) {
     const streamUrl = raw.file?.['mp3-128'];
     if (!streamUrl) continue;
     tracks.push({
-      id: raw.track_id ?? null,
+      itemKey: raw.track_id == null ? null : itemKey('t', raw.track_id),
       title: raw.title ?? '',
       duration: raw.duration ?? 0,
       streamUrl,
@@ -27,11 +27,11 @@ export function parseReleasePreview(html: string): ReleasePreview {
   }
   const startIndex = Math.max(
     0,
-    tracks.findIndex((track) => track.id === featured),
+    tracks.findIndex((track) => featured != null && track.itemKey === itemKey('t', featured)),
   );
   return {
     matchKey: previewMatchKey(tralbum),
-    tracks: tracks.map(({ id: _id, ...track }) => track),
+    tracks,
     startIndex,
   };
 }

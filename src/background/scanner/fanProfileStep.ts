@@ -37,7 +37,7 @@ export async function profileStep(ctx: StepContext, job: FanJob): Promise<StepRe
     }
     throw error;
   }
-  await saveFanProfile(ctx.db, fanId, profile);
+  await saveFanProfile(ctx.db, fanId, profile, ctx.now);
   return {
     next: { ...QUICK, rank: await rankAfterProfile(ctx, job, profile) },
     event: 'continued',

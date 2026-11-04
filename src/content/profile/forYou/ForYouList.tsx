@@ -3,7 +3,7 @@ import { useListPlayer } from '../../../hooks/useListPlayer';
 import type { ForYouMode, ForYouRow } from '../../../shared/forYou';
 import { ReleaseRow, RowList, SkeletonRows, Toolbar } from '../../../ui';
 import { withFollowed } from '../../shared/followedText';
-import { PlayThrough, rowControls } from '../../shared/RowControls';
+import { ListNowPlaying, PlayThrough, rowControls } from '../../shared/RowControls';
 import { formatDeepCutReason, formatPickReason } from './forYouText';
 
 export interface ForYouListProps {
@@ -52,12 +52,13 @@ export function ForYouList({ rows, limit, mode, now, actions, moreComing }: ForY
               release={row}
               rank={i + 1}
               reason={withFollowed(reasonFor(row, mode, now), row.followed)}
-              {...rowControls(row, player, actions)}
+              {...rowControls(row, player, actions, 'docked')}
             />
           ))}
         </RowList>
         {moreComing && rows.length < limit && <SkeletonRows count={3} ranked />}
       </div>
+      <ListNowPlaying player={player} />
       <p className="dh-profile__note">
         {NOTES[mode]} Hidden, owned and wishlisted releases are left out.
       </p>

@@ -8,10 +8,23 @@ import {
   type FetchText,
   type ReleasePreview,
 } from '../bandcamp';
-import { itemsAtUrls, type CraterDb } from '../db';
+import { itemsAtUrls, trackBuyerCounts, type CraterDb } from '../db';
+import { previewStartIndex } from '../scoring/previewStart';
 import { BlockedHostError } from './http';
 
+/** The release's preview, starting at the track fans bought most on its own (§22). */
 export async function getReleasePreview(
+  db: CraterDb,
+  fetchers: { fetchJson: FetchJson; fetchText: FetchText },
+  url: string,
+): Promise<ReleasePreview> {
+  const preview = await fetchPreview(db, fetchers, url);
+  if (preview.matchKey === null || preview.tracks.length < 2) return preview;
+  const buyers = await trackBuyerCounts(db, preview.matchKey);
+  return { ...preview, startIndex: previewStartIndex(preview.tracks, buyers, preview.startIndex) };
+}
+
+async function fetchPreview(
   db: CraterDb,
   { fetchJson, fetchText }: { fetchJson: FetchJson; fetchText: FetchText },
   url: string,

@@ -2,7 +2,8 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, type Mock, vi } from 'vitest';
-import { usePreviewPlayer } from './usePreviewPlayer';
+import type { PreviewTrack } from '../bandcamp';
+import { type PreviewPlayer, usePreviewPlayer } from './usePreviewPlayer';
 
 let container: HTMLElement;
 let root: Root;
@@ -10,10 +11,16 @@ let preview: HTMLAudioElement;
 let bandcamp: HTMLAudioElement;
 let pauseBandcamp: Mock<() => void>;
 let pausePreview: Mock<() => void>;
+let tracks: PreviewTrack[];
+let player: PreviewPlayer;
 
 function Player() {
-  usePreviewPlayer('https://artist.bandcamp.com/album/one');
+  player = usePreviewPlayer('https://artist.bandcamp.com/album/one');
   return null;
+}
+
+function track(title: string): PreviewTrack {
+  return { itemKey: null, title, streamUrl: `https://bcbits.test/${title}`, duration: 100 };
 }
 
 /** An audio element whose `paused` is set by hand, since jsdom doesn't play media. */
@@ -29,12 +36,13 @@ async function openPreview() {
 
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  tracks = [track('One')];
   vi.stubGlobal('chrome', {
     runtime: {
       sendMessage: async () => ({
         ok: true,
         data: {
-          tracks: [{ title: 'One', streamUrl: 'https://bcbits.test/1', duration: 100 }],
+          tracks,
           startIndex: 0,
           matchKey: 'a1',
         },
@@ -107,4 +115,20 @@ it('leaves an already paused Bandcamp player alone', async () => {
     preview.dispatchEvent(new Event('play'));
   });
   expect(pauseBandcamp).not.toHaveBeenCalled();
+});
+
+it("steps between the release's tracks and stops at either end", async () => {
+  tracks = [track('One'), track('Two')];
+  await openPreview();
+  const title = () => (player.view.state === 'ready' ? player.view.track.title : null);
+
+  act(() => player.previousTrack());
+  expect(title()).toBe('One');
+  act(() => player.nextTrack());
+  expect(title()).toBe('Two');
+  expect(preview.src).toBe('https://bcbits.test/Two');
+  act(() => player.nextTrack());
+  expect(title()).toBe('Two');
+  act(() => player.previousTrack());
+  expect(title()).toBe('One');
 });

@@ -19,7 +19,12 @@ import {
   Tooltip,
 } from '../../../ui';
 import { FilterControls } from '../../shared/FilterControls';
-import { HideHeardToggle, PlayThrough, rowControls } from '../../shared/RowControls';
+import {
+  HideHeardToggle,
+  ListNowPlaying,
+  PlayThrough,
+  rowControls,
+} from '../../shared/RowControls';
 import { isFiltering, liveTagIds, NO_FILTER, visibleKeys } from '../../shared/tagFilter';
 import { CheckingProgress } from './CheckingProgress';
 import { formatAccounts, formatFollowsReason, formatFollowsSummary } from './followsText';
@@ -165,6 +170,7 @@ export function FollowsList({
           <MutedAccounts accounts={muted} onUnmute={(bandId) => onMute(bandId, false)} />
         </Disclosure>
       )}
+      <ListNowPlaying player={player} />
       <p className="dh-profile__note">
         What the artists and labels you follow released in the last {result.windowDays} days, newest
         first; on the same day, accounts more of your top crate mates buy from go first. Crater
@@ -195,7 +201,7 @@ function FollowsRow({ row, accounts, now, onMute, player, actions }: FollowsRowP
         ),
       }}
       reason={formatFollowsReason(row, now)}
-      {...rowControls(row, player, actions)}
+      {...rowControls(row, player, actions, 'docked')}
       extraActions={
         primary && (
           <Tooltip

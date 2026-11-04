@@ -88,6 +88,8 @@ export interface FanRecord {
    * Null when the page was read logged out.
    */
   inCommon?: number | null;
+  /** When the profile page was last read. */
+  profiledAt?: number;
 }
 
 export interface OwnershipRecord {

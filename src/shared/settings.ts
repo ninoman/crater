@@ -61,7 +61,7 @@ export const DEFAULT_SETTINGS: Settings = {
   tagPrompt: true,
   followingBoost: true,
   // Underground electronic runs small; what counts as rare depends on the genre you dig in.
-  deepCutMaxSupporters: 50,
+  deepCutMaxSupporters: 15,
   // Needs an optional permission, asked for when it's turned on.
   followNotifications: false,
 };

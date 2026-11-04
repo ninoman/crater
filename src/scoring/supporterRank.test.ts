@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  seedInCommonCutoff,
   inCommonSimilarity,
   passZeroOrder,
   readsAhead,
@@ -125,5 +126,13 @@ describe('seedFanOrder', () => {
       ],
     });
     expect(order).toEqual([8, 10, 7, 9]);
+  });
+});
+
+describe('seedInCommonCutoff', () => {
+  it('asks for one item in common per 180 of your releases, from 1 to 5', () => {
+    expect([0, 50, 180, 181, 400, 720, 908, 5000].map(seedInCommonCutoff)).toEqual([
+      1, 1, 1, 2, 3, 4, 5, 5,
+    ]);
   });
 });
