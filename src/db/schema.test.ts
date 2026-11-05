@@ -4,8 +4,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseFanPage, type CollectionItem } from '../bandcamp';
 import { fixtureText } from '../../tests/fixtures';
 import { itemFromCollection, ownershipFromCollection } from './mappers';
-import { fanRows, getItem, putItems, readItems } from './repo';
+import { fanRows, getItem, matchRows, putItems, readItems } from './repo';
 import { CraterDb } from './schema';
+import { putOwnershipRows } from '../../tests/ownership';
 
 const album: CollectionItem = {
   itemKey: 'a100',
@@ -44,7 +45,8 @@ describe('CraterDb', () => {
   it('stores items and ownership mapped from a real fan page', async () => {
     const page = parseFanPage(fixtureText('fan-page.html'));
     await putItems(db, page.firstItems.map(itemFromCollection));
-    await db.ownership.bulkPut(
+    await putOwnershipRows(
+      db,
       page.firstItems.map((item) => ownershipFromCollection(page.fanId, item, 'collection')),
     );
 
@@ -53,12 +55,12 @@ describe('CraterDb', () => {
   });
 
   it('matches an album owner with a fan who owns one of its tracks', async () => {
-    await db.ownership.bulkPut([
+    await putOwnershipRows(db, [
       ownershipFromCollection(1, album, 'collection'),
       ownershipFromCollection(2, trackFromAlbum, 'collection'),
     ]);
 
-    const owners = await db.ownership.where('matchKey').equals('a100').toArray();
+    const owners = await matchRows(db, 'a100');
     expect(owners.map((row) => row.fanId).sort()).toEqual([1, 2]);
   });
 

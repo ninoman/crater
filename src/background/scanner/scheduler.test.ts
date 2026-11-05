@@ -9,6 +9,7 @@ import { fetchJson, fetchText } from '../http';
 import { releaseProgress } from './progress';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { INITIAL_SCANNER_STATE, resumePatch, type ScannerState, type ScannerStore } from './state';
+import { countFanRows } from '../../../tests/ownership';
 
 const SMALL_ALBUM_URL = 'https://doorsdarkmancollective.bandcamp.com/album/summers-fault';
 const smallAlbum = parseReleasePage(fixtureText('album-page-small.html'));
@@ -172,7 +173,7 @@ describe('drainQueue', () => {
     expect(fans.map((fan) => fan?.status)).toEqual(['done', 'private', 'partial']);
     expect(fans.map((fan) => fan?.scannedItems)).toEqual([3, 0, 200]);
     expect(fans[0]?.collectionSize).toBe(3);
-    expect(await db.ownership.where('fanId').equals(big).count()).toBe(201); // 200 + this release
+    expect(await countFanRows(db, big)).toBe(201); // 200 + this release
     expect(await releaseProgress(db, smallAlbum.item.itemKey)).toEqual({
       releaseKey: smallAlbum.item.itemKey,
       scanned: 3,
@@ -206,7 +207,7 @@ describe('drainQueue', () => {
 
     vi.setSystemTime(START + 120_000);
     expect(await drainQueue(deps())).toBe('idle');
-    expect(await db.ownership.where('fanId').equals(7).count()).toBe(2);
+    expect(await countFanRows(db, 7)).toBe(2);
     expect(store.state.backoff).toBeNull();
   });
 
@@ -218,12 +219,12 @@ describe('drainQueue', () => {
     await drainQueue(deps());
     expect(store.state.backoff).toBeNull();
     expect(store.state.networkFailures).toBe(0);
-    expect(await db.ownership.where('fanId').equals(8).count()).toBe(1);
-    expect(await db.ownership.where('fanId').equals(7).count()).toBe(0);
+    expect(await countFanRows(db, 8)).toBe(1);
+    expect(await countFanRows(db, 7)).toBe(0);
 
     vi.setSystemTime(START + 60_000);
     await drainQueue(deps());
-    expect(await db.ownership.where('fanId').equals(7).count()).toBe(1);
+    expect(await countFanRows(db, 7)).toBe(1);
   });
 
   it('backs off exponentially from 60 s on 5xx and runs of network failures', async () => {
@@ -270,7 +271,7 @@ describe('drainQueue', () => {
 
     await store.save(resumePatch(store.state));
     await drainQueue(deps());
-    expect(await db.ownership.where('fanId').equals(7).count()).toBe(1);
+    expect(await countFanRows(db, 7)).toBe(1);
     expect(store.state.offline).toBe(false);
     expect(store.state.networkFailures).toBe(0);
   });
@@ -325,7 +326,7 @@ describe('drainQueue', () => {
     expect(await drainQueue(restarted)).toBe('idle');
 
     expect(bandcamp.requests.slice(1)).toEqual(['fan 9 p:9:100', 'fan 9 p:9:200']);
-    expect(await db.ownership.where('fanId').equals(9).count()).toBe(250);
+    expect(await countFanRows(db, 9)).toBe(250);
   });
 
   it('drops jobs that cannot succeed, marks the fan, and moves on', async () => {

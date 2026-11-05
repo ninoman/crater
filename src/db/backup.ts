@@ -20,6 +20,7 @@ import {
   flagCompilation,
   rebuildFanMatchLists,
   slimToV12,
+  startOwnershipMigration,
   TABLES_ADDED,
   TABLES_DROPPED,
   TABLES_RENAMED,
@@ -127,6 +128,8 @@ async function migrateRows(db: CraterDb, fromVersion: number): Promise<void> {
   if (fromVersion < 19) await db.queue.toCollection().modify(demoteFollowReadToV19);
   // v20 put seed fan scans behind every seed supporter list.
   if (fromVersion < 20) await db.queue.toCollection().modify(moveSeedFanToV20);
+  // v21 packs ownership one record per fan; the worker moves the rows in the background (§27).
+  if (fromVersion < 21) await startOwnershipMigration(db.ownership, db.ownershipMigration);
 }
 
 /** A backup's JSON, with tables renamed since it was made under their current names. */

@@ -101,10 +101,51 @@ export interface OwnershipRecord {
   addedAt: number | null;
 }
 
-/** An ownership row as stored: `source` is left out for collection rows (decisions §19). */
+/**
+ * An ownership row as `ownership` stored it up to v20: `source` left out for collection rows
+ * (decisions §19). From v21 the rows live packed in `fanOwnership` (decisions §27); this table
+ * only holds rows still waiting for the migration.
+ */
 export type StoredOwnership = Omit<OwnershipRecord, 'source'> & {
   source?: OwnershipRecord['source'];
 };
+
+/**
+ * Every ownership row of one fan, packed into aligned lists (decisions §27). One record per fan
+ * instead of a row per item, with its primary key and index entries. Keys are numbers
+ * (keyToNumber), in itemKey order: the order `ownership` rows always came in.
+ */
+export interface FanOwnershipRecord {
+  fanId: number;
+  itemIds: Float64Array;
+  matchIds: Float64Array;
+  /** Purchase or wishlist time in ms; NaN when unknown. */
+  addedAt: Float64Array;
+  /** The itemIds on their wishlist rather than in their collection. Left out when none. */
+  wishlistIds?: Float64Array;
+}
+
+/**
+ * Who has a matchKey in their collection, and through which item: what the `ownership.matchKey`
+ * index answered (decisions §27). Derived from `fanOwnership` and kept in step with it. Aligned
+ * lists in `[fanId+itemKey]` order, as that index returned them.
+ */
+export interface MatchOwnershipRecord {
+  /** keyToNumber(matchKey) */
+  matchId: number;
+  fanIds: Float64Array;
+  itemIds: Float64Array;
+}
+
+/**
+ * How far moving `ownership` rows into `fanOwnership` has got (decisions §27). No record: done,
+ * or never needed. `copy`: fans up to `after` are copied, and reads still use `ownership`.
+ * `clear`: everything is copied and reads use the packed tables; old rows after the `after` key
+ * are being deleted.
+ */
+export type OwnershipMigration =
+  | { id: 'state'; phase: 'copy'; after: number }
+  | { id: 'state'; phase: 'clear'; after: [number, ItemKey] | null };
 
 /**
  * A fan's distinct collection matchKeys, kept in step with their `ownership` rows. Scoring reads
@@ -380,6 +421,9 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   bandReleases: 15,
   bandReads: 15,
   followMutes: 15,
+  fanOwnership: 21,
+  matchOwnership: 21,
+  ownershipMigration: 21,
 };
 
 /**
@@ -403,7 +447,11 @@ export class CraterDb extends Dexie {
   items!: EntityTable<StoredItem, 'itemKey'>;
   bands!: EntityTable<BandRecord, 'bandId'>;
   fans!: EntityTable<FanRecord, 'fanId'>;
+  /** Rows still to be moved into `fanOwnership` (decisions §27). Only repo/ownershipStore reads it. */
   ownership!: Table<StoredOwnership, [number, ItemKey]>;
+  fanOwnership!: EntityTable<FanOwnershipRecord, 'fanId'>;
+  matchOwnership!: EntityTable<MatchOwnershipRecord, 'matchId'>;
+  ownershipMigration!: EntityTable<OwnershipMigration, 'id'>;
   releaseSupporters!: EntityTable<ReleaseSupportersRecord, 'itemKey'>;
   me!: EntityTable<MeRecord, 'id'>;
   crateMates!: EntityTable<CrateMateRecord, 'fanId'>;
@@ -557,7 +605,27 @@ export class CraterDb extends Dexie {
     this.version(20)
       .stores({})
       .upgrade((tx) => tx.table<QueueJob>('queue').toCollection().modify(moveSeedFanToV20));
+    // v21: ownership packed one record per fan (decisions §27). The upgrade only creates the
+    // tables and flags the move; rows are copied in the background, a chunk per transaction,
+    // because rewriting 10⁷ rows in here would take minutes (§19).
+    this.version(21)
+      .stores({ fanOwnership: 'fanId', matchOwnership: 'matchId', ownershipMigration: 'id' })
+      .upgrade((tx) =>
+        startOwnershipMigration(tx.table('ownership'), tx.table('ownershipMigration')),
+      );
   }
+}
+
+/**
+ * Flags `ownership` rows for the background move into `fanOwnership`, when there are any. The
+ * v21 upgrade runs it, and so does importing an older backup (migrateRows).
+ */
+export async function startOwnershipMigration(
+  ownership: Table<StoredOwnership, [number, ItemKey]>,
+  state: EntityTable<OwnershipMigration, 'id'>,
+): Promise<void> {
+  if ((await ownership.limit(1).primaryKeys()).length === 0) return;
+  await state.put({ id: 'state', phase: 'copy', after: -1 });
 }
 
 /**

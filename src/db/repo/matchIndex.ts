@@ -1,27 +1,26 @@
 import { addOwnerDeltas, fanMatchLists } from '../matchIndex';
-import type { CraterDb, FanMatchesRecord } from '../schema';
-import { fanRows } from './fanRows';
+import type { CraterDb, FanMatchesRecord, OwnershipRecord } from '../schema';
 
 const EMPTY = new Float64Array();
 
 /**
- * Recomputes the fans' match lists from their ownership rows and adjusts owner counts. Call it
- * inside the transaction that changed their rows, with ownership, fanMatches and matchOwners in
- * scope, so the index never drifts from `ownership`.
+ * Recomputes these fans' match lists from their new rows (an empty list for a fan whose rows are
+ * all gone) and adjusts owner counts. Call it inside the transaction that changed their rows,
+ * with fanMatches and matchOwners in scope, so the index never drifts from the rows.
  */
-export async function refreshFanMatches(db: CraterDb, fanIds: Iterable<number>): Promise<void> {
-  const ids = [...new Set(fanIds)];
+export async function refreshFanMatches(
+  db: CraterDb,
+  rowsByFan: ReadonlyMap<number, readonly OwnershipRecord[]>,
+): Promise<void> {
+  const ids = [...rowsByFan.keys()];
   if (ids.length === 0) return;
-  const [before, rows] = await Promise.all([
-    db.fanMatches.bulkGet(ids),
-    Promise.all(ids.map((fanId) => fanRows(db, fanId))),
-  ]);
+  const before = await db.fanMatches.bulkGet(ids);
 
   const deltas = new Map<number, number>();
   const put: FanMatchesRecord[] = [];
   const emptied: number[] = [];
   for (const [i, fanId] of ids.entries()) {
-    const lists = fanMatchLists(rows[i] ?? []);
+    const lists = fanMatchLists(rowsByFan.get(fanId) ?? []);
     addOwnerDeltas(before[i]?.matchIds ?? EMPTY, lists.matchIds, deltas);
     if (lists.matchIds.length > 0) put.push({ fanId, ...lists });
     else if (before[i]) emptied.push(fanId);

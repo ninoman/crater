@@ -8,6 +8,7 @@ import { saveViewer } from './me';
 import { putOwnership } from './ownership';
 import { pageBadges } from './pageBadges';
 import { replaceCrateMates } from './crateMates';
+import { deleteOwnershipRow } from '../../../tests/ownership';
 
 const ME = 1;
 
@@ -95,7 +96,7 @@ describe('pageBadges', () => {
   });
 
   it("doesn't count a track you own for its sibling tracks", async () => {
-    await db.ownership.delete([ME, 'a1']);
+    await deleteOwnershipRow(db, ME, 'a1');
     await putOwnership(db, ME, [item('t12', 'a1')], 'collection');
     const [sibling, album] = await pageBadges(db, [byUrl('t11'), byUrl('a1')], 30);
     expect(sibling?.owned).toBe(false);

@@ -4,7 +4,7 @@
 import type { ItemKey } from '../../bandcamp';
 import type { BandReleaseRecord, CraterDb, FollowingRecord, OwnershipRecord } from '../schema';
 import { bandCatalogues, mutedBandIds, recentBandReleases } from './bandReleases';
-import { fanRows } from './fanRows';
+import { fanRows, ownershipTables } from './ownershipStore';
 import { heardKeys } from './heard';
 import { type HiddenSets, hiddenSets } from './hidden';
 import { countJobs } from './queue';
@@ -37,7 +37,7 @@ export async function gatherFollowsDigest(
     db.followMutes,
     db.following,
     db.fanMatches,
-    db.ownership,
+    ...ownershipTables(db),
     db.hides,
     db.heard,
     db.queue,

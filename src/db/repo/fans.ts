@@ -1,7 +1,7 @@
 import type { ItemKey, Supporter } from '../../bandcamp';
 import { fanFromSupporter } from '../mappers';
 import type { CraterDb, FanRecord, FanStatus } from '../schema';
-import { deleteFanRows } from './fanRows';
+import { editFans, ownershipTables } from './ownershipStore';
 import { refreshFanMatches } from './matchIndex';
 
 const FULLY_READ: FanStatus[] = ['done', 'partial'];
@@ -169,7 +169,7 @@ export async function forgetFansNotSeenSince(
       'rw',
       [
         db.fans,
-        db.ownership,
+        ...ownershipTables(db),
         db.fanMatches,
         db.matchOwners,
         db.crateMates,
@@ -177,9 +177,9 @@ export async function forgetFansNotSeenSince(
         db.queue,
       ],
       async () => {
-        await deleteFanRows(db, ids);
-        // Their rows are gone, so this drops their lists and lowers the owner counts.
-        await refreshFanMatches(db, ids);
+        await editFans(db, ids, (rows) => rows.clear());
+        // With no rows left, this drops their lists and lowers the owner counts.
+        await refreshFanMatches(db, new Map(ids.map((fanId) => [fanId, []])));
         await db.crateMates.bulkDelete(ids);
         await db.latelyCrateMates.bulkDelete(ids);
         await db.queue

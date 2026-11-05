@@ -2,7 +2,6 @@
 export * from './alsoBought';
 export * from './bandReleases';
 export * from './clear';
-export * from './fanRows';
 export * from './fans';
 export * from './following';
 export * from './followSignal';
@@ -15,6 +14,8 @@ export * from './items';
 export * from './matchIndex';
 export * from './me';
 export * from './ownership';
+export * from './ownershipMigration';
+export * from './ownershipStore';
 export * from './pageBadges';
 export * from './queue';
 export * from './releaseSupporters';

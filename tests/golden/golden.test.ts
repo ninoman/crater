@@ -9,6 +9,8 @@ import {
   ensureFileReader,
   exportDatabase,
   importDatabase,
+  migrateOwnershipStep,
+  migrationState,
   readBackup,
 } from '../../src/db';
 import { memorySnapshot } from '../memorySnapshot';
@@ -58,6 +60,27 @@ async function expectSlim(target: CraterDb): Promise<void> {
 /** Ownership rows written by v12 leave out `source: 'collection'`; migrated ones keep it. */
 const collectionRows = (target: CraterDb) =>
   target.ownership.filter((row) => row.source === 'collection').count();
+
+/** Ownership is packed (decisions §27): no rows left in the old table, nor a migration. */
+async function expectPacked(target: CraterDb): Promise<void> {
+  expect(await target.ownership.count()).toBe(0);
+  expect(await target.fanOwnership.count()).toBeGreaterThan(0);
+  expect(await migrationState(target)).toBeUndefined();
+}
+
+/**
+ * Runs the background migration to the end in small chunks, so chunks end partway through fans.
+ * Outputs must match the golden file before it starts, at every step and once it's done.
+ */
+async function migrateChecking(target: CraterDb): Promise<void> {
+  expect((await migrationState(target))?.phase).toBe('copy');
+  let steps = 0;
+  while (await migrateOwnershipStep(target, 7)) {
+    if (++steps % 25 === 0) expect(await outputsOf(target)).toEqual(golden());
+  }
+  await expectPacked(target);
+  expect(await outputsOf(target)).toEqual(golden());
+}
 const v11Backup = () => new Blob([readFileSync(V11_BACKUP)]);
 const outputsOf = async (target: CraterDb) =>
   JSON.parse(JSON.stringify(await collectOutputs(target)));
@@ -78,7 +101,7 @@ it('every recommender answers as recorded', async () => {
   await db.open();
   await buildScenario(db);
   await expectSlim(db);
-  expect(await collectionRows(db)).toBe(0);
+  await expectPacked(db);
   const outputs = await outputsOf(db);
   if (process.env.UPDATE_GOLDEN || !existsSync(GOLDEN)) {
     writeFileSync(GOLDEN, `${JSON.stringify(outputs, null, 1)}\n`);
@@ -94,10 +117,11 @@ it('answers the same after Dexie upgrades a v11 database', async () => {
   old.close();
 
   await db.open();
-  expect(db.verno).toBe(20);
+  expect(db.verno).toBe(21);
   await expectSlim(db);
   expect(await collectionRows(db)).toBeGreaterThan(0);
   expect(await outputsOf(db)).toEqual(golden());
+  await migrateChecking(db);
 });
 
 it('answers the same after importing a v11 backup', async () => {
@@ -105,6 +129,7 @@ it('answers the same after importing a v11 backup', async () => {
   await importDatabase(db, v11Backup(), memorySnapshot().store, async () => undefined);
   await expectSlim(db);
   expect(await outputsOf(db)).toEqual(golden());
+  await migrateChecking(db);
 });
 
 it('answers the same after a gzipped round trip', async () => {
@@ -114,6 +139,7 @@ it('answers the same after a gzipped round trip', async () => {
   const copy = new CraterDb(`${name}-copy`);
   await copy.open();
   await importDatabase(copy, file, memorySnapshot().store, async () => undefined);
+  await expectPacked(copy);
   expect(await outputsOf(copy)).toEqual(golden());
   await copy.delete();
 });

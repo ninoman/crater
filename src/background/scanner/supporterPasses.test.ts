@@ -1,13 +1,14 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
-import { CraterDb, enqueueAt, fanJob, putFollowing, refreshFanMatches } from '../../db';
+import { CraterDb, enqueueAt, fanJob, putFollowing } from '../../db';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import type { StepEvent } from './context';
 import { BACKGROUND, FOREGROUND, FULL_SCAN_RANK, SEED } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
 import { INITIAL_SCANNER_STATE, type ScannerState, type ScannerStore } from './state';
+import { putOwnershipRows, seedOwnership } from '../../../tests/ownership';
 
 // Passes 1 and 2 of supporter scanning (decisions §12), end to end on a fake bandcamp.com.
 
@@ -130,14 +131,15 @@ function deps(overrides: Partial<SchedulerDeps> = {}): SchedulerDeps {
 /** You, signed in, owning one release, so in-common ratios have a "yours". */
 async function signIn() {
   await db.me.put({ id: 'self', fanId: ME, username: 'me', syncedAt: START });
-  await db.ownership.put({
-    fanId: ME,
-    itemKey: 'a1',
-    matchKey: 'a1',
-    source: 'collection',
-    addedAt: null,
-  });
-  await refreshFanMatches(db, [ME]);
+  await seedOwnership(db, [
+    {
+      fanId: ME,
+      itemKey: 'a1',
+      matchKey: 'a1',
+      source: 'collection',
+      addedAt: null,
+    },
+  ]);
 }
 
 /** Lists the fans as the release's supporters and queues them in page order. */
@@ -264,14 +266,15 @@ describe('pass 1: profile pages', () => {
   it('reads a seed fan in full only when they share enough with you', async () => {
     await signIn();
     // Already known to own your release, so no profile is needed.
-    await db.ownership.put({
-      fanId: 23,
-      itemKey: 'a1',
-      matchKey: 'a1',
-      source: 'collection',
-      addedAt: null,
-    });
-    await refreshFanMatches(db, [23]);
+    await seedOwnership(db, [
+      {
+        fanId: 23,
+        itemKey: 'a1',
+        matchKey: 'a1',
+        source: 'collection',
+        addedAt: null,
+      },
+    ]);
     const requests = fakeBandcamp({
       21: { inCommon: 0, items: 5 },
       22: { inCommon: 3, items: 5 },
@@ -330,13 +333,15 @@ describe('pass 2: quick read, then full scan', () => {
   const token = (ms: number) => `${Math.floor(ms / 1000)}::a::`;
 
   async function bought(fanId: number, at: number) {
-    await db.ownership.put({
-      fanId,
-      itemKey: RELEASE,
-      matchKey: RELEASE,
-      source: 'collection',
-      addedAt: at,
-    });
+    await putOwnershipRows(db, [
+      {
+        fanId,
+        itemKey: RELEASE,
+        matchKey: RELEASE,
+        source: 'collection',
+        addedAt: at,
+      },
+    ]);
   }
 
   it('reads 100 items from a few months after the purchase, then the rest in the background', async () => {

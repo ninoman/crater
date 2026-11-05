@@ -1,6 +1,6 @@
 // A small made-up database as a backup file, for testing the eval end to end.
 
-import { buildMatchIndex, CraterDb, exportDatabase } from '../../src/db';
+import { buildMatchIndex, buildPackedOwnership, CraterDb, exportDatabase } from '../../src/db';
 import type { FanRecord, ItemRecord, OwnershipRecord } from '../../src/db';
 import { seededRandom } from './splits';
 
@@ -74,7 +74,9 @@ export async function syntheticBackup(): Promise<Blob> {
   await db.me.put({ id: 'self', fanId: ME, username: 'me', syncedAt: 0 });
   await db.fans.bulkPut(fans);
   await db.items.bulkPut(items);
-  await db.ownership.bulkPut(rows);
+  const packed = buildPackedOwnership(rows);
+  await db.fanOwnership.bulkPut(packed.fanOwnership);
+  await db.matchOwnership.bulkPut(packed.matchOwnership);
   await db.fanMatches.bulkPut(index.fanMatches);
   await db.matchOwners.bulkPut(index.matchOwners);
   const { file } = await exportDatabase(db);

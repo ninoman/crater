@@ -5,6 +5,7 @@ import { CraterDb, enqueue, nextJob, type OwnershipRecord } from '../../db';
 import { SUPPORTERS_FRESH_MS } from './freshness';
 import { BACKGROUND, SEED } from './priority';
 import { ownReleaseProgress, ownReleases, seedOwnReleases } from './seed';
+import { putOwnershipRows } from '../../../tests/ownership';
 
 const ME = 1;
 const NOW = 1_800_000_000_000;
@@ -30,7 +31,7 @@ function row(
 
 /** Saves your ownership rows, with an item (and its url) for each. */
 async function own(rows: OwnershipRecord[]): Promise<void> {
-  await db.ownership.bulkPut(rows);
+  await putOwnershipRows(db, rows);
   await db.items.bulkPut(
     rows.map((r) => ({
       itemKey: r.itemKey,
@@ -80,7 +81,7 @@ describe('ownReleases', () => {
 describe('seedOwnReleases', () => {
   it('queues your releases at seed priority, newest purchase first, one per matchKey', async () => {
     await own([row('a1', 100), row('t2', 300, { matchKey: 'a1' }), row('a3', 200)]);
-    await db.ownership.put(row('a9', 400, { source: 'wishlist' }));
+    await putOwnershipRows(db, [row('a9', 400, { source: 'wishlist' })]);
 
     expect(await seedOwnReleases(db, ME, NOW)).toBe(2);
 

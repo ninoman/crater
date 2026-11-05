@@ -4,6 +4,7 @@ import { CraterDb } from '../../src/db';
 import { loadBackup, runEval } from './pipeline';
 import { formatReport } from './report';
 import { syntheticBackup } from './syntheticBackup';
+import { countFanRows } from '../ownership';
 
 let db: CraterDb;
 
@@ -19,7 +20,7 @@ afterEach(async () => {
 describe('runEval on a synthetic backup', () => {
   it('runs both splits and leaves the database as it found it', async () => {
     await loadBackup(db, await syntheticBackup());
-    const before = await db.ownership.where('fanId').equals(1).count();
+    const before = await countFanRows(db, 1);
 
     const { splits, notes } = await runEval(db);
 
@@ -28,7 +29,7 @@ describe('runEval on a synthetic backup', () => {
       [1, [8]],
       [5, [8, 8, 8, 8, 8]],
     ]);
-    expect(await db.ownership.where('fanId').equals(1).count()).toBe(before);
+    expect(await countFanRows(db, 1)).toBe(before);
     for (const split of splits) {
       const forYou = split.rows.find((r) => r.kind === 'forYou' && r.nicheCap === 100);
       expect(forYou?.at[100].recall?.mean).toBeGreaterThan(0);

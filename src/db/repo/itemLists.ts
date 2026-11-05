@@ -4,7 +4,7 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { CraterDb, ItemRecord, ItemTagsRecord, OwnershipRecord } from '../schema';
-import { fanRows } from './fanRows';
+import { fanRows, fanRowsFor, ownershipTables } from './ownershipStore';
 import { getItemList } from './items';
 
 type Source = OwnershipRecord['source'];
@@ -25,19 +25,23 @@ export async function listOwnedItems(
   fanId: number,
   source: Source,
 ): Promise<OwnedRow[]> {
-  return db.transaction('r', [db.ownership, db.items, db.bands, db.itemTags], async () => {
-    const owned = (await fanRows(db, fanId)).filter((row) => row.source === source);
-    const keys = owned.map((row) => row.itemKey);
-    const [items, tags] = await Promise.all([getItemList(db, keys), db.itemTags.bulkGet(keys)]);
-    const rows = owned.flatMap((row, i): OwnedRow[] => {
-      const item = items[i];
-      if (!item) return [];
-      return [
-        { item, matchKey: row.matchKey, addedAt: row.addedAt, tagIds: tags[i]?.tagIds ?? [] },
-      ];
-    });
-    return rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
-  });
+  return db.transaction(
+    'r',
+    [...ownershipTables(db), db.items, db.bands, db.itemTags],
+    async () => {
+      const owned = (await fanRows(db, fanId)).filter((row) => row.source === source);
+      const keys = owned.map((row) => row.itemKey);
+      const [items, tags] = await Promise.all([getItemList(db, keys), db.itemTags.bulkGet(keys)]);
+      const rows = owned.flatMap((row, i): OwnedRow[] => {
+        const item = items[i];
+        if (!item) return [];
+        return [
+          { item, matchKey: row.matchKey, addedAt: row.addedAt, tagIds: tags[i]?.tagIds ?? [] },
+        ];
+      });
+      return rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
+    },
+  );
 }
 
 /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
@@ -46,8 +50,8 @@ export async function getItemTags(
   fanId: number,
   itemKey: ItemKey,
 ): Promise<number[] | null> {
-  return db.transaction('r', [db.ownership, db.itemTags], async () => {
-    const row = await db.ownership.get([fanId, itemKey]);
+  return db.transaction('r', [...ownershipTables(db), db.itemTags], async () => {
+    const [row] = await fanRowsFor(db, fanId, [itemKey]);
     if (row?.source !== 'wishlist') return null;
     return (await db.itemTags.get(itemKey))?.tagIds ?? [];
   });
@@ -83,7 +87,7 @@ export async function assignItemTag(
  * its tags (decisions §24).
  */
 export async function pruneItemData(db: CraterDb, fanId: number): Promise<void> {
-  await db.transaction('rw', [db.ownership, db.itemTags], async () => {
+  await db.transaction('rw', [...ownershipTables(db), db.itemTags], async () => {
     const listed = new Set((await fanRows(db, fanId)).map((row) => row.itemKey));
     await db.itemTags.filter((row) => !listed.has(row.itemKey)).delete();
   });
@@ -95,6 +99,6 @@ export async function listedKeys(
   fanId: number,
   itemKeys: ItemKey[],
 ): Promise<Set<ItemKey>> {
-  const rows = await db.ownership.bulkGet(itemKeys.map((key): [number, ItemKey] => [fanId, key]));
+  const rows = await fanRowsFor(db, fanId, itemKeys);
   return new Set(rows.flatMap((row) => (row ? [row.itemKey] : [])));
 }

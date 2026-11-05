@@ -11,8 +11,8 @@ import type {
 } from '../schema';
 import type { SupporterList } from '../../scoring/alsoBought';
 import { type BuyerPage, releaseBuyers } from '../../scoring/releaseBuyers';
-import { readItemFields, readOwnership } from '../storage';
-import { fanRows } from './fanRows';
+import { readItemFields } from '../storage';
+import { fanRows, matchRows, ownershipTables } from './ownershipStore';
 import { collectionRead } from './fans';
 import { getItemFields, itemFieldsWhere, readItems } from './items';
 import { heardKeys } from './heard';
@@ -55,7 +55,7 @@ export async function gatherAlsoBought(
     'r',
     [
       db.items,
-      db.ownership,
+      ...ownershipTables(db),
       db.fans,
       db.fanMatches,
       db.hides,
@@ -126,7 +126,7 @@ export async function getReleaseBuyers(
   listed: readonly number[],
   meFanId: number | null,
 ): Promise<number[]> {
-  return db.transaction('r', [db.items, db.ownership], async () => {
+  return db.transaction('r', [db.items, ...ownershipTables(db)], async () => {
     const { page } = await readBuyerPage(db, releaseKey);
     return [...(await buyerWeights(db, page, listed, meFanId)).keys()];
   });
@@ -149,13 +149,7 @@ async function buyerWeights(
   albumBuyers = true,
 ): Promise<Map<number, number>> {
   // The matchKey index finds track buyers and album buyers alike.
-  const rows = await db.ownership.where('matchKey').equals(page.matchKey).toArray();
-  const weights = releaseBuyers(
-    page,
-    rows.map(readOwnership).filter((row) => row.source === 'collection'),
-    listed,
-    albumBuyers,
-  );
+  const weights = releaseBuyers(page, await matchRows(db, page.matchKey), listed, albumBuyers);
   if (meFanId !== null) weights.delete(meFanId);
   return weights;
 }

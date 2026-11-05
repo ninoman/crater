@@ -6,8 +6,8 @@
 
 import { serialize } from 'node:v8';
 import { parseCollectionPage, parseSupportersPage } from '../src/bandcamp';
-import { fanFromSupporter, itemFromCollection, ownershipFromCollection } from '../src/db/mappers';
-import { storeItem, storeOwnership } from '../src/db/storage';
+import { fanFromSupporter, itemFromCollection } from '../src/db/mappers';
+import { storeItem } from '../src/db/storage';
 import { DEFAULT_SETTINGS } from '../src/shared/settings';
 import { fixtureJson } from '../tests/fixtures';
 
@@ -58,11 +58,19 @@ const itemBytes = mean(
     ]);
   }),
 );
-const ownershipBytes = mean(
-  collection.map((item) => {
-    const row = storeOwnership(ownershipFromCollection(123_456_789, item, 'collection'));
-    return recordSize(row, [row.fanId, row.itemKey], [row.matchKey]);
-  }),
+/**
+ * Ownership is packed (decisions §27): one fanOwnership record per fan, 24 bytes per row (item,
+ * matchKey and date as float64), and one matchOwnership record per matchKey, 16 bytes per row.
+ */
+const fanOwnershipBase = recordSize(
+  { fanId: 1, itemIds: new Float64Array(), matchIds: new Float64Array(), addedAt: new Float64Array() },
+  1,
+  [],
+);
+const matchOwnershipBase = recordSize(
+  { matchId: 1, fanIds: new Float64Array(), itemIds: new Float64Array() },
+  1,
+  [],
 );
 const fanBytes = mean(
   supporters.map((supporter) => {
@@ -94,7 +102,8 @@ function estimate(s: Scenario) {
     releases * recordSize({ itemKey: 'a1', fanIds: Array(perList).fill(1e9), fetchedAt: now }, 'a1', [])
     + s.fans * (ENTRY_OVERHEAD + keySize(1e9) + keySize('a3149089081'));
   const tables = {
-    ownership: rows * ownershipBytes,
+    fanOwnership: (s.fans + 1) * fanOwnershipBase + rows * 24,
+    matchOwnership: items * matchOwnershipBase + rows * 16,
     items: items * itemBytes,
     fanMatches: (s.fans + 1) * fanMatchesBase + rows * 8,
     matchOwners: items * matchOwnersBytes,
@@ -109,7 +118,8 @@ const mb = (bytes: number) => `${(bytes / 1024 ** 2).toFixed(0)} MB`;
 const gb = (bytes: number) => `${(bytes / 1024 ** 3).toFixed(2)} GB`;
 
 console.log('Per record (bytes, with index entries):');
-console.log(`  ownership ${ownershipBytes.toFixed(0)}, item ${itemBytes.toFixed(0)}, fan ${fanBytes.toFixed(0)}, matchOwners ${matchOwnersBytes}, fanMatches ${fanMatchesBase} + 8 per id`);
+console.log(`  item ${itemBytes.toFixed(0)}, fan ${fanBytes.toFixed(0)}, matchOwners ${matchOwnersBytes}, fanMatches ${fanMatchesBase} + 8 per id`);
+console.log(`  fanOwnership ${fanOwnershipBase} + 24 per row, matchOwnership ${matchOwnershipBase} + 16 per row`);
 
 const scenarios: Scenario[] = [
   { name: 'Worst case: every fan at the 2,000-item cap', ownItems: 5000, fans: 20_000, itemsPerFan: DEFAULT_SETTINGS.collectionCap, newItemShare: 0.1 },

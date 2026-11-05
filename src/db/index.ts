@@ -4,6 +4,7 @@ export * from './backup';
 export * from './gzip';
 export * from './mappers';
 export * from './matchIndex';
+export * from './packedOwnership';
 export * from './repo';
 export * from './storage';
 export * from './tagBackup';
