@@ -17,6 +17,7 @@ import {
   releasesSupportedBy,
   saveReleaseSupporters,
 } from './releaseSupporters';
+import { ownershipRow } from '../../../tests/ownership';
 
 function item(itemKey: CollectionItem['itemKey'], otherOwners: number | null = 4): CollectionItem {
   return {
@@ -157,8 +158,8 @@ describe('releaseSupporters', () => {
       supporter(2),
     ]);
 
-    expect(await db.ownership.get([1, 't5'])).toMatchObject({ addedAt: 99 });
-    expect(await db.ownership.get([2, 't5'])).toMatchObject({
+    expect(await ownershipRow(db, 1, 't5')).toMatchObject({ addedAt: 99 });
+    expect(await ownershipRow(db, 2, 't5')).toMatchObject({
       matchKey: 'a4',
       addedAt: 1_700_000_000_000,
     });

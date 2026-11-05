@@ -2,7 +2,7 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { CraterDb, OwnershipRecord } from '../schema';
-import { fanRows } from './fanRows';
+import { fanRows, ownershipTables } from './ownershipStore';
 import { heardKeys } from './heard';
 import { type HiddenSets, hiddenSets } from './hidden';
 
@@ -21,18 +21,22 @@ export async function gatherForYou(
   crateMateFanIds: readonly number[],
   meFanId: number,
 ): Promise<ForYouData> {
-  return db.transaction('r', [db.fanMatches, db.ownership, db.hides, db.heard], async () => {
-    const [lists, mine, hidden, heard] = await Promise.all([
-      db.fanMatches.bulkGet([...crateMateFanIds]),
-      fanRows(db, meFanId),
-      hiddenSets(db),
-      heardKeys(db),
-    ]);
-    const crateMateLists = lists.flatMap((record) =>
-      record
-        ? [{ fanId: record.fanId, matchIds: record.matchIds, matchTimes: record.matchTimes }]
-        : [],
-    );
-    return { crateMateLists, mine, hidden, heard };
-  });
+  return db.transaction(
+    'r',
+    [db.fanMatches, ...ownershipTables(db), db.hides, db.heard],
+    async () => {
+      const [lists, mine, hidden, heard] = await Promise.all([
+        db.fanMatches.bulkGet([...crateMateFanIds]),
+        fanRows(db, meFanId),
+        hiddenSets(db),
+        heardKeys(db),
+      ]);
+      const crateMateLists = lists.flatMap((record) =>
+        record
+          ? [{ fanId: record.fanId, matchIds: record.matchIds, matchTimes: record.matchTimes }]
+          : [],
+      );
+      return { crateMateLists, mine, hidden, heard };
+    },
+  );
 }

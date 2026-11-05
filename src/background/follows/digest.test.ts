@@ -14,6 +14,7 @@ import {
   type MeRecord,
 } from '../../db';
 import { computeFollowsDigest } from './digest';
+import { putOwnershipRows } from '../../../tests/ownership';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.UTC(2026, 9, 24);
@@ -81,7 +82,7 @@ describe('computeFollowsDigest', () => {
     await readBand(1, [release(10, 30), release(11, 2)], NOW - 20 * DAY);
     await readBand(2, [release(20, 3), release(21, 1)], NOW - 20 * DAY);
     await readBand(2, [release(22, 0), release(20, 3), release(21, 1)], NOW);
-    await db.ownership.put({ fanId: ME, itemKey: 'a21', matchKey: 'a21', addedAt: null });
+    await putOwnershipRows(db, [{ fanId: ME, itemKey: 'a21', matchKey: 'a21', addedAt: null }]);
     await hide(db, { kind: 'release', matchKey: 'a20' }, NOW);
     await setFollowMute(db, 1, true, NOW);
 

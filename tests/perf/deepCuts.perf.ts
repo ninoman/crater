@@ -110,7 +110,8 @@ beforeAll(async () => {
   const index = buildMatchIndex(rows);
   const stored = storedRows(items, rows);
   for (const [table, records] of [
-    [db.ownership, stored.ownership],
+    [db.fanOwnership, stored.fanOwnership],
+    [db.matchOwnership, stored.matchOwnership],
     [db.fanMatches, index.fanMatches],
     [db.matchOwners, index.matchOwners],
     [db.items, stored.items],

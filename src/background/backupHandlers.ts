@@ -10,6 +10,7 @@ import {
 import type { MessageHandlers } from '../shared/messages';
 import { chromeImportStateStore } from './importState';
 import { keepAliveWhile } from './keepAlive';
+import { kickOwnershipMigration, stopOwnershipMigration } from './ownershipMigration';
 import { refreshCrateMates } from './recommend';
 import { resetScanDataAfterImport, whileScannerPausedForImport } from './scanner';
 
@@ -35,6 +36,7 @@ export function backupHandlers(db: CraterDb): BackupHandlers {
     importBackup: async () => {
       try {
         return await whileScannerPausedForImport(async () => {
+          await stopOwnershipMigration();
           const summary = await keepAliveWhile(
             importDatabase(db, await readStagedFile('import'), opfsSnapshot, (phase) =>
               chromeImportStateStore.save({ phase, notice: null }),
@@ -45,6 +47,7 @@ export function backupHandlers(db: CraterDb): BackupHandlers {
         });
       } finally {
         await discardStagedFile('import');
+        void kickOwnershipMigration(db);
         refreshCrateMates();
       }
     },

@@ -6,6 +6,7 @@ import { fetchJson, fetchText } from '../http';
 import { LATELY_RESCAN } from './priority';
 import { drainQueue } from './scheduler';
 import { INITIAL_SCANNER_STATE, type ScannerState, type ScannerStore } from './state';
+import { countFanRows, putOwnershipRows } from '../../../tests/ownership';
 
 const DAY = 24 * 60 * 60 * 1000;
 const START = new Date(2026, 9, 20, 12, 0, 0).getTime();
@@ -91,7 +92,8 @@ async function fanReadDaysAgo(days: number, owned: number) {
   };
   await db.fans.put(fan);
   // What the last read saw: everything bought before it.
-  await db.ownership.bulkPut(
+  await putOwnershipRows(
+    db,
     Array.from({ length: owned }, (_, i) => ({
       fanId: FAN,
       itemKey: `a${1000 + days + i}` as const,
@@ -132,7 +134,7 @@ describe('latest reads', () => {
     const fan = await db.fans.get(FAN);
     expect(fan).toMatchObject({ status: 'done', scannedItems: 300, collectionSize: 300 });
     expect(fan?.collectionFetchedAt).toBe(Date.now());
-    expect(await db.ownership.where('fanId').equals(FAN).count()).toBe(300);
+    expect(await countFanRows(db, FAN)).toBe(300);
     expect(await db.queue.count()).toBe(0);
   });
 
@@ -153,6 +155,6 @@ describe('latest reads', () => {
     await drain(100);
 
     expect(await db.fans.get(FAN)).toMatchObject({ status: 'done', scannedItems: 293 });
-    expect(await db.ownership.where('fanId').equals(FAN).count()).toBe(293);
+    expect(await countFanRows(db, FAN)).toBe(293);
   });
 });

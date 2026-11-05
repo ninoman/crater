@@ -7,16 +7,24 @@ import {
 } from '../../bandcamp';
 import { ownershipFromCollection, ownershipFromSupporter } from '../mappers';
 import type { CraterDb, OwnershipRecord } from '../schema';
-import { readOwnership, storeOwnership } from '../storage';
 import { getItemFields } from './items';
-import { byFan, fanRows } from './fanRows';
 import { refreshFanMatches } from './matchIndex';
+import {
+  editFans,
+  fanRows,
+  fanRowsFor,
+  matchRows,
+  ownershipTables,
+  type RowEdit,
+} from './ownershipStore';
 
 type Source = OwnershipRecord['source'];
 
-/** Runs an ownership write together with the match-index refresh it calls for. */
-function writeOwnership(db: CraterDb, write: () => Promise<void>): Promise<void> {
-  return db.transaction('rw', [db.ownership, db.fanMatches, db.matchOwners], write);
+/** Edits fans' rows and refreshes the match index for the ones that changed, in one transaction. */
+function writeOwnership(db: CraterDb, fanIds: Iterable<number>, edit: RowEdit): Promise<void> {
+  return db.transaction('rw', [...ownershipTables(db), db.fanMatches, db.matchOwners], async () => {
+    await refreshFanMatches(db, await editFans(db, fanIds, edit));
+  });
 }
 
 export async function putOwnership(
@@ -25,11 +33,10 @@ export async function putOwnership(
   items: CollectionItem[],
   source: Source,
 ): Promise<void> {
-  await writeOwnership(db, async () => {
-    await db.ownership.bulkPut(
-      items.map((item) => storeOwnership(ownershipFromCollection(fanId, item, source))),
-    );
-    await refreshFanMatches(db, [fanId]);
+  await writeOwnership(db, [fanId], (rows) => {
+    for (const item of items) {
+      rows.set(item.itemKey, ownershipFromCollection(fanId, item, source));
+    }
   });
 }
 
@@ -43,18 +50,15 @@ export async function markWishlisted(
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   addedAt: number,
 ): Promise<void> {
-  await writeOwnership(db, async () => {
-    if (await db.ownership.get([fanId, release.itemKey])) return;
-    await db.ownership.put(
-      storeOwnership({
-        fanId,
-        itemKey: release.itemKey,
-        matchKey: matchKey(release),
-        source: 'wishlist',
-        addedAt,
-      }),
-    );
-    await refreshFanMatches(db, [fanId]);
+  await writeOwnership(db, [fanId], (rows) => {
+    if (rows.has(release.itemKey)) return;
+    rows.set(release.itemKey, {
+      fanId,
+      itemKey: release.itemKey,
+      matchKey: matchKey(release),
+      source: 'wishlist',
+      addedAt,
+    });
   });
 }
 
@@ -67,11 +71,8 @@ export async function markUnwishlisted(
   fanId: number,
   itemKey: ItemKey,
 ): Promise<void> {
-  await writeOwnership(db, async () => {
-    const row = await db.ownership.get([fanId, itemKey]);
-    if (!row || readOwnership(row).source !== 'wishlist') return;
-    await db.ownership.delete([fanId, itemKey]);
-    await refreshFanMatches(db, [fanId]);
+  await writeOwnership(db, [fanId], (rows) => {
+    if (rows.get(itemKey)?.source === 'wishlist') rows.delete(itemKey);
   });
 }
 
@@ -80,15 +81,10 @@ export async function markUnwishlisted(
  * buyers and an album page finds track buyers.
  */
 export async function collectorsOf(db: CraterDb, releaseKey: ItemKey): Promise<Set<number>> {
-  return db.transaction('r', [db.items, db.ownership], async () => {
+  return db.transaction('r', [db.items, ...ownershipTables(db)], async () => {
     const [release] = await getItemFields(db, [releaseKey]);
-    const rows = await db.ownership
-      .where('matchKey')
-      .equals(release?.albumKey ?? releaseKey)
-      .toArray();
-    return new Set(
-      rows.map(readOwnership).flatMap((row) => (row.source === 'collection' ? [row.fanId] : [])),
-    );
+    const rows = await matchRows(db, release?.albumKey ?? releaseKey);
+    return new Set(rows.map((row) => row.fanId));
   });
 }
 
@@ -97,10 +93,9 @@ export async function trackBuyerCounts(
   db: CraterDb,
   releaseKey: ItemKey,
 ): Promise<Map<ItemKey, number>> {
-  const rows = await db.ownership.where('matchKey').equals(releaseKey).toArray();
   const counts = new Map<ItemKey, number>();
-  for (const row of rows.map(readOwnership)) {
-    if (row.source !== 'collection' || !row.itemKey.startsWith('t')) continue;
+  for (const row of await matchRows(db, releaseKey)) {
+    if (!row.itemKey.startsWith('t')) continue;
     counts.set(row.itemKey, (counts.get(row.itemKey) ?? 0) + 1);
   }
   return counts;
@@ -123,9 +118,7 @@ export async function collectionRows(db: CraterDb, fanId: number): Promise<Owner
 }
 
 export async function countOwnership(db: CraterDb, fanId: number, source: Source) {
-  return byFan(db, fanId)
-    .filter((row) => readOwnership(row).source === source)
-    .count();
+  return (await fanRows(db, fanId)).filter((row) => row.source === source).length;
 }
 
 /** Deletes a fan's rows for `source` that aren't in `keep`, e.g. items removed from a wishlist. */
@@ -135,12 +128,10 @@ export async function removeOwnershipExcept(
   source: Source,
   keep: ReadonlySet<ItemKey>,
 ): Promise<void> {
-  await writeOwnership(db, async () => {
-    const stale = await byFan(db, fanId)
-      .filter((row) => readOwnership(row).source === source && !keep.has(row.itemKey))
-      .primaryKeys();
-    await db.ownership.bulkDelete(stale);
-    await refreshFanMatches(db, [fanId]);
+  await writeOwnership(db, [fanId], (rows) => {
+    for (const row of [...rows.values()]) {
+      if (row.source === source && !keep.has(row.itemKey)) rows.delete(row.itemKey);
+    }
   });
 }
 
@@ -153,17 +144,12 @@ export async function addSupporterOwnership(
   release: Pick<ReleaseInfo, 'itemKey' | 'albumKey'>,
   supporters: Supporter[],
 ): Promise<void> {
-  await writeOwnership(db, async () => {
-    const keys = supporters.map((s): [number, ItemKey] => [s.fanId, release.itemKey]);
-    const existing = await db.ownership.bulkGet(keys);
-    const missing = supporters.filter((_, i) => existing[i] === undefined);
-    await db.ownership.bulkPut(
-      missing.map((s) => storeOwnership(ownershipFromSupporter(release, s))),
-    );
-    await refreshFanMatches(
-      db,
-      missing.map((s) => s.fanId),
-    );
+  const bySupporter = new Map(supporters.map((s) => [s.fanId, s]));
+  await writeOwnership(db, bySupporter.keys(), (rows, fanId) => {
+    const supporter = bySupporter.get(fanId);
+    if (supporter && !rows.has(release.itemKey)) {
+      rows.set(release.itemKey, ownershipFromSupporter(release, supporter));
+    }
   });
 }
 
@@ -173,7 +159,7 @@ export async function purchasedAt(
   fanId: number,
   itemKey: ItemKey,
 ): Promise<number | null> {
-  return (await db.ownership.get([fanId, itemKey]))?.addedAt ?? null;
+  return (await fanRowsFor(db, fanId, [itemKey]))[0]?.addedAt ?? null;
 }
 
 /** Which of these items a fan already has a row for, in either list. */
@@ -182,6 +168,6 @@ export async function knownItemKeys(
   fanId: number,
   itemKeys: readonly ItemKey[],
 ): Promise<Set<ItemKey>> {
-  const rows = await db.ownership.bulkGet(itemKeys.map((key): [number, ItemKey] => [fanId, key]));
+  const rows = await fanRowsFor(db, fanId, itemKeys);
   return new Set(rows.flatMap((row) => (row ? [row.itemKey] : [])));
 }

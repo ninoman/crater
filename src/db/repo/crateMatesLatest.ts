@@ -2,7 +2,7 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { CraterDb, FanMatchesRecord, OwnershipRecord } from '../schema';
-import { fanRows } from './fanRows';
+import { fanRows, ownershipTables } from './ownershipStore';
 import { heardKeys } from './heard';
 import { type HiddenSets, hiddenSets } from './hidden';
 import { queuedFans } from './queue';
@@ -24,7 +24,7 @@ export async function gatherCrateMatesLatest(
   crateMateFanIds: readonly number[],
   meFanId: number,
 ): Promise<CrateMatesLatestData> {
-  const tables = [db.fanMatches, db.ownership, db.hides, db.heard, db.queue];
+  const tables = [db.fanMatches, ...ownershipTables(db), db.hides, db.heard, db.queue];
   return db.transaction('r', tables, async () => {
     const [lists, mine, hidden, heard, queued] = await Promise.all([
       db.fanMatches.bulkGet([...crateMateFanIds]),

@@ -3,7 +3,7 @@
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { PageBadge, ReleaseRef } from '../../shared/pageBadges';
 import type { CraterDb, ItemFields, OwnershipRecord } from '../schema';
-import { fanRows } from './fanRows';
+import { fanRows, ownershipTables } from './ownershipStore';
 import { getItemFields, itemsAtUrls } from './items';
 import { getCrateMates } from './crateMates';
 
@@ -65,7 +65,7 @@ export async function pageBadges(
   if (refs.length === 0) return [];
   return db.transaction(
     'r',
-    [db.items, db.bands, db.me, db.ownership, db.crateMates, db.fanMatches],
+    [db.items, db.bands, db.me, ...ownershipTables(db), db.crateMates, db.fanMatches],
     async () => {
       const [releases, me, board] = await Promise.all([
         resolve(db, refs),

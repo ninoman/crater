@@ -7,19 +7,13 @@ import {
   parseApiRelease,
   type BandcampRequest,
 } from '../../bandcamp';
-import {
-  CraterDb,
-  getItem,
-  putFollowing,
-  refreshFanMatches,
-  upsertReleasePageItem,
-  type ReleaseJob,
-} from '../../db';
+import { CraterDb, getItem, putFollowing, upsertReleasePageItem, type ReleaseJob } from '../../db';
 import { DEFAULT_SETTINGS } from '../../shared/settings';
 import { BlockedHostError } from '../http';
 import type { StepContext } from './context';
 import { BACKGROUND, FOREGROUND, SEED, SEED_FANS } from './priority';
 import { runReleaseStep } from './releaseJob';
+import { countMatchRows, seedOwnership } from '../../../tests/ownership';
 
 const NOW = 1_800_000_000_000;
 const PROMISES = 'a3149089081';
@@ -88,7 +82,7 @@ describe('runReleaseStep', () => {
     expect(supporters?.fanIds).toHaveLength(150);
     expect(supporters?.fetchedAt).toBe(NOW);
     expect(await db.fans.count()).toBe(150);
-    expect(await db.ownership.where('matchKey').equals(PROMISES).count()).toBe(150);
+    expect(await countMatchRows(db, PROMISES)).toBe(150);
     const queued = await db.queue.toArray();
     expect(queued).toHaveLength(150);
     expect(queued.every((q) => q.kind === 'fan' && q.priority === 1)).toBe(true);
@@ -171,7 +165,8 @@ describe('runReleaseStep', () => {
 
     const keen = fanIds[40] as number;
     await db.me.put({ id: 'self', fanId: 1, username: 'me', syncedAt: NOW });
-    await db.ownership.bulkPut(
+    await seedOwnership(
+      db,
       [1, keen].map((fanId) => ({
         fanId,
         itemKey: 'a5' as const,
@@ -180,7 +175,6 @@ describe('runReleaseStep', () => {
         addedAt: null,
       })),
     );
-    await refreshFanMatches(db, [1, keen]);
     await db.queue.clear();
     await runReleaseStep(ctx, job());
 
@@ -194,7 +188,8 @@ describe('runReleaseStep', () => {
     const keen = fanIds[40] as number;
     const friend = fanIds[60] as number;
     await db.me.put({ id: 'self', fanId: 1, username: 'me', syncedAt: NOW });
-    await db.ownership.bulkPut(
+    await seedOwnership(
+      db,
       [1, keen].map((fanId) => ({
         fanId,
         itemKey: 'a5' as const,
@@ -203,7 +198,6 @@ describe('runReleaseStep', () => {
         addedAt: null,
       })),
     );
-    await refreshFanMatches(db, [1, keen]);
     await putFollowing(db, [
       {
         kind: 'fan',

@@ -1,9 +1,10 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
-import { CraterDb, enqueueAt, fanJob, putFollowing, refreshFanMatches } from '../../db';
+import { CraterDb, enqueueAt, fanJob, putFollowing } from '../../db';
 import { SEED, SEED_FANS } from './priority';
 import { rankSeedFansOnceListed } from './seedFans';
+import { seedOwnership } from '../../../tests/ownership';
 
 const ME = 1;
 const NOW = 1_800_000_000_000;
@@ -22,7 +23,8 @@ afterEach(async () => {
 
 /** Each fan owns these releases, as a supporter list or their collection would record it. */
 async function owners(byFan: Record<number, ItemKey[]>): Promise<void> {
-  await db.ownership.bulkPut(
+  await seedOwnership(
+    db,
     Object.entries(byFan).flatMap(([fanId, keys]) =>
       keys.map((itemKey) => ({
         fanId: Number(fanId),
@@ -33,7 +35,6 @@ async function owners(byFan: Record<number, ItemKey[]>): Promise<void> {
       })),
     ),
   );
-  await refreshFanMatches(db, Object.keys(byFan).map(Number));
 }
 
 /** Bandcamp's supporter count per release, which sets its rarity weight. */

@@ -6,6 +6,7 @@ import { upsertCollectionItems } from './items';
 import { markUnwishlisted, markWishlisted, putOwnership } from './ownership';
 import { createTag, deleteTag, exportTags, importTags } from './tags';
 import { assignItemTag, getItemTags, listedKeys, listOwnedItems, pruneItemData } from './itemLists';
+import { deleteOwnershipRow, ownershipRow } from '../../../tests/ownership';
 
 const ME = 7;
 
@@ -110,7 +111,7 @@ describe('markWishlisted / markUnwishlisted', () => {
   it('never removes an owned item', async () => {
     await markUnwishlisted(db, ME, 'a4');
 
-    expect(await db.ownership.get([ME, 'a4'])).toBeDefined();
+    expect(await ownershipRow(db, ME, 'a4')).toBeDefined();
   });
 });
 
@@ -173,7 +174,7 @@ describe('pruneItemData', () => {
   it('drops tags of items in neither list', async () => {
     const dub = await tagId('dub');
     await assignItemTag(db, dub, ['a1', 'a2', 'a4', 'a99'], 'add');
-    await db.ownership.delete([ME, 'a2']);
+    await deleteOwnershipRow(db, ME, 'a2');
 
     await pruneItemData(db, ME);
 

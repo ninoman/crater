@@ -3,7 +3,7 @@
 import { keyToNumber, type ItemKey } from '../../bandcamp';
 import type { CraterDb, FanMatchesRecord, ItemFields, CrateMateRecord } from '../schema';
 import { collectionFullyRead } from './fans';
-import { fanRows } from './fanRows';
+import { fanRows, ownershipTables } from './ownershipStore';
 import { getItemFields, itemFieldsWhere } from './items';
 
 /** What rarity weighs a release by: Bandcamp's counts (album first) and the owners we've seen. */
@@ -52,52 +52,56 @@ function matchId(item: ItemFields): number {
 
 /** Your side of the comparison. Empty when you have no synced collection. */
 export async function gatherCrateMateBasis(db: CraterDb, meFanId: number): Promise<CrateMateBasis> {
-  return db.transaction('r', [db.ownership, db.fanMatches, db.matchOwners, db.items], async () => {
-    const [list, rows] = await Promise.all([db.fanMatches.get(meFanId), fanRows(db, meFanId)]);
-    const lists = list ?? NO_LISTS;
-    const owned = rows.filter((row) => row.source === 'collection');
-    const albumOfTrack = new Map<number, number>();
-    for (const row of owned) {
-      if (row.itemKey !== row.matchKey) {
-        albumOfTrack.set(keyToNumber(row.itemKey), keyToNumber(row.matchKey));
+  return db.transaction(
+    'r',
+    [...ownershipTables(db), db.fanMatches, db.matchOwners, db.items],
+    async () => {
+      const [list, rows] = await Promise.all([db.fanMatches.get(meFanId), fanRows(db, meFanId)]);
+      const lists = list ?? NO_LISTS;
+      const owned = rows.filter((row) => row.source === 'collection');
+      const albumOfTrack = new Map<number, number>();
+      for (const row of owned) {
+        if (row.itemKey !== row.matchKey) {
+          albumOfTrack.set(keyToNumber(row.itemKey), keyToNumber(row.matchKey));
+        }
       }
-    }
-    const keys = [...new Set(owned.flatMap((row) => [row.matchKey, row.itemKey]))];
-    const [items, owners] = await Promise.all([
-      getItemFields(db, keys),
-      db.matchOwners.bulkGet([...lists.matchIds]),
-    ]);
-    const byKey = new Map<ItemKey, ItemFields>();
-    for (const item of items) if (item) byKey.set(item.itemKey, item);
+      const keys = [...new Set(owned.flatMap((row) => [row.matchKey, row.itemKey]))];
+      const [items, owners] = await Promise.all([
+        getItemFields(db, keys),
+        db.matchOwners.bulkGet([...lists.matchIds]),
+      ]);
+      const byKey = new Map<ItemKey, ItemFields>();
+      for (const item of items) if (item) byKey.set(item.itemKey, item);
 
-    const counts = new Map<number, SupporterCounts>();
-    lists.matchIds.forEach((id, i) => {
-      counts.set(id, { bandcampCounts: [], knownOwners: owners[i]?.owners ?? 0 });
-    });
-    const labels = new Set<number>();
-    const compilations = new Set<number>();
-    // Albums before tracks, so an album's own count comes first.
-    const ordered = [...owned].sort(
-      (a, b) => Number(a.itemKey !== a.matchKey) - Number(b.itemKey !== b.matchKey),
-    );
-    for (const row of ordered) {
-      const item = byKey.get(row.itemKey);
-      if (!item) continue;
-      counts.get(keyToNumber(row.matchKey))?.bandcampCounts.push(item.supporterCount);
-      labels.add(labelKey(item));
-      if (item.compilation) compilations.add(keyToNumber(row.matchKey));
-    }
+      const counts = new Map<number, SupporterCounts>();
+      lists.matchIds.forEach((id, i) => {
+        counts.set(id, { bandcampCounts: [], knownOwners: owners[i]?.owners ?? 0 });
+      });
+      const labels = new Set<number>();
+      const compilations = new Set<number>();
+      // Albums before tracks, so an album's own count comes first.
+      const ordered = [...owned].sort(
+        (a, b) => Number(a.itemKey !== a.matchKey) - Number(b.itemKey !== b.matchKey),
+      );
+      for (const row of ordered) {
+        const item = byKey.get(row.itemKey);
+        if (!item) continue;
+        counts.get(keyToNumber(row.matchKey))?.bandcampCounts.push(item.supporterCount);
+        labels.add(labelKey(item));
+        if (item.compilation) compilations.add(keyToNumber(row.matchKey));
+      }
 
-    const { labelOf, catalogSize } = await labelCatalogs(db, labels);
-    const mine = {
-      matchIds: lists.matchIds,
-      trackIds: lists.trackIds,
-      partialIds: lists.partialIds,
-      matchTimes: lists.matchTimes,
-      albumOfTrack,
-    };
-    return { mine, counts, labelOf, catalogSize, compilations };
-  });
+      const { labelOf, catalogSize } = await labelCatalogs(db, labels);
+      const mine = {
+        matchIds: lists.matchIds,
+        trackIds: lists.trackIds,
+        partialIds: lists.partialIds,
+        matchTimes: lists.matchTimes,
+        albumOfTrack,
+      };
+      return { mine, counts, labelOf, catalogSize, compilations };
+    },
+  );
 }
 
 /** Each label's releases in the local DB, keyed by match id so tracks fold into albums. */

@@ -122,7 +122,8 @@ beforeAll(async () => {
   const index = buildMatchIndex(rows);
   const stored = storedRows(items, rows);
   for (const [table, records] of [
-    [db.ownership, stored.ownership],
+    [db.fanOwnership, stored.fanOwnership],
+    [db.matchOwnership, stored.matchOwnership],
     [db.fanMatches, index.fanMatches],
     [db.matchOwners, index.matchOwners],
     [db.fans, fans],
@@ -149,7 +150,9 @@ afterAll(async () => {
 });
 
 it(`re-scores a release with ${SUPPORTERS} scanned supporters in under ${BUDGET_MS} ms`, async () => {
-  expect(await db.ownership.count()).toBeGreaterThanOrEqual(300_000);
+  const records = await db.fanOwnership.toArray();
+  const seeded = records.reduce((sum, record) => sum + record.itemIds.length, 0);
+  expect(seeded).toBeGreaterThanOrEqual(300_000);
   await computeAlsoBought(db, RELEASE, ME); // warm-up
 
   const times: number[] = [];

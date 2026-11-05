@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 import type { CollectionItem, FetchJson } from '../bandcamp';
 import { createTag, CraterDb, putOwnership, saveViewer, upsertCollectionItems } from '../db';
 import { itemListHandlers, type ItemListHandlers } from './itemListHandlers';
+import { ownershipRow } from '../../tests/ownership';
 
 const sender = {} as chrome.runtime.MessageSender;
 const ME = 5;
@@ -107,7 +108,7 @@ describe('item list handlers', () => {
         title: 'Grainphase',
         url: 'https://x.bandcamp.com/track/grainphase',
       });
-      expect((await db.ownership.get([ME, 't5']))?.matchKey).toBe('a6');
+      expect((await ownershipRow(db, ME, 't5'))?.matchKey).toBe('a6');
     });
 
     it('saves it from the card alone when Bandcamp fails', async () => {

@@ -6,6 +6,7 @@ import type { CraterDb, FollowingKey, FollowingRecord, ItemTagsRecord, TagRecord
 import type { TagBackup } from '../tagBackup';
 import { followingKey } from './following';
 import { listedKeys } from './itemLists';
+import { ownershipTables } from './ownershipStore';
 
 export type TagResult =
   | { ok: true; tag: TagRecord }
@@ -118,7 +119,7 @@ export async function importTags(
   backup: TagBackup,
   fanId: number | null,
 ): Promise<TagImportSummary> {
-  const tables = [db.tags, db.following, db.itemTags, db.ownership];
+  const tables = [db.tags, db.following, db.itemTags, ...ownershipTables(db)];
   return db.transaction('rw', tables, async () => {
     const summary: TagImportSummary = { tagsCreated: 0, assigned: 0, skipped: 0 };
     for (const entry of backup.tags) {

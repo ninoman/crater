@@ -1088,3 +1088,48 @@ Added on 2026-11-02. One codebase, two builds: `pnpm build` (Chrome, `dist/`) an
 - **Host access can be withdrawn.** Firefox users can take away bandcamp.com access in the add-ons manager, which stops every scan. The popup shows a "No access to Bandcamp" notice with an Allow button when that happens (Chrome's "Site access" setting triggers it too).
 - **No Chrome-only query options.** Firefox validates API arguments strictly and rejects a call with a property it doesn't know. `tabs.query({ frozen: false })` (Chrome 132+) failed every scan-progress broadcast, so `broadcastToTabs` now filters `tab.frozen` itself; Firefox tabs don't have the field and are kept.
 - **Known `web-ext lint` warnings**, all from dependencies: React's `innerHTML` writes, and zod's `Function('')` probe, which fails under the extension CSP and falls back to non-JIT parsing.
+
+## 27. Ownership packed one record per fan
+
+Decided and built 2026-11-05. Code: `src/db/packedOwnership.ts` (pure), `src/db/repo/ownershipStore.ts` (every ownership read and write), `src/db/repo/ownershipMigration.ts` (the move), `src/background/ownershipMigration.ts` (running it), schema v21.
+
+### Why
+
+A real backup from 2026-11-04 (schema v20) was 1.59 GB of JSON and 413 MB gzipped. `ownership` alone held 9.48M rows, 847 MB of the JSON. Counted the way `pnpm storage:estimate` counts (V8 values, Chrome's key encoding, one entry per index, before LevelDB's compression), those rows cost **1.93 GB**: 752 MB of values and 1.18 GB of primary keys and `matchKey` index entries, because each row carried its own `[fanId+itemKey]` key three times over. Only 12.6k of the 78k fans in that backup were scanned, at 576 items each on average, so the table was on course for several times that size.
+
+§19 change 1 (scanned fans' purchases only in `fanMatches`) was rejected because it was one-way: `fanMatches` holds distinct matchKeys only, so rows couldn't be rebuilt from it. This layout keeps every row, so it is not.
+
+### Layout
+
+- **`fanOwnership: 'fanId'`.** One record per fan: aligned `Float64Array`s of item keys and matchKeys (`keyToNumber`) and dates (ms, NaN when unknown), in itemKey order, the order rows always came in. `wishlistIds` lists the wishlist rows, and is left out when there are none. It's the source of truth.
+- **`matchOwnership: 'matchId'`.** Per matchKey, the fans who have it in their collection and through which item, in `[fanId+itemKey]` order: what the `matchKey` index answered. Derived from `fanOwnership` in the same transaction, so it never drifts, like `fanMatches` (§6). Wishlists aren't in it; nothing read them through the index.
+- **`fanMatches` and `matchOwners` are unchanged,** so scoring reads exactly what it read before.
+- **One module knows the layout.** `repo/ownershipStore.ts` has the reads (`fanRows`, `fanRowsFor`, `matchRows`) and one write, `editFans`: it hands each fan's rows to an edit as a map, stores what changed, and moves their entries in the matchKey lists. Every writer in `repo/ownership.ts` and the forgetting of fans is an edit. Transactions take `ownershipTables(db)`.
+- **Measured on the same backup:** `fanOwnership` 234 MB plus `matchOwnership` 216 MB, **450 MB against 1.93 GB**, counted the same way. On-disk sizes after Snappy haven't been measured in Chrome yet. Float64 everywhere keeps every key exact: ids fit in 32 bits today, but the largest seen (4,294,965,647) sits just under the limit, so `Uint32Array` would save another ~40% only by betting on Bandcamp's id range.
+
+### Migration (schema v21)
+
+- **The upgrade only creates the tables** and, when `ownership` has rows, stores `{ phase: 'copy', after: -1 }` in `ownershipMigration` (`startOwnershipMigration`, also run by `migrateRows` for older backups). Rewriting 10⁷ rows inside the upgrade would hold every other database use for minutes (§19).
+- **Copy.** `migrateOwnershipStep` copies 20,000 rows' worth of whole fans per transaction, in fanId order, and saves `after`, the last fan copied, in the same transaction. A chunk that would end partway through a fan stops before them, unless they're the only fan in it. It diffs against anything already packed, so a fan copied twice isn't counted twice.
+- **Nothing pauses while it runs.** Reads use `ownership` until the copy is done. Writes go to `ownership`, and also to the packed tables for fans up to `after`, so copied fans stay in step and the copy picks up the rest when it gets there. That replaced the earlier idea of pausing the scanner: it's simpler, and scans don't wait for minutes.
+- **Clear.** Once every fan is copied the phase becomes `clear` in the same transaction as the last chunk, and reads switch to the packed tables. The old rows are then deleted 20,000 per transaction in key order, from a saved key so deleted entries aren't scanned again. Then the state record goes.
+- **The worker runs it** (`kickOwnershipMigration`) on every wake-up, after an interrupted import is put right, with `keepAliveWhile`. A killed worker leaves it at the last saved chunk. A backup import stops it first (it replaces the tables it reads) and starts it again after, so an imported older backup is migrated the same way.
+- **The eval** runs the same copy, then empties `ownership` in one `clear()`, since fake-indexeddb can't delete row by row at this size.
+
+### Proving results stay identical
+
+- **Golden outputs (§19) match before, during and after the move**, from both the Dexie upgrade and an imported v11 backup, migrated 7 rows per chunk so chunks end partway through fans, and checked every 25 chunks. A gzipped round trip of a packed database matches too.
+- **Writes during the copy** (collection pages, supporter lists, wishlist marks, removals and forgetting fans, on fans already copied, not yet copied and new) end in exactly the tables the same writes give on a database that started packed (`ownershipMigration.test.ts`).
+- **Perf** (`pnpm perf`, medians, same seeds, fake-indexeddb):
+
+  | Check | Before | After |
+  | --- | --- | --- |
+  | Also bought re-score | 67 ms | 68 ms |
+  | Deep cuts | 140 ms | 140 ms |
+  | For you, All | 115 ms | 112 ms |
+  | Crate mates recompute | 462 ms | 486 ms |
+  | Collection page, 100 items (new) | 7 ms | 11 ms |
+  | Supporter page, 100 fans (new) | 94 ms | 43 ms |
+
+  A collection page now also rewrites the matchKey lists of the releases it adds. A supporter page reads one record per fan instead of all their rows. Both are milliseconds against the hundreds a request takes.
+- **Not yet measured:** how long the copy takes in Chrome on a database this size, and the on-disk size after it. Packing all 9.5M rows in memory took 18 s in Node, so minutes in IndexedDB is the expectation.

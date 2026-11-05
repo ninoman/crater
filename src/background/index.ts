@@ -10,6 +10,7 @@ import { keepAliveWhile } from './keepAlive';
 import { chromeImportStateStore } from './importState';
 import { ensureMaintenanceAlarm, MAINTENANCE_ALARM, runMaintenance } from './maintenance';
 import { onSynced, startSync } from './meSync';
+import { kickOwnershipMigration } from './ownershipMigration';
 import { refreshCrateMates } from './recommend';
 import { handlers } from './router';
 import {
@@ -60,12 +61,15 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 // An import cut short by a killed worker is put right first. Until it is, the import flag it left
-// behind keeps the scanner and every sync still.
+// behind keeps the scanner and every sync still, and the ownership migration (§27) waits too.
 void recoverInterruptedImport(db, chromeImportStateStore, opfsSnapshot, async () => {
   await chromeScannerStore.save({ importing: false });
 })
   .catch((error: unknown) => console.error('crater: import recovery failed', error))
-  .finally(kickScanner);
+  .finally(() => {
+    kickScanner();
+    void kickOwnershipMigration(db);
+  });
 
 // Every wake-up, including the one after the worker was killed, picks the queue back up.
 void ensureScannerAlarm();

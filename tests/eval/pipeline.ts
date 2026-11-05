@@ -7,12 +7,16 @@ import { keyFromNumber, keyToNumber } from '../../src/bandcamp';
 import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import {
   type CraterDb,
+  editFans,
   fanRows,
   gatherForYou,
   getShownFields,
   getOwnerCounts,
   importDatabase,
+  migrateOwnershipStep,
+  migrationState,
   type OwnershipRecord,
+  ownershipTables,
   putItems,
   readBackup,
   readItem,
@@ -20,7 +24,7 @@ import {
   replaceAll,
   type SnapshotStore,
 } from '../../src/db';
-import { flagCompilation } from '../../src/db/schema';
+import { flagCompilation, startOwnershipMigration } from '../../src/db/schema';
 import { exclusions } from '../../src/scoring/exclusions';
 import { topCrateMates, crateMateOwnership } from '../../src/scoring/forYou';
 import { parseBackupMeta } from '../../src/shared/backupFile';
@@ -42,8 +46,8 @@ const LOOKUP_CHUNK = 1000;
 const HOLDOUT_FAN_ID = -1_000_000_000;
 /**
  * From v7 on, the migrations left can skip the importer: queue ranks (v8) don't matter here,
- * and item rows (v11 flags, v12 shape) are rewritten below. Ownership rows still saying
- * 'collection' (v12 drops it) read the same.
+ * item rows (v11 flags, v12 shape) are rewritten below, and ownership rows (v21) packed.
+ * Ownership rows still saying 'collection' (v12 drops it) read the same.
  */
 const MIN_FAST_VERSION = 7;
 
@@ -76,14 +80,27 @@ export async function loadBackup(db: CraterDb, backup: Blob): Promise<void> {
     await importDatabase(db, file, memorySnapshot(), async () => undefined);
     return;
   }
-  if (meta.data.databaseVersion >= 12) return;
-  const rows = await db.items.toArray();
-  for (const row of rows) flagCompilation(row);
-  await db.items.clear();
-  await putItems(
-    db,
-    rows.map((row) => readItem(row, undefined)),
-  );
+  if (meta.data.databaseVersion < 12) {
+    const rows = await db.items.toArray();
+    for (const row of rows) flagCompilation(row);
+    await db.items.clear();
+    await putItems(
+      db,
+      rows.map((row) => readItem(row, undefined)),
+    );
+  }
+  if (meta.data.databaseVersion < 21) await packOwnership(db);
+}
+
+/**
+ * Copies ownership rows into the packed tables with the worker's own migration (decisions §27),
+ * then empties the old table in one go: deleting row by row never finishes in fake-indexeddb.
+ */
+async function packOwnership(db: CraterDb): Promise<void> {
+  await startOwnershipMigration(db.ownership, db.ownershipMigration);
+  while ((await migrationState(db))?.phase === 'copy') await migrateOwnershipStep(db);
+  await db.ownership.clear();
+  await db.ownershipMigration.clear();
 }
 
 export interface EvalRun {
@@ -174,12 +191,7 @@ function purchasesOf(rows: readonly OwnershipRecord[]): Purchase[] {
   return [...newest].map(([id, at]) => ({ id, at }));
 }
 
-/**
- * Writes your lists minus the held-out releases under `fanId`, runs `body` as that fan, then
- * takes the fan out of the match index. Deleting ownership rows instead would be far too slow:
- * fake-indexeddb scans every index entry on each delete. The rows left behind under old fold ids
- * are only read by fan, and no one asks for those fans again.
- */
+/** Writes your lists minus the held-out releases under `fanId`, runs `body` as that fan, then forgets the fan. */
 async function withHoldout<T>(
   db: CraterDb,
   fanId: number,
@@ -190,13 +202,27 @@ async function withHoldout<T>(
   const kept = mine.filter(
     (row) => row.source !== 'collection' || !heldOut.has(keyToNumber(row.matchKey)),
   );
-  await db.ownership.bulkAdd(kept.map((row) => ({ ...row, fanId })));
-  await refreshFanMatches(db, [fanId]);
+  await writeFan(
+    db,
+    fanId,
+    kept.map((row) => ({ ...row, fanId })),
+  );
   try {
     return await body();
   } finally {
-    await dropFanMatches(db, fanId);
+    await writeFan(db, fanId, []);
   }
+}
+
+/** Replaces a fan's rows and their match index entries. */
+async function writeFan(db: CraterDb, fanId: number, rows: OwnershipRecord[]): Promise<void> {
+  await db.transaction('rw', [...ownershipTables(db), db.fanMatches, db.matchOwners], async () => {
+    await editFans(db, [fanId], (current) => {
+      current.clear();
+      for (const row of rows) current.set(row.itemKey, row);
+    });
+    await refreshFanMatches(db, new Map([[fanId, rows]]));
+  });
 }
 
 /** Removes a fan from the match index and the owner counts, leaving its ownership rows. */
