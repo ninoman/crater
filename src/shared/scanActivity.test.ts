@@ -24,9 +24,9 @@ describe('scanActivity', () => {
     });
   });
 
-  it('is stopped by a pause or a parser error', () => {
+  it('is stopped by a pause, but not by a parser error, since the queue moves on', () => {
     expect(scanActivity({ ...status, pause: { reason: 'budget', until: 1 } }).kind).toBe('stopped');
-    expect(scanActivity({ ...status, parserError: 'broken' }).kind).toBe('stopped');
+    expect(scanActivity({ ...status, parserError: 'broken' }).kind).toBe('scanning');
   });
 
   it('is idle with nothing queued, paused or not', () => {

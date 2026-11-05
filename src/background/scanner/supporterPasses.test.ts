@@ -122,6 +122,7 @@ function deps(overrides: Partial<SchedulerDeps> = {}): SchedulerDeps {
     owner: 'worker-1',
     waitForOwnSync: async () => {},
     onStep: async () => {},
+    logError: async () => {},
     ...overrides,
   };
 }
@@ -307,21 +308,20 @@ describe('pass 1: profile pages', () => {
       'fan 12',
     ]);
     expect((await db.fans.bulkGet([11, 12])).map((fan) => fan?.status)).toEqual(['done', 'done']);
-    expect(store.state.parserError).toEqual({
-      kind: 'profile',
-      message: expect.stringContaining('fan 12') as string,
+    expect(store.state.parserFailures).toEqual({
+      profile: { streak: 1, message: expect.stringContaining('fan 12') as string },
     });
   });
 
   it('clears a profile parser error once a profile reads again', async () => {
     await signIn();
-    store.state.parserError = { kind: 'profile', message: 'old' };
+    store.state.parserFailures = { profile: { streak: 2, message: 'old' } };
     fakeBandcamp({ 11: { inCommon: 3, items: 5 } });
     await listSupporters([11]);
 
     await drainQueue(deps());
 
-    expect(store.state.parserError).toBeNull();
+    expect(store.state.parserFailures).toEqual({});
   });
 });
 

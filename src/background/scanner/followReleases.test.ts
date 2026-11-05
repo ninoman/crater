@@ -82,6 +82,7 @@ function drain() {
     owner: 'worker-1',
     waitForOwnSync: async () => {},
     onStep: async () => {},
+    logError: async () => {},
   });
 }
 

@@ -1,7 +1,7 @@
 import type { FetchJson, FetchText, ParserError } from '../../bandcamp';
 import type { CraterDb, JobProgress } from '../../db';
 import type { Settings } from '../../shared/settings';
-import type { ParserKind } from './state';
+import type { ParserKind } from './parserHealth';
 
 /** Everything one job run needs. Each run sends exactly one request. */
 export interface StepContext {

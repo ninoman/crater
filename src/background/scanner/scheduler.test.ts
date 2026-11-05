@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
 import { parseReleasePage } from '../../bandcamp';
 import { CraterDb, countJobs, enqueue, fanJob, type JobSpec } from '../../db';
+import type { ErrorLogEntry } from '../../shared/diagnostics';
 import { DEFAULT_SETTINGS, type Settings } from '../../shared/settings';
 import { fetchJson, fetchText } from '../http';
 import { releaseProgress } from './progress';
@@ -112,6 +113,7 @@ function deps(overrides: Partial<SchedulerDeps> = {}): SchedulerDeps {
     owner: 'worker-1',
     waitForOwnSync: async () => {},
     onStep: async () => {},
+    logError: async () => {},
     ...overrides,
   };
 }
@@ -353,19 +355,23 @@ describe('drainQueue', () => {
     expect((await db.fans.get(4))?.status).toBe('error');
     expect((await db.fans.get(5))?.status).toBe('done');
     expect(store.state.lastError).toBeNull(); // cleared by the success after it
-    expect(store.state.parserError).toBeNull();
+    expect(store.state.parserFailures).toEqual({});
   });
 
-  it('flags a parser error until a job of the same kind succeeds', async () => {
-    fakeBandcamp({ 4: 'broken' });
-    await queue([fanJob(4)]);
+  it('counts parser errors in a row, and logs each one', async () => {
+    fakeBandcamp({ 4: 'broken', 6: 'broken' });
+    await queue([fanJob(4), fanJob(6)]);
+    const logged: ErrorLogEntry[] = [];
 
-    await drainQueue(deps());
+    await drainQueue(deps({ logError: async (entry) => void logged.push(entry) }));
 
-    expect(store.state.parserError).toEqual({
-      kind: 'fan',
-      message: expect.stringContaining('fan 4') as string,
+    expect(store.state.parserFailures).toEqual({
+      fan: { streak: 2, message: expect.stringContaining('fan 6') as string },
     });
+    expect(logged.map(({ name, outcome }) => `${name} ${outcome}`)).toEqual([
+      'ParserError dropped',
+      'ParserError dropped',
+    ]);
   });
 
   it('retries a job that failed for an unknown reason, without pausing the queue', async () => {

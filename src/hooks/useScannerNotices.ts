@@ -3,17 +3,38 @@ import {
   scannerNotices,
   type ScannerNoticeText,
 } from '../shared/scannerNotices';
-import type { NoticeItem } from '../ui';
+import type { NoticeAction, NoticeItem } from '../ui';
+import { useCopyDiagnostics, type CopyDiagnostics } from './useCopyDiagnostics';
 import { useScannerControls, type ScannerControls } from './useScannerControls';
 import { useScannerStatus } from './useScannerStatus';
 
-/** Resuming is what clears a wait on unanswered requests, so it doubles as the retry. */
-export function withRetry(text: ScannerNoticeText, controls: ScannerControls): NoticeItem {
-  if (text.id !== 'unreachable') return text;
-  return {
-    ...text,
-    action: { label: 'Try again', onClick: controls.resume, disabled: controls.pending },
-  };
+const COPY_LABELS = {
+  idle: 'Copy diagnostics',
+  working: 'Copying…',
+  copied: 'Copied',
+  error: 'Couldn’t copy',
+} as const;
+
+/**
+ * What you can do about a notice, right in it. Resuming is what clears a wait on unanswered
+ * requests, so it doubles as the retry; a broken parser needs a report to fix.
+ */
+export function withAction(
+  text: ScannerNoticeText,
+  controls: ScannerControls,
+  diagnostics: CopyDiagnostics,
+): NoticeItem {
+  const action: NoticeAction | null =
+    text.id === 'unreachable'
+      ? { label: 'Try again', onClick: controls.resume, disabled: controls.pending }
+      : text.id === 'parser-broken'
+        ? {
+            label: COPY_LABELS[diagnostics.status.state],
+            onClick: diagnostics.copy,
+            disabled: diagnostics.status.state === 'working',
+          }
+        : null;
+  return action ? { ...text, action } : text;
 }
 
 /**
@@ -23,9 +44,10 @@ export function withRetry(text: ScannerNoticeText, controls: ScannerControls): N
 export function useScannerNotices(pollMs: number): NoticeItem[] {
   const view = useScannerStatus(pollMs);
   const controls = useScannerControls(view.refresh);
+  const diagnostics = useCopyDiagnostics();
   if (view.state !== 'ready') return [];
   const now = Date.now();
   return scannerNotices(view.status).map((notice) =>
-    withRetry(describeScannerNotice(notice, now), controls),
+    withAction(describeScannerNotice(notice, now), controls, diagnostics),
   );
 }

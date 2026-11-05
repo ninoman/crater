@@ -5,6 +5,7 @@
 import type { FanItemCard, ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
 import type { AlsoBoughtPrefs, AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
+import type { Diagnostics } from './diagnostics';
 import type { ForYouMode, ForYouResult } from './forYou';
 import type { HeardSource } from './heard';
 import type { HiddenEntry, HideTarget } from './hide';
@@ -52,6 +53,8 @@ export interface MessageMap {
     response: { status: QueueReleaseStatus };
   };
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
+  /** Version, scanner state and recent errors, for a bug report. */
+  getDiagnostics: { request: NoPayload; response: Diagnostics };
   /** Scores Also bought for a release from what's in the database now. */
   getAlsoBought: {
     request: { itemKey: ItemKey } & Required<AlsoBoughtPrefs>;
