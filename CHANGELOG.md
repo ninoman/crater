@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/ninoman/crater/compare/v0.13.0...v0.14.0) (2026-11-05)
+
+
+### Features
+
+* **scanner:** log scanner errors and add "Copy diagnostics" ([#58](https://github.com/ninoman/crater/issues/58)) ([ff8b868](https://github.com/ninoman/crater/commit/ff8b8684660d3c2e34298f62cf97eace1bb08cac))
+
 ## [0.13.0](https://github.com/ninoman/crater/compare/v0.12.0...v0.13.0) (2026-11-04)
 
 
