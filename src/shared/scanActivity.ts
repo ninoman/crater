@@ -5,7 +5,7 @@ import type { ScannerStatus } from './scan';
 
 export type ScanActivity =
   | { kind: 'scanning'; releases: { scanned: number; total: number }; fansRead: number }
-  /** Work is queued but nothing is sent: paused, out of budget, backing off or a parser error. */
+  /** Work is queued but nothing is sent: paused, out of budget or backing off. */
   | { kind: 'stopped'; releases: { scanned: number; total: number }; fansRead: number }
   /** Nothing queued, so an empty list will stay empty for now. */
   | { kind: 'idle' };
@@ -13,9 +13,7 @@ export type ScanActivity =
 export function scanActivity(status: ScannerStatus): ScanActivity {
   if (status.queued.release + status.queued.fan === 0) return { kind: 'idle' };
   const progress = { releases: status.ownReleases, fansRead: status.fansScanned };
-  return status.pause || status.parserError
-    ? { kind: 'stopped', ...progress }
-    : { kind: 'scanning', ...progress };
+  return status.pause ? { kind: 'stopped', ...progress } : { kind: 'scanning', ...progress };
 }
 
 /** "12 of 903 releases scanned · 40 fans read", without the half that has nothing yet. */

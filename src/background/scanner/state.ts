@@ -1,15 +1,12 @@
 // The scanner's own state: back-off, budget, pace and lock. Kept in chrome.storage.local
 // so a pause survives the worker being killed and the browser restarting.
 
-import type { JobKind } from '../../db';
 import type { ScannerPause } from '../../shared/scan';
 import type { Backoff } from './backoff';
 import { budgetExhausted, nextLocalMidnight, type Budget } from './budget';
 import type { Lock } from './lock';
 import { INITIAL_PACE, type AdaptivePace } from './pace';
-
-/** Which parser broke: a job's own, or the profile page that only ranks fans (decisions §12). */
-export type ParserKind = JobKind | 'profile';
+import type { ParserFailures } from './parserHealth';
 
 export interface ScannerState {
   backoff: Backoff | null;
@@ -22,11 +19,8 @@ export interface ScannerState {
   pace: AdaptivePace;
   lock: Lock | null;
   lastError: string | null;
-  /**
-   * The last ParserError, meaning Bandcamp changed something we read. Cleared once a job of
-   * the same kind succeeds, so one odd page doesn't look like a broken parser for good.
-   */
-  parserError: { kind: ParserKind; message: string } | null;
+  /** ParserErrors in a row, by kind. A kind's run ends when a job of that kind parses. */
+  parserFailures: ParserFailures;
   /** Paused from the popup. Stays paused until resumed there. */
   paused: boolean;
   /** A database import is running. Its own flag, so it never touches your pause. */
@@ -42,7 +36,7 @@ export const INITIAL_SCANNER_STATE: ScannerState = {
   pace: INITIAL_PACE,
   lock: null,
   lastError: null,
-  parserError: null,
+  parserFailures: {},
   paused: false,
   importing: false,
 };

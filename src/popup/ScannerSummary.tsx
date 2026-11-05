@@ -1,5 +1,6 @@
+import { useCopyDiagnostics } from '../hooks/useCopyDiagnostics';
 import { useScannerControls } from '../hooks/useScannerControls';
-import { withRetry } from '../hooks/useScannerNotices';
+import { withAction } from '../hooks/useScannerNotices';
 import { useScannerStatus } from '../hooks/useScannerStatus';
 import type { ScannerStatus } from '../shared/scan';
 import { describeScannerNotice, scannerNotices } from '../shared/scannerNotices';
@@ -25,6 +26,7 @@ function StateLine({ status, stopped }: { status: ScannerStatus; stopped: boolea
 
 function Ready({ status }: { status: ScannerStatus }) {
   const controls = useScannerControls();
+  const diagnostics = useCopyDiagnostics();
   const { queued, fansScanned, ownReleases, requestsToday, dailyBudget, paceFactor } = status;
   const pausedByYou = status.pause?.reason === 'manual';
   const fansKnown = fansScanned + queued.fan;
@@ -32,7 +34,9 @@ function Ready({ status }: { status: ScannerStatus }) {
   // Your own pause has its Resume button right here, so it needs no notice.
   const notices = scannerNotices(status)
     .filter(({ kind }) => kind !== 'paused-by-you')
-    .map((notice) => withRetry(describeScannerNotice(notice, now), controls));
+    .map((notice) => withAction(describeScannerNotice(notice, now), controls, diagnostics));
+  // A broken parser drops jobs but the queue moves on, so it doesn't mean "not scanning".
+  const stopped = notices.some(({ id }) => id !== 'parser-broken');
 
   return (
     <>
@@ -71,7 +75,7 @@ function Ready({ status }: { status: ScannerStatus }) {
           {controls.error ? (
             <StatusDot tone="error">Couldn't reach the scanner: {controls.error}</StatusDot>
           ) : (
-            <StateLine status={status} stopped={notices.length > 0} />
+            <StateLine status={status} stopped={stopped} />
           )}
         </span>
         {pausedByYou ? (

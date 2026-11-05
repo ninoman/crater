@@ -24,6 +24,7 @@ import {
 import { broadcastToTabs } from '../../shared/messages';
 import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
+import { logError } from '../errorLog';
 import { notifyWhenRoundEnds } from '../follows/notify';
 import { fetchJson, fetchText } from '../http';
 import { ownSyncSettled, type SyncResult } from '../meSync';
@@ -39,6 +40,7 @@ import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
 import { BACKGROUND, FOLLOW_RELEASES, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
+import { brokenParser } from './parserHealth';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { withImportPause } from './importPause';
 import { chromeScannerStore, pauseFor, resumePatch } from './state';
@@ -96,6 +98,7 @@ const deps: SchedulerDeps = {
     }
     await reportProgress(job, event);
   },
+  logError,
 };
 
 let running: Promise<void> | null = null;
@@ -233,7 +236,7 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     pause: pauseFor(state, settings.dailyRequestBudget, now),
     online: navigator.onLine,
     lastError: state.lastError,
-    parserError: state.parserError?.message ?? null,
+    parserError: brokenParser(state.parserFailures),
   };
 }
 
@@ -254,13 +257,13 @@ export async function resumeScanner(): Promise<void> {
 export async function clearScanData(): Promise<void> {
   await clearAllData(db);
   await clearWatchedReleases();
-  await chromeScannerStore.save({ lastError: null, parserError: null });
+  await chromeScannerStore.save({ lastError: null, parserFailures: {} });
 }
 
 /** After an import: queue-side leftovers from the old data no longer apply. Pause and budget stay. */
 export async function resetScanDataAfterImport(): Promise<void> {
   await clearWatchedReleases();
-  await chromeScannerStore.save({ lastError: null, parserError: null });
+  await chromeScannerStore.save({ lastError: null, parserFailures: {} });
 }
 
 /** Runs a database import with the scanner stopped, under its own flag. */

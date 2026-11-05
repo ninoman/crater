@@ -4,6 +4,7 @@ import { EmptyState, StatusDot, Tabs } from '../ui';
 import { ClearData } from './ClearData';
 import { CsvExport } from './CsvExport';
 import { DatabaseBackup } from './DatabaseBackup';
+import { DiagnosticsCopy } from './DiagnosticsCopy';
 import { HiddenList } from './HiddenList';
 import { HostAccessNotice } from './HostAccessNotice';
 import { TagBackup } from './TagBackup';
@@ -62,6 +63,7 @@ function DataTab() {
       <TagBackup />
       <CsvExport />
       <DatabaseBackup />
+      <DiagnosticsCopy />
       <ClearData />
     </>
   );

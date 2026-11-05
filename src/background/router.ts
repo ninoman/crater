@@ -2,6 +2,7 @@ import { db } from '../db';
 import type { MessageHandlers } from '../shared/messages';
 import { loadSettings } from '../shared/settings';
 import { backupHandlers } from './backupHandlers';
+import { getDiagnostics } from './diagnostics';
 import { followingHandlers } from './followingHandlers';
 import { hideHeardHandlers } from './hideHeardHandlers';
 import { followsHandlers } from './follows/handlers';
@@ -42,6 +43,7 @@ export const handlers: MessageHandlers = {
   releaseOpened: ({ item }, sender) => openRelease(item, sender.tab?.id),
   queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
+  getDiagnostics: () => getDiagnostics(),
   getAlsoBought: ({ itemKey, ...prefs }) => getAlsoBought(itemKey, prefs),
   getPreview: ({ url }) => getReleasePreview(db, { fetchJson, fetchText }, url),
   ...hideHeardHandlers(db),

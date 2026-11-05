@@ -68,8 +68,18 @@ describe('scannerNotices', () => {
 
 describe('describeScannerNotice', () => {
   it('marks a broken parser as an error and pauses as warnings', () => {
-    expect(describeScannerNotice({ kind: 'parser-broken' }, NOW).tone).toBe('error');
+    expect(describeScannerNotice({ kind: 'parser-broken', message: 'x' }, NOW).tone).toBe('error');
     expect(describeScannerNotice({ kind: 'paused-by-you' }, NOW).tone).toBe('warning');
+  });
+
+  it('shows what broke, so a screenshot is enough to start on', () => {
+    const notice = {
+      kind: 'parser-broken',
+      message: 'fan 7: fan page: no #pagedata blob',
+    } as const;
+    expect(describeScannerNotice(notice, NOW).detail).toContain(
+      'fan 7: fan page: no #pagedata blob',
+    );
   });
 
   it('says when a back-off ends and how long that is', () => {

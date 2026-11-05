@@ -4,7 +4,8 @@ import type { ScannerStatus } from './scan';
 import { clockTime, timeUntil } from './timeAgo';
 
 export type ScannerNotice =
-  | { kind: 'parser-broken' }
+  /** `message` is the latest failure, so a screenshot says what broke. */
+  | { kind: 'parser-broken'; message: string }
   /** `retryAt` is null when the browser says it's offline but no request has failed yet. */
   | { kind: 'offline'; retryAt: number | null }
   /** Requests go unanswered though the browser says it's online, so we can't tell why. */
@@ -19,7 +20,7 @@ export type ScannerNoticeKind = ScannerNotice['kind'];
 export function scannerNotices(status: ScannerStatus): ScannerNotice[] {
   const { pause, online, parserError, dailyBudget } = status;
   const notices: ScannerNotice[] = [];
-  if (parserError !== null) notices.push({ kind: 'parser-broken' });
+  if (parserError !== null) notices.push({ kind: 'parser-broken', message: parserError });
 
   const retryAt = pause?.reason === 'offline' || pause?.reason === 'backoff' ? pause.until : null;
   // Offline, any back-off is ours, not Bandcamp asking.
@@ -54,8 +55,8 @@ export function describeScannerNotice(notice: ScannerNotice, now: number): Scann
         id,
         tone: 'error',
         title: 'Parser broken.',
-        detail:
-          "Bandcamp changed something Crater reads, so scanning has stopped and results won't update. Crater needs an update.",
+        // Failing jobs are dropped and the queue moves on, so scanning itself hasn't stopped.
+        detail: `Bandcamp changed something Crater reads, so some results won't update until Crater is updated. Last error: ${notice.message}`,
       };
     case 'offline':
       return {

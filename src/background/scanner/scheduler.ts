@@ -10,6 +10,7 @@ import {
   type CraterDb,
   type QueueJob,
 } from '../../db';
+import type { ErrorLogEntry, ErrorOutcome } from '../../shared/diagnostics';
 import type { Settings } from '../../shared/settings';
 import { jobRetryAt, nextBackoff, OFFLINE_AFTER_FAILURES } from './backoff';
 import { spend } from './budget';
@@ -19,6 +20,7 @@ import { runFollowReleasesStep } from './followReleasesJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
 import { paceAfterRequest, paceAfterThrottle, paceWaitMs } from './pace';
+import { withParserFailure, withParserSuccess } from './parserHealth';
 import { SEED } from './priority';
 import { runReleaseStep } from './releaseJob';
 import { rankSeedFansOnceListed } from './seedFans';
@@ -39,6 +41,8 @@ export interface SchedulerDeps {
   waitForOwnSync: () => Promise<void>;
   /** After each run that changed something. */
   onStep: (job: QueueJob, event: StepEvent) => Promise<void>;
+  /** Keeps a failure for "Copy diagnostics". */
+  logError: (entry: ErrorLogEntry) => Promise<void>;
 }
 
 /** idle: queue empty. paused: back-off or budget. locked: another loop holds the lock. */
@@ -121,20 +125,24 @@ async function runJob(
   if (skipped) {
     const message = `${job.kind} ${job.target}: ${skipped.message}`;
     console.warn(`crater: ${message}. Carried on without it.`);
+    await logFailure(deps, skipped, message, 'skipped');
     return deps.store.save({
       backoff: null,
       offline: false,
-      parserError: { kind: 'profile', message },
+      parserFailures: withParserFailure(state.parserFailures, 'profile', message),
     });
   }
-  const parserFixed = state.parserError !== null && state.parserError.kind === result.parsed;
+  const parserFailures = result.parsed
+    ? withParserSuccess(state.parserFailures, result.parsed)
+    : state.parserFailures;
+  const parserFixed = parserFailures !== state.parserFailures;
   return state.backoff || state.offline || state.networkFailures || state.lastError || parserFixed
     ? deps.store.save({
         backoff: null,
         offline: false,
         networkFailures: 0,
         lastError: null,
-        ...(parserFixed ? { parserError: null } : {}),
+        parserFailures,
       })
     : state;
 }
@@ -152,6 +160,7 @@ async function handleFailure(
   if (failure.kind === 'throttled') {
     const backoff = nextBackoff(state.backoff, failure.retryAfterMs, ctx.now);
     console.warn(`crater: ${message}. Scanner paused until ${new Date(backoff.until).toString()}`);
+    await logFailure(deps, error, message, 'paused');
     return deps.store.save({
       backoff,
       offline: false,
@@ -166,12 +175,14 @@ async function handleFailure(
     // Being offline says nothing about how fast Bandcamp lets us go, so the pace stays.
     const backoff = nextBackoff(state.backoff, null, ctx.now);
     console.warn(`crater: ${message}. Offline; paused until ${new Date(backoff.until).toString()}`);
+    await logFailure(deps, error, message, 'offline');
     return deps.store.save({ backoff, offline: true, networkFailures, lastError: message });
   }
 
   // A lone network error retries just this job later, so one bad request can't stall the queue.
   const retryAt = failure.kind === 'permanent' ? null : jobRetryAt(job.attempts, ctx.now);
   console.warn(`crater: ${message}. ${retryAt === null ? 'Dropped' : 'Will retry'}.`, error);
+  await logFailure(deps, error, message, retryAt === null ? 'dropped' : 'retrying');
   await failJob(ctx.db, job, retryAt);
   // A seed list that's dropped or waiting on a retry no longer holds up the seed backlog.
   if (job.kind === 'release' && job.priority === SEED)
@@ -183,6 +194,18 @@ async function handleFailure(
   return deps.store.save({
     lastError: message,
     networkFailures,
-    ...(error instanceof ParserError ? { parserError: { kind: job.kind, message } } : {}),
+    ...(error instanceof ParserError
+      ? { parserFailures: withParserFailure(state.parserFailures, job.kind, message) }
+      : {}),
   });
+}
+
+function logFailure(
+  deps: SchedulerDeps,
+  error: unknown,
+  message: string,
+  outcome: ErrorOutcome,
+): Promise<void> {
+  const name = error instanceof Error ? error.name : typeof error;
+  return deps.logError({ at: deps.now(), name, message, outcome });
 }

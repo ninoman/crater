@@ -73,6 +73,7 @@ async function drain(collectionBatchSize: number) {
     owner: 'worker-1',
     waitForOwnSync: async () => {},
     onStep: async () => {},
+    logError: async () => {},
   });
 }
 
