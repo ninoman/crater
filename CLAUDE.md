@@ -6,8 +6,6 @@ Chrome extension (MV3, no backend) that builds a local database of Bandcamp fans
 - Findings and decisions that override the original spec: [docs/decisions.md](docs/decisions.md). Read it before touching scanning, parsing or scoring.
 - Bandcamp response samples: [tests/fixtures/](tests/fixtures/README.md)
 
-Stack: TypeScript (strict), Vite + CRXJS, React, Dexie (IndexedDB), Vitest.
-
 ## Code principles
 
 The goal is code that stays clean, modular and maintainable as the project grows.
