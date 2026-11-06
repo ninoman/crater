@@ -367,7 +367,14 @@ describe('drainQueue', () => {
     await drainQueue(deps({ logError: async (entry) => void logged.push(entry) }));
 
     expect(store.state.parserFailures).toEqual({
-      fan: { streak: 2, message: expect.stringContaining('fan 6') as string },
+      fan: {
+        streak: 2,
+        message: expect.stringContaining('fan 6') as string,
+        retry: {
+          spec: expect.objectContaining({ kind: 'fan', target: '6' }) as object,
+          priority: expect.any(Number) as number,
+        },
+      },
     });
     expect(logged.map(({ name, outcome }) => `${name} ${outcome}`)).toEqual([
       'ParserError dropped',

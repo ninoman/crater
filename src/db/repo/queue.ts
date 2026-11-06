@@ -12,6 +12,18 @@ export function fanJob(fanId: number, via: ItemKey | null = null): JobSpec {
   return { kind: 'fan', target: `${fanId}`, via };
 }
 
+/** What a queued job scans, without its progress, so it can be queued afresh. */
+export function specOf(job: QueueJob): JobSpec {
+  switch (job.kind) {
+    case 'release':
+      return { kind: job.kind, target: job.target, url: job.url };
+    case 'fan':
+      return { kind: job.kind, target: job.target, via: job.via };
+    case 'followReleases':
+      return { kind: job.kind, target: job.target };
+  }
+}
+
 /** Where a job waits in line within its priority, and its tie-break there. */
 export interface JobPlace {
   spec: JobSpec;

@@ -15,7 +15,7 @@ export function HostAccessNotice() {
     <Notice
       tone="error"
       title="No access to Bandcamp."
-      action={{ label: 'Allow access', onClick: () => void request() }}
+      actions={[{ label: 'Allow access', onClick: () => void request() }]}
     >
       Crater can’t read Bandcamp pages, so it can’t sync or scan.
     </Notice>

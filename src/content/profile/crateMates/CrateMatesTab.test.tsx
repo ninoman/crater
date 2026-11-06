@@ -29,6 +29,7 @@ function scanner(patch: Partial<ScannerStatus> = {}): ScannerStatus {
     online: true,
     lastError: null,
     parserError: null,
+    parserRetrying: false,
     ...patch,
   };
 }

@@ -17,6 +17,7 @@ function status(patch: Partial<ScannerStatus> = {}): ScannerStatus {
     online: true,
     lastError: null,
     parserError: null,
+    parserRetrying: false,
     ...patch,
   };
 }
@@ -64,11 +65,18 @@ describe('scannerNotices', () => {
       ).map(({ kind }) => kind),
     ).toEqual(['parser-broken', 'budget']);
   });
+
+  it('says when the failed job is queued again', () => {
+    const [notice] = scannerNotices(status({ parserError: 'fan 7: bad', parserRetrying: true }));
+    expect(notice).toEqual({ kind: 'parser-broken', message: 'fan 7: bad', retrying: true });
+  });
 });
 
 describe('describeScannerNotice', () => {
   it('marks a broken parser as an error and pauses as warnings', () => {
-    expect(describeScannerNotice({ kind: 'parser-broken', message: 'x' }, NOW).tone).toBe('error');
+    expect(
+      describeScannerNotice({ kind: 'parser-broken', message: 'x', retrying: false }, NOW).tone,
+    ).toBe('error');
     expect(describeScannerNotice({ kind: 'paused-by-you' }, NOW).tone).toBe('warning');
   });
 
@@ -76,6 +84,7 @@ describe('describeScannerNotice', () => {
     const notice = {
       kind: 'parser-broken',
       message: 'fan 7: fan page: no #pagedata blob',
+      retrying: false,
     } as const;
     expect(describeScannerNotice(notice, NOW).detail).toContain(
       'fan 7: fan page: no #pagedata blob',

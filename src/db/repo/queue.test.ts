@@ -13,6 +13,7 @@ import {
   nextJob,
   rankFanJobs,
   saveProgress,
+  specOf,
 } from './queue';
 
 let db: CraterDb;
@@ -90,6 +91,27 @@ describe('queue', () => {
       cursor: { stage: 'quick' },
     });
     expect(await order()).toEqual(['2', '1']);
+  });
+
+  it('queues a dropped job afresh from its spec, without its progress', async () => {
+    await enqueue(db, [release('a1')], 3, 0);
+    const job = await nextJob(db, 0);
+    if (!job) throw new Error('expected a job');
+    await saveProgress(db, job, {
+      cursor: { thumbsToken: 't', reviewsToken: null, collected: 40 },
+    });
+    const stored = await db.queue.get(job.id ?? -1);
+    if (!stored) throw new Error('expected the job');
+    expect(specOf(stored)).toEqual(release('a1'));
+
+    await failJob(db, stored, null);
+    await enqueue(db, [fanJob(2)], 3, 0);
+    await enqueueAt(db, [{ spec: specOf(stored), at: Number.MIN_SAFE_INTEGER }], 3);
+    expect(await db.queue.where('[kind+target]').equals(['release', 'a1']).first()).toMatchObject({
+      cursor: null,
+      attempts: 0,
+    });
+    expect(await order()).toEqual(['a1', '2']);
   });
 
   it('runs jobs by priority, then next attempt time, then insertion order', async () => {

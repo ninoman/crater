@@ -5,7 +5,7 @@ import { clockTime, timeUntil } from './timeAgo';
 
 export type ScannerNotice =
   /** `message` is the latest failure, so a screenshot says what broke. */
-  | { kind: 'parser-broken'; message: string }
+  | { kind: 'parser-broken'; message: string; retrying: boolean }
   /** `retryAt` is null when the browser says it's offline but no request has failed yet. */
   | { kind: 'offline'; retryAt: number | null }
   /** Requests go unanswered though the browser says it's online, so we can't tell why. */
@@ -18,9 +18,11 @@ export type ScannerNoticeKind = ScannerNotice['kind'];
 
 /** Most important first. A broken parser outlasts any pause, so it leads. */
 export function scannerNotices(status: ScannerStatus): ScannerNotice[] {
-  const { pause, online, parserError, dailyBudget } = status;
+  const { pause, online, parserError, parserRetrying, dailyBudget } = status;
   const notices: ScannerNotice[] = [];
-  if (parserError !== null) notices.push({ kind: 'parser-broken', message: parserError });
+  if (parserError !== null) {
+    notices.push({ kind: 'parser-broken', message: parserError, retrying: parserRetrying });
+  }
 
   const retryAt = pause?.reason === 'offline' || pause?.reason === 'backoff' ? pause.until : null;
   // Offline, any back-off is ours, not Bandcamp asking.

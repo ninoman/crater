@@ -38,6 +38,8 @@ export interface ScannerStatus {
   lastError: string | null;
   /** Set while Bandcamp data fails to parse: Crater needs an update. */
   parserError: string | null;
+  /** "Try again" put the failed job back in the queue, and it hasn't run yet. */
+  parserRetrying: boolean;
 }
 
 /** What queueing a release on request did: added, was already waiting, or its supporters are recent enough. */

@@ -312,7 +312,14 @@ describe('pass 1: profile pages', () => {
     ]);
     expect((await db.fans.bulkGet([11, 12])).map((fan) => fan?.status)).toEqual(['done', 'done']);
     expect(store.state.parserFailures).toEqual({
-      profile: { streak: 1, message: expect.stringContaining('fan 12') as string },
+      profile: {
+        streak: 1,
+        message: expect.stringContaining('fan 12') as string,
+        retry: {
+          spec: expect.objectContaining({ kind: 'fan', target: '12' }) as object,
+          priority: expect.any(Number) as number,
+        },
+      },
     });
   });
 

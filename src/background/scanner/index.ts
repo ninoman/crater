@@ -14,7 +14,9 @@ import {
   db,
   dropRelease,
   enqueue,
+  enqueueAt,
   focusRelease,
+  getQueuedJob,
   getMe,
   getReleaseSupporters,
   releasesSupportedBy,
@@ -40,7 +42,7 @@ import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
 import { BACKGROUND, FOLLOW_RELEASES, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
-import { brokenParser } from './parserHealth';
+import { brokenParser, withParserSuccess, type BrokenParser } from './parserHealth';
 import { ownReleaseProgress, seedOwnReleases } from './seed';
 import { withImportPause } from './importPause';
 import { chromeScannerStore, pauseFor, resumePatch } from './state';
@@ -225,6 +227,7 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     getMe(db),
   ]);
   const ownReleases = me ? await ownReleaseProgress(db, me.fanId) : { scanned: 0, total: 0 };
+  const broken = brokenParser(state.parserFailures);
   const now = Date.now();
   return {
     queued,
@@ -236,8 +239,38 @@ export async function getScannerStatus(): Promise<ScannerStatus> {
     pause: pauseFor(state, settings.dailyRequestBudget, now),
     online: navigator.onLine,
     lastError: state.lastError,
-    parserError: brokenParser(state.parserFailures),
+    parserError: broken?.failure.message ?? null,
+    parserRetrying: broken !== null && (await isRetrying(broken)),
   };
+}
+
+/** The failed job is back in the queue: its next run says whether the parser still fails. */
+async function isRetrying({ failure }: BrokenParser): Promise<boolean> {
+  const spec = failure.retry?.spec;
+  return spec !== undefined && (await getQueuedJob(db, spec.kind, spec.target)) !== undefined;
+}
+
+/** Earlier than any job's nextAttemptAt, including the seed backlog's (decisions §5). */
+const FRONT_OF_LINE = Number.MIN_SAFE_INTEGER;
+
+/**
+ * Queues the job that broke the parser again, first in line at its own priority, so a seed list
+ * still queues its fans as seed fans. A pass clears the banner, a failure renews it. A failure
+ * stored without its job can't be retried, so it's cleared and has to fail again to come back.
+ */
+export async function retryBrokenParser(): Promise<void> {
+  const state = await chromeScannerStore.load();
+  const broken = brokenParser(state.parserFailures);
+  if (!broken) return;
+  const { retry } = broken.failure;
+  if (retry) {
+    await enqueueAt(db, [{ spec: retry.spec, at: FRONT_OF_LINE }], retry.priority);
+  } else {
+    await chromeScannerStore.save({
+      parserFailures: withParserSuccess(state.parserFailures, broken.kind),
+    });
+  }
+  kickScanner();
 }
 
 /** Stops the scanner after the request in flight, until resumed. Survives a restart. */
