@@ -1,9 +1,9 @@
 import { useCopyDiagnostics } from '../hooks/useCopyDiagnostics';
 import { useScannerControls } from '../hooks/useScannerControls';
-import { withAction } from '../hooks/useScannerNotices';
+import { toNoticeItem } from '../hooks/useScannerNotices';
 import { useScannerStatus } from '../hooks/useScannerStatus';
 import type { ScannerStatus } from '../shared/scan';
-import { describeScannerNotice, scannerNotices } from '../shared/scannerNotices';
+import { scannerNotices } from '../shared/scannerNotices';
 import { Button, NoticeStack, Progress, Stat, StatusDot } from '../ui';
 
 /** The one-line state. Why it's stopped, other than by you, is in the notices above. */
@@ -34,7 +34,7 @@ function Ready({ status }: { status: ScannerStatus }) {
   // Your own pause has its Resume button right here, so it needs no notice.
   const notices = scannerNotices(status)
     .filter(({ kind }) => kind !== 'paused-by-you')
-    .map((notice) => withAction(describeScannerNotice(notice, now), controls, diagnostics));
+    .map((notice) => toNoticeItem(notice, now, controls, diagnostics));
   // A broken parser drops jobs but the queue moves on, so it doesn't mean "not scanning".
   const stopped = notices.some(({ id }) => id !== 'parser-broken');
 

@@ -19,7 +19,10 @@
   font-weight: var(--dh-weight-bold);
 }
 
-.dh-notice__action {
+.dh-notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dh-space-2);
   margin-top: var(--dh-space-2);
 }
 

@@ -35,7 +35,7 @@ To try a build locally: `pnpm build:firefox && pnpm start:firefox`.
 
 ## Quick patch: Bandcamp broke a parser
 
-Symptoms: the sidebar shows "parser broken", or a scan fails with a `ParserError`.
+Symptoms: the sidebar shows "parser broken", or a scan fails with a `ParserError`. Ask the user to press **Try again** on the notice first: if the retried job parses, it was a passing glitch and the notice goes. If it stays, ask for **Copy diagnostics**.
 
 1. Diff the live responses against the saved fixtures with `pnpm fixtures:refresh`. It captures fresh copies into `tests/fixtures/.fresh/` and prints which keys were added, removed or changed type, and which parser now rejects the body. Saved fixtures are untouched.
 2. Update the zod schema and the parser in `src/bandcamp/`. Bandcamp knowledge stays in that folder only.

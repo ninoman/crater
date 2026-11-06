@@ -12,12 +12,12 @@ export interface NoticeProps {
   /** A short lead-in, e.g. "Queue paused." */
   title?: ReactNode;
   children: ReactNode;
-  /** What you can do about it, right here. */
-  action?: NoticeAction;
+  /** What you can do about it, right here. The first is the one to try first. */
+  actions?: readonly NoticeAction[];
 }
 
 /** A banner about the state of things, e.g. "queue paused", shown above content. */
-export function Notice({ tone, title, children, action }: NoticeProps) {
+export function Notice({ tone, title, children, actions = [] }: NoticeProps) {
   return (
     <div className={`dh-notice dh-notice--${tone}`} role={tone === 'error' ? 'alert' : 'status'}>
       {title && (
@@ -26,11 +26,13 @@ export function Notice({ tone, title, children, action }: NoticeProps) {
         </>
       )}
       {children}
-      {action && (
-        <div className="dh-notice__action">
-          <Button onClick={action.onClick} disabled={action.disabled}>
-            {action.label}
-          </Button>
+      {actions.length > 0 && (
+        <div className="dh-notice__actions">
+          {actions.map((action) => (
+            <Button key={action.label} onClick={action.onClick} disabled={action.disabled}>
+              {action.label}
+            </Button>
+          ))}
         </div>
       )}
     </div>
@@ -42,7 +44,7 @@ export interface NoticeItem {
   tone: NoticeProps['tone'];
   title: string;
   detail: string;
-  action?: NoticeAction;
+  actions?: readonly NoticeAction[];
 }
 
 /** A column of notices. Renders nothing when there are none. */
@@ -50,8 +52,8 @@ export function NoticeStack({ notices }: { notices: readonly NoticeItem[] }) {
   if (notices.length === 0) return null;
   return (
     <div className="dh-notice-stack">
-      {notices.map(({ id, tone, title, detail, action }) => (
-        <Notice key={id} tone={tone} title={title} action={action}>
+      {notices.map(({ id, tone, title, detail, actions }) => (
+        <Notice key={id} tone={tone} title={title} actions={actions}>
           {detail}
         </Notice>
       ))}

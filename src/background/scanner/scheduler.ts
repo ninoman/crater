@@ -7,6 +7,7 @@ import {
   failJob,
   nextJob,
   saveProgress,
+  specOf,
   type CraterDb,
   type QueueJob,
 } from '../../db';
@@ -20,7 +21,7 @@ import { runFollowReleasesStep } from './followReleasesJob';
 import { canTakeLock } from './lock';
 import { classifyFailure } from './outcome';
 import { paceAfterRequest, paceAfterThrottle, paceWaitMs } from './pace';
-import { withParserFailure, withParserSuccess } from './parserHealth';
+import { withParserFailure, withParserSuccess, type RetryJob } from './parserHealth';
 import { SEED } from './priority';
 import { runReleaseStep } from './releaseJob';
 import { rankSeedFansOnceListed } from './seedFans';
@@ -129,7 +130,7 @@ async function runJob(
     return deps.store.save({
       backoff: null,
       offline: false,
-      parserFailures: withParserFailure(state.parserFailures, 'profile', message),
+      parserFailures: withParserFailure(state.parserFailures, 'profile', message, retryOf(job)),
     });
   }
   const parserFailures = result.parsed
@@ -195,9 +196,15 @@ async function handleFailure(
     lastError: message,
     networkFailures,
     ...(error instanceof ParserError
-      ? { parserFailures: withParserFailure(state.parserFailures, job.kind, message) }
+      ? {
+          parserFailures: withParserFailure(state.parserFailures, job.kind, message, retryOf(job)),
+        }
       : {}),
   });
+}
+
+function retryOf(job: QueueJob): RetryJob {
+  return { spec: specOf(job), priority: job.priority };
 }
 
 function logFailure(

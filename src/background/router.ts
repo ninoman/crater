@@ -26,6 +26,7 @@ import {
   pauseScanner,
   requestRelease,
   resumeScanner,
+  retryBrokenParser,
 } from './scanner';
 import { itemListHandlers } from './itemListHandlers';
 
@@ -63,6 +64,10 @@ export const handlers: MessageHandlers = {
   },
   resumeScanner: async () => {
     await resumeScanner();
+    return null;
+  },
+  retryBrokenParser: async () => {
+    await retryBrokenParser();
     return null;
   },
   clearAllData: async () => {

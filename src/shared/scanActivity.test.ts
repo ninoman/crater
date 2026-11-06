@@ -13,6 +13,7 @@ const status: ScannerStatus = {
   online: true,
   lastError: null,
   parserError: null,
+  parserRetrying: false,
 };
 
 describe('scanActivity', () => {
