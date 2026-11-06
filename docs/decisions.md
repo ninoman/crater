@@ -1132,4 +1132,13 @@ A real backup from 2026-11-04 (schema v20) was 1.59 GB of JSON and 413 MB gzippe
   | Supporter page, 100 fans (new) | 94 ms | 43 ms |
 
   A collection page now also rewrites the matchKey lists of the releases it adds. A supporter page reads one record per fan instead of all their rows. Both are milliseconds against the hundreds a request takes.
-- **Not yet measured:** how long the copy takes in Chrome on a database this size, and the on-disk size after it. Packing all 9.5M rows in memory took 18 s in Node, so minutes in IndexedDB is the expectation.
+- **Run on the real database (2026-11-06, Arc).** The move finished on its own: `ownership` empty, 78,590 fans in `fanOwnership`, state record gone. How long it took wasn't caught, since it was done before anyone watched.
+
+### Disk space comes back days later
+
+The profile folder **grew** from 2.47 to 3.07 GB after the move, and a browser restart didn't change it. Deleting a row in LevelDB only writes a tombstone; the old value stays on disk until a compaction merges the two. Chromium's routine compactions mostly worked on other key ranges, writing back as many bytes as they read. Chromium's IndexedDB code (`backing_store.cc`, `indexed_db_leveldb_operations.cc`) explains it:
+
+- **A full `CompactRange` runs only as a pre-close task**, when the last connection closes (for us, when the idle worker shuts down), at most once per origin every 1–3 days (random), and never in the first 5–60 minutes after the browser starts.
+- **Dropping the table instead wouldn't help:** `deleteObjectStore` and `clear()` delete without compacting. Only `deleteDatabase` compacts.
+
+So after updating, a user's storage grows by the size of the new tables (about 0.6–1 GB on this database) and drops below where it started within about 3 days. There's no API to force it, so nothing in the code tries to.
