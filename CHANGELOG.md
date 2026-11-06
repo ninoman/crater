@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/ninoman/crater/compare/v0.14.0...v0.15.0) (2026-11-05)
+
+
+### Features
+
+* **db:** pack ownership one record per fan ([#60](https://github.com/ninoman/crater/issues/60)) ([7ba5400](https://github.com/ninoman/crater/commit/7ba5400371cd7412159cc9194b426fc8fd1e2727))
+
 ## [0.14.0](https://github.com/ninoman/crater/compare/v0.13.0...v0.14.0) (2026-11-05)
 
 
