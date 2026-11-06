@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/ninoman/crater/compare/v0.15.0...v0.16.0) (2026-11-06)
+
+
+### Features
+
+* **scanner:** "Try again" on the parser-broken notice ([#63](https://github.com/ninoman/crater/issues/63)) ([6b605b1](https://github.com/ninoman/crater/commit/6b605b12226d9b180afb64261448e62784e7c520))
+
 ## [0.15.0](https://github.com/ninoman/crater/compare/v0.14.0...v0.15.0) (2026-11-05)
 
 
