@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.17.0](https://github.com/ninoman/crater/compare/v0.16.0...v0.17.0) (2026-11-10)
+
+
+### Features
+
+* **db:** forget unseen fans after 30 days, keeping crate mates ([#65](https://github.com/ninoman/crater/issues/65)) ([22213bb](https://github.com/ninoman/crater/commit/22213bb7ae1b67a87fc874f5c1e60c8021650f34))
+
+
+### Bug Fixes
+
+* **crate-mates:** rank Lately by album rarity and damp quiet fans ([#66](https://github.com/ninoman/crater/issues/66)) ([2c85ffa](https://github.com/ninoman/crater/commit/2c85ffa33d98d5d67244263ed7690edc6439e7e0))
+
 ## [0.16.0](https://github.com/ninoman/crater/compare/v0.15.0...v0.16.0) (2026-11-06)
 
 
