@@ -90,7 +90,7 @@ const MATCH: Column = {
 };
 const THIS_YEAR: Column = {
   key: 'latelyOverlap',
-  header: 'this year',
+  header: 'past 12 mo',
   numeric: true,
   sortKey: 'latelyOverlap',
   cell: (row) => row.latelyOverlap,
@@ -282,7 +282,7 @@ export function CrateMatesBoard({
             Lately ranks by what you've both bought recently: a purchase counts half as much every{' '}
             {result.latelyHalfLifeMonths} {result.latelyHalfLifeMonths === 1 ? 'month' : 'months'},
             and a release you both bought within two months of each other counts up to 1.5 times.
-            This year: releases you both bought in the last 12 months.
+            Past 12 mo: releases you both bought in the last 12 months.
           </>
         )}{' '}
         Latest buys: their newest purchases; click a cover to preview it. Trend compares how in step
