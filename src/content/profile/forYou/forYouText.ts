@@ -36,7 +36,7 @@ export function formatForYouSummary(picks: number, crateMates: number, mode: For
   }
   const count = `${picks} ${picks === 1 ? 'pick' : 'picks'}`;
   if (mode === 'fresh') {
-    return `${count} from what your ${crateMates === 1 ? 'lately crate mate' : `${crateMates} lately crate mates`} bought this year`;
+    return `${count} from what your ${crateMates === 1 ? 'lately crate mate' : `${crateMates} lately crate mates`} bought in the past 12 months`;
   }
   return `${count} from what your ${crateMates === 1 ? 'closest crate mate owns' : `${crateMates} closest crate mates own`}`;
 }

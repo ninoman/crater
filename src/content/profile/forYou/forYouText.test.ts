@@ -22,7 +22,7 @@ describe('For-you text', () => {
     );
     expect(formatForYouSummary(1, 1, 'all')).toBe('1 pick from what your closest crate mate owns');
     expect(formatForYouSummary(12, 30, 'fresh')).toBe(
-      '12 picks from what your 30 lately crate mates bought this year',
+      '12 picks from what your 30 lately crate mates bought in the past 12 months',
     );
   });
 
