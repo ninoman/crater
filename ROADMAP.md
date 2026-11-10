@@ -399,7 +399,7 @@ Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate 
 2. [x] Error states throughout: offline, budget reached, queue paused for backoff, parser broken. One `NoticeStack` in `src/ui/`, fed by `scannerNotices()` (pure, tested) over `getScannerStatus`, shows them above the sidebar, both profile tabs and the popup. The worker now tells offline apart from Bandcamp's back-off (`pause.reason = 'offline'`, plus `online` from `navigator.onLine`).
 3. [ ] Tune weights and thresholds from real use (lift cap, label-cluster limits, K).
 4. [x] Fixture refresh script: re-capture fixtures and diff them against the saved ones, so you can quickly check whether Bandcamp changed something.
-5. [x] Storage check: estimate DB size for a heavy user and add a cleanup for fans not seen in more than 180 days.
+5. [x] Storage check: estimate DB size for a heavy user and add a cleanup for fans not seen in more than 180 days (now 30, crate mates and queued fans kept; decisions §9).
 6. [ ] Run 2–4 weeks of daily use, ideally with a few friends who dig (load unpacked).
 
 ---

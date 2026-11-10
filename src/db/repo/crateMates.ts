@@ -173,6 +173,15 @@ export async function replaceCrateMates(
   });
 }
 
+/** Every fan on either leaderboard. */
+export async function crateMateFanIds(db: CraterDb): Promise<number[]> {
+  const [allTime, lately] = await Promise.all([
+    db.crateMates.toCollection().primaryKeys(),
+    db.latelyCrateMates.toCollection().primaryKeys(),
+  ]);
+  return [...new Set([...allTime, ...lately])];
+}
+
 /** The leaderboard, best first. */
 export function getCrateMates(db: CraterDb): Promise<CrateMateRecord[]> {
   return db.crateMates.orderBy('score').reverse().toArray();
