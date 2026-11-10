@@ -128,6 +128,17 @@ describe('computeCrateMates', () => {
     expect(crateMate?.score).toBeCloseTo(0.5 / Math.sqrt(1 * 4));
   });
 
+  it("uses the album's count for rarity when you own only one of its tracks", async () => {
+    // The album record comes from fan 10's collection: 38 owners. Your track has 2.
+    await fan(10, [item('a1', 1, 37), ...filler(100, 3)]);
+    await mine([item('t11', 1, 1, 'a1')]);
+
+    const [crateMate] = await run();
+
+    expect(crateMate).toMatchObject({ fanId: 10, overlap: 1 });
+    expect(crateMate?.score).toBeCloseTo(1 / Math.log2(2 + 38) / Math.sqrt(1 * 4));
+  });
+
   it('leaves out you, unread or quick-read fans and fans outside the size range', async () => {
     await mine([item('a1')]);
     await fan(10, [item('a1')], 'private');

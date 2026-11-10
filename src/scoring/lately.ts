@@ -15,6 +15,12 @@ export const CO_TIMING_BONUS = 0.5;
 export const TREND_LOOKBACK_MS = 365 * DAY_MS;
 /** A score this many times its year-ago value (or less than its inverse) is a trend. */
 export const TREND_RATIO = 1.25;
+/**
+ * Added to a fan's faded size in the divisor, so a fan who buys little can't top the board on
+ * one or two shared releases. 20 tested best on a real backup: one-release fans drop out of the
+ * top 100, and big collectors aren't held back much.
+ */
+export const FAN_SIZE_PRIOR = 20;
 
 /** When to take the score, with your side's faded collection size worked out once per run. */
 export interface Moment {
@@ -61,7 +67,7 @@ export function coTiming(a: number, b: number): number {
 
 /**
  * Σ w(i) × fade(yours) × fade(theirs) × coTiming over shared releases, divided by
- * √(your faded size × theirs). Crate mates' score with every purchase weighed by age, so old overlap
+ * √(your faded size × (theirs + FAN_SIZE_PRIOR)). Crate mates' score with every purchase weighed by age, so old overlap
  * and old bulk both fade out. Null when either side bought too little by `when`.
  */
 export function latelyScore(
@@ -84,7 +90,7 @@ export function latelyScore(
     if (faded === 0) continue;
     sum += (weights.get(theirs.matchIds[j] as number) ?? 0) * faded * coTiming(a, b);
   }
-  return sum / Math.sqrt(when.mineSize * theirSize);
+  return sum / Math.sqrt(when.mineSize * (theirSize + FAN_SIZE_PRIOR));
 }
 
 /** Shared releases you both bought since `since`. */
