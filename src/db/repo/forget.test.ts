@@ -12,7 +12,7 @@ import {
 import { getOwnerCounts } from './matchIndex';
 import { putOwnership } from './ownership';
 import { enqueue, fanJob, countJobs } from './queue';
-import { replaceCrateMates } from './crateMates';
+import { crateMateFanIds, replaceCrateMates } from './crateMates';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = 400 * DAY;
@@ -82,7 +82,7 @@ describe('forgetFansNotSeenSince', () => {
     );
     await enqueue(db, [fanJob(4), fanJob(3)], 2, 0);
 
-    expect(await forgetFansNotSeenSince(db, CUTOFF, me)).toBe(2);
+    expect(await forgetFansNotSeenSince(db, CUTOFF, new Set([me]))).toBe(2);
 
     expect(await db.fans.toCollection().primaryKeys()).toEqual([1, 3, 5]);
     expect(await db.ownership.where('fanId').anyOf([2, 4]).count()).toBe(0);
@@ -104,8 +104,26 @@ describe('forgetFansNotSeenSince', () => {
       Array.from({ length: 250 }, (_, i) => supporter(i + 10)),
       0,
     );
-    expect(await forgetFansNotSeenSince(db, CUTOFF, null)).toBe(250);
+    expect(await forgetFansNotSeenSince(db, CUTOFF, new Set())).toBe(250);
     expect(await db.fans.count()).toBe(0);
+  });
+
+  it('keeps the fans it is given, however many sit ahead of the expired ones', async () => {
+    await upsertSupporterFans(
+      db,
+      Array.from({ length: 250 }, (_, i) => supporter(i + 10)),
+      0,
+    );
+    const keep = new Set(Array.from({ length: 150 }, (_, i) => i + 10));
+    expect(await forgetFansNotSeenSince(db, CUTOFF, keep)).toBe(100);
+    expect(await db.fans.toCollection().primaryKeys()).toEqual([...keep]);
+  });
+});
+
+describe('crateMateFanIds', () => {
+  it('lists fans on either leaderboard once', async () => {
+    await replaceCrateMates(db, [crateMate(2), crateMate(3)], [crateMate(3), crateMate(4)]);
+    expect((await crateMateFanIds(db)).sort()).toEqual([2, 3, 4]);
   });
 });
 

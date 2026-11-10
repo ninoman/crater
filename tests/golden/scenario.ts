@@ -185,7 +185,7 @@ export async function buildScenario(db: CraterDb): Promise<void> {
     else
       await finishFanScan(db, fanId, fanId % 10 === 7 ? 'partial' : 'done', owned.length, seenAt);
   }
-  await forgetFansNotSeenSince(db, NOW - 180 * DAY, ME);
+  await forgetFansNotSeenSince(db, NOW - 180 * DAY, new Set([ME]));
 
   // Release pages you opened: tags, a track page, and a release no collection has shown.
   await upsertReleasePageItem(db, pageItem(get(albumKey(0)), ['dub', 'techno']));

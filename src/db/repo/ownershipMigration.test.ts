@@ -91,7 +91,7 @@ async function writeDuring(db: CraterDb): Promise<void> {
       lastSeenAt: 0,
     })),
   );
-  await forgetFansNotSeenSince(db, 1, null);
+  await forgetFansNotSeenSince(db, 1, new Set());
 }
 
 /** Every derived table, to compare two databases. */

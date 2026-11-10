@@ -146,25 +146,20 @@ const FORGET_BATCH = 100;
 
 /**
  * Forgets fans last seen before `before`, with their ownership rows, match-index entries,
- * crate mate rows and queued scans. `keepFanId` (you) is never forgotten. Returns how many went.
+ * crate mate rows and queued scans. Fans in `keep` are never forgotten. Returns how many went.
  */
 export async function forgetFansNotSeenSince(
   db: CraterDb,
   before: number,
-  keepFanId: number | null,
+  keep: ReadonlySet<number>,
 ): Promise<number> {
+  // Keys only, read once: paging by index would refetch the kept fans at the head every round.
+  const expired = (await db.fans.where('lastSeenAt').below(before).primaryKeys()).filter(
+    (fanId) => !keep.has(fanId),
+  );
   let forgotten = 0;
-  for (;;) {
-    const ids = (
-      await db.fans
-        .where('lastSeenAt')
-        .below(before)
-        .limit(FORGET_BATCH + 1)
-        .primaryKeys()
-    )
-      .filter((fanId) => fanId !== keepFanId)
-      .slice(0, FORGET_BATCH);
-    if (ids.length === 0) return forgotten;
+  for (let start = 0; start < expired.length; start += FORGET_BATCH) {
+    const batch = expired.slice(start, start + FORGET_BATCH);
     await db.transaction(
       'rw',
       [
@@ -177,6 +172,11 @@ export async function forgetFansNotSeenSince(
         db.queue,
       ],
       async () => {
+        // A supporter list or scan may have seen them again since the keys were read.
+        const ids = (await db.fans.bulkGet(batch)).flatMap((fan) =>
+          fan && fan.lastSeenAt < before ? [fan.fanId] : [],
+        );
+        if (ids.length === 0) return;
         await editFans(db, ids, (rows) => rows.clear());
         // With no rows left, this drops their lists and lowers the owner counts.
         await refreshFanMatches(db, new Map(ids.map((fanId) => [fanId, []])));
@@ -187,10 +187,11 @@ export async function forgetFansNotSeenSince(
           .anyOf(ids.map((fanId) => ['fan', `${fanId}`]))
           .delete();
         await db.fans.bulkDelete(ids);
+        forgotten += ids.length;
       },
     );
-    forgotten += ids.length;
   }
+  return forgotten;
 }
 
 /**

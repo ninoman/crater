@@ -2,7 +2,7 @@
 // stops growing with fans that no longer matter (decisions §9), and queue the top lately crate mates'
 // re-reads that are due (§11), and the weekly reads of your follows (§23).
 
-import { db, forgetFansNotSeenSince, getMe } from '../db';
+import { crateMateFanIds, db, forgetFansNotSeenSince, getMe, queuedTargets } from '../db';
 import { refreshCrateMates } from './recommend';
 import { queueFollowReleases, rescanLatelyCrateMates } from './scanner';
 import { FAN_FORGET_MS } from './scanner/freshness';
@@ -18,9 +18,17 @@ export async function ensureMaintenanceAlarm(): Promise<void> {
 }
 
 export async function runMaintenance(): Promise<void> {
-  const me = await getMe(db);
+  const [me, crateMates, waiting] = await Promise.all([
+    getMe(db),
+    crateMateFanIds(db),
+    queuedTargets(db, 'fan'),
+  ]);
+  // You and your crate mates feed every recommendation, however long ago a page showed them.
+  // Fans waiting for a scan hold almost nothing yet, and a long seed backlog outlasts the cutoff.
+  const keep = new Set([...crateMates, ...[...waiting].map(Number)]);
+  if (me) keep.add(me.fanId);
   const before = Date.now() - FAN_FORGET_MS;
-  const forgotten = await forgetFansNotSeenSince(db, before, me?.fanId ?? null);
+  const forgotten = await forgetFansNotSeenSince(db, before, keep);
   // Forgotten fans may have been crate mates, and the base rates behind every score moved.
   if (forgotten > 0) refreshCrateMates();
   await rescanLatelyCrateMates();
