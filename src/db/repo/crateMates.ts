@@ -1,6 +1,6 @@
 // Reads what the crate mates scorer needs, as plain data, and stores the leaderboard it produces.
 
-import { keyToNumber, type ItemKey } from '../../bandcamp';
+import { keyFromNumber, keyToNumber, type ItemKey } from '../../bandcamp';
 import type { CraterDb, FanMatchesRecord, ItemFields, CrateMateRecord } from '../schema';
 import { collectionFullyRead } from './fans';
 import { fanRows, ownershipTables } from './ownershipStore';
@@ -73,20 +73,24 @@ export async function gatherCrateMateBasis(db: CraterDb, meFanId: number): Promi
       const byKey = new Map<ItemKey, ItemFields>();
       for (const item of items) if (item) byKey.set(item.itemKey, item);
 
+      // The album's own count first, even when you own only tracks of it: a track's buyers are a
+      // small slice of the release's, and would make a popular album look rare.
       const counts = new Map<number, SupporterCounts>();
       lists.matchIds.forEach((id, i) => {
-        counts.set(id, { bandcampCounts: [], knownOwners: owners[i]?.owners ?? 0 });
+        const album = byKey.get(keyFromNumber(id));
+        counts.set(id, {
+          bandcampCounts: album ? [album.supporterCount] : [],
+          knownOwners: owners[i]?.owners ?? 0,
+        });
       });
       const labels = new Set<number>();
       const compilations = new Set<number>();
-      // Albums before tracks, so an album's own count comes first.
-      const ordered = [...owned].sort(
-        (a, b) => Number(a.itemKey !== a.matchKey) - Number(b.itemKey !== b.matchKey),
-      );
-      for (const row of ordered) {
+      for (const row of owned) {
         const item = byKey.get(row.itemKey);
         if (!item) continue;
-        counts.get(keyToNumber(row.matchKey))?.bandcampCounts.push(item.supporterCount);
+        if (row.itemKey !== row.matchKey) {
+          counts.get(keyToNumber(row.matchKey))?.bandcampCounts.push(item.supporterCount);
+        }
         labels.add(labelKey(item));
         if (item.compilation) compilations.add(keyToNumber(row.matchKey));
       }

@@ -3,6 +3,7 @@
 
 import type { ItemKey } from '../../src/bandcamp';
 import { computeAlsoBought } from '../../src/background/recommend/alsoBought';
+import { computeCrateMates } from '../../src/background/recommend/crateMates';
 import { computeDeepCuts } from '../../src/background/recommend/deepCuts';
 import { computeForYou } from '../../src/background/recommend/forYou';
 import { computeReleaseCrateMates } from '../../src/background/recommend/releaseCrateMates';
@@ -54,6 +55,12 @@ export async function collectOutputs(db: CraterDb): Promise<unknown> {
   const me = await getMe(db);
   const out: Record<string, unknown> = {};
 
+  // Recomputed rather than read as stored: a backup's boards were scored by the code that made
+  // it, and scoring changes must reach every path the same way.
+  await computeCrateMates(
+    { db, settings: DEFAULT_SETTINGS, now: NOW, yieldNow: async () => undefined },
+    ME,
+  );
   out.crateMates = await readCrateMatesResult(db, DEFAULT_SETTINGS.latelyHalfLifeMonths);
   for (const key of RELEASES) {
     out[`alsoBought ${key}`] = await computeAlsoBought(db, key, ME);

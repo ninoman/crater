@@ -6,6 +6,7 @@ import {
   coTiming,
   fade,
   fadedSize,
+  FAN_SIZE_PRIOR,
   latelyScore,
   moment,
   MONTH_MS,
@@ -96,9 +97,27 @@ describe('latelyScore', () => {
     const together = score([1, 1, 1, 1, 1, 1], [[1, 1]]) ?? 0;
     const apart = score([1, 1, 1, 1, 1, 1], [[1, 4]]) ?? 0;
 
-    // Apart, their copy has faded 3 months more (2^(3/6), square-rooted by the normalising
-    // on their side) and misses the bonus: 3 months is outside the co-timing window.
-    expect(together / apart).toBeCloseTo((1 + CO_TIMING_BONUS) * 2 ** (1 / 4));
+    // Apart, their copy has faded 3 months more and misses the bonus: 3 months is outside the
+    // co-timing window. Their faded size (plus the prior) shrinks with it.
+    const size = (months: number) => fade(ago(months), NOW, HALF_LIFE);
+    expect(together / apart).toBeCloseTo(
+      (1 + CO_TIMING_BONUS) *
+        (size(1) / size(4)) *
+        Math.sqrt((size(4) + FAN_SIZE_PRIOR) / (size(1) + FAN_SIZE_PRIOR)),
+    );
+  });
+
+  it("doesn't let a fan who bought one thing top a fan sharing much more", () => {
+    const mine = [1, 1, 1, 1, 1, 1];
+    const quiet = score(mine, [[1, 1]]) ?? 0;
+    const busy =
+      score(mine, [
+        ...[1, 2, 3, 4, 5, 6].map((id): [number, number] => [id, 1]),
+        ...Array.from({ length: 34 }, (_, i): [number, number] => [100 + i, 1]),
+      ]) ?? 0;
+
+    // Without the prior, one shared release out of one would score about as high as 6 out of 40.
+    expect(busy).toBeGreaterThan(3 * quiet);
   });
 
   it('is null when the fan bought too little lately, or you bought nothing dated', () => {
