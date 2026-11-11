@@ -172,6 +172,8 @@ Code: `src/background/scanner/`, with the queue repo in `src/db/repo/queue.ts`. 
 
 A "scan supporters" button on each Also bought row sends `queueRelease { itemKey, url }`, which queues that release's job at BACKGROUND priority (never above the page you're reading). Fresh supporter lists (7 days) are reported as "scanned recently" and not re-queued; a job already waiting isn't duplicated, though it moves up from SEED. We chose the row button over a popup URL field because the rows are where you already spot interesting releases, and they carry the item key and url, so there is no URL parsing to get wrong. *Crate mates who own this* rows list fans, not releases, so they get no button.
 
+*Removed 2026-11-11: the button gave way to Add to cart (§28). Opening a release still scans it first, so the dataset grows where you look; a row's button only saved a click.*
+
 ## 6. Also bought (Phase 4)
 
 Code: `src/scoring/alsoBought.ts` (pure), `src/db/repo/alsoBought.ts` (gathering), `src/background/recommend/` (running it). Decided 2026-10-20.
@@ -239,7 +241,7 @@ Before, every page scored the whole matchKey (§3.8), so every track of an album
 
 ### Gaps
 
-- **Wishlist from the sidebar isn't wired up.** Adding to a wishlist needs a logged-in Bandcamp API call that we haven't captured, so rows have no wishlist button; *Open in a new tab* gets you to Bandcamp's own. To add one, capture the request Bandcamp sends when you click Wishlist on a release page (logged in) and save it as a fixture.
+- ~~**Wishlist from the sidebar isn't wired up.**~~ Done 2026-11-11: rows have a heart and a cart button (§28).
 - **Track-only buyers of an album aren't listed as its supporters** (§3.8). This is still unmeasured: watch for albums whose supporter list looks small next to their `also_collected_count`.
 - **Preview plays in our own `<audio>`, not Bandcamp's EmbeddedPlayer** (changed 2026-10-21). The embed is a cross-origin iframe, so we couldn't start it from the Preview click or give it a seek bar. Now the worker fetches the release page (`getPreview`) and reads each track's `file["mp3-128"]` from `data-tralbum`. Those URLs are signed and expire, so they're fetched when a preview opens, never stored. Playback starts at the track the most stored fans bought on its own (`trackBuyerCounts`, `scoring/previewStart.ts`; added 2026-11-04), since that's usually why the release came up, and on a compilation it's the one artist its buyers came for. Ties go to the earlier track, and with no single-track buys it starts at `featured_track_id`. It moves on to the next track at the end, and previous / next step through the tracklist. Media loads aren't subject to CORS, so the content script plays the bcbits.com stream directly.
 
@@ -281,7 +283,7 @@ Code: `src/scoring/forYou.ts` (pure), `src/db/repo/forYou.ts` (gathering), `src/
 - **Filters** are `scoring/exclusions.ts`, as for Also bought: hidden releases, releases you own or wishlisted as a whole, and albums you own a track of (§3.8).
 - **w(i)** uses the shown record's `supporterCount` (the album's, or a track's when only tracks of the album have turned up), else `matchOwners`. It doesn't look for a track's count when the album record exists without one.
 - **Pruning:** w(i) ≤ 1, so a candidate's summed crate mate score is its ceiling. Candidates come in falling crate-mate-score order, 200 at a time, and the loop stops once the next ceiling is below the 60th-best score. 60 (twice the 30 shown) leaves room for the diversity rule to move an artist's extras down without leaving rows empty. Candidates with no item record are dropped before ranking, since they can't be shown.
-- **Rows** show their place in the list, cover, artist · label, "owned by N of your top crate mates", and the same preview / wishlist / open / hide buttons as Also bought (one shared `ReleaseRow` in `src/ui/`). Wishlist still opens the release page (§6, Gaps). Hide drops the row at once and re-fetches, so the next pick moves up.
+- **Rows** show their place in the list, cover, artist · label, "owned by N of your top crate mates", and the same preview / wishlist / cart / heard / hide buttons as Also bought (one shared `ReleaseRow` in `src/ui/`; §28). Hide drops the row at once and re-fetches, so the next pick moves up.
 - **Empty states** reuse the crate mates basis (`no-viewer`, `unsynced`), then "no crate mates yet" (no leaderboard) and "nothing new from your crate mates", both linking to `#crate-mates`. A scanner `ParserError` shows as a notice above the rows, or in place of them when there are none.
 - **Scored on request**, each time the tab opens. Nothing pushes updates while it's open.
 
@@ -1145,3 +1147,27 @@ The profile folder **grew** from 2.47 to 3.07 GB after the move, and a browser r
 - **Dropping the table instead wouldn't help:** `deleteObjectStore` and `clear()` delete without compacting. Only `deleteDatabase` compacts.
 
 So after updating, a user's storage grows by the size of the new tables (about 0.6–1 GB on this database) and drops below where it started within about 3 days. There's no API to force it, so nothing in the code tries to.
+
+## 28. Wishlist and cart from recommendations
+
+Decided and built 2026-11-11, with requests captured from a signed-in browser. Code: `bandcamp/wishlist.ts`, `bandcamp/cart.ts`, `background/sessionOrigin.ts`, `background/cartStore.ts`, `hooks/useWishlistHearts.ts`, `hooks/useCartLines.ts`, `content/shared/PlayerActions.tsx`.
+
+Every recommendation row (Also bought, For you, Crate mates' latest, New from follows) has a heart and a cart button, and the player has them beside the track title. The row's *Open in a new tab* button is gone: the title links to the release.
+
+### What Bandcamp needs
+
+- **Wishlist:** `POST collect_item_cb` / `uncollect_item_cb`, form-encoded `fan_id`, `item_id`, `item_type` (`album` or `track`), `band_id`, `crumb`. The crumb is per endpoint and session, from the page's `data-crumbs`, and lasts about 30 minutes, so the worker fetches the release page signed in right before each change. A logged-out page has no crumbs: that's `signed-out`.
+- **Cart:** `POST cart/cb` with `req=add` (`item_type` `a`/`t`, `item_id`, `unit_price` in the seller's currency, `quantity`, `band_id`, `cart_length`, `sync_num`, a random `local_id`) or `req=del` (`id` of the cart line). No crumb. A stale `sync_num` answers `resync: true` with the cart as it stands and changes nothing, so we retry once with that state, as Bandcamp's own cart script does. A successful add answers the line's `id`. The page's `data-cart` holds `sync_num` and the lines; a release page carries it, a fan page doesn't.
+- **Three things a browser page gets for free**, found one failure at a time:
+  1. `X-Requested-With: XMLHttpRequest`, or every one of these answers HTTP 400 "oops".
+  2. **bandcamp.com, not the artist's subdomain.** From the extension, the subdomain answers "request must use the base domain".
+  3. **Bandcamp's Origin.** Chrome stamps extension requests `Origin: chrome-extension://<id>`, which Bandcamp reads as an unknown custom domain. `fetch` can't set Origin, so a declarativeNetRequest session rule (`declarativeNetRequestWithHostAccess`, no new install warning) sets `Origin` and `Referer` to bandcamp.com. It matches only these three endpoints, POSTs, and requests from no tab (the worker), so Bandcamp's own pages are untouched.
+
+### Behaviour
+
+- **Optimistic.** A click shows the change at once and puts it back on a refusal or failure; the tooltip says which. Clicks while saving are ignored.
+- **Heart.** An add is recorded locally first (`markWishlisted`), so the tag picker opens at once with an item to tag (§21, behind the same `tagPrompt` setting). A failed add takes the record out again; any tags stay for a re-add (§14). A removal is recorded only once Bandcamp confirms it. A row's heart wishlists its matchKey, the album even when the row links to one of its tracks. The player's heart wishlists the playing track, or the release when it has one track.
+- **Cart:** the digital release at `minimum_price`, the price for fixed-price releases and the floor of name-your-price ones. A release with no price (free, or name-your-price from 0) opens its page instead, since a free item can't go in the cart. Physical formats need a choice and shipping, so they stay on Bandcamp's page. A row linking to a track of the album wanted reads the album's page for its price.
+- **What's in your cart is left out of every list**, like wishlisted releases (`exclusions`, `inCart`). A track in the cart keeps its album in. Our copy (`cartStore`, session storage) comes from three places: any release or band page you open (its `data-cart`), and our own adds and removals. A fan page has no `data-cart`, so something added on Bandcamp only drops out of the profile tabs after the next release or band page.
+- **Hearts and cart buttons start off**, since lists leave out what's in your wishlist and cart. A row you just changed keeps its filled button until the list reloads, then drops out.
+

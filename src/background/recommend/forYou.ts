@@ -59,6 +59,8 @@ export interface ForYouInput {
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
   now: number;
+  /** Albums and tracks in your Bandcamp cart, left out like owned ones. */
+  inCart?: ReadonlySet<ItemKey>;
 }
 
 export async function computeForYou(
@@ -76,6 +78,7 @@ export async function computeForYou(
     me.fanId,
   );
   const excluded = exclusions(data.mine, data.hidden, {
+    inCart: input.inCart,
     heard: input.hideHeard ? data.heard : undefined,
   });
   const candidates = candidatesFor(input, crateMates, data, excluded.ids);

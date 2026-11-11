@@ -40,6 +40,8 @@ export interface DeepCutsInput {
   ignoreCompilations: boolean;
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
+  /** Albums and tracks in your Bandcamp cart, left out like owned ones. */
+  inCart?: ReadonlySet<ItemKey>;
 }
 
 export async function computeDeepCuts(
@@ -58,6 +60,7 @@ export async function computeDeepCuts(
   );
   const scoreOf = new Map(crateMates.map((crateMate) => [crateMate.fanId, crateMate.score]));
   const excluded = exclusions(data.mine, data.hidden, {
+    inCart: input.inCart,
     heard: input.hideHeard ? data.heard : undefined,
   });
   const owned = crateMateOwnership(

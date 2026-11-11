@@ -56,6 +56,8 @@ export interface AlsoBoughtOptions {
   hideHeard?: boolean;
   /** On a track page, count the album's buyers too (decisions §17). */
   albumBuyers?: boolean;
+  /** Albums and tracks in your Bandcamp cart, left out like owned ones. */
+  inCart?: ReadonlySet<ItemKey>;
 }
 
 export async function computeAlsoBought(
@@ -66,6 +68,7 @@ export async function computeAlsoBought(
     followingBoost = true,
     ignoreCompilations = true,
     hideHeard = false,
+    inCart,
     albumBuyers = true,
   }: AlsoBoughtOptions = {},
 ): Promise<AlsoBoughtResult> {
@@ -74,6 +77,7 @@ export async function computeAlsoBought(
     loadFollowedReleases(db, followingBoost),
   ]);
   const excluded = exclusions(data.mine, data.hidden, {
+    inCart,
     release: data.matchKey,
     heard: hideHeard ? data.heard : undefined,
   });

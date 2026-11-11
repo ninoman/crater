@@ -59,7 +59,8 @@ Crater is an independent project and isn't affiliated with Bandcamp.
 
 | Permission | Used for | Justification (for the store form) |
 | --- | --- | --- |
-| `storage` | `chrome.storage.local` for settings, scanner pacing/back-off state and UI preferences; `chrome.storage.session` for the list of release pages open in tabs | Stores the user's settings and the scanner's small working state on their device. The large database lives in IndexedDB, which needs no permission. |
+| `storage` | `chrome.storage.local` for settings, scanner pacing/back-off state and UI preferences; `chrome.storage.session` for the list of release pages open in tabs and the user's Bandcamp cart as last seen | Stores the user's settings and the scanner's small working state on their device. The large database lives in IndexedDB, which needs no permission. |
+| `declarativeNetRequestWithHostAccess` | One session rule from the service worker, on its own POSTs to `bandcamp.com/collect_item_cb`, `/uncollect_item_cb` and `/cart/cb` | When the user clicks the heart or cart button on a recommendation, the extension adds the release to their Bandcamp wishlist or cart. Bandcamp only accepts these from its own origin, and `fetch` can't set the Origin header, so the rule sets it to bandcamp.com. It applies only to requests the extension makes, never to pages the user browses, and uses only the Bandcamp host access the extension already has. |
 | `alarms` | `chrome.alarms` in the service worker | Wakes the service worker to continue the background scan queue at a polite pace (a service worker can't keep timers alive between wake-ups) and to check for a due re-sync. |
 
 Optional, asked for at runtime:

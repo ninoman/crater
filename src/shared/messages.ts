@@ -2,7 +2,14 @@
 // Add a message by extending MessageMap; both sides get checked types for free.
 // Worker-to-tab events go the other way and are listed in EventMap.
 
-import type { FanItemCard, ItemKey, ReleasePageItem, ReleasePreview, Viewer } from '../bandcamp';
+import type {
+  Cart,
+  FanItemCard,
+  ItemKey,
+  ReleasePageItem,
+  ReleasePreview,
+  Viewer,
+} from '../bandcamp';
 import type { AlsoBoughtPrefs, AlsoBoughtResult } from './alsoBought';
 import type { BackupSummary, ImportNotice } from './backupFile';
 import type { Diagnostics } from './diagnostics';
@@ -23,7 +30,7 @@ import type {
 } from './following';
 import type { PageBadge, ReleaseRef } from './pageBadges';
 import type { ReleaseCrateMatesResult } from './releaseCrateMates';
-import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from './scan';
+import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { CrateMatesResult, CrateMateStanding } from './crateMates';
 import type { ListedItem, ListSource } from './itemList';
@@ -47,11 +54,6 @@ export interface MessageMap {
    * Answers with the progress so far.
    */
   releaseOpened: { request: { item: ReleasePageItem }; response: ScanProgress };
-  /** Scans a release's supporters on request, at background priority, so the dataset grows where you want. */
-  queueRelease: {
-    request: { itemKey: ItemKey; url: string };
-    response: { status: QueueReleaseStatus };
-  };
   getScannerStatus: { request: NoPayload; response: ScannerStatus };
   /** Version, scanner state and recent errors, for a bug report. */
   getDiagnostics: { request: NoPayload; response: Diagnostics };
@@ -144,6 +146,30 @@ export interface MessageMap {
   /** A heart clicked on an item card on someone's profile; like `markWishlisted`. */
   markCardWishlisted: { request: { card: FanItemCard }; response: boolean };
   markUnwishlisted: { request: { itemKey: ItemKey }; response: null };
+  /**
+   * Adds `release` to your Bandcamp wishlist or takes it off, from a recommendation row or its
+   * player, and records it. `url` is a page of it, its album or one of its tracks, for the crumb.
+   * `signed-out` when Bandcamp gave no session to post with.
+   */
+  setWishlisted: {
+    request: {
+      url: string;
+      release: Pick<ReleasePageItem, 'itemKey' | 'albumKey'>;
+      wishlisted: boolean;
+    };
+    response: { status: 'done' | 'signed-out' };
+  };
+  /**
+   * Adds the digital release `itemKey` to your Bandcamp cart at its minimum price, or takes it
+   * out. `url` is its page or one of its tracks'. `free` when it has nothing to pay: open its
+   * page instead.
+   */
+  setInCart: {
+    request: { url: string; itemKey: ItemKey; inCart: boolean };
+    response: { status: 'done' } | { status: 'free'; url: string };
+  };
+  /** The cart a Bandcamp page shows, so lists leave out what's in it. */
+  cartSeen: { request: { cart: Cart }; response: null };
   exportTags: { request: NoPayload; response: TagBackup };
   importTags: { request: { backup: TagBackup }; response: TagImportSummary };
   /** Writes a full backup to the staging file (shared/backupStaging.ts); the popup saves it. */

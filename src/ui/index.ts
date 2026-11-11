@@ -16,13 +16,14 @@ export { InfoHint, type InfoHintProps } from './InfoHint';
 export { InlineProgress, type InlineProgressProps } from './InlineProgress';
 export {
   ExternalIcon,
-  HideIcon,
+  CloseIcon,
   PauseIcon,
   PlayIcon,
-  QueueIcon,
   ReorderIcon,
   StopIcon,
 } from './icons';
+export { CartButton, type CartButtonProps, type CartLine } from './CartButton';
+export { WishlistButton, type WishlistButtonProps, type WishlistHeart } from './WishlistButton';
 export { Menu, type MenuItem, type MenuProps } from './Menu';
 export { NowPlaying, type NowPlayingProps } from './NowPlaying';
 export {

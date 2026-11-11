@@ -14,13 +14,23 @@ import {
 } from '../../ui';
 import { hideScopeNames, hideTargetFor } from './hideTargets';
 import { previewPlayerState } from './ReleasePreview';
+import { HeartTagPrompt } from './TagPrompt';
+import { PlayerActions } from './PlayerActions';
 
 type RowControlProps = Pick<
   ReleaseRowProps,
-  'previewing' | 'preview' | 'onPreview' | 'heard' | 'onHeardChange' | 'hideScopes' | 'onHide'
+  | 'previewing'
+  | 'preview'
+  | 'onPreview'
+  | 'heard'
+  | 'onHeardChange'
+  | 'hideScopes'
+  | 'onHide'
+  | 'wishlist'
+  | 'cart'
 >;
 
-type NamedRow = ActionableRow & { artist: string; title: string };
+type NamedRow = ActionableRow & { artist: string; title: string; url: string };
 
 /**
  * A row's preview, heard and hide props, wired to its list's player and actions. `placement`
@@ -37,7 +47,7 @@ export function rowControls(
   return {
     previewing,
     preview: placement === 'inline' && previewing && (
-      <ListAudioPlayer player={player} name={nameOf(row)} />
+      <ListAudioPlayer player={player} row={row} actions={actions} placement="inline" />
     ),
     onPreview: (open) => (open ? player.play(row.matchKey) : player.stop()),
     heard: row.heard,
@@ -49,32 +59,80 @@ export function rowControls(
       player.hidden(target);
       actions.hide(target);
     },
+    wishlist: {
+      heart: actions.wishlist.heart(row.matchKey),
+      onToggle: (anchor) =>
+        actions.wishlist.toggle(
+          {
+            rowKey: row.matchKey,
+            url: row.url,
+            release: { itemKey: row.matchKey, albumKey: null },
+            name: nameOf(row),
+          },
+          anchor,
+        ),
+      // The row hosts its player's track picker too, so it stays up while the row is mounted.
+      tagPicker: actions.wishlist.prompt?.rowKey === row.matchKey && (
+        <HeartTagPrompt prompt={actions.wishlist.prompt} close={actions.wishlist.closePrompt} />
+      ),
+    },
+    cart: {
+      line: actions.cart.line(row.matchKey),
+      onToggle: () => actions.cart.toggle(row.matchKey, row.url),
+    },
   };
 }
 
 /** The playing row's player, docked at the bottom of the window like every profile tab's. */
-export function ListNowPlaying({ player }: { player: ListPlayer<ListPlayerRow & NamedRow> }) {
+export function ListNowPlaying({
+  player,
+  actions,
+}: {
+  player: ListPlayer<ListPlayerRow & NamedRow>;
+  actions: RowActions;
+}) {
   const row = player.rows.find((candidate) => candidate.matchKey === player.current);
   if (!row) return null;
   const name = nameOf(row);
   return (
     <Dock>
       <NowPlaying name={name} href={row.url} onStop={player.stop}>
-        <ListAudioPlayer player={player} name={name} />
+        <ListAudioPlayer player={player} row={row} actions={actions} placement="docked" />
       </NowPlaying>
     </Dock>
   );
 }
 
-function ListAudioPlayer({ player, name }: { player: ListPlayer; name: string }) {
+function ListAudioPlayer({
+  player,
+  row,
+  actions,
+  placement,
+}: {
+  player: ListPlayer;
+  row: NamedRow;
+  actions: RowActions;
+  placement: 'inline' | 'docked';
+}) {
+  // Inline, the row right above has the release's heart and cart.
+  const docked = placement === 'docked';
   return (
     <AudioPlayer
       state={previewPlayerState(player.view)}
-      label={name}
+      label={nameOf(row)}
       onToggle={player.toggle}
       onSeek={player.seek}
       onPreviousTrack={player.previousTrack}
       onNextTrack={player.nextTrack}
+      actions={
+        <PlayerActions
+          view={player.view}
+          release={row}
+          hearts={actions.wishlist}
+          cart={docked ? actions.cart : undefined}
+          releaseHeart={docked}
+        />
+      }
     />
   );
 }

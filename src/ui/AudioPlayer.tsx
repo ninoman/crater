@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Button } from './Button';
 import { cx } from './cx';
 import { formatTime } from './formatTime';
@@ -26,6 +26,8 @@ export interface AudioPlayerProps {
   onSeek: (seconds: number) => void;
   onPreviousTrack: () => void;
   onNextTrack: () => void;
+  /** Buttons beside the track title, such as a heart and a cart. */
+  actions?: ReactNode;
 }
 
 /**
@@ -39,6 +41,7 @@ export function AudioPlayer({
   onSeek,
   onPreviousTrack,
   onNextTrack,
+  actions,
 }: AudioPlayerProps) {
   const ready = state.kind === 'ready';
   const multiTrack = ready && state.trackCount > 1;
@@ -92,6 +95,7 @@ export function AudioPlayer({
                 <span className="dh-player__title" title={state.title}>
                   {state.title}
                 </span>
+                {actions && <span className="dh-player__actions">{actions}</span>}
                 {multiTrack && (
                   <span className="dh-player__track">
                     {state.trackIndex + 1} / {state.trackCount}

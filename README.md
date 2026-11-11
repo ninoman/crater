@@ -48,6 +48,8 @@ A second profile tab with three parts:
 
 Preview any pick from its cover, or press **Play all** and work through a whole list with next, previous and keyboard shortcuts. Anything you've heard gets a mark, and you can hide heard releases from any list.
 
+Heart a pick, or just the track that's playing, to add it to your Bandcamp wishlist, or put the digital release in your cart, right from the list. What's already in your cart drops out of your recommendations.
+
 ### Tags for follows and wishlist
 
 Tag the artists, labels and fans you follow and the releases on your wishlist, then filter by tag or tag many at once. Heart a release or follow an account and the tag picker opens right there. Tags show on each artist's and release's own page, and stay with a release after you buy it.

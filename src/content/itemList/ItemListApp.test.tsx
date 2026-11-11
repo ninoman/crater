@@ -224,7 +224,7 @@ describe('the wishlist tab', () => {
     expect(player?.textContent).toContain('Artist 2 – Title 2');
     expect(cards(doc)[1]?.querySelector('.dh-player')).toBeNull();
 
-    const stop = player?.querySelector('button[aria-label="Stop preview"]') as HTMLButtonElement;
+    const stop = player?.querySelector('button[aria-label="Close player"]') as HTMLButtonElement;
     await act(async () => stop.click());
     expect(root(doc)?.querySelector('.dh-now-playing')).toBeNull();
   });

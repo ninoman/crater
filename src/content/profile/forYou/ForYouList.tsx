@@ -58,7 +58,7 @@ export function ForYouList({ rows, limit, mode, now, actions, moreComing }: ForY
         </RowList>
         {moreComing && rows.length < limit && <SkeletonRows count={3} ranked />}
       </div>
-      <ListNowPlaying player={player} />
+      <ListNowPlaying player={player} actions={actions} />
       <p className="dh-profile__note">
         {NOTES[mode]} Hidden, owned and wishlisted releases are left out.
       </p>

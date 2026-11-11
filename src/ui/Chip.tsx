@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { HideIcon } from './icons';
+import { CloseIcon } from './icons';
 import { type TagOption, tagColor } from './tag';
 
 type ChipProps =
@@ -50,7 +50,7 @@ export function Chip(props: ChipProps) {
           aria-label={`Remove tag ${tag.name}`}
           onClick={props.onRemove}
         >
-          <HideIcon />
+          <CloseIcon />
         </button>
       )}
     </span>

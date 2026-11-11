@@ -37,7 +37,9 @@ export const manifestFor = (browser: Browser) =>
       48: 'icons/icon-48.png',
       128: 'icons/icon-128.png',
     },
-    permissions: ['storage', 'alarms'],
+    // declarativeNetRequest sets the Origin Bandcamp requires on wishlist POSTs (decisions §6).
+    // The WithHostAccess variant adds no install warning beyond the Bandcamp host access.
+    permissions: ['storage', 'alarms', 'declarativeNetRequestWithHostAccess'],
     // Asked for from the popup when you turn on notifications for your follows (decisions §23).
     optional_permissions: ['notifications'],
     host_permissions: BANDCAMP_MATCHES,

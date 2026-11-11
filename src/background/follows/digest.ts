@@ -24,6 +24,8 @@ export async function followsDigestEntries(
   topCrateMatesK: number,
   now: number,
   hideHeard = false,
+  /** Albums and tracks in your Bandcamp cart, left out like owned ones. */
+  inCart?: ReadonlySet<ItemKey>,
 ) {
   const crateMateIds = (await getCrateMates(db))
     .slice(0, topCrateMatesK)
@@ -33,7 +35,10 @@ export async function followsDigestEntries(
     releases: data.releases,
     followed: new Set(data.accounts.map((row) => row.id)),
     muted: data.muted,
-    excluded: exclusions(data.mine, data.hidden, { heard: hideHeard ? data.heard : undefined }),
+    excluded: exclusions(data.mine, data.hidden, {
+      heard: hideHeard ? data.heard : undefined,
+      inCart,
+    }),
     interest: crateMateInterest(data.catalogues, data.crateMateLists),
     since: windowStart(now),
   });
@@ -102,6 +107,7 @@ export async function computeFollowsDigest(
   lastVisitAt: number | null,
   now: number,
   hideHeard: boolean,
+  inCart?: ReadonlySet<ItemKey>,
 ): Promise<FollowsDigestResult> {
   const empty = { rows: [], accounts: [], readAccounts: 0, checking: 0 };
   if (!me) return { basis: crateMatesBasis(me), windowDays: DIGEST_WINDOW_DAYS, ...empty };
@@ -111,6 +117,7 @@ export async function computeFollowsDigest(
     topCrateMatesK,
     now,
     hideHeard,
+    inCart,
   );
   const names = new Map(accounts.map((account) => [account.bandId, account.name]));
   const scopes = await entryHideScopes(db, entries, names);

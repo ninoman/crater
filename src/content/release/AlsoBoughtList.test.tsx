@@ -58,7 +58,17 @@ function render(
         progress={progress}
         scanStopped={stopped}
         firstWaitOver={firstWaitOver}
-        actions={{ hide: () => {}, setHeard: () => {} }}
+        actions={{
+          hide: () => {},
+          setHeard: () => {},
+          wishlist: {
+            heart: () => ({ on: false, status: 'idle' }),
+            toggle: () => {},
+            prompt: null,
+            closePrompt: () => {},
+          },
+          cart: { line: () => ({ inCart: false, status: 'idle' }), toggle: () => {} },
+        }}
         hideHeard={false}
         albumBuyers={null}
         onHideHeardChange={() => {}}
@@ -132,7 +142,17 @@ describe('AlsoBoughtList', () => {
           progress={listed}
           scanStopped={false}
           firstWaitOver={false}
-          actions={{ hide: () => {}, setHeard: () => {} }}
+          actions={{
+            hide: () => {},
+            setHeard: () => {},
+            wishlist: {
+              heart: () => ({ on: false, status: 'idle' }),
+              toggle: () => {},
+              prompt: null,
+              closePrompt: () => {},
+            },
+            cart: { line: () => ({ inCart: false, status: 'idle' }), toggle: () => {} },
+          }}
           hideHeard={false}
           albumBuyers={null}
           onHideHeardChange={() => {}}

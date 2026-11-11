@@ -36,7 +36,7 @@ export function LatestList({ result, now, actions, moreComing }: LatestListProps
         </RowList>
         {moreComing && result.rows.length < result.limit && <SkeletonRows count={3} />}
       </div>
-      <ListNowPlaying player={player} />
+      <ListNowPlaying player={player} actions={actions} />
       <p className="dh-profile__note">
         What your top crate mates on the Lately board, then the all-time one, bought recently and
         you don&apos;t own. Crater re-reads your closest lately crate mates every week, everyone

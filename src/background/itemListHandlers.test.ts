@@ -1,9 +1,13 @@
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
-import type { CollectionItem, FetchJson } from '../bandcamp';
+import type { CollectionItem, FetchJson, FetchText } from '../bandcamp';
+import { fixtureText } from '../../tests/fixtures';
 import { createTag, CraterDb, putOwnership, saveViewer, upsertCollectionItems } from '../db';
 import { itemListHandlers, type ItemListHandlers } from './itemListHandlers';
 import { ownershipRow } from '../../tests/ownership';
+
+// The Origin rule needs Chrome's declarativeNetRequest.
+vi.mock('./sessionOrigin', () => ({ ensureSessionOrigin: async () => {} }));
 
 const sender = {} as chrome.runtime.MessageSender;
 const ME = 5;
@@ -27,12 +31,14 @@ const ITEM: CollectionItem = {
 let db: CraterDb;
 let h: ItemListHandlers;
 let fetchJson: Mock<FetchJson>;
+let fetchText: Mock<FetchText>;
 
 beforeEach(async () => {
   db = new CraterDb(`test-${crypto.randomUUID()}`);
   await db.open();
   fetchJson = vi.fn<FetchJson>();
-  h = itemListHandlers(db, async () => 30, fetchJson);
+  fetchText = vi.fn<FetchText>();
+  h = itemListHandlers(db, async () => 30, fetchJson, fetchText);
   await upsertCollectionItems(db, [ITEM]);
   await putOwnership(db, ME, [ITEM], 'wishlist');
 });
@@ -129,6 +135,40 @@ describe('item list handlers', () => {
       await saveViewer(db, { fanId: ME, username: 'me' });
       expect(await h.markCardWishlisted({ card: { ...card, itemKey: 'a1' } }, sender)).toBe(true);
       expect(fetchJson).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('hearts on recommendation rows', () => {
+    const url = 'https://floatingpoints.bandcamp.com/album/promises';
+    const release = { itemKey: 'a2' as const, albumKey: null };
+    const signedIn = fixtureText('album-page.html').replace(
+      /data-crumbs="[^"]*"/,
+      'data-crumbs="{&quot;collect_item_cb&quot;:&quot;|collect_item_cb|1|X&quot;,&quot;uncollect_item_cb&quot;:&quot;|uncollect_item_cb|1|Y&quot;}"',
+    );
+
+    beforeEach(async () => {
+      await saveViewer(db, { fanId: ME, username: 'me' });
+      fetchText.mockResolvedValue(signedIn);
+      fetchJson.mockResolvedValue({ ok: true });
+    });
+
+    it('records the wishlist change once Bandcamp makes it', async () => {
+      expect(await h.setWishlisted({ url, release, wishlisted: true }, sender)).toEqual({
+        status: 'done',
+      });
+      expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toEqual([]);
+
+      await h.setWishlisted({ url, release, wishlisted: false }, sender);
+      expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toBeNull();
+    });
+
+    it('records nothing when Bandcamp has no session for you', async () => {
+      fetchText.mockResolvedValue(fixtureText('album-page.html'));
+
+      expect(await h.setWishlisted({ url, release, wishlisted: true }, sender)).toEqual({
+        status: 'signed-out',
+      });
+      expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toBeNull();
     });
   });
 });

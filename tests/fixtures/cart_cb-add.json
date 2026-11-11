@@ -1,0 +1,22 @@
+{
+  "req": "add",
+  "req_id": "0.2458730789869481",
+  "localize_page": true,
+  "locale": "en",
+  "help_center_url": "https://get.bandcamp.help/hc/en-us",
+  "id": 410362013,
+  "local_id": "0.34576061126669244",
+  "sync_num": 2,
+  "currency": "EUR",
+  "country_name": "Example",
+  "subtotal": 1.78,
+  "has_additional_contribution": false,
+  "additional_contribution_total": 0.0,
+  "has_shipping": false,
+  "shipping": null,
+  "has_tax": false,
+  "tax": null,
+  "country": "XX",
+  "us_state": null,
+  "us_zip": null
+}
