@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.18.0](https://github.com/ninoman/crater/compare/v0.17.0...v0.18.0) (2026-11-11)
+
+
+### Features
+
+* **recommendations:** wishlist and cart from rows and the player ([#70](https://github.com/ninoman/crater/issues/70)) ([d09b09a](https://github.com/ninoman/crater/commit/d09b09a242157271c26de9a9c0f5d4785571b634))
+
+
+### Bug Fixes
+
+* **profile:** say "past 12 mo" instead of "this year" ([#68](https://github.com/ninoman/crater/issues/68)) ([db563a7](https://github.com/ninoman/crater/commit/db563a77e2cccd8f83b086f48ab117bf0cee10cd))
+
 ## [0.17.0](https://github.com/ninoman/crater/compare/v0.16.0...v0.17.0) (2026-11-10)
 
 
