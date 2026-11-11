@@ -1,0 +1,10 @@
+{
+  "error": true,
+  "ok": false,
+  "exception": "exception: InsistError: Failed insist: request must use the base domain",
+  "host": "flexocentral-hgt4-4",
+  "url": "bambooforestmemo604.bandcamp.com/collect_item_cb",
+  "date": "2026-11-11 14:42:27 UTC",
+  "user": "fan@example.com",
+  "member_of_current_band": null
+}

@@ -28,6 +28,8 @@ export interface ExclusionOptions {
   release?: ItemKey;
   /** matchKeys you've heard, only when the list asks to hide them. */
   heard?: ReadonlySet<ItemKey>;
+  /** Albums and tracks in your Bandcamp cart: you're about to buy them. */
+  inCart?: ReadonlySet<ItemKey>;
 }
 
 export interface Exclusions {
@@ -43,8 +45,9 @@ export interface Exclusions {
 }
 
 /**
- * Leaves out hidden releases, releases you own or wishlisted as a whole, albums you own a track
- * of, the release being recommended from, and, when asked, releases you've heard. Owning a track
+ * Leaves out hidden releases, releases you own, wishlisted or have in your cart as a whole,
+ * albums you own a track of, the release being recommended from, and, when asked, releases
+ * you've heard. A track in your cart, like a wishlisted one, keeps its album in. Owning a track
  * almost always means you've heard the album; wishlisting one doesn't, so that album stays in
  * (decisions §3.8). Hidden artists and labels are left out through `allows`. Hide always wins
  * over heard: a hidden release is out whether or not heard ones are.
@@ -52,11 +55,12 @@ export interface Exclusions {
 export function exclusions(
   mine: readonly MyRow[],
   hidden: HiddenTargets,
-  { release, heard }: ExclusionOptions = {},
+  { release, heard, inCart }: ExclusionOptions = {},
 ): Exclusions {
   const ids = new Set([...hidden.releases].map(keyToNumber));
   if (release !== undefined) ids.add(keyToNumber(release));
   for (const key of heard ?? []) ids.add(keyToNumber(key));
+  for (const key of inCart ?? []) ids.add(keyToNumber(key));
   for (const row of mine) {
     if (row.itemKey === row.matchKey || row.source === 'collection') {
       ids.add(keyToNumber(row.matchKey));

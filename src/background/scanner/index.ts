@@ -24,7 +24,7 @@ import {
   type QueueJob,
 } from '../../db';
 import { broadcastToTabs } from '../../shared/messages';
-import type { QueueReleaseStatus, ScannerStatus, ScanProgress } from '../../shared/scan';
+import type { ScannerStatus, ScanProgress } from '../../shared/scan';
 import { loadSettings } from '../../shared/settings';
 import { logError } from '../errorLog';
 import { notifyWhenRoundEnds } from '../follows/notify';
@@ -38,7 +38,6 @@ import { queueFollowReads } from './followReleases';
 import { supportersAreFresh } from './freshness';
 import { queueLatelyRescans } from './latelyRescan';
 import { rankSupporters } from './passZero';
-import { queueRelease } from './queueRelease';
 import { releaseProgress } from './progress';
 import { BACKGROUND, FOLLOW_RELEASES, FOREGROUND } from './priority';
 import { drainQueue, type SchedulerDeps } from './scheduler';
@@ -180,15 +179,6 @@ async function dropOpenedRelease(release: ItemKey): Promise<void> {
   const lists = await Promise.all(others.map((key) => getReleaseSupporters(db, key)));
   const keep = new Set(lists.flatMap((list) => list?.fanIds ?? []));
   await dropRelease(db, release, BACKGROUND, keep);
-}
-
-export async function requestRelease(
-  itemKey: ItemKey,
-  url: string,
-): Promise<{ status: QueueReleaseStatus }> {
-  const status = await queueRelease(db, itemKey, url, Date.now());
-  if (status !== 'fresh') kickScanner();
-  return { status };
 }
 
 /**

@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
-import { Button, LinkButton } from './Button';
+import { Button } from './Button';
+import { CartButton, type CartButtonProps } from './CartButton';
 import { HeardBadge } from './HeardBadge';
-import { ExternalIcon, HeardIcon, HideIcon } from './icons';
+import { HeardIcon, CloseIcon } from './icons';
 import { Menu, type MenuItem } from './Menu';
 import { PlayableCover } from './PlayableCover';
 import { Row } from './Row';
 import { Tooltip } from './Tooltip';
+import { WishlistButton, type WishlistButtonProps } from './WishlistButton';
 
 /** What a recommended release row shows. Also-bought and For-you rows both fit it. */
 export interface ReleaseRowRelease {
@@ -39,9 +41,13 @@ export interface ReleaseRowProps {
   /** Names for the wider hides on offer, e.g. the artist's; null leaves that one out. */
   hideScopes: { band: string | null; label: string | null };
   onHide: (scope: HideScope) => void;
+  /** The heart, and the tag picker it opened, if any. Left out, the row has no heart. */
+  wishlist?: Pick<WishlistButtonProps, 'heart' | 'onToggle'> & { tagPicker: ReactNode };
+  /** Adds the digital release to your cart, or takes it out. Left out, the row has none. */
+  cart?: Pick<CartButtonProps, 'line' | 'onToggle'>;
 }
 
-/** A recommended release: playable cover, artist and label, reason, and open / heard / hide. */
+/** A recommended release: playable cover, artist and label, reason, and wishlist / cart / heard / hide. */
 export function ReleaseRow({
   release,
   reason,
@@ -55,6 +61,8 @@ export function ReleaseRow({
   onHeardChange,
   hideScopes,
   onHide,
+  wishlist,
+  cart,
 }: ReleaseRowProps) {
   const name = `${release.artist} – ${release.title}`;
   return (
@@ -84,18 +92,13 @@ export function ReleaseRow({
       badges={heard && <HeardBadge />}
       actions={
         <>
-          <Tooltip content="Open in a new tab">
-            <LinkButton
-              variant="ghost"
-              icon
-              href={release.url}
-              target="_blank"
-              rel="noopener"
-              aria-label={`Open ${name} in a new tab`}
-            >
-              <ExternalIcon />
-            </LinkButton>
-          </Tooltip>
+          {wishlist && (
+            <>
+              <WishlistButton name={name} heart={wishlist.heart} onToggle={wishlist.onToggle} />
+              {wishlist.tagPicker}
+            </>
+          )}
+          {cart && <CartButton name={name} line={cart.line} onToggle={cart.onToggle} />}
           {extraActions}
           <Tooltip content={heard ? 'Mark as not heard' : 'Mark as heard'}>
             <Button
@@ -114,7 +117,7 @@ export function ReleaseRow({
             items={hideItems(hideScopes, onHide)}
             trigger={
               <Button variant="ghost" icon aria-label={`Hide ${name} from recommendations`}>
-                <HideIcon />
+                <CloseIcon />
               </Button>
             }
           />

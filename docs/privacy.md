@@ -46,6 +46,10 @@ Nothing. Crater does not transmit stored data anywhere. Cover art and avatars ar
 
 We do not sell, share or use your data for advertising or credit decisions, and we do not use it for anything other than the extension's single purpose.
 
+## Your wishlist and cart
+
+When you click the heart or cart button on a recommendation, Crater asks Bandcamp, with your Bandcamp session, to add that release to your wishlist or cart, or take it out. Nothing happens to your wishlist or cart without that click. Crater keeps a copy of what's in your cart, from the Bandcamp pages you open, only for the browser session, to leave those releases out of your recommendations.
+
 ## Notifications
 
 If you turn on *Notify me about new releases* in the popup, Chrome asks you to allow Crater's optional `notifications` permission. With it, Crater shows a desktop notification when its weekly check finds new releases from the artists and labels you follow. The notification is made on your device from the data above; nothing is sent anywhere. It's off by default, and turning it off stops it.

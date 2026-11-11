@@ -1,7 +1,7 @@
 // Message handlers for your wishlist and collection lists and the tags on their items. The
 // rules live in the repos.
 
-import { artUrl, type FetchJson, keyToNumber } from '../bandcamp';
+import { artUrl, setWishlisted, type FetchJson, type FetchText, keyToNumber } from '../bandcamp';
 import {
   assignItemTag,
   getCrateMates,
@@ -19,6 +19,7 @@ import { crateMateOwnerCounts } from '../scoring/wishlistCrateMates';
 import type { ListedItem } from '../shared/itemList';
 import type { MessageHandlers } from '../shared/messages';
 import { releaseFromCard } from './releaseFromCard';
+import { ensureSessionOrigin } from './sessionOrigin';
 
 export type ItemListHandlers = Pick<
   MessageHandlers,
@@ -28,6 +29,7 @@ export type ItemListHandlers = Pick<
   | 'markWishlisted'
   | 'markCardWishlisted'
   | 'markUnwishlisted'
+  | 'setWishlisted'
 >;
 
 /** How many of your top crate mates own each row's release, in row order. */
@@ -47,6 +49,7 @@ export function itemListHandlers(
   db: CraterDb,
   topCrateMatesK: () => Promise<number>,
   fetchJson: FetchJson,
+  fetchText: FetchText,
 ): ItemListHandlers {
   return {
     // Before your first sync there's no `me`, so no lists yet.
@@ -92,6 +95,20 @@ export function itemListHandlers(
       const me = await getMe(db);
       if (me) await markUnwishlisted(db, me.fanId, itemKey);
       return null;
+    },
+    setWishlisted: async ({ url, release, wishlisted }) => {
+      const me = await getMe(db);
+      if (!me) return { status: 'signed-out' };
+      await ensureSessionOrigin();
+      const change = await setWishlisted({ fetchText, fetchJson }, url, {
+        fanId: me.fanId,
+        itemKey: release.itemKey,
+        wishlisted,
+      });
+      if (change.status === 'signed-out') return change;
+      if (wishlisted) await markWishlisted(db, me.fanId, release, Date.now());
+      else await markUnwishlisted(db, me.fanId, release.itemKey);
+      return change;
     },
   };
 }

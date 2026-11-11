@@ -35,6 +35,13 @@ describe('exclusions', () => {
     expect(sorted(exclusions(mine, hiding(['a9'])).ids)).toEqual(['a1', 'a2', 'a3', 'a5', 'a9']);
   });
 
+  it('leaves out releases in your cart, but keeps the album of a track in it', () => {
+    const { ids } = exclusions([], hiding(), { inCart: new Set<ItemKey>(['a6', 't71']) });
+
+    expect(sorted(ids)).toEqual(['a6', 't71']);
+    expect(ids.has(keyToNumber('a7'))).toBe(false);
+  });
+
   it('keeps an album you only wishlisted a track of', () => {
     expect(exclusions(mine, hiding()).ids.has(keyToNumber('a4'))).toBe(false);
   });

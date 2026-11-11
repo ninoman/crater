@@ -45,15 +45,20 @@ export const ExternalIcon = () => (
   </Icon>
 );
 
-export const HideIcon = () => (
+/** An ×: closes a panel, or hides a row. */
+export const CloseIcon = () => (
   <Icon>
     <path d="M4 4l8 8M12 4l-8 8" />
   </Icon>
 );
 
-export const QueueIcon = () => (
+/** A cart; a tick inside once the release is in it. */
+export const CartIcon = ({ filled = false }: { filled?: boolean }) => (
   <Icon>
-    <path d="M2.5 4.5h7M2.5 8h7M2.5 11.5h4M12 8.5v5M9.5 11h5" />
+    <path d="M1.5 2.5h2l1.6 7.5h7.4l1.5-5.5H4.3" />
+    <circle cx="6" cy="13" r="1" fill="currentColor" />
+    <circle cx="11.5" cy="13" r="1" fill="currentColor" />
+    {filled && <path d="M6.8 6.8l1.4 1.4 2.6-2.6" />}
   </Icon>
 );
 
@@ -96,5 +101,15 @@ export const PreviousIcon = () => (
 export const ReorderIcon = () => (
   <Icon>
     <path d="M5 13V3M2.5 5.5 5 3l2.5 2.5M11 3v10M8.5 10.5 11 13l2.5-2.5" />
+  </Icon>
+);
+
+/** Bandcamp's wishlist heart; filled once the release is in your wishlist. */
+export const HeartIcon = ({ filled = false }: { filled?: boolean }) => (
+  <Icon>
+    <path
+      d="M8 13.5S2.5 10.2 2.5 6.2A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.2c0 4-5.5 7.3-5.5 7.3z"
+      fill={filled ? 'currentColor' : 'none'}
+    />
   </Icon>
 );

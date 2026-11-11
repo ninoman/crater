@@ -3,6 +3,7 @@
 import { db, getMe, setFollowMute, type CraterDb } from '../../db';
 import type { MessageHandlers } from '../../shared/messages';
 import { loadSettings } from '../../shared/settings';
+import { cartKeys } from '../cartStore';
 import { openFollowsDigest } from '../scanner';
 import { computeFollowsDigest } from './digest';
 import { chromeFollowsStore } from './state';
@@ -23,6 +24,7 @@ export function followsHandlers(database: CraterDb = db): FollowsHandlers {
         previousVisitAt,
         Date.now(),
         hideHeard,
+        await cartKeys(),
       );
     },
     followsDigestOpened: async () => {

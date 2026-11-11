@@ -65,7 +65,7 @@
 }
 
 .dh-player__heading > .dh-player__title {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -73,6 +73,19 @@
   display: flex;
   align-items: center;
   gap: var(--dh-space-2);
+}
+
+/* Right after the title, without making its line taller. */
+.dh-player__actions {
+  flex: none;
+  display: flex;
+  align-self: center;
+  margin-block: calc(-1 * var(--dh-space-2));
+}
+
+/* Keeps "3 / 9" at the right edge while the title and its buttons sit left. */
+.dh-player__track {
+  margin-inline-start: auto;
 }
 
 .dh-player__time,

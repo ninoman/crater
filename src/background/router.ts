@@ -24,10 +24,10 @@ import {
   getScannerStatus,
   openRelease,
   pauseScanner,
-  requestRelease,
   resumeScanner,
   retryBrokenParser,
 } from './scanner';
+import { cartHandlers } from './cartHandlers';
 import { itemListHandlers } from './itemListHandlers';
 
 export const handlers: MessageHandlers = {
@@ -42,7 +42,6 @@ export const handlers: MessageHandlers = {
     return null;
   },
   releaseOpened: ({ item }, sender) => openRelease(item, sender.tab?.id),
-  queueRelease: ({ itemKey, url }) => requestRelease(itemKey, url),
   getScannerStatus: () => getScannerStatus(),
   getDiagnostics: () => getDiagnostics(),
   getAlsoBought: ({ itemKey, ...prefs }) => getAlsoBought(itemKey, prefs),
@@ -56,7 +55,8 @@ export const handlers: MessageHandlers = {
   getForYou: ({ mode, hideHeard }) => getForYou(mode, hideHeard),
   getCrateMatesLatest: ({ hideHeard }) => getCrateMatesLatest(hideHeard),
   ...followingHandlers(db),
-  ...itemListHandlers(db, async () => (await loadSettings()).topCrateMatesK, fetchJson),
+  ...cartHandlers(db, fetchJson, fetchText),
+  ...itemListHandlers(db, async () => (await loadSettings()).topCrateMatesK, fetchJson, fetchText),
   ...backupHandlers(db),
   pauseScanner: async () => {
     await pauseScanner();

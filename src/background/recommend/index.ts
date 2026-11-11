@@ -1,6 +1,7 @@
 // Keeps Also-bought and crate-mates-who-own-this lists fresh for releases open in a tab, answers the
 // sidebar's requests, and keeps the crate-mates leaderboard up to date.
 
+import { cartKeys } from '../cartStore';
 import { FAN_PAGE_PATTERNS, RELEASE_PAGE_PATTERNS, type ItemKey } from '../../bandcamp';
 import { countReadFans, db, getMe, type JobKind } from '../../db';
 import type { AlsoBoughtResult, AlsoBoughtPrefs } from '../../shared/alsoBought';
@@ -49,6 +50,7 @@ export async function getAlsoBought(
     ignoreCompilations: settings.ignoreCompilations,
     hideHeard,
     albumBuyers,
+    inCart: await cartKeys(),
   });
 }
 
@@ -60,6 +62,7 @@ export async function getForYou(mode: ForYouMode, hideHeard: boolean): Promise<F
       maxSupporters: settings.deepCutMaxSupporters,
       ignoreCompilations: settings.ignoreCompilations,
       hideHeard,
+      inCart: await cartKeys(),
     });
   }
   return computeForYou(db, me, {
@@ -69,6 +72,7 @@ export async function getForYou(mode: ForYouMode, hideHeard: boolean): Promise<F
     followingBoost: settings.followingBoost,
     ignoreCompilations: settings.ignoreCompilations,
     hideHeard,
+    inCart: await cartKeys(),
     now: Date.now(),
   });
 }
@@ -79,6 +83,7 @@ export async function getCrateMatesLatest(hideHeard: boolean): Promise<CrateMate
   return computeCrateMatesLatest(db, me, {
     topCrateMatesK: settings.topCrateMatesK,
     hideHeard,
+    inCart: await cartKeys(),
     now: Date.now(),
   });
 }

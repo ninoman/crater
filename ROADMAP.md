@@ -123,7 +123,7 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
 4. [x] Scoring runs in the service worker, re-scores every 5 fans scanned and pushes the results to the tab.
 5. [x] Sidebar UI: collapsible, docked right, in a shadow root.
    - header with scan progress ("32 / 48 supporters scanned")
-   - rows with cover, artist – title, label, reason line, and buttons for preview, wishlist, open and hide. Wishlist opens the release page for now: the logged-in wishlist call isn't captured yet (decisions §6)
+   - rows with cover, artist – title, label, reason line, and buttons for preview, wishlist, open and hide. Wishlist opens the release page for now: the logged-in wishlist call isn't captured yet (decisions §6). *Since 2026-11-11 the heart wishlists from the row, and a cart button replaced Open (decisions §28)*
    - preview in a Bandcamp `EmbeddedPlayer` iframe
    - "hide" saves a hidden-items set that the scorers respect
 6. [x] "Parser broken" state: if a `ParserError` comes up, show a clear message instead of an empty panel.
@@ -386,6 +386,19 @@ Design: decisions §23.
 10. [x] Fewer profile tabs: For you, Crate mates' latest and New from follows become sub-tabs of *for you*, each keeping its hash (decisions, *Profile tabs*).
 
 **Done when:** a week after following a few active labels, the tab lists their new releases newest first, muting one hides it, and the notification (when on) arrives once.
+
+## Wishlist and cart from recommendations (not MVP)
+
+**Goal:** wishlist or buy a pick without leaving the list. Design: decisions §28.
+
+1. [x] Capture the signed-in `collect_item_cb`, `uncollect_item_cb` and `cart/cb` requests; save the responses as fixtures.
+2. [x] `bandcamp/wishlist.ts` and `bandcamp/cart.ts`: the requests, the page's crumbs and cart, the cart's resync retry.
+3. [x] A session rule sets Bandcamp's Origin on these POSTs from the worker.
+4. [x] Heart and cart buttons on every recommendation row and beside the player's track title, optimistic, with the tag picker on a heart.
+5. [x] Leave what's in your cart out of every list.
+6. [x] Drop the row's Open and Scan supporters buttons; the player's stop becomes ×.
+
+**Done when:** a heart on a row or a playing track adds it to your Bandcamp wishlist with the tag picker open, a second click takes it off, the cart button adds the digital release and takes it out again, and a release in your cart is gone from For you after the next release page.
 
 ## List filters (removed)
 

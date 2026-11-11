@@ -5,6 +5,8 @@ import { type Dispatch, type SetStateAction, useCallback } from 'react';
 import type { ItemKey } from '../bandcamp';
 import type { HideScopes, HideTarget } from '../shared/hide';
 import { sendMessage } from '../shared/messages';
+import { type CartLines, useCartLines } from './useCartLines';
+import { useWishlistHearts, type WishlistHearts } from './useWishlistHearts';
 
 /** What every recommended row carries for hiding and heard. */
 export interface ActionableRow {
@@ -43,6 +45,10 @@ export interface RowActions {
    * when the player has already saved it.
    */
   setHeard: (matchKey: ItemKey, heard: boolean, save: boolean) => void;
+  /** The hearts on the rows and their player (decisions §6). */
+  wishlist: WishlistHearts;
+  /** The rows' cart buttons. */
+  cart: CartLines;
 }
 
 export function useRowActions<R extends ActionableRow, V extends RowsView<R>>(
@@ -76,5 +82,8 @@ export function useRowActions<R extends ActionableRow, V extends RowsView<R>>(
     [setView, onError],
   );
 
-  return { hide, setHeard };
+  const wishlist = useWishlistHearts();
+  const cart = useCartLines();
+
+  return { hide, setHeard, wishlist, cart };
 }

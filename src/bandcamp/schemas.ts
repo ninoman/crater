@@ -69,6 +69,8 @@ export const rawTralbum = z.object({
     title: z.string(),
     band_id: z.number(),
     album_id: z.number().nullish(),
+    /** The digital price in the seller's currency; the floor when it's name-your-price. */
+    minimum_price: z.number().nullish(),
   }),
   /** A track's own artist line: null on a normal album, set per track on a compilation. */
   trackinfo: z.array(z.object({ artist: z.string().nullish() })).nullish(),
@@ -194,4 +196,31 @@ export const rawFollowingPagedata = z.object({
     following_bands: z.record(z.string(), rawFollowee),
     following_fans: z.record(z.string(), rawFollowee),
   }),
+});
+
+/** `#js-crumbs-data`: per-endpoint CSRF tokens. Empty when logged out. */
+export const rawCrumbs = z.record(z.string(), z.string());
+
+/** What `collect_item_cb` and `uncollect_item_cb` answer. Only `error` is read. */
+export const rawCollectItemResponse = z.looseObject({ error: z.unknown().optional() });
+
+/** The cart as a page carries it (`data-cart`) and as `cart/cb` hands it back on a resync. */
+export const rawCart = z.looseObject({
+  sync_num: z.number().nullish(),
+  /** `item_type` is "a", "t" or "p" (a package); `id` is the cart line's. */
+  items: z
+    .array(z.looseObject({ id: z.number(), item_type: z.string(), item_id: z.number() }))
+    .nullish(),
+});
+
+/**
+ * What `cart/cb` answers. An add answers the new line's `id`. With `resync`, the request's
+ * `sync_num` was stale and nothing changed; `cart_data` is the cart as it stands.
+ */
+export const rawCartResponse = z.looseObject({
+  id: z.number().nullish(),
+  sync_num: z.number().nullish(),
+  resync: z.boolean().nullish(),
+  unexpected_error: z.unknown().optional(),
+  cart_data: rawCart.nullish(),
 });

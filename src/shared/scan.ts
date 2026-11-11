@@ -41,6 +41,3 @@ export interface ScannerStatus {
   /** "Try again" put the failed job back in the queue, and it hasn't run yet. */
   parserRetrying: boolean;
 }
-
-/** What queueing a release on request did: added, was already waiting, or its supporters are recent enough. */
-export type QueueReleaseStatus = 'queued' | 'already-queued' | 'fresh';

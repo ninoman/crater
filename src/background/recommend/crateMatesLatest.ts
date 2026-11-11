@@ -1,7 +1,7 @@
 // Crate mates' latest: what your top crate mates bought in the last weeks that you don't own, newest first,
 // dressed for display (decisions §11).
 
-import { artUrl, fanPageUrl, keyFromNumber } from '../../bandcamp';
+import { artUrl, fanPageUrl, type ItemKey, keyFromNumber } from '../../bandcamp';
 import {
   gatherCrateMatesLatest,
   getDisplayItems,
@@ -31,12 +31,14 @@ export interface CrateMatesLatestInput {
   /** Leave out releases you've heard, before the list is cut to length (decisions §22). */
   hideHeard: boolean;
   now: number;
+  /** Albums and tracks in your Bandcamp cart, left out like owned ones. */
+  inCart?: ReadonlySet<ItemKey>;
 }
 
 export async function computeCrateMatesLatest(
   db: CraterDb,
   me: MeRecord | undefined,
-  { topCrateMatesK, hideHeard, now }: CrateMatesLatestInput,
+  { topCrateMatesK, hideHeard, now, inCart }: CrateMatesLatestInput,
 ): Promise<CrateMatesLatestResult> {
   const empty = {
     rows: [],
@@ -54,6 +56,7 @@ export async function computeCrateMatesLatest(
   );
   const data = await gatherCrateMatesLatest(db, crateMateIds, me.fanId);
   const excluded = exclusions(data.mine, data.hidden, {
+    inCart,
     heard: hideHeard ? data.heard : undefined,
   });
   const picks = latestPurchases(

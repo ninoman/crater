@@ -1,4 +1,6 @@
 import { type ReactNode, useMemo, useState } from 'react';
+import { useCartLines } from '../../../hooks/useCartLines';
+import { useWishlistHearts } from '../../../hooks/useWishlistHearts';
 import { timeAgo } from '../../../shared/timeAgo';
 import type { CrateMateBuy, CrateMateRow, CrateMatesResult } from '../../../shared/crateMates';
 import {
@@ -27,6 +29,7 @@ import {
   type CrateMateSort,
 } from './crateMatesView';
 import { ReleasePreview } from '../../shared/ReleasePreview';
+import { HeartTagPrompt } from '../../shared/TagPrompt';
 import { CrateMateBuys } from './CrateMateBuys';
 
 type Column = TableColumn<CrateMateRow, CrateMateSort>;
@@ -185,6 +188,8 @@ export function CrateMatesBoard({
   const [query, setQuery] = useState('');
   const [sortedBy, setSortedBy] = useState<CrateMateSort>(DEFAULT_SORT.all);
   const [playing, setPlaying] = useState<Playing | null>(null);
+  const hearts = useWishlistHearts();
+  const cart = useCartLines();
   const boardRows = board === 'all' ? result.rows : result.latelyRows;
   const rows = useMemo(
     () => sortCrateMates(filterCrateMates(boardRows, query), sortedBy),
@@ -267,8 +272,10 @@ export function CrateMatesBoard({
               key={playing.buy.url}
               url={playing.buy.url}
               name={`${playing.buy.artist} – ${playing.buy.title}`}
+              shop={{ release: playing.buy, hearts, cart }}
             />
           </NowPlaying>
+          {hearts.prompt && <HeartTagPrompt prompt={hearts.prompt} close={hearts.closePrompt} />}
         </Dock>
       )}
       <p className="dh-profile__note">

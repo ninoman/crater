@@ -6,6 +6,7 @@ import { type FollowedAccount, useRecordFollow } from '../../hooks/useRecordFoll
 import { type FanCardPromptView, useFanCardTagPrompt } from '../../hooks/useFanCardTagPrompt';
 import { useTagPrompt } from '../../hooks/useTagPrompt';
 import { useTags } from '../../hooks/useTags';
+import type { WishlistPrompt } from '../../hooks/useWishlistHearts';
 import { AnchoredTagPicker } from '../../ui';
 import { itemTagHandlers, type TagHandlers, type TagMutations } from './tagActions';
 
@@ -28,6 +29,18 @@ export interface WishlistTagPromptProps {
 export function WishlistTagPrompt({ release, name }: WishlistTagPromptProps) {
   const prompt = useTagPrompt(document, release);
   return <ItemPromptPicker {...prompt} itemKey={release.itemKey} name={name} />;
+}
+
+/** The tag picker by a recommendation row's heart, after it added the release or a track of it. */
+export function HeartTagPrompt({ prompt, close }: { prompt: WishlistPrompt; close: () => void }) {
+  return (
+    <ItemPromptPicker
+      view={{ open: true, anchor: prompt.anchor }}
+      close={close}
+      itemKey={prompt.itemKey}
+      name={prompt.name}
+    />
+  );
 }
 
 /** Opens the tag picker by an item card when you wishlist it on someone's profile (§21). */

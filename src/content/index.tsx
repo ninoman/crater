@@ -9,12 +9,14 @@ import { mountProfile } from './profile/mountProfile';
 import { ReleaseSidebar } from './release/ReleaseSidebar';
 import { ReleaseTagPrompts } from './release/ReleaseTagPrompts';
 import sidebarCss from './release/ReleaseSidebar.css?inline';
+import { reportCart } from './reportCart';
 import { reportPage } from './reportPage';
 import { pageTagsStyles } from './shared/tagStyles';
 import { mountShadow } from './shared/mountShadow';
 import { pageTheme } from './shared/pageTheme';
 
 reportPage();
+reportCart();
 
 const kind = detectPageKind(document);
 switch (kind) {
