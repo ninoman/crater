@@ -36,7 +36,8 @@ import type { StepContext } from './context';
 import { needsFanScan, supportersAreFresh } from './freshness';
 import { rankSupporters } from './passZero';
 import { SEED, SEED_FANS } from './priority';
-import { rankSeedFansOnceListed } from './seedFans';
+import { ownReleaseProgress } from './seed';
+import { promoteFirstSeedFans, rankSeedFansOnceListed } from './seedFans';
 import { profileRulesOut } from './seedScreen';
 import { seedInCommonCutoff } from '../../scoring/supporterRank';
 
@@ -164,9 +165,15 @@ async function carryOn(
 ): Promise<ReleaseCursor | null> {
   const exhausted = cursor.thumbsToken === null && cursor.reviewsToken === null;
   if (!exhausted && cursor.collected < ctx.settings.supportersPerReleaseCap) return cursor;
-  if (job.priority === SEED) await rankSeedFansOnceListed(ctx.db, ctx.now, job.id);
+  if (job.priority === SEED) await seedListDone(ctx, job);
   else await rankSupporters(ctx.db, job.target);
   return null;
+}
+
+async function seedListDone(ctx: StepContext, job: ReleaseJob): Promise<void> {
+  await rankSeedFansOnceListed(ctx.db, ctx.now, job.id);
+  const me = await getMe(ctx.db);
+  if (me) await promoteFirstSeedFans(ctx.db, await ownReleaseProgress(ctx.db, me.fanId));
 }
 
 /**

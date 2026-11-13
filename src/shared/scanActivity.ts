@@ -2,8 +2,11 @@
 // list can show work in progress instead of a dead end.
 
 import type { ScannerStatus } from './scan';
+import type { SyncingActivity } from './sync';
 
 export type ScanActivity =
+  /** Your own collection is still syncing, so there's nothing to scan yet. */
+  | { kind: 'syncing'; sync: SyncingActivity }
   | { kind: 'scanning'; releases: { scanned: number; total: number }; fansRead: number }
   /** Work is queued but nothing is sent: paused, out of budget or backing off. */
   | { kind: 'stopped'; releases: { scanned: number; total: number }; fansRead: number }

@@ -2,8 +2,9 @@ import { useCrateMates } from '../../../hooks/useCrateMates';
 import { useScanActivity } from '../../../hooks/useScanActivity';
 import type { CrateMatesResult } from '../../../shared/crateMates';
 import type { ScanActivity } from '../../../shared/scanActivity';
-import { Button, EmptyState, SkeletonPeopleTable, WorkingState } from '../../../ui';
+import { Button, EmptyState, SkeletonPeopleTable } from '../../../ui';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
+import { SyncingCollection } from '../../shared/SyncingCollection';
 import { ScanningProgress } from '../../shared/ScanningProgress';
 import { BOARD_ROWS, CrateMatesBoard } from './CrateMatesBoard';
 
@@ -62,9 +63,7 @@ function NoCrateMates({ result, activity }: NoCrateMatesProps) {
         />
       );
     case 'unsynced':
-      return (
-        <WorkingState title="Syncing your collection" line="Crate mates are found once it's in." />
-      );
+      return <SyncingCollection then="Crate mates are found once it's in." />;
     case 'ready':
       return (
         <FindingCrateMates

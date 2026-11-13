@@ -141,6 +141,26 @@ export async function rankFanJobs(db: CraterDb, ranks: Map<number, number>): Pro
   });
 }
 
+/** Moves fan jobs that haven't started to `priority`, in the order given. */
+export async function promoteFans(
+  db: CraterDb,
+  fanIds: readonly number[],
+  priority: number,
+): Promise<void> {
+  if (fanIds.length === 0) return;
+  const ranks = new Map(fanIds.map((fanId, i) => [fanId, i + 1]));
+  await db.transaction('rw', db.queue, async () => {
+    await db.queue
+      .where('[kind+target]')
+      .anyOf(fanIds.map((fanId) => ['fan', `${fanId}`]))
+      .filter((job) => job.cursor === null)
+      .modify((job) => {
+        job.priority = priority;
+        job.rank = ranks.get(Number(job.target)) ?? job.rank;
+      });
+  });
+}
+
 /** Fans whose scan waits at `priority` and hasn't started, in queue order. */
 export async function waitingFans(db: CraterDb, priority: number): Promise<number[]> {
   const jobs = await db.queue

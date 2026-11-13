@@ -77,11 +77,14 @@ async function runSync(requested: SyncMode): Promise<void> {
       me,
       mode,
     );
-    activity = { state: 'idle' };
+    // Still syncing while the scanner is seeded, so a tab never sees the sync done and the queue
+    // empty, which reads as "nothing to scan".
+    if (activity.state === 'syncing') activity = { ...activity, step: 'seeding' };
     refreshCrateMates();
     await afterSync({ me, mode, added }).catch((error: unknown) =>
       console.error('crater: after-sync step failed', error),
     );
+    activity = { state: 'idle' };
   } catch (error) {
     console.error('crater: sync failed', error);
     activity = { state: 'error', message: error instanceof Error ? error.message : String(error) };

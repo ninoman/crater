@@ -5,6 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { CrateMateRow, CrateMatesResult } from '../../../shared/crateMates';
 import type { ScannerStatus } from '../../../shared/scan';
+import type { SyncActivity, SyncStatus } from '../../../shared/sync';
 import { CrateMatesTab } from './CrateMatesTab';
 
 const empty: CrateMatesResult = {
@@ -16,6 +17,18 @@ const empty: CrateMatesResult = {
   computedAt: null,
   fansRead: 0,
 };
+
+function syncStatus(activity: SyncActivity): SyncStatus {
+  return {
+    state: 'known',
+    username: 'me',
+    owned: 0,
+    wishlisted: 0,
+    followed: 0,
+    syncedAt: null,
+    activity,
+  };
+}
 
 function scanner(patch: Partial<ScannerStatus> = {}): ScannerStatus {
   return {
@@ -54,6 +67,7 @@ const mate: CrateMateRow = {
 
 let board: CrateMatesResult;
 let status: ScannerStatus;
+let sync: SyncStatus;
 let crateMateFetches: number;
 
 function stubWorker() {
@@ -66,6 +80,7 @@ function stubWorker() {
           return { ok: true, data: board };
         }
         if (message.type === 'getScannerStatus') return { ok: true, data: status };
+        if (message.type === 'getSyncStatus') return { ok: true, data: sync };
         return { ok: false, error: `not faked: ${message.type}` };
       },
       onMessage: {
@@ -99,6 +114,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   status = scanner();
+  sync = syncStatus({ state: 'idle' });
   board = empty;
   stubWorker();
   container = document.createElement('div');
@@ -114,11 +130,13 @@ afterEach(() => {
 });
 
 describe('CrateMatesTab', () => {
-  it('waits on the scan without a bar, and asks again as more fans are read', async () => {
+  it('counts the supporter lists read, and asks again as more fans are read', async () => {
     await render();
     expect(text()).toContain('Finding your crate mates');
-    // A bar out of 903 would read as "nothing until all 903 are scanned".
-    expect(container.querySelector('[role="progressbar"]')).toBeNull();
+    expect(text()).toContain('Read 12 of 903 releases');
+    expect(container.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe(
+      '12',
+    );
     expect(crateMateFetches).toBe(1);
 
     await poll();
@@ -127,6 +145,39 @@ describe('CrateMatesTab', () => {
     status = scanner({ fansScanned: 41 });
     await poll();
     expect(crateMateFetches).toBe(2);
+  });
+
+  it('counts the fans compared once the lists the first fans wait for are in', async () => {
+    status = scanner({ ownReleases: { scanned: 150, total: 903 } });
+    await render();
+    expect(text()).toContain('40 fans compared so far');
+  });
+
+  it('counts what the sync has read while it runs, and never flashes the empty view', async () => {
+    board = { ...empty, basis: 'unsynced' };
+    sync = syncStatus({
+      state: 'syncing',
+      mode: 'full',
+      step: 'collection',
+      itemsFetched: 640,
+      followingFetched: 0,
+    });
+    await render();
+    expect(text()).toContain('640 items read so far');
+
+    // The sync has stored your collection but is still queuing releases: not "nothing to scan".
+    board = { ...empty };
+    status = scanner({ queued: { release: 0, fan: 0 } });
+    sync = syncStatus({
+      state: 'syncing',
+      mode: 'full',
+      step: 'seeding',
+      itemsFetched: 903,
+      followingFetched: 0,
+    });
+    await poll();
+    expect(text()).toContain('Lining up your releases to scan');
+    expect(text()).not.toContain('No crate mates yet');
   });
 
   it('shows the scan next to the board once there are crate mates, and keeps fetching', async () => {

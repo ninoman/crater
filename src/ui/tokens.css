@@ -84,6 +84,7 @@
   --dh-record-size: 48px;
   --dh-working-width: 280px;
   --dh-inline-progress-width: 12rem;
+  --dh-working-progress-width: 20rem;
   --dh-skeleton-name-width: 96px;
 
   --dh-z-panel: 2147483000;

@@ -8,7 +8,7 @@ import { fullStep, quickStep } from './fanCollectionStep';
 import { latestStep } from './fanLatestStep';
 import { profileStep } from './fanProfileStep';
 import { seedFirstStep } from './seedFanStep';
-import { SEED } from './priority';
+import { SEED_FIRST_FANS } from './priority';
 
 export { fanIdOf };
 
@@ -31,7 +31,7 @@ export async function runFanStep(ctx: StepContext, job: FanJob): Promise<StepRes
  * screened instead. Logged out, the profile has no count, so the quick read comes first.
  */
 async function firstStep(ctx: StepContext, job: FanJob): Promise<StepResult> {
-  if (job.priority >= SEED) return seedFirstStep(ctx, job);
+  if (job.priority >= SEED_FIRST_FANS) return seedFirstStep(ctx, job);
   if (!(await getMe(ctx.db))) return quickStep(ctx, job);
   return profileStep(ctx, job);
 }
