@@ -32,6 +32,12 @@
   --dh-color-on-tooltip: #ffffff;
   --dh-color-overlay: rgba(0, 0, 0, 0.35);
   --dh-color-on-overlay: #ffffff;
+  /* Dragging a card and saving the order, in the colours of Bandcamp's own collection grid. */
+  --dh-color-drag-handle-border: rgba(6, 135, 245, 0.5);
+  --dh-color-drag-outline: rgba(0, 155, 242, 0.5);
+  --dh-color-drag-placeholder: rgba(0, 0, 0, 0.25);
+  --dh-color-toast-bg: rgba(0, 0, 0, 0.5);
+  --dh-color-on-toast: #ffffff;
 
   /* Tag colours, picked by tag id (see tag.ts). Chips are filled with these and carry
      --dh-color-on-tag text, so they read the same on light and dark pages.
@@ -76,6 +82,10 @@
   --dh-picker-list-height: 200px;
   --dh-menu-width: 200px;
   --dh-heard-opacity: 0.45;
+  --dh-drag-handle-size: 29px;
+  --dh-drag-handle-hit: 45px;
+  --dh-drag-opacity: 0.75;
+  --dh-spinner-size: 12px;
   --dh-duration: 120ms;
   --dh-duration-reveal: 180ms;
   --dh-duration-shimmer: 1400ms;

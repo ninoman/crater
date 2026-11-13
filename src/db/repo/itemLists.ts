@@ -4,6 +4,8 @@
 
 import type { ItemKey } from '../../bandcamp';
 import type { CraterDb, ItemRecord, ItemTagsRecord, OwnershipRecord } from '../schema';
+import { orderRanks } from '../collectionOrder';
+import { getCollectionOrder } from './collectionOrder';
 import { fanRows, fanRowsFor, ownershipTables } from './ownershipStore';
 import { getItemList } from './items';
 
@@ -19,7 +21,10 @@ export interface OwnedRow {
   tagIds: number[];
 }
 
-/** Your wishlist or collection, newest first. Items whose metadata we lack are left out. */
+/**
+ * Your wishlist newest first, or your collection in the order you gave it on Bandcamp, with any
+ * item the order doesn't know yet first (decisions §29). Items whose metadata we lack are left out.
+ */
 export async function listOwnedItems(
   db: CraterDb,
   fanId: number,
@@ -27,8 +32,9 @@ export async function listOwnedItems(
 ): Promise<OwnedRow[]> {
   return db.transaction(
     'r',
-    [...ownershipTables(db), db.items, db.bands, db.itemTags],
+    [...ownershipTables(db), db.items, db.bands, db.itemTags, db.collectionOrder],
     async () => {
+      const order = source === 'collection' ? await getCollectionOrder(db, fanId) : null;
       const owned = (await fanRows(db, fanId)).filter((row) => row.source === source);
       const keys = owned.map((row) => row.itemKey);
       const [items, tags] = await Promise.all([getItemList(db, keys), db.itemTags.bulkGet(keys)]);
@@ -39,9 +45,16 @@ export async function listOwnedItems(
           { item, matchKey: row.matchKey, addedAt: row.addedAt, tagIds: tags[i]?.tagIds ?? [] },
         ];
       });
-      return rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
+      const newest = rows.sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0));
+      return order ? inOrder(newest, orderRanks(order)) : newest;
     },
   );
+}
+
+/** Ranked rows by rank, after the unranked ones, which keep their order. Stable. */
+function inOrder(rows: OwnedRow[], ranks: Map<ItemKey, number>): OwnedRow[] {
+  const rank = (row: OwnedRow) => ranks.get(row.item.itemKey) ?? -1;
+  return rows.sort((a, b) => rank(a) - rank(b));
 }
 
 /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */

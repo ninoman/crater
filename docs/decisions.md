@@ -597,7 +597,7 @@ The same tags as §8, on the releases in your wishlist, with the same filter (al
 - **All ours, in one shadow root.** Following cards had to stay light DOM for Bandcamp's follow handler (§8). Wishlist rows don't need any Bandcamp handler, so the whole list is our own `Card`s in a grid, inside one shadow root placed before Bandcamp's hidden list. No Bandcamp markup is copied, so its delegated handlers on collection items can't misfire on ours. The cost: no heart button to un-wishlist from the list; do that on the release page.
 - **Lazy takeover:** the list is taken over the first time the tab opens, then stays mounted, filters and selection included. Bandcamp's own list comes back while ours can't stand in (worker unreachable, or empty and the sync hasn't finished, has failed, or hasn't seen you log in). The same rules as §8, from the shared `syncEmpty.ts`.
 - **Grid, like Bandcamp's own:** `CardGrid` of `Card`s, `auto-fill` columns of at least 180px. We first built rows; a grid keeps the wishlist looking like the rest of Bandcamp's fan page.
-- **Each card:** big playable cover (our own preview player, one open at a time) with a select box top-left and "open in a new tab" top-right on hover, then the title linking to the release, artist and "added 3 Oct 2026", then the tags and "+ tag". An open preview plays in a player docked at the bottom of the window, like Bandcamp's own list player, with the bulk bar stacked above it in one `Dock`. Filtering re-renders the list rather than hiding cards, since no Bandcamp state lives in them.
+- **Each card:** big playable cover (our own preview player, one open at a time) with a select box top-left, then the title linking to the release, artist and "added 3 Oct 2026", then the tags and "+ tag". An open preview plays in a player docked at the bottom of the window, like Bandcamp's own list player, with the bulk bar stacked above it in one `Dock`. Filtering re-renders the list rather than hiding cards, since no Bandcamp state lives in them.
 - **Shared with the following tab:** `TagEditor`, `FilterControls`, `BulkBar`, the tag-bar CSS, `tagActions.ts` (`followTagHandlers`, `itemTagHandlers`) and the pure `tagFilter.ts`, which works over any rows through key, tags and text accessors.
 - **Release pages:** when the release is in your wishlist, the sidebar shows "In your wishlist" with its tags and "+ tag", under the artist's tags (§8). Only the exact item: wishlisting an album doesn't tag its track pages.
 - **Gap:** Bandcamp's own wishlist search box (`#wishlist-controls`) is left as it is and searches Bandcamp's list, not ours.
@@ -1165,7 +1165,7 @@ Every recommendation row (Also bought, For you, Crate mates' latest, New from fo
 - **Three things a browser page gets for free**, found one failure at a time:
   1. `X-Requested-With: XMLHttpRequest`, or every one of these answers HTTP 400 "oops".
   2. **bandcamp.com, not the artist's subdomain.** From the extension, the subdomain answers "request must use the base domain".
-  3. **Bandcamp's Origin.** Chrome stamps extension requests `Origin: chrome-extension://<id>`, which Bandcamp reads as an unknown custom domain. `fetch` can't set Origin, so a declarativeNetRequest session rule (`declarativeNetRequestWithHostAccess`, no new install warning) sets `Origin` and `Referer` to bandcamp.com. It matches only these three endpoints, POSTs, and requests from no tab (the worker), so Bandcamp's own pages are untouched.
+  3. **Bandcamp's Origin.** Chrome stamps extension requests `Origin: chrome-extension://<id>`, which Bandcamp reads as an unknown custom domain. `fetch` can't set Origin, so a declarativeNetRequest session rule (`declarativeNetRequestWithHostAccess`, no new install warning) sets `Origin` and `Referer` to bandcamp.com. It matches only these endpoints (and, since §29, `collection_reorder_cb`), POSTs, and requests from no tab (the worker), so Bandcamp's own pages are untouched.
 
 ### Behaviour
 
@@ -1174,4 +1174,33 @@ Every recommendation row (Also bought, For you, Crate mates' latest, New from fo
 - **Cart:** the digital release at `minimum_price`, the price for fixed-price releases and the floor of name-your-price ones. A release with no price (free, or name-your-price from 0) opens its page instead, since a free item can't go in the cart. Physical formats need a choice and shipping, so they stay on Bandcamp's page. A row linking to a track of the album wanted reads the album's page for its price.
 - **What's in your cart is left out of every list**, like wishlisted releases (`exclusions`, `inCart`). A track in the cart keeps its album in. Our copy (`cartStore`, session storage) comes from three places: any release or band page you open (its `data-cart`), and our own adds and removals. A fan page has no `data-cart`, so something added on Bandcamp only drops out of the profile tabs after the next release or band page.
 - **Hearts and cart buttons start off**, since lists leave out what's in your wishlist and cart. A row you just changed keeps its filled button until the list reloads, then drops out.
+
+## 29. Collection order and drag to reorder
+
+Decided and built 2026-11-13. Code: `bandcamp/collectionReorder.ts`, `db/collectionOrder.ts` (pure), `db/repo/collectionOrder.ts`, `background/syncMe.ts`, `hooks/useCollectionReorder.ts`, `ui/useSortableGrid.ts`, `ui/sortableGrid.ts` (pure), `ui/SortableCardGrid.tsx`, `ui/DragHandle.tsx`, `ui/Toast.tsx`, schema v22. Tested on fixtures and in jsdom; **not yet tried on a live account**.
+
+### Why
+
+Users reported that our collection tab ignored the order they set on Bandcamp. Bandcamp keeps that order on its server, and `collection_items` pages in it (`token` is the sort key). We threw it away by sorting on the purchase date (§24).
+
+### How Bandcamp does it
+
+Read 2026-11-13 from its public scripts (`collection_owner-*.js`, `global_foot2-*.js`) and stylesheet (`collection_owner-*.css`):
+
+- **Only your own main collection** sorts (`ol.collection-grid.editable`, `is_own_collection && is_main_collection`). The wishlist doesn't.
+- **jQuery UI sortable:** `handle: ".drag-thumb"`, `tolerance: "pointer"`, `revert: 100`, `opacity: .75`, `placeholder: "placeholder"`, `scrollSensitivity: 100`, `scrollSpeed: 60`. The handle is a 29 px white box with a blue edge in the card's top-right corner, shown on hover. The placeholder is a dark translucent box with a dashed blue outline.
+- **Saving:** 3 s after the last drop, `Crumb.ajax` POSTs `/collection_reorder_cb` with `fan_id` and `ids` (jQuery's form encoding: `ids[]` repeated) holding every entry's `data-itemid` (`item_id`) in the new order, plus `crumb`. An expired crumb answers `{error: "invalid_crumb", crumb}` and is retried twice with the new one. Meanwhile "saving collection order…" shows bottom-left and leaving the page asks first.
+- **Over 1,000 items** it refuses: "Sorting is not supported on collections over 1000 items."
+
+### What we do
+
+- **The order is stored apart from ownership**, in `collectionOrder` (one record per fan): every entry's `item_id` and release, subscriptions included (release null), so a reorder can send them all back. Packing it into `fanOwnership` (§27) would have changed every fan's record for something only you have.
+- **Sync:** a full sync stores the whole order. An incremental sync puts the pages it read on top and keeps the rest (`mergeTopOfOrder`); it also keeps the all-known page it stops at, so a release moved into the top page counts. With no stored order the collection syncs in full, so existing users get one on their next sync. `item_id` is optional in the schema, falling back to `tralbum_id` (the same for albums and tracks), so a change to it can't stop scans.
+- **Listing:** `listOwnedItems` sorts the collection by the stored order, with anything it doesn't know yet first, newest first. The wishlist stays newest first.
+- **No "open in a new tab" button** on wishlist and collection cards any more (removed 2026-11-13): the handle took its corner, and the title links to the release.
+- **Reordering:** each card gets Bandcamp's handle. Drag it, or focus it and press Space, move with the arrow keys (Home/End too), and Space again; Escape puts it back. The list shows the new order at once; 3 s after the last drop the worker reads your fan page signed in for the crumb and posts every entry, the moved releases in their new order and subscriptions in their places (`reorderEntries`). Releases gone from your collection since the last full sync aren't sent. Only on success is the order stored. A failure puts the list back and says why. "Saving collection order…" shows bottom-left meanwhile, and leaving the page asks first.
+- **No handles** while a filter or search hides part of the list (a drop's place among hidden releases means nothing), while the first sync is still reading the collection, or over 1,000 items (a note says why). The worker refuses those too.
+- **Paging:** the grid renders 120 cards at a time (§24). A drop orders the rendered ones; the rest keep their order after them. Scrolling to the bottom while dragging loads the next page as usual.
+- **Our own sortable, not a library.** Adding dnd-kit was blocked in the session that built this, and a small hook could match jQuery UI's feel exactly: cards jump rather than slide, the copy follows the pointer at 75%, and settles in 100 ms. It's split into pure geometry (`sortableGrid.ts`) and the hook.
+- **Session Origin rule** (§28) now covers `collection_reorder_cb` too.
 

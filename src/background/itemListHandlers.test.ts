@@ -2,7 +2,15 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { CollectionItem, FetchJson, FetchText } from '../bandcamp';
 import { fixtureText } from '../../tests/fixtures';
-import { createTag, CraterDb, putOwnership, saveViewer, upsertCollectionItems } from '../db';
+import {
+  createTag,
+  CraterDb,
+  getCollectionOrder,
+  putCollectionOrder,
+  putOwnership,
+  saveViewer,
+  upsertCollectionItems,
+} from '../db';
 import { itemListHandlers, type ItemListHandlers } from './itemListHandlers';
 import { ownershipRow } from '../../tests/ownership';
 
@@ -45,6 +53,59 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await db.delete();
+});
+
+describe('reorderCollection', () => {
+  const OWNED: CollectionItem[] = [
+    { ...ITEM, itemKey: 'a10' },
+    { ...ITEM, itemKey: 'a20' },
+  ];
+
+  beforeEach(async () => {
+    await saveViewer(db, { fanId: ME, username: 'randoom_taker' });
+    await upsertCollectionItems(db, OWNED);
+    await putOwnership(db, ME, OWNED, 'collection');
+  });
+
+  it('isn’t possible before a sync has read the order', async () => {
+    expect(await h.reorderCollection({ itemKeys: ['a20', 'a10'] }, sender)).toEqual({
+      status: 'not-synced',
+    });
+  });
+
+  it('saves every entry on Bandcamp, then here', async () => {
+    await putCollectionOrder(db, ME, [
+      { itemId: 10, itemKey: 'a10' },
+      { itemId: 5, itemKey: null },
+      { itemId: 20, itemKey: 'a20' },
+      // Gone from your collection since the last full sync: not sent back.
+      { itemId: 30, itemKey: 'a30' },
+    ]);
+    fetchText.mockResolvedValue(fixtureText('me-fan-page.html'));
+    fetchJson.mockResolvedValue({ ok: true });
+
+    expect(await h.reorderCollection({ itemKeys: ['a20', 'a10'] }, sender)).toEqual({
+      status: 'done',
+    });
+
+    const body = new URLSearchParams(fetchJson.mock.calls[0]?.[0].init.body as string);
+    expect(body.getAll('ids[]')).toEqual(['20', '5', '10']);
+    expect((await getCollectionOrder(db, ME))?.map((entry) => entry.itemId)).toEqual([20, 5, 10]);
+  });
+
+  it('keeps the stored order when Bandcamp gave no session', async () => {
+    const stored = [
+      { itemId: 10, itemKey: 'a10' as const },
+      { itemId: 20, itemKey: 'a20' as const },
+    ];
+    await putCollectionOrder(db, ME, stored);
+    fetchText.mockResolvedValue(fixtureText('fan-page.html'));
+
+    expect(await h.reorderCollection({ itemKeys: ['a20', 'a10'] }, sender)).toEqual({
+      status: 'signed-out',
+    });
+    expect(await getCollectionOrder(db, ME)).toEqual(stored);
+  });
 });
 
 describe('item list handlers', () => {

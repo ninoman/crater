@@ -66,10 +66,20 @@ describe('parseCollectionPage', () => {
     expect(page.nextToken).toBe('1788634572:5741628:s::');
   });
 
+  it('keeps every entry in Bandcamp’s order, subscriptions included', () => {
+    const page = parseCollectionPage(fixtureJson('collection_items-subscription.json'));
+
+    expect(page.order).toEqual([
+      { itemId: 792094440, itemKey: 'a792094440' },
+      { itemId: 2828211009, itemKey: 'a2828211009' },
+      { itemId: 5741628, itemKey: null },
+    ]);
+  });
+
   it('returns an empty page for an unknown fan', () => {
     const page = parseCollectionPage(fixtureJson('collection_items-unknown-fan.json'));
 
-    expect(page).toEqual({ items: [], moreAvailable: false, nextToken: null });
+    expect(page).toEqual({ items: [], order: [], moreAvailable: false, nextToken: null });
   });
 
   it('throws BandcampApiError for a bad token or a hidden wishlist', () => {

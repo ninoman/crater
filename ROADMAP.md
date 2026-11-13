@@ -224,6 +224,7 @@ Design: decisions §14.
 6. [x] ~~Bandcamp Friday shortlist~~. Removed the same day (decisions §24).
 7. [x] CSV export of the wishlist, the collection and a For you list, from the popup (`shared/csv.ts`, `exportCsv.ts`).
 8. [ ] Try both tabs on live pages with Bandcamp's own JS running, and a collection of thousands (check the first render and the message size).
+9. [x] Keep your collection in the order you set on Bandcamp, and drag cards to reorder it, saved back to Bandcamp (decisions §29). Not yet tried on a live account.
 
 **Done when:** tags survive a re-sync and a purchase, and a CSV opens in a spreadsheet with its accents intact.
 

@@ -1,0 +1,17 @@
+/* The copy of a card that follows the pointer, at jQuery UI's opacity on Bandcamp's grid. */
+.dh-sortable-overlay {
+  position: fixed;
+  z-index: var(--dh-z-panel);
+  opacity: var(--dh-drag-opacity);
+  pointer-events: none;
+}
+
+.dh-card-grid--overlay {
+  grid-template-columns: 1fr;
+  padding: 0;
+}
+
+.dh-card-grid--dragging {
+  user-select: none;
+  cursor: move;
+}

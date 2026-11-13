@@ -98,6 +98,13 @@ export const PreviousIcon = () => (
   </Icon>
 );
 
+/** Four arrows, like the handle on Bandcamp's own collection cards. */
+export const MoveIcon = () => (
+  <Icon>
+    <path d="M8 1.5v13M1.5 8h13M6 3.5l2-2 2 2M6 12.5l2 2 2-2M3.5 6l-2 2 2 2M12.5 6l2 2-2 2" />
+  </Icon>
+);
+
 export const ReorderIcon = () => (
   <Icon>
     <path d="M5 13V3M2.5 5.5 5 3l2.5 2.5M11 3v10M8.5 10.5 11 13l2.5-2.5" />

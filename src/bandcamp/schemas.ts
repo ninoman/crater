@@ -7,6 +7,11 @@ const apiError = z.object({ error: z.literal(true) });
 
 export const rawCollectionItem = z.object({
   item_type: z.string(),
+  /**
+   * Bandcamp's id for the entry, which the collection's reorder POST sends back (decisions §29).
+   * Optional so a change to it can't stop scans, which don't need it.
+   */
+  item_id: z.number().nullish(),
   tralbum_id: z.number(),
   /** 'a' or 't' for releases; subscriptions use 's'. */
   tralbum_type: z.string(),
@@ -203,6 +208,12 @@ export const rawCrumbs = z.record(z.string(), z.string());
 
 /** What `collect_item_cb` and `uncollect_item_cb` answer. Only `error` is read. */
 export const rawCollectItemResponse = z.looseObject({ error: z.unknown().optional() });
+
+/** `collection_reorder_cb`'s answer. An expired crumb is `{error: "invalid_crumb", crumb}`. */
+export const rawReorderResponse = z.looseObject({
+  error: z.unknown().optional(),
+  crumb: z.string().optional(),
+});
 
 /** The cart as a page carries it (`data-cart`) and as `cart/cb` hands it back on a resync. */
 export const rawCart = z.looseObject({

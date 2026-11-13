@@ -1,15 +1,7 @@
 import { memo } from 'react';
 import type { ItemKey } from '../../bandcamp';
 import type { ListedItem, ListSource } from '../../shared/itemList';
-import {
-  Card,
-  Checkbox,
-  ExternalIcon,
-  LinkButton,
-  PlayableCover,
-  type TagOption,
-  Tooltip,
-} from '../../ui';
+import { Card, Checkbox, PlayableCover, type SortableSlot, type TagOption } from '../../ui';
 import { itemTagHandlers, type TagMutations } from '../shared/tagActions';
 import { TagEditor } from '../shared/TagEditor';
 import { cardMeta } from './itemCardText';
@@ -21,6 +13,8 @@ export interface ItemCardProps {
   mutations: TagMutations;
   selected: boolean;
   previewing: boolean;
+  /** Its drag handle and state in a sortable grid; null when the list can't be reordered. */
+  sortable?: SortableSlot | null;
   onSelect: (itemKey: ItemKey, selected: boolean) => void;
   onPreview: (itemKey: ItemKey, open: boolean) => void;
   onError: (message: string) => void;
@@ -37,6 +31,7 @@ export const ItemCard = memo(function ItemCard({
   mutations,
   selected,
   previewing,
+  sortable = null,
   onSelect,
   onPreview,
   onError,
@@ -45,6 +40,9 @@ export const ItemCard = memo(function ItemCard({
   const handlers = itemTagHandlers(mutations, [item.itemKey], item.tagIds, onError);
   return (
     <Card
+      ref={sortable?.ref}
+      handle={sortable?.handle}
+      dragState={sortable?.dragState}
       media={
         <PlayableCover
           src={item.coverUrl}
@@ -61,20 +59,6 @@ export const ItemCard = memo(function ItemCard({
           checked={selected}
           onChange={(checked) => onSelect(item.itemKey, checked)}
         />
-      }
-      actions={
-        <Tooltip content="Open in a new tab">
-          <LinkButton
-            variant="ghost"
-            icon
-            href={item.url}
-            target="_blank"
-            rel="noopener"
-            aria-label={`Open ${name} in a new tab`}
-          >
-            <ExternalIcon />
-          </LinkButton>
-        </Tooltip>
       }
       title={
         <a href={item.url} title={name}>

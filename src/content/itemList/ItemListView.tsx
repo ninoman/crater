@@ -1,12 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { ItemKey } from '../../bandcamp';
+import { type ItemKey, MAX_REORDER_ITEMS } from '../../bandcamp';
 import { notifyFollowingChanged } from '../../hooks/followingChanges';
+import { useCollectionReorder } from '../../hooks/useCollectionReorder';
 import { useListItems } from '../../hooks/useListItems';
 import { useSyncReload } from '../../hooks/useSyncReload';
 import { useTags } from '../../hooks/useTags';
 import type { Tag } from '../../shared/following';
 import type { ListedItem } from '../../shared/itemList';
-import { Button, CardGrid, Dock, EmptyState, LoadMore, Notice, NowPlaying } from '../../ui';
+import {
+  Button,
+  Dock,
+  EmptyState,
+  LoadMore,
+  Notice,
+  NowPlaying,
+  SortableCardGrid,
+  Toast,
+} from '../../ui';
 import { BulkBar } from '../shared/BulkBar';
 import { FilterControls } from '../shared/FilterControls';
 import { ReleasePreview } from '../shared/ReleasePreview';
@@ -20,6 +30,8 @@ import type { ListConfig } from './lists';
 
 const NO_ITEMS: readonly ListedItem[] = [];
 const NO_TAGS: Tag[] = [];
+const itemKeyOf = (item: ListedItem) => item.itemKey;
+const nameOf = (item: ListedItem) => `${item.artist} – ${item.title}`;
 /** Cards rendered at a time. A 2,000-item list all at once is ~60k elements. */
 const PAGE_SIZE = 120;
 
@@ -41,7 +53,11 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
   const tagsQuery = useTags();
   const { create, assign, assignItems } = tagsQuery;
   const mutations = useMemo(() => ({ create, assign, assignItems }), [create, assign, assignItems]);
-  const items = view.state === 'ready' ? view.data : NO_ITEMS;
+  const loaded = view.state === 'ready' ? view.data : NO_ITEMS;
+  const [error, setError] = useState<string | null>(null);
+  // Only the collection has an order of its own on Bandcamp; the wishlist is newest first.
+  const reordering = useCollectionReorder(loaded, setError);
+  const items = source === 'collection' ? reordering.items : loaded;
   const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
   const sync = useSyncReload(open, list.countOf);
   const stillSyncing = sync.state === 'ready' && syncingStep(sync.status, list.step);
@@ -60,7 +76,22 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
   const rendered = useMemo(() => shown.slice(0, limit), [shown, limit]);
   const [selected, setSelected] = useState<ReadonlySet<ItemKey>>(new Set());
   const [previewing, setPreviewing] = useState<ItemKey | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Like Bandcamp's grid: the whole list, so not while a filter hides some of it.
+  const tooBig = items.length > MAX_REORDER_ITEMS;
+  const sortable = source === 'collection' && !isFiltering(filter) && !stillSyncing && !tooBig;
+  const { reorder } = reordering;
+  const onReorder = useCallback(
+    (keys: ItemKey[]) => {
+      setError(null);
+      // The grid holds the cards shown so far; the rest keep their order after them.
+      const moved = new Set(keys);
+      reorder([
+        ...keys,
+        ...items.flatMap((item) => (moved.has(item.itemKey) ? [] : [item.itemKey])),
+      ]);
+    },
+    [items, reorder],
+  );
 
   // Ours can't stand in for Bandcamp's list until it has loaded; an empty list decides itself.
   useEffect(() => {
@@ -132,6 +163,12 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
                 they arrive.
               </p>
             )}
+            {source === 'collection' && tooBig && !isFiltering(filter) && (
+              <p className="dh-tag-bar__note">
+                Bandcamp doesn’t sort collections over {MAX_REORDER_ITEMS.toLocaleString()} items,
+                so these can’t be dragged into a new order.
+              </p>
+            )}
             {tags.length === 0 && (
               <p className="dh-tag-bar__note">
                 No tags yet. Use “+ tag” on a release to make your first, or check a few to tag them
@@ -156,8 +193,14 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
       </section>
       {shown.length > 0 && (
         <div className="dh-itemlist__list">
-          <CardGrid label={`Your ${noun}`}>
-            {rendered.map((item) => (
+          <SortableCardGrid
+            label={`Your ${noun}`}
+            items={rendered}
+            getId={itemKeyOf}
+            describe={nameOf}
+            enabled={sortable}
+            onReorder={onReorder}
+            renderCard={(item, slot) => (
               <ItemCard
                 key={item.itemKey}
                 item={item}
@@ -166,18 +209,20 @@ export function ItemListView({ list, open, showBandcampList }: ItemListViewProps
                 mutations={mutations}
                 selected={selected.has(item.itemKey)}
                 previewing={previewing === item.itemKey}
+                sortable={slot}
                 onSelect={onSelect}
                 onPreview={onPreview}
                 onError={setError}
               />
-            ))}
-          </CardGrid>
+            )}
+          />
           <LoadMore
             remaining={shown.length - rendered.length}
             onMore={() => setLimit((current) => current + PAGE_SIZE)}
           />
         </div>
       )}
+      {reordering.saving && source === 'collection' && <Toast busy>Saving collection order…</Toast>}
       {(picked.length > 0 || nowPlaying) && (
         <Dock>
           {picked.length > 0 && (

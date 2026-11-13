@@ -56,4 +56,10 @@ export {
   setInCart,
 } from './cart';
 export { parseWishlistPage, setWishlisted, type WishlistChange } from './wishlist';
+export {
+  type CollectionReorder,
+  MAX_REORDER_ITEMS,
+  parseReorderCrumb,
+  saveCollectionOrder,
+} from './collectionReorder';
 export type * from './types';

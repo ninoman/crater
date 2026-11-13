@@ -1,9 +1,17 @@
 // Message handlers for your wishlist and collection lists and the tags on their items. The
 // rules live in the repos.
 
-import { artUrl, setWishlisted, type FetchJson, type FetchText, keyToNumber } from '../bandcamp';
+import {
+  artUrl,
+  type FetchJson,
+  type FetchText,
+  keyToNumber,
+  saveCollectionOrder,
+  setWishlisted,
+} from '../bandcamp';
 import {
   assignItemTag,
+  getCollectionOrder,
   getCrateMates,
   getItemTags,
   getMe,
@@ -11,6 +19,9 @@ import {
   listOwnedItems,
   markUnwishlisted,
   markWishlisted,
+  ownedItemKeys,
+  putCollectionOrder,
+  reorderEntries,
   type CraterDb,
   type OwnedRow,
 } from '../db';
@@ -24,6 +35,7 @@ import { ensureSessionOrigin } from './sessionOrigin';
 export type ItemListHandlers = Pick<
   MessageHandlers,
   | 'listItems'
+  | 'reorderCollection'
   | 'getItemTags'
   | 'assignItemTag'
   | 'markWishlisted'
@@ -73,6 +85,25 @@ export function itemListHandlers(
           crateMateOwners: owners[i] ?? 0,
         };
       });
+    },
+    reorderCollection: async ({ itemKeys }) => {
+      const me = await getMe(db);
+      if (!me) return { status: 'signed-out' };
+      const stored = await getCollectionOrder(db, me.fanId);
+      if (!stored) return { status: 'not-synced' };
+      // Releases gone from your collection since the last full sync aren't sent back.
+      const owned = await ownedItemKeys(db, me.fanId, 'collection');
+      const entries = reorderEntries(
+        stored.filter((entry) => entry.itemKey === null || owned.has(entry.itemKey)),
+        itemKeys,
+      );
+      await ensureSessionOrigin();
+      const result = await saveCollectionOrder(
+        { fetchText, fetchJson },
+        { username: me.username, fanId: me.fanId, itemIds: entries.map((entry) => entry.itemId) },
+      );
+      if (result.status === 'done') await putCollectionOrder(db, me.fanId, entries);
+      return result;
     },
     getItemTags: async ({ itemKey }) => {
       const me = await getMe(db);
