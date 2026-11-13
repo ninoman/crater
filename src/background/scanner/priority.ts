@@ -10,6 +10,11 @@ export const BACKGROUND = 2;
  * stays as it is.
  */
 export const LATELY_RESCAN = 2.5;
+/**
+ * The best seed fans from the first lists, read before the rest of the lists so the first crate
+ * mates show up in minutes, not after a 1,000-release backlog (decisions §5).
+ */
+export const SEED_FIRST_FANS = 2.75;
 /** Your own releases' supporter lists, queued after each sync of your collection. */
 export const SEED = 3;
 /**

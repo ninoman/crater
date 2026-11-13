@@ -2,8 +2,9 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { ItemKey } from '../../bandcamp';
 import { CraterDb, enqueueAt, fanJob, putFollowing } from '../../db';
-import { SEED, SEED_FANS } from './priority';
-import { rankSeedFansOnceListed } from './seedFans';
+import { SEED, SEED_FANS, SEED_FIRST_FANS } from './priority';
+import { FIRST_FANS, promoteFirstSeedFans, rankSeedFansOnceListed } from './seedFans';
+import { FIRST_FANS_AFTER_LISTS } from '../../shared/scanEta';
 import { seedOwnership } from '../../../tests/ownership';
 
 const ME = 1;
@@ -139,5 +140,47 @@ describe('rankSeedFansOnceListed', () => {
       .modify({ rank: 0, cursor: { stage: 'full', token: 'x', scanned: 0 } });
     await rankSeedFansOnceListed(db, NOW);
     expect(await order()).toEqual([14, 13, 12, 11]);
+  });
+});
+
+describe('promoteFirstSeedFans', () => {
+  const fanIds = Array.from({ length: FIRST_FANS + 5 }, (_, i) => 100 + i);
+
+  beforeEach(async () => {
+    await supporterCounts({ a1: 20, a2: 20 });
+    // Fan 100 owns both of your releases, so it ranks first; the rest own one.
+    await owners({
+      [ME]: ['a1', 'a2'],
+      ...Object.fromEntries(fanIds.map((id) => [id, id === 100 ? ['a1', 'a2'] : ['a1']])),
+    });
+    await enqueueAt(
+      db,
+      fanIds.map((fanId, i) => ({ spec: fanJob(fanId, 'a1'), at: 0, rank: i + 1 })),
+      SEED_FANS,
+    );
+  });
+
+  const promoted = async () =>
+    (await db.queue.toArray())
+      .filter((job) => job.priority === SEED_FIRST_FANS)
+      .map((job) => Number(job.target));
+
+  it('moves the best fans ahead of the unread lists once enough lists are in', async () => {
+    await promoteFirstSeedFans(db, { scanned: FIRST_FANS_AFTER_LISTS, total: 900 });
+    const ids = await promoted();
+    expect(ids).toHaveLength(FIRST_FANS);
+    expect(ids).toContain(100);
+    const [first] = await db.queue.orderBy('[priority+nextAttemptAt+rank]').toArray();
+    expect(Number(first?.target)).toBe(100);
+  });
+
+  it('does nothing before that point, after it, or for a collection that needs no help', async () => {
+    await promoteFirstSeedFans(db, { scanned: FIRST_FANS_AFTER_LISTS - 1, total: 900 });
+    await promoteFirstSeedFans(db, { scanned: FIRST_FANS_AFTER_LISTS + 1, total: 900 });
+    await promoteFirstSeedFans(db, {
+      scanned: FIRST_FANS_AFTER_LISTS,
+      total: FIRST_FANS_AFTER_LISTS,
+    });
+    expect(await promoted()).toEqual([]);
   });
 });

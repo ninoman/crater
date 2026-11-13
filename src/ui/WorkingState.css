@@ -52,6 +52,12 @@
   color: var(--dh-color-muted);
 }
 
+.dh-working__progress {
+  margin-top: var(--dh-space-2);
+  width: 100%;
+  max-width: var(--dh-working-progress-width);
+}
+
 @keyframes dh-working-spin {
   to {
     transform: rotate(360deg);

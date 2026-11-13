@@ -5,10 +5,11 @@ import { useScanActivity } from '../../../hooks/useScanActivity';
 import { useStoredFlag } from '../../../hooks/useStoredFlag';
 import type { ForYouMode, ForYouResult } from '../../../shared/forYou';
 import type { ScanActivity } from '../../../shared/scanActivity';
-import { Button, EmptyState, LinkButton, Segmented, SkeletonRows, WorkingState } from '../../../ui';
+import { Button, EmptyState, LinkButton, Segmented, SkeletonRows } from '../../../ui';
 import { AllHeard } from '../../shared/AllHeard';
 import { FindingCrateMates } from '../../shared/FindingCrateMates';
 import { ScanningProgress } from '../../shared/ScanningProgress';
+import { SyncingCollection } from '../../shared/SyncingCollection';
 import { HideHeardToggle } from '../../shared/RowControls';
 import { ForYouList } from './ForYouList';
 import { formatForYouSummary } from './forYouText';
@@ -123,12 +124,7 @@ function NoPicks({ result, mode, activity }: NoPicksProps) {
     );
   }
   if (result.basis === 'unsynced') {
-    return (
-      <WorkingState
-        title="Syncing your collection"
-        line="Picks come once your crate mates are found."
-      />
-    );
+    return <SyncingCollection then="Picks come once your crate mates are found." />;
   }
   // Fresh can lack lately crate mates long after crate mates are found, so it doesn't wait on the scan.
   if (mode === 'fresh') return <NoFreshPicks crateMatesUsed={result.crateMatesUsed} />;

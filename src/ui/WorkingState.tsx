@@ -5,6 +5,8 @@ export interface WorkingStateProps {
   title: ReactNode;
   /** One short line of detail, e.g. how far a scan has got. */
   line?: ReactNode;
+  /** A bar for work that can be counted, e.g. releases scanned so far. */
+  progress?: ReactNode;
   /** The wait isn't moving, e.g. the scanner is paused: the record and rows hold still. */
   paused?: boolean;
 }
@@ -13,7 +15,7 @@ export interface WorkingStateProps {
  * A view held up by work that takes minutes, e.g. the first scan: a turning record and a short status.
  * No placeholder rows: a quick load shows those under a toolbar line instead, so nothing jumps.
  */
-export function WorkingState({ title, line, paused = false }: WorkingStateProps) {
+export function WorkingState({ title, line, progress, paused = false }: WorkingStateProps) {
   return (
     <div
       className={cx('dh-working', paused && 'dh-working--paused')}
@@ -24,6 +26,7 @@ export function WorkingState({ title, line, paused = false }: WorkingStateProps)
         <Record />
         <p className="dh-working__title">{title}</p>
         {line && <p className="dh-working__line">{line}</p>}
+        {progress && <div className="dh-working__progress">{progress}</div>}
       </div>
     </div>
   );
