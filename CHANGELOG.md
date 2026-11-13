@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.19.0](https://github.com/ninoman/crater/compare/v0.18.0...v0.19.0) (2026-11-13)
+
+
+### Features
+
+* **collection:** keep Bandcamp's collection order and drag to reorder ([#71](https://github.com/ninoman/crater/issues/71)) ([08e1f92](https://github.com/ninoman/crater/commit/08e1f9261029ffb819d80e3914c891a894804f9a))
+* **crate-mates:** show progress while the first crate mates are found ([#72](https://github.com/ninoman/crater/issues/72)) ([cf93dff](https://github.com/ninoman/crater/commit/cf93dff09f3b710dd6be1ec434765f1f98d4d3ad))
+
 ## [0.18.0](https://github.com/ninoman/crater/compare/v0.17.0...v0.18.0) (2026-11-11)
 
 
