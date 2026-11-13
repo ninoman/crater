@@ -2,6 +2,7 @@
 export * from './alsoBought';
 export * from './bandReleases';
 export * from './clear';
+export * from './collectionOrder';
 export * from './fans';
 export * from './following';
 export * from './followSignal';

@@ -5,6 +5,7 @@ import { CraterDb } from '../schema';
 import { upsertCollectionItems } from './items';
 import { markUnwishlisted, markWishlisted, putOwnership } from './ownership';
 import { createTag, deleteTag, exportTags, importTags } from './tags';
+import { putCollectionOrder } from './collectionOrder';
 import { assignItemTag, getItemTags, listedKeys, listOwnedItems, pruneItemData } from './itemLists';
 import { deleteOwnershipRow, ownershipRow } from '../../../tests/ownership';
 
@@ -51,6 +52,22 @@ async function tagId(name: string): Promise<number> {
 }
 
 describe('listOwnedItems', () => {
+  it('lists the collection in Bandcamp’s order, with releases it doesn’t know yet first', async () => {
+    const owned = [item('a5', 500), item('a6', 600), item('a8', 800)];
+    await upsertCollectionItems(db, owned);
+    await putOwnership(db, ME, owned, 'collection');
+    await putCollectionOrder(db, ME, [
+      { itemId: 6, itemKey: 'a6' },
+      { itemId: 99, itemKey: null },
+      { itemId: 4, itemKey: 'a4' },
+      { itemId: 5, itemKey: 'a5' },
+    ]);
+
+    const rows = await listOwnedItems(db, ME, 'collection');
+
+    expect(rows.map((row) => row.item.itemKey)).toEqual(['a8', 'a6', 'a4', 'a5']);
+  });
+
   it('lists only wishlisted items, newest first, with their tags', async () => {
     const dub = await tagId('dub');
     await assignItemTag(db, dub, ['a1'], 'add');

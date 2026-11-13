@@ -21,6 +21,7 @@ let collection: ListedItem[];
 let status: SyncStatus;
 let stored: Record<string, unknown>;
 const assigned: unknown[] = [];
+const reorders: unknown[] = [];
 
 function wish(n: number, tagIds: number[], extra: Partial<ListedItem> = {}): ListedItem {
   return {
@@ -59,6 +60,9 @@ function answer(message: { type: string; payload: Record<string, unknown> }): un
     case 'assignItemTag':
       assigned.push(message.payload);
       return 1;
+    case 'reorderCollection':
+      reorders.push(message.payload);
+      return { status: 'done' };
     default:
       throw new Error(`not faked: ${message.type}`);
   }
@@ -71,6 +75,7 @@ beforeEach(() => {
   collection = [];
   stored = {};
   assigned.length = 0;
+  reorders.length = 0;
   vi.stubGlobal('chrome', {
     storage: {
       local: {
@@ -290,6 +295,14 @@ describe('the wishlist tab', () => {
   });
 
   // Renders 240 cards in jsdom: ~2 s locally, past the 5 s default on CI runners.
+  it('has no move handles: Bandcamp keeps the wishlist newest first', async () => {
+    const doc = fanPage();
+    await openTab(doc);
+
+    expect(cards(doc)).toHaveLength(3);
+    expect(root(doc)?.querySelector('.dh-drag-handle')).toBeNull();
+  });
+
   it('renders a long wishlist a page at a time', async () => {
     items = Array.from({ length: 300 }, (_, n) => wish(300 - n, []));
     const doc = fanPage();
@@ -348,6 +361,81 @@ describe('the collection tab', () => {
     expect(doc.getElementById('collection-items')?.classList).not.toContain(
       'crater-collection-taken',
     );
+  });
+
+  const handles = (doc: Document) => [
+    ...(collectionRoot(doc)?.querySelectorAll<HTMLButtonElement>('.dh-drag-handle') ?? []),
+  ];
+  const order = (doc: Document) =>
+    colCards(doc).map((card) => card.querySelector('.dh-card__title')?.textContent);
+  const press = (target: HTMLElement, key: string) =>
+    act(async () => {
+      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+    });
+
+  it('moves a release from the keyboard and saves the order 3 s after the drop', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      collection = [wish(3, []), wish(2, []), wish(1, [])];
+      const doc = fanPage();
+      await act(async () => mountItemList(doc, COLLECTION));
+      await settle();
+
+      const handle = handles(doc)[0] as HTMLButtonElement;
+      expect(handle.getAttribute('aria-label')).toBe('Move Artist 3 – Title 3');
+      await press(handle, ' ');
+      expect(collectionRoot(doc)?.textContent).toContain('Picked up Artist 3 – Title 3');
+      await press(handle, 'ArrowRight');
+      await press(handle, ' ');
+
+      expect(order(doc)).toEqual(['Title 2', 'Title 3', 'Title 1']);
+      expect(collectionRoot(doc)?.textContent).toContain('Saving collection order…');
+      expect(reorders).toEqual([]);
+
+      collection = [wish(2, []), wish(3, []), wish(1, [])];
+      await act(async () => vi.advanceTimersByTime(3000));
+      await settle();
+
+      expect(reorders).toEqual([{ itemKeys: ['a2', 'a3', 'a1'] }]);
+      expect(order(doc)).toEqual(['Title 2', 'Title 3', 'Title 1']);
+      expect(collectionRoot(doc)?.textContent).not.toContain('Saving collection order…');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('puts a release back on Escape', async () => {
+    collection = [wish(3, []), wish(2, []), wish(1, [])];
+    const doc = fanPage();
+    await act(async () => mountItemList(doc, COLLECTION));
+    await settle();
+
+    const handle = handles(doc)[0] as HTMLButtonElement;
+    await press(handle, 'Enter');
+    await press(handle, 'End');
+    expect(order(doc)).toEqual(['Title 2', 'Title 1', 'Title 3']);
+    await press(handle, 'Escape');
+
+    expect(order(doc)).toEqual(['Title 3', 'Title 2', 'Title 1']);
+    expect(collectionRoot(doc)?.textContent).not.toContain('Saving collection order…');
+  });
+
+  it('has no move handles while a filter hides part of the list', async () => {
+    collection = [wish(2, []), wish(1, [])];
+    const doc = fanPage();
+    await act(async () => mountItemList(doc, COLLECTION));
+    await settle();
+    expect(handles(doc)).toHaveLength(2);
+
+    const search = collectionRoot(doc)?.querySelector('input[type="search"]') as HTMLInputElement;
+    await act(async () => {
+      const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+      setValue?.call(search, 'Title 1');
+      search.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    expect(colCards(doc)).toHaveLength(1);
+    expect(handles(doc)).toHaveLength(0);
   });
 
   it('says the collection is empty once synced', async () => {

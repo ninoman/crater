@@ -33,7 +33,7 @@ import type { ReleaseCrateMatesResult } from './releaseCrateMates';
 import type { ScannerStatus, ScanProgress } from './scan';
 import type { SyncStatus } from './sync';
 import type { CrateMatesResult, CrateMateStanding } from './crateMates';
-import type { ListedItem, ListSource } from './itemList';
+import type { CollectionReorderResult, ListedItem, ListSource } from './itemList';
 import type { CrateMatesLatestResult } from './crateMatesLatest';
 import type { FollowsDigestResult, FollowsDigestVisit } from './followsDigest';
 
@@ -128,6 +128,11 @@ export interface MessageMap {
   };
   /** Your wishlist or collection with your tags, newest first. Empty before your first sync. */
   listItems: { request: { source: ListSource }; response: ListedItem[] };
+  /**
+   * Saves a new order for your collection on Bandcamp, as dragging a card on your fan page does,
+   * then here. `itemKeys` is the releases in their new order.
+   */
+  reorderCollection: { request: { itemKeys: ItemKey[] }; response: CollectionReorderResult };
   /** The tag ids on an item in your wishlist, or null when it isn't in your wishlist. */
   getItemTags: { request: { itemKey: ItemKey }; response: number[] | null };
   /** Adds a tag to, or removes it from, many wishlist items at once. Answers with how many changed. */

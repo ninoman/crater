@@ -1,6 +1,7 @@
 import { CraterDb } from './schema';
 
 export * from './backup';
+export * from './collectionOrder';
 export * from './gzip';
 export * from './mappers';
 export * from './matchIndex';

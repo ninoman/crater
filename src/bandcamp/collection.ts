@@ -2,7 +2,13 @@ import { isCompilation } from './compilation';
 import { itemKey, parseBandcampDate } from './keys';
 import { collectionListRequest, firstPageToken, type BandcampRequest } from './requests';
 import { rawCollectionResponse, type RawCollectionItem } from './schemas';
-import type { CollectionItem, CollectionList, CollectionPage, TralbumType } from './types';
+import type {
+  CollectionItem,
+  CollectionList,
+  CollectionOrderEntry,
+  CollectionPage,
+  TralbumType,
+} from './types';
 import { assertNotApiError, validate } from './validate';
 
 const PURCHASE_KINDS = ['album', 'track', 'package'] as const;
@@ -37,6 +43,11 @@ export function toCollectionItem(raw: RawCollectionItem): CollectionItem | null 
   };
 }
 
+function toOrderEntry(raw: RawCollectionItem): CollectionOrderEntry {
+  // For albums and tracks the entry's id is the release's (collection_items-p1.json).
+  return { itemId: raw.item_id ?? raw.tralbum_id, itemKey: toCollectionItem(raw)?.itemKey ?? null };
+}
+
 export function toCollectionItems(raws: RawCollectionItem[]): CollectionItem[] {
   return raws.map(toCollectionItem).filter((item): item is CollectionItem => item !== null);
 }
@@ -46,6 +57,7 @@ export function parseCollectionPage(json: unknown, source = 'collection_items'):
   const data = assertNotApiError(validate(rawCollectionResponse, json, source), source);
   return {
     items: toCollectionItems(data.items),
+    order: data.items.map(toOrderEntry),
     moreAvailable: data.more_available,
     // last_token points at the 20th item whatever `count` was, so with bigger batches it would
     // re-fetch most of the page. Continue from the last item's own token instead.

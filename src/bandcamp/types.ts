@@ -65,8 +65,19 @@ export interface ReleasePage {
   moreReviewsAvailable: boolean;
 }
 
+/**
+ * One entry of a collection in Bandcamp's order: its own id, which a reorder sends back, and
+ * the release when it's one we track (null for subscriptions).
+ */
+export interface CollectionOrderEntry {
+  itemId: number;
+  itemKey: ItemKey | null;
+}
+
 export interface CollectionPage {
   items: CollectionItem[];
+  /** Every entry on the page in Bandcamp's order, subscriptions included. */
+  order: CollectionOrderEntry[];
   moreAvailable: boolean;
   /** older_than_token for the page after this one. */
   nextToken: string | null;

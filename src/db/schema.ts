@@ -1,7 +1,7 @@
 // IndexedDB schema, owned by the service worker. Settings live in chrome.storage, not here.
 
 import Dexie, { type EntityTable, type Table } from 'dexie';
-import { isCompilation, type ItemKey } from '../bandcamp';
+import { type CollectionOrderEntry, isCompilation, type ItemKey } from '../bandcamp';
 import type { HeardSource } from '../shared/heard';
 import { buildMatchIndex, fanMatchLists } from './matchIndex';
 import { readItem, readOwnership, storeItem } from './storage';
@@ -200,6 +200,15 @@ export interface ReleaseSupportersRecord {
   /** In page order: most recent first, capped by settings.supportersPerReleaseCap. */
   fanIds: number[];
   fetchedAt: number;
+}
+
+/**
+ * Your collection in Bandcamp's order, which you set by dragging cards on your fan page
+ * (decisions §29). Subscriptions are in it too, so a reorder can send every entry back.
+ */
+export interface CollectionOrderRecord {
+  fanId: number;
+  entries: CollectionOrderEntry[];
 }
 
 /** The logged-in user. Owned and wishlisted items are their rows in `ownership`. */
@@ -424,6 +433,7 @@ export const TABLES_ADDED: Readonly<Record<string, number>> = {
   fanOwnership: 21,
   matchOwnership: 21,
   ownershipMigration: 21,
+  collectionOrder: 22,
 };
 
 /**
@@ -468,6 +478,7 @@ export class CraterDb extends Dexie {
   bandReleases!: Table<BandReleaseRecord, [number, ItemKey]>;
   bandReads!: EntityTable<BandReadRecord, 'bandId'>;
   followMutes!: EntityTable<FollowMuteRecord, 'bandId'>;
+  collectionOrder!: EntityTable<CollectionOrderRecord, 'fanId'>;
 
   // Stays 'dighead', the working name: renaming the IndexedDB would orphan every existing local database.
   constructor(name = 'dighead') {
@@ -613,6 +624,8 @@ export class CraterDb extends Dexie {
       .upgrade((tx) =>
         startOwnershipMigration(tx.table('ownership'), tx.table('ownershipMigration')),
       );
+    // v22: your collection's order (decisions §29). Empty until the next sync fills it.
+    this.version(22).stores({ collectionOrder: 'fanId' });
   }
 }
 

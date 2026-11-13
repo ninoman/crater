@@ -31,22 +31,6 @@
   box-shadow: var(--dh-shadow-tooltip);
 }
 
-.dh-card__actions {
-  position: absolute;
-  top: var(--dh-space-1);
-  right: var(--dh-space-1);
-  padding: 2px;
-  border-radius: var(--dh-radius-sm);
-  background: var(--dh-color-bg);
-  opacity: 0;
-  transition: opacity var(--dh-duration);
-}
-
-.dh-card:hover .dh-card__actions,
-.dh-card:focus-within .dh-card__actions {
-  opacity: 1;
-}
-
 .dh-card__title,
 .dh-card__meta {
   overflow: hidden;
@@ -66,4 +50,21 @@
 
 .dh-card__badges {
   margin-top: var(--dh-space-1);
+}
+
+/* The gap a dragged card leaves, styled like jQuery UI's placeholder on Bandcamp's own grid. */
+.dh-card--placeholder > :not(.dh-card__media),
+.dh-card--placeholder .dh-card__media > * {
+  visibility: hidden;
+}
+
+.dh-card--placeholder .dh-card__media {
+  background: var(--dh-color-drag-placeholder);
+  outline: 2px dashed var(--dh-color-drag-outline);
+}
+
+/* Picked up from the keyboard: it stays visible, outlined like the placeholder. */
+.dh-card--lifted .dh-card__media {
+  outline: 2px dashed var(--dh-color-drag-outline);
+  outline-offset: 2px;
 }

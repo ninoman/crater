@@ -1,0 +1,44 @@
+/* Bandcamp's handle on its own collection cards: a white box with a blue edge in the artwork's
+   corner, shown while the pointer is over the card. */
+.dh-drag-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: var(--dh-drag-handle-hit);
+  height: var(--dh-drag-handle-hit);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dh-color-text);
+  cursor: move;
+  touch-action: none;
+}
+
+.dh-drag-handle__box {
+  display: grid;
+  place-items: center;
+  width: var(--dh-drag-handle-size);
+  height: var(--dh-drag-handle-size);
+  border: 1px solid var(--dh-color-drag-handle-border);
+  border-radius: var(--dh-radius-md);
+  background: var(--dh-color-bg);
+  opacity: 0;
+  transition: opacity var(--dh-duration) ease-out;
+}
+
+.dh-card:hover .dh-drag-handle__box,
+.dh-drag-handle:focus-visible .dh-drag-handle__box,
+.dh-drag-handle[aria-pressed='true'] .dh-drag-handle__box {
+  opacity: 0.9;
+}
+
+.dh-root .dh-drag-handle:focus-visible {
+  outline: none;
+}
+
+.dh-drag-handle:focus-visible .dh-drag-handle__box {
+  outline: 2px solid var(--dh-color-focus);
+  outline-offset: 1px;
+}

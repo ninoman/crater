@@ -6,6 +6,7 @@ import {
   countOwnership,
   createTag,
   CraterDb,
+  getCollectionOrder,
   getItemTags,
   getMe,
   ownedItemKeys,
@@ -121,6 +122,62 @@ describe('syncMe', () => {
     expect(added).toEqual(['a9']);
     expect(await ownedItemKeys(db, FAN, 'collection')).toContain('a9');
     expect(bandcamp.requests).toEqual(['wishlist:start', 'collection:start', 'collection:at:2']);
+  });
+
+  it('stores the collection in Bandcamp’s order on a full sync', async () => {
+    await syncMe(
+      deps(fakeBandcamp({ collection: [3, 1, 2], wishlist: [10] }).fetchJson),
+      me,
+      'full',
+    );
+
+    const order = await getCollectionOrder(db, FAN);
+    expect(order?.map((entry) => entry.itemKey)).toEqual(['a3', 'a1', 'a2']);
+    expect(order?.map((entry) => entry.itemId)).toEqual([3, 1, 2]);
+  });
+
+  it('updates the top of the order on an incremental sync, moves included', async () => {
+    await syncMe(
+      deps(fakeBandcamp({ collection: [1, 2, 3, 4, 5, 6], wishlist: [] }).fetchJson),
+      me,
+      'full',
+    );
+    // A purchase on top, and 2 moved above 1 on Bandcamp.
+    const bandcamp = fakeBandcamp({ collection: [9, 2, 1, 3, 4, 5, 6], wishlist: [] });
+
+    await syncMe(deps(bandcamp.fetchJson), me, 'incremental');
+
+    const order = await getCollectionOrder(db, FAN);
+    expect(order?.map((entry) => entry.itemKey)).toEqual([
+      'a9',
+      'a2',
+      'a1',
+      'a3',
+      'a4',
+      'a5',
+      'a6',
+    ]);
+    expect(bandcamp.requests).toEqual(['wishlist:start', 'collection:start', 'collection:at:2']);
+  });
+
+  it('syncs the collection in full when its order isn’t stored yet', async () => {
+    await syncMe(
+      deps(fakeBandcamp({ collection: [1, 2, 3, 4], wishlist: [] }).fetchJson),
+      me,
+      'full',
+    );
+    await db.collectionOrder.clear();
+    const bandcamp = fakeBandcamp({ collection: [1, 2, 3, 4], wishlist: [] });
+
+    await syncMe(deps(bandcamp.fetchJson), me, 'incremental');
+
+    expect(bandcamp.requests).toEqual(['wishlist:start', 'collection:start', 'collection:at:2']);
+    expect((await getCollectionOrder(db, FAN))?.map((entry) => entry.itemKey)).toEqual([
+      'a1',
+      'a2',
+      'a3',
+      'a4',
+    ]);
   });
 
   it('drops wishlist items that were removed, on a full sync', async () => {

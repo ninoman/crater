@@ -129,7 +129,7 @@ export type WishlistEndpoint = 'collect_item_cb' | 'uncollect_item_cb';
  * not the extension's.
  */
 export const SESSION_POST_REGEX =
-  '^https://bandcamp\\.com/(collect_item_cb|uncollect_item_cb|cart/cb)$';
+  '^https://bandcamp\\.com/(collect_item_cb|uncollect_item_cb|cart/cb|collection_reorder_cb)$';
 export const SESSION_POST_ORIGIN = 'https://bandcamp.com';
 
 /**
@@ -160,6 +160,40 @@ export function wishlistItemRequest(
     init: {
       method: 'POST',
       // Without X-Requested-With, Bandcamp answers HTTP 400 "oops".
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: body.toString(),
+      credentials: 'include',
+    },
+  };
+}
+
+/** Your own fan page signed in, for the crumb its collection grid reorders with (decisions §29). */
+export function signedInFanPageRequest(username: string): BandcampRequest {
+  return {
+    url: `https://bandcamp.com/${encodeURIComponent(username)}`,
+    init: { credentials: 'include' },
+  };
+}
+
+/**
+ * Saves the order of your collection, as dragging a card on your fan page does: every entry's
+ * id in the new order, form-encoded the way jQuery sends an array (`ids[]` repeated).
+ */
+export function collectionReorderRequest(fields: {
+  fanId: number;
+  itemIds: readonly number[];
+  crumb: string;
+}): BandcampRequest {
+  const body = new URLSearchParams({ fan_id: String(fields.fanId) });
+  for (const id of fields.itemIds) body.append('ids[]', String(id));
+  body.append('crumb', fields.crumb);
+  return {
+    url: 'https://bandcamp.com/collection_reorder_cb',
+    init: {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'X-Requested-With': 'XMLHttpRequest',

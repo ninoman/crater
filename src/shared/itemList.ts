@@ -22,6 +22,16 @@ export interface ListedItem {
   crateMateOwners: number;
 }
 
+/** How saving a new collection order went (decisions §29). */
+export type CollectionReorderResult =
+  | { status: 'done' }
+  /** Bandcamp gave no session to post with. */
+  | { status: 'signed-out' }
+  /** Bandcamp doesn't sort collections this big. */
+  | { status: 'too-many'; limit: number }
+  /** No sync has read the whole collection yet, so its order isn't known. */
+  | { status: 'not-synced' };
+
 /** Whether two reads of the same item would render the same card. */
 export function sameListedItem(a: ListedItem, b: ListedItem): boolean {
   return (

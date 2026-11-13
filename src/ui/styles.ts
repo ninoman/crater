@@ -11,6 +11,7 @@ import chip from './Chip.css?inline';
 import confirmDialog from './ConfirmDialog.css?inline';
 import cover from './Cover.css?inline';
 import disclosure from './Disclosure.css?inline';
+import dragHandle from './DragHandle.css?inline';
 import dock from './Dock.css?inline';
 import emptyState from './EmptyState.css?inline';
 import field from './Field.css?inline';
@@ -33,11 +34,13 @@ import sectionHeading from './SectionHeading.css?inline';
 import segmented from './Segmented.css?inline';
 import select from './Select.css?inline';
 import skeleton from './Skeleton.css?inline';
+import sortableCardGrid from './SortableCardGrid.css?inline';
 import stat from './Stat.css?inline';
 import statusDot from './StatusDot.css?inline';
 import table from './Table.css?inline';
 import tagPicker from './TagPicker.css?inline';
 import tabs from './Tabs.css?inline';
+import toast from './Toast.css?inline';
 import tokens from './tokens.css?inline';
 import toolbar from './Toolbar.css?inline';
 import tooltip from './Tooltip.css?inline';
@@ -62,6 +65,8 @@ export const uiStyles = [
   inlineProgress,
   row,
   card,
+  dragHandle,
+  sortableCardGrid,
   releaseRow,
   table,
   searchField,
@@ -85,6 +90,7 @@ export const uiStyles = [
   heardBadge,
   playQueueBar,
   toolbar,
+  toast,
 ].join('\n');
 
 /** Adds the UI stylesheet to a document or shadow root. */
