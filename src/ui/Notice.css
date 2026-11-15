@@ -5,6 +5,11 @@
   font-size: var(--dh-text-sm);
 }
 
+.dh-notice--info {
+  border-color: var(--dh-color-accent);
+  background: var(--dh-color-bg);
+}
+
 .dh-notice--warning {
   border-color: var(--dh-color-warning);
   background: var(--dh-color-warning-bg);

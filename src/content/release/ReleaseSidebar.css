@@ -7,13 +7,27 @@
   max-height: calc(100vh - 128px);
 }
 
-.dh-sidebar__toggle {
+.dh-sidebar__collapsed {
   position: fixed;
   top: 96px;
   right: 0;
   z-index: var(--dh-z-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--dh-space-2);
+}
+
+.dh-sidebar__toggle {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  box-shadow: var(--dh-shadow-panel);
+}
+
+.dh-sidebar__nudge {
+  width: 240px;
+  margin-right: var(--dh-space-4);
+  border-radius: var(--dh-radius-sm);
   box-shadow: var(--dh-shadow-panel);
 }
 
