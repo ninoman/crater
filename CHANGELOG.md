@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/ninoman/crater/compare/v0.19.0...v0.20.0) (2026-11-16)
+
+
+### Features
+
+* **sidebar:** nudge back to the collapsed sidebar once picks are strong ([#74](https://github.com/ninoman/crater/issues/74)) ([fa4cb1b](https://github.com/ninoman/crater/commit/fa4cb1b2643b92783c6a3837e50ac6ffaa1f3ff0))
+
 ## [0.19.0](https://github.com/ninoman/crater/compare/v0.18.0...v0.19.0) (2026-11-13)
 
 
