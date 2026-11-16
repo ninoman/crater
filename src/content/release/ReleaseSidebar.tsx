@@ -4,12 +4,15 @@ import { useAlsoBought } from '../../hooks/useAlsoBought';
 import { useReleaseCrateMates } from '../../hooks/useReleaseCrateMates';
 import { useScannerNotices } from '../../hooks/useScannerNotices';
 import { useScanProgress } from '../../hooks/useScanProgress';
+import { useSidebarNudgeTimes } from '../../hooks/useSidebarNudgeTimes';
 import { useStoredFlag } from '../../hooks/useStoredFlag';
 import { useTimePassed } from '../../hooks/useTimePassed';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
 import { AlsoBoughtList } from './AlsoBoughtList';
+import { ComebackNudge } from './ComebackNudge';
+import { shouldShowComebackNudge } from './comebackNudgeRule';
 import { ReleaseCrateMatesList } from './ReleaseCrateMatesList';
 import { ReorderButton } from './ReorderButton';
 import { ScanHeader } from './ScanHeader';
@@ -63,6 +66,11 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
       subtitle={`${item.artist} – ${item.title}`}
       actions={reorder && <ReorderButton onClick={reorder} />}
       onBodyScroll={tab === 'also-bought' ? holdOrder : undefined}
+      picks={
+        view.state === 'ready'
+          ? { trusted: view.result.warmup === null, count: view.result.rows.length }
+          : null
+      }
     >
       <FollowedAccountTags
         kind="band"
@@ -111,19 +119,47 @@ interface SidebarShellProps {
   /** Header controls before the collapse button. The header stays put while the list scrolls. */
   actions?: ReactNode;
   onBodyScroll?: () => void;
+  /** This release's Also bought picks, which may earn the collapsed sidebar a comeback nudge. */
+  picks?: { trusted: boolean; count: number } | null;
   children: ReactNode;
 }
 
-/** The docked panel, or the tab that brings it back. Open or collapsed holds across pages. */
-function SidebarShell({ subtitle, actions, onBodyScroll, children }: SidebarShellProps) {
+/**
+ * The docked panel, or the tab that brings it back. Open or collapsed holds across pages. Collapsed,
+ * the tab may nudge you back when the picks have got good (decisions §30).
+ */
+function SidebarShell({
+  subtitle,
+  actions,
+  onBodyScroll,
+  picks = null,
+  children,
+}: SidebarShellProps) {
   const [open, setOpen] = useStoredFlag('sidebarOpen', true);
+  const { collapsedAt, lastNudgeAt, markCollapsed, markNudged } = useSidebarNudgeTimes();
+  // Fixed per page, so the times recorded here (later than this) keep the nudge hidden.
+  const [now] = useState(Date.now);
   const worker = useWorkerStatus();
 
   if (!open) {
+    const nudge =
+      picks !== null &&
+      shouldShowComebackNudge({
+        now,
+        collapsedAt,
+        lastNudgeAt,
+        trusted: picks.trusted,
+        picks: picks.count,
+      });
     return (
-      <Button variant="primary" className="dh-sidebar__toggle" onClick={() => setOpen(true)}>
-        Crater
-      </Button>
+      <div className="dh-sidebar__collapsed">
+        <Button variant="primary" className="dh-sidebar__toggle" onClick={() => setOpen(true)}>
+          Crater
+        </Button>
+        {nudge && (
+          <ComebackNudge picks={picks.count} onOpen={() => setOpen(true)} onDismiss={markNudged} />
+        )}
+      </div>
     );
   }
   return (
@@ -134,7 +170,15 @@ function SidebarShell({ subtitle, actions, onBodyScroll, children }: SidebarShel
       actions={
         <>
           {actions}
-          <Button variant="ghost" icon aria-label="Collapse Crater" onClick={() => setOpen(false)}>
+          <Button
+            variant="ghost"
+            icon
+            aria-label="Collapse Crater"
+            onClick={() => {
+              setOpen(false);
+              markCollapsed();
+            }}
+          >
             ×
           </Button>
         </>

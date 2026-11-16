@@ -1204,3 +1204,23 @@ Read 2026-11-13 from its public scripts (`collection_owner-*.js`, `global_foot2-
 - **Our own sortable, not a library.** Adding dnd-kit was blocked in the session that built this, and a small hook could match jQuery UI's feel exactly: cards jump rather than slide, the copy follows the pointer at 75%, and settles in 100 ms. It's split into pure geometry (`sortableGrid.ts`) and the hook.
 - **Session Origin rule** (§28) now covers `collection_reorder_cb` too.
 
+
+## 30. Comeback nudge on the collapsed sidebar
+
+Decided and built 2026-11-16. Code: `content/release/comebackNudgeRule.ts` (pure), `hooks/useSidebarNudgeTimes.ts`, `content/release/ComebackNudge.tsx`, `content/release/ReleaseSidebar.tsx`. Tested on the rule and the callout in jsdom; **not yet tried live**.
+
+### Why
+
+Collapsing the sidebar holds on every release page for good (ROADMAP Phase 4, step 5). Users who closed it early, while picks were weak, never saw that they'd got better.
+
+### What we do
+
+- **No automatic reopen.** Collapsed, the *Crater* tab shows a small callout under it: "12 strong picks for this release. Have a look?" with **Open** and **Not now**.
+- **It shows only when all of these hold** (`shouldShowComebackNudge`):
+  - the sidebar has been collapsed for at least 3 days;
+  - this release's Also bought list is past its warm-up (§12), so the picks are trusted ones, not early ones;
+  - there are at least 5 picks (after *Hide heard* and the album-buyers switch, as the list would show them);
+  - at least 3 days have passed since the last **Not now**. The gap is fixed, not growing.
+- **Open** sets `sidebarOpen` back to true. **Not now** hides the callout and records the time. Ignoring it leaves it on qualifying pages until you choose.
+- **Storage:** `sidebarCollapsedAt` and `sidebarLastNudgeAt` in `chrome.storage.local`, next to `sidebarOpen`. Collapsing records `sidebarCollapsedAt`. A sidebar collapsed before this shipped has no time, so the first release page that finds it collapsed stamps it, and its nudge comes 3 days later.
+- **"Now" is fixed per page**, so a collapse or Not now on the page you're on keeps the callout hidden there.

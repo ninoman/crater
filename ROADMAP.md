@@ -130,7 +130,7 @@ Also added: the popup shows queued fans, today's requests and the pause reason, 
 7. [x] Scoring tests on a small synthetic dataset with known expected rankings.
 8. [x] Performance check: seed around 300k `ownership` rows and confirm a re-score stays under about 200 ms. `pnpm perf`: 39 ms at 300k rows, 88 ms at 1M. Uses a precomputed match index (decisions §6).
 
-Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match index and the `hidden` store), a "queue paused" notice in the sidebar, and the collapsed state kept across pages.
+Also added: schema v3 (labels on items, the `fanMatches` / `matchOwners` match index and the `hidden` store), a "queue paused" notice in the sidebar, and the collapsed state kept across pages. *Since 2026-11-16 the collapsed tab nudges you back once a release has 5+ trusted picks, at most every 3 days (decisions §30).*
 
 **Done when:** you use it on real releases for a week and the results look right. Note what feels off, so you can tune it in P7.
 

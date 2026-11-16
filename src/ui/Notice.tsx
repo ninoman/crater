@@ -5,10 +5,13 @@ export interface NoticeAction {
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  /** The action you're being invited to take. */
+  primary?: boolean;
 }
 
 export interface NoticeProps {
-  tone: 'warning' | 'error';
+  /** `info` invites rather than warns, e.g. a nudge to look at something new. */
+  tone: 'info' | 'warning' | 'error';
   /** A short lead-in, e.g. "Queue paused." */
   title?: ReactNode;
   children: ReactNode;
@@ -29,7 +32,12 @@ export function Notice({ tone, title, children, actions = [] }: NoticeProps) {
       {actions.length > 0 && (
         <div className="dh-notice__actions">
           {actions.map((action) => (
-            <Button key={action.label} onClick={action.onClick} disabled={action.disabled}>
+            <Button
+              key={action.label}
+              variant={action.primary ? 'primary' : 'secondary'}
+              onClick={action.onClick}
+              disabled={action.disabled}
+            >
               {action.label}
             </Button>
           ))}
