@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.0](https://github.com/ninoman/crater/compare/v0.20.0...v0.21.0) (2026-11-18)
+
+
+### Features
+
+* **tags:** setting to turn tagging off ([#76](https://github.com/ninoman/crater/issues/76)) ([68455ea](https://github.com/ninoman/crater/commit/68455ead31196d6b3e1d7d8a6508000e65beb5d4))
+
 ## [0.20.0](https://github.com/ninoman/crater/compare/v0.19.0...v0.20.0) (2026-11-16)
 
 
