@@ -10,6 +10,7 @@ import { useTimePassed } from '../../hooks/useTimePassed';
 import { useWorkerStatus, type WorkerStatus } from '../../hooks/useWorkerStatus';
 import { Button, EmptyState, Panel, StatusDot, Tabs } from '../../ui';
 import { FollowedAccountTags } from '../shared/FollowedAccountTags';
+import { useTagging } from '../shared/tagging';
 import { AlsoBoughtList } from './AlsoBoughtList';
 import { ComebackNudge } from './ComebackNudge';
 import { shouldShowComebackNudge } from './comebackNudgeRule';
@@ -60,6 +61,7 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
   const crateMates = useReleaseCrateMates(item.itemKey, releaseSaved);
   const firstWaitOver = useTimePassed(EARLY_PICKS_AFTER_MS);
   const [tab, setTab] = useState('also-bought');
+  const tagging = useTagging();
 
   return (
     <SidebarShell
@@ -72,12 +74,16 @@ function ReleaseRecommendations({ item }: { item: ReleasePageItem }) {
           : null
       }
     >
-      <FollowedAccountTags
-        kind="band"
-        id={item.bandId}
-        name={readBandHeader(document)?.name ?? item.artist}
-      />
-      <WishlistItemTags itemKey={item.itemKey} name={`${item.artist} – ${item.title}`} />
+      {tagging && (
+        <>
+          <FollowedAccountTags
+            kind="band"
+            id={item.bandId}
+            name={readBandHeader(document)?.name ?? item.artist}
+          />
+          <WishlistItemTags itemKey={item.itemKey} name={`${item.artist} – ${item.title}`} />
+        </>
+      )}
       <ScanHeader progress={progress} notices={notices} />
       <Tabs
         label="Recommendations"

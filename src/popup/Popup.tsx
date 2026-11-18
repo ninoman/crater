@@ -1,4 +1,5 @@
 import { useSyncStatus } from '../hooks/useSyncStatus';
+import { useTaggingOn } from '../hooks/useTaggingOn';
 import { useWorkerStatus } from '../hooks/useWorkerStatus';
 import { EmptyState, StatusDot, Tabs } from '../ui';
 import { ClearData } from './ClearData';
@@ -58,9 +59,10 @@ function SettingsTab() {
 
 // Occasional, file-level jobs kept apart from everyday settings, with Clear away from them.
 function DataTab() {
+  const tagging = useTaggingOn();
   return (
     <>
-      <TagBackup />
+      {tagging && <TagBackup />}
       <CsvExport />
       <DatabaseBackup />
       <DiagnosticsCopy />

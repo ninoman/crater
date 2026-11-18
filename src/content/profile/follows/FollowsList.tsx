@@ -19,6 +19,7 @@ import {
   Tooltip,
 } from '../../../ui';
 import { FilterControls } from '../../shared/FilterControls';
+import { useTagging } from '../../shared/tagging';
 import {
   HideHeardToggle,
   ListNowPlaying,
@@ -56,7 +57,9 @@ export function FollowsList({
   empty,
 }: FollowsListProps) {
   const tagsQuery = useTags();
-  const tags = tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
+  const tagging = useTagging();
+  // Without tags the filter bar is just the search.
+  const tags = tagging && tagsQuery.view.state === 'ready' ? tagsQuery.view.data : NO_TAGS;
   const [rawFilter, setFilter] = useState(NO_FILTER);
   const filter = useMemo(
     () => ({ ...rawFilter, tagIds: liveTagIds(rawFilter.tagIds, tags) }),

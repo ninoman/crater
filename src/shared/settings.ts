@@ -29,6 +29,8 @@ export interface Settings {
   seedFromCollection: boolean;
   /** "owned" / "wishlist" / "3 crate mates" next to release links on Bandcamp pages (decisions §15). */
   pageBadges: boolean;
+  /** Tags on follows and releases. Off hides them everywhere but keeps them (decisions §31). */
+  tagging: boolean;
   /** Open the tag picker when you wishlist a release on its page (decisions §21). */
   tagPrompt: boolean;
   /** Releases from artists and labels you follow score a little higher (decisions §16). */
@@ -58,6 +60,7 @@ export const DEFAULT_SETTINGS: Settings = {
   latelyRescanDays: 7,
   seedFromCollection: true,
   pageBadges: false,
+  tagging: true,
   tagPrompt: true,
   followingBoost: true,
   // Underground electronic runs small; what counts as rare depends on the genre you dig in.
@@ -65,6 +68,11 @@ export const DEFAULT_SETTINGS: Settings = {
   // Needs an optional permission, asked for when it's turned on.
   followNotifications: false,
 };
+
+/** Whether a heart should open the tag picker: only while tags are on at all. */
+export function asksForTags(settings: Pick<Settings, 'tagging' | 'tagPrompt'>): boolean {
+  return settings.tagging && settings.tagPrompt;
+}
 
 export type NumericSetting = {
   [K in keyof Settings]: Settings[K] extends number ? K : never;

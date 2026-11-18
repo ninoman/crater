@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetFollowsDigestVisit } from '../../../hooks/useFollowsDigest';
 import type { FollowsDigestResult, FollowsDigestRow } from '../../../shared/followsDigest';
 import { PortalContainerProvider } from '../../../ui';
+import { TaggingProvider } from '../../shared/tagging';
 import { FollowsTab } from './FollowsTab';
 
 const NOW = Date.now();
@@ -82,11 +83,13 @@ function stubWorker() {
 let container: HTMLDivElement;
 let root: Root;
 
-async function render() {
+async function render(tagging = true) {
   await act(async () => {
     root.render(
       <PortalContainerProvider container={container}>
-        <FollowsTab />
+        <TaggingProvider value={tagging}>
+          <FollowsTab />
+        </TaggingProvider>
       </PortalContainerProvider>,
     );
   });
@@ -138,6 +141,14 @@ describe('FollowsTab', () => {
     );
     await act(async () => chip?.click());
     expect(titles()).toEqual(['Album 2']);
+  });
+
+  it('keeps only the search while tags are off', async () => {
+    answer = () => digest();
+    await render(false);
+    expect(button('labels')).toBeUndefined();
+    expect(container.querySelector('input[type="search"], input')).not.toBeNull();
+    expect(titles()).toEqual(['Album 1', 'Album 2']);
   });
 
   it('mutes an account at once and tells the worker', async () => {

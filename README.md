@@ -52,7 +52,7 @@ Heart a pick, or just the track that's playing, to add it to your Bandcamp wishl
 
 ### Tags for follows and wishlist
 
-Tag the artists, labels and fans you follow and the releases on your wishlist, then filter by tag or tag many at once. Heart a release or follow an account and the tag picker opens right there. Tags show on each artist's and release's own page, and stay with a release after you buy it.
+Tag the artists, labels and fans you follow and the releases on your wishlist, then filter by tag or tag many at once. Heart a release or follow an account and the tag picker opens right there. Tags show on each artist's and release's own page, and stay with a release after you buy it. Don't want them? Turn *Tags* off in Settings: they disappear everywhere, Bandcamp's own following, wishlist and collection tabs come back, and your tags are kept for if you change your mind.
 
 <img src="docs/media/tags.png" alt="Wishlist filtered by the trance tag" width="800">
 

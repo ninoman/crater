@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { type ReleaseInfo, WISHLIST_ACTION } from '../bandcamp';
 import { sendMessage } from '../shared/messages';
-import { loadSettings } from '../shared/settings';
+import { asksForTags, loadSettings } from '../shared/settings';
 import { notifyFollowingChanged } from './followingChanges';
 import { usePageActionChange } from './usePageActionChange';
 
@@ -33,7 +33,7 @@ export function useTagPrompt(
       .then(([taggable, settings]) => {
         notifyFollowingChanged();
         const anchor = WISHLIST_ACTION.button(doc);
-        if (change === 'on' && taggable && settings.tagPrompt && anchor) {
+        if (change === 'on' && taggable && asksForTags(settings) && anchor) {
           setView({ open: true, anchor });
         }
       })

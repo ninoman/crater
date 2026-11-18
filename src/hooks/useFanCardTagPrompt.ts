@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { type FanItemCard, type ItemKey, readFanItemCard } from '../bandcamp';
 import { sendMessage } from '../shared/messages';
-import { loadSettings } from '../shared/settings';
+import { asksForTags, loadSettings } from '../shared/settings';
 import { notifyFollowingChanged } from './followingChanges';
 import { useFanCardWishlistChange } from './useFanCardWishlistChange';
 
@@ -41,7 +41,7 @@ export function useFanCardTagPrompt(doc: Document): {
     Promise.all([record(item, change), loadSettings()])
       .then(([taggable, settings]) => {
         notifyFollowingChanged();
-        if (change === 'on' && taggable && settings.tagPrompt) {
+        if (change === 'on' && taggable && asksForTags(settings)) {
           setView({
             open: true,
             anchor: card,

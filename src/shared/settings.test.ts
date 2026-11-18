@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS, sanitizeSettings, validateSettings } from './settings';
+import { asksForTags, DEFAULT_SETTINGS, sanitizeSettings, validateSettings } from './settings';
+
+describe('asksForTags', () => {
+  it('opens the picker only while tags and the prompt are both on', () => {
+    expect(asksForTags({ tagging: true, tagPrompt: true })).toBe(true);
+    expect(asksForTags({ tagging: false, tagPrompt: true })).toBe(false);
+    expect(asksForTags({ tagging: true, tagPrompt: false })).toBe(false);
+  });
+});
 
 describe('validateSettings', () => {
   it('accepts the defaults', () => {
@@ -29,6 +37,9 @@ describe('validateSettings', () => {
 describe('sanitizeSettings', () => {
   it('fills in defaults for anything missing', () => {
     expect(sanitizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
+    // Saved before the setting existed: tags stay on.
+    expect(sanitizeSettings({ tagPrompt: false }).tagging).toBe(true);
+    expect(sanitizeSettings({ tagging: false }).tagging).toBe(false);
     expect(sanitizeSettings({ topCrateMatesK: 50 })).toEqual({
       ...DEFAULT_SETTINGS,
       topCrateMatesK: 50,

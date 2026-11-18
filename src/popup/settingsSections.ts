@@ -4,7 +4,14 @@ import type { BooleanSetting, NumericSetting } from '../shared/settings';
 
 export type SettingEntry =
   | { kind: 'number'; key: NumericSetting; label: string; description: string }
-  | { kind: 'toggle'; key: BooleanSetting; label: string; description: string }
+  | {
+      kind: 'toggle';
+      key: BooleanSetting;
+      label: string;
+      description: string;
+      /** Shown only while this other toggle is on. */
+      requires?: BooleanSetting;
+    }
   /** Pace and daily budget as one Normal / Fast choice. */
   | { kind: 'speed' }
   /** Lately re-reads on or off; the count and interval are in Advanced. */
@@ -77,9 +84,17 @@ export const MAIN_SECTIONS: SettingSection[] = [
       },
       {
         kind: 'toggle',
+        key: 'tagging',
+        label: 'Tags',
+        description:
+          'Tag follows and releases, and filter by tag. Off hides tags everywhere and leaves your collection and wishlist tabs to Bandcamp. Your tags are kept. Reload open Bandcamp pages to apply.',
+      },
+      {
+        kind: 'toggle',
         key: 'tagPrompt',
         label: 'Ask for tags when you wishlist',
         description: 'Opens the tag picker next to Bandcamp’s heart.',
+        requires: 'tagging',
       },
     ],
   },

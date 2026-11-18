@@ -5,10 +5,10 @@ import { pageTagsStyles } from '../shared/tagStyles';
 import { mountShadow } from '../shared/mountShadow';
 
 /**
- * Adds your tags under the band's name on its home page, when you follow the band, and saves a
- * follow made here.
+ * Adds your tags under the band's name on its home page, when you follow the band and tags are
+ * on, and saves a follow made here.
  */
-export function mountBand(doc: Document): void {
+export function mountBand(doc: Document, tagging: boolean): void {
   const name = doc.querySelector(BAND_PAGE_DOM.name);
   const tag = doc.querySelector('[data-band]');
   if (!name || !tag) return;
@@ -38,7 +38,7 @@ export function mountBand(doc: Document): void {
   mountShadow(
     name,
     <>
-      <FollowedAccountTags kind="band" id={bandId} name={bandName} />
+      {tagging && <FollowedAccountTags kind="band" id={bandId} name={bandName} />}
       <FollowRecorder account={account} />
     </>,
     pageTagsStyles,
