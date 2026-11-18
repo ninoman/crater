@@ -1224,3 +1224,14 @@ Collapsing the sidebar holds on every release page for good (ROADMAP Phase 4, st
 - **Open** sets `sidebarOpen` back to true. **Not now** hides the callout and records the time. Ignoring it leaves it on qualifying pages until you choose.
 - **Storage:** `sidebarCollapsedAt` and `sidebarLastNudgeAt` in `chrome.storage.local`, next to `sidebarOpen`. Collapsing records `sidebarCollapsedAt`. A sidebar collapsed before this shipped has no time, so the first release page that finds it collapsed stamps it, and its nudge comes 3 days later.
 - **"Now" is fixed per page**, so a collapse or Not now on the page you're on keeps the callout hidden there.
+
+## 31. Turning tags off
+
+Decided and built 2026-11-18. Code: `shared/settings.ts` (`tagging`, `asksForTags`), `content/shared/tagging.tsx`, `content/index.tsx`, `content/profile/mountProfile.tsx`, `hooks/useTaggingOn.ts`. Not yet tried on live pages.
+
+- **Setting:** *Tags*, under *On Bandcamp pages*, on by default. *Ask for tags when you wishlist* shows only while it's on.
+- **Off hides, never deletes.** Tags, their assignments and the sync's pruning (§14, §24) are untouched, so turning it back on restores everything. Full backups still carry them.
+- **What goes:** the tag lines on release, band and fan pages; the tag picker after a heart, anywhere; tag chips on the profile's Follows tab (its search stays); the tag backup in the popup's Data tab.
+- **The following, wishlist and collection tabs stay Bandcamp's own.** Without tags, our takeovers (§8, §14, §24) add too little to be worth replacing Bandcamp's lists: full-list search, crate mate rank on follows and drag to reorder (§29) go with them.
+- **Read once per page.** Content scripts read the setting when the page loads, like page badges (§15), so a change applies on reload. A heart re-reads it each time. The popup's Data tab follows saves live.
+- **Still recorded while off:** follows and hearts are saved as before (§21), so nothing is missing when tags come back.

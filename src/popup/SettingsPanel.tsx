@@ -69,6 +69,7 @@ function Entry({ entry, view, setDraft }: EntryProps) {
         />
       );
     case 'toggle':
+      if (entry.requires && !draft[entry.requires]) return null;
       return (
         <Toggle
           label={entry.label}

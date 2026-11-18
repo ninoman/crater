@@ -5,7 +5,7 @@
 import { useCallback, useState } from 'react';
 import type { ItemKey, ReleaseInfo } from '../bandcamp';
 import { sendMessage } from '../shared/messages';
-import { loadSettings } from '../shared/settings';
+import { asksForTags, loadSettings } from '../shared/settings';
 import type { WishlistHeart } from '../ui';
 import { notifyFollowingChanged } from './followingChanges';
 
@@ -93,7 +93,7 @@ export function useWishlistHearts(): WishlistHearts {
 
       const openPrompt = () =>
         loadSettings().then((settings) => {
-          if (!settings.tagPrompt) return;
+          if (!asksForTags(settings)) return;
           setPrompt({ rowKey: target.rowKey, itemKey: key, name: target.name, anchor });
         });
 

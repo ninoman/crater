@@ -14,33 +14,46 @@ import { reportPage } from './reportPage';
 import { pageTagsStyles } from './shared/tagStyles';
 import { mountShadow } from './shared/mountShadow';
 import { pageTheme } from './shared/pageTheme';
+import { TaggingProvider } from './shared/tagging';
+import { loadSettings } from '../shared/settings';
 
 reportPage();
 reportCart();
 
 const kind = detectPageKind(document);
-switch (kind) {
-  case 'release':
-    mountShadow(
-      document.body,
-      <ReleaseSidebar />,
-      sidebarCss + pageTagsStyles,
-      pageTheme(document),
-    );
-    // Apart from the sidebar, which renders nothing inside while collapsed.
-    mountShadow(document.body, <ReleaseTagPrompts />, '', pageTheme(document));
-    break;
-  case 'band':
-    mountBand(document);
-    break;
-  case 'own-fan':
-    mountProfile(document);
-    break;
-  case 'fan':
-    mountFan(document);
-    break;
-  case 'other':
-    break;
+loadSettings()
+  .catch((error: unknown) => {
+    console.warn('crater: could not read settings; tags stay on', error);
+    return { tagging: true };
+  })
+  .then(({ tagging }) => mountPage(tagging));
+
+function mountPage(tagging: boolean): void {
+  switch (kind) {
+    case 'release':
+      mountShadow(
+        document.body,
+        <TaggingProvider value={tagging}>
+          <ReleaseSidebar />
+        </TaggingProvider>,
+        sidebarCss + pageTagsStyles,
+        pageTheme(document),
+      );
+      // Apart from the sidebar, which renders nothing inside while collapsed.
+      mountShadow(document.body, <ReleaseTagPrompts />, '', pageTheme(document));
+      break;
+    case 'band':
+      mountBand(document, tagging);
+      break;
+    case 'own-fan':
+      mountProfile(document, tagging);
+      break;
+    case 'fan':
+      mountFan(document, tagging);
+      break;
+    case 'other':
+      break;
+  }
 }
 
 mountPageBadges(document, kind).catch((error: unknown) => {

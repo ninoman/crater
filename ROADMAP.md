@@ -401,6 +401,18 @@ Design: decisions §23.
 
 **Done when:** a heart on a row or a playing track adds it to your Bandcamp wishlist with the tag picker open, a second click takes it off, the cart button adds the digital release and takes it out again, and a release in your cart is gone from For you after the next release page.
 
+## Turning tags off (not MVP)
+
+**Goal:** a setting that hides tagging everywhere without losing your tags. Design: decisions §31.
+
+1. [x] `tagging` setting, on by default; *Ask for tags when you wishlist* depends on it.
+2. [x] Off hides the tag lines on release, band and fan pages, the picker after a heart, tag filters on the Follows tab and the tag backup in the popup.
+3. [x] Off leaves the following, wishlist and collection tabs to Bandcamp.
+
+**Done when:** with tags off no tag UI shows anywhere and Bandcamp's own following, wishlist and collection tabs are back; turning tags on again shows every tag as before.
+
+---
+
 ## List filters (removed)
 
 Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate mates' latest, and the "Your place" setting. See decisions §25.

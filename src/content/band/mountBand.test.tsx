@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// The band home page against a fake worker: tags show only for a band you follow.
+// The band home page against a fake worker: tags show only for a band you follow, while tags are on.
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureText } from '../../../tests/fixtures';
@@ -21,10 +21,10 @@ function stubWorker() {
   });
 }
 
-async function mountPage() {
+async function mountPage(tagging = true) {
   const doc = new DOMParser().parseFromString(fixtureText('band-page.html'), 'text/html');
   await act(async () => {
-    mountBand(doc);
+    mountBand(doc, tagging);
   });
   await act(async () => {});
   return doc.querySelector('crater-root')?.shadowRoot?.querySelector('.dh-tag-editor') ?? null;
@@ -40,6 +40,11 @@ describe('mountBand', () => {
   it('shows the band’s tags when you follow it', async () => {
     followed = [1];
     expect((await mountPage())?.textContent).toContain('dub');
+  });
+
+  it('shows nothing while tags are off, even when you follow it', async () => {
+    followed = [1];
+    expect(await mountPage(false)).toBeNull();
   });
 
   it('shows nothing when you do not follow it', async () => {

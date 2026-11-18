@@ -10,7 +10,7 @@ import { CrateMateStandingBadge } from './CrateMateStandingBadge';
  * Adds the "your #N crate mate" badge and, for fans you follow, your tags under the name. A
  * follow made here is saved at once, and hearting one of the fan's items opens the tag picker.
  */
-export function mountFan(doc: Document): void {
+export function mountFan(doc: Document, tagging: boolean): void {
   const pagedata = doc.getElementById('pagedata');
   const name = doc.querySelector(FAN_PAGE_DOM.name);
   if (!pagedata || !name) return;
@@ -39,7 +39,7 @@ export function mountFan(doc: Document): void {
     name,
     <>
       <CrateMateStandingBadge fanId={fanId} />
-      <FollowedAccountTags kind="fan" id={fanId} name={fanName} />
+      {tagging && <FollowedAccountTags kind="fan" id={fanId} name={fanName} />}
       <FollowRecorder account={account} />
       <FanCardTagPrompt />
     </>,
