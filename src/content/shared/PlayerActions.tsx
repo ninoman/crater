@@ -1,5 +1,5 @@
-// The heart and cart beside a player's track title. The heart wishlists the playing track, or the
-// release when it has only one; the cart takes the digital release.
+// The heart and cart beside a player's track title. They take the playing track, or the release
+// when it has only one.
 
 import type { ItemKey } from '../../bandcamp';
 import type { CartLines } from '../../hooks/useCartLines';
@@ -19,13 +19,12 @@ export interface PlayerActionsProps {
   view: PreviewPlayerView;
   release: PlayingRelease;
   hearts: WishlistHearts;
-  /** Left out where the row under the player has the release's own cart button. */
-  cart?: CartLines;
-  /** False where that row has the release's heart, so only a track gets one here. */
-  releaseHeart: boolean;
+  cart: CartLines;
+  /** False where the row by the player has the release's heart and cart, so only a track gets them. */
+  forRelease: boolean;
 }
 
-function heartTarget(view: PreviewPlayerView, release: PlayingRelease, releaseHeart: boolean) {
+function target(view: PreviewPlayerView, release: PlayingRelease, forRelease: boolean) {
   if (view.state !== 'ready') return null;
   const trackKey = view.track.itemKey;
   if (view.trackCount > 1 && trackKey !== null) {
@@ -34,34 +33,32 @@ function heartTarget(view: PreviewPlayerView, release: PlayingRelease, releaseHe
       name: `${release.artist} – ${view.track.title}`,
     };
   }
-  if (!releaseHeart) return null;
+  if (!forRelease) return null;
   return {
     release: { itemKey: release.matchKey, albumKey: null },
     name: `${release.artist} – ${release.title}`,
   };
 }
 
-export function PlayerActions({ view, release, hearts, cart, releaseHeart }: PlayerActionsProps) {
-  const target = heartTarget(view, release, releaseHeart);
-  const releaseName = `${release.artist} – ${release.title}`;
+export function PlayerActions({ view, release, hearts, cart, forRelease }: PlayerActionsProps) {
+  const item = target(view, release, forRelease);
+  if (!item) return null;
+  const { itemKey } = item.release;
   return (
     <>
-      {target && (
-        <WishlistButton
-          name={target.name}
-          heart={hearts.heart(target.release.itemKey)}
-          onToggle={(anchor) =>
-            hearts.toggle({ ...target, rowKey: release.matchKey, url: release.url }, anchor)
-          }
-        />
-      )}
-      {cart && (
-        <CartButton
-          name={releaseName}
-          line={cart.line(release.matchKey)}
-          onToggle={() => cart.toggle(release.matchKey, release.url)}
-        />
-      )}
+      <WishlistButton
+        name={item.name}
+        heart={hearts.heart(itemKey)}
+        onToggle={(anchor) =>
+          hearts.toggle({ ...item, rowKey: release.matchKey, url: release.url }, anchor)
+        }
+      />
+      {/* The album's page leads the worker to the track's. */}
+      <CartButton
+        name={item.name}
+        line={cart.line(itemKey)}
+        onToggle={() => cart.toggle(itemKey, release.url)}
+      />
     </>
   );
 }

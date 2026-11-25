@@ -143,6 +143,21 @@ describe('setInCart', () => {
     expect(body(f.fetchJson.mock.calls[0]?.[0] as BandcampRequest).get('unit_price')).toBe('9.99');
   });
 
+  it("reads the track's page when the link is its album", async () => {
+    const trackUrl = 'https://floatingpoints.bandcamp.com/track/movement-1';
+    const wanted = parseReleasePage(TRACK).item.itemKey;
+    const f = fetchers({ [ALBUM_URL]: ALBUM, [trackUrl]: TRACK }, [
+      fixtureJson('cart_cb-add.json'),
+    ]);
+
+    const result = await setInCart(f, ALBUM_URL, { ...change, wanted, inCart: true });
+
+    expect(f.fetchText.mock.calls.map(([request]) => request.url)).toEqual([ALBUM_URL, trackUrl]);
+    const sent = body(f.fetchJson.mock.calls[0]?.[0] as BandcampRequest);
+    expect([sent.get('item_type'), sent.get('item_id')]).toEqual(['t', wanted.slice(1)]);
+    expect(result.status === 'done' && result.cart.items[0]?.itemKey).toBe(wanted);
+  });
+
   it('opens the page instead of adding a release with nothing to pay', async () => {
     const free = ALBUM.replace('minimum_price&quot;:9.99', 'minimum_price&quot;:0.0');
     const f = fetchers({ [ALBUM_URL]: free }, []);

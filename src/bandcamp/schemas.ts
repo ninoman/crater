@@ -78,7 +78,16 @@ export const rawTralbum = z.object({
     minimum_price: z.number().nullish(),
   }),
   /** A track's own artist line: null on a normal album, set per track on a compilation. */
-  trackinfo: z.array(z.object({ artist: z.string().nullish() })).nullish(),
+  trackinfo: z
+    .array(
+      z.object({
+        artist: z.string().nullish(),
+        track_id: z.number().nullish(),
+        /** Relative to the band's host: "/track/movement-1". */
+        title_link: z.string().nullish(),
+      }),
+    )
+    .nullish(),
 });
 
 /** The tracks a release page can stream. `file` is null for tracks Bandcamp won't play. */

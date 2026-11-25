@@ -25,7 +25,7 @@ export function ReleasePreview({ url, name, onHeard, shop }: ReleasePreviewProps
       onSeek={seek}
       onPreviousTrack={previousTrack}
       onNextTrack={nextTrack}
-      actions={shop && <PlayerActions view={view} releaseHeart {...shop} />}
+      actions={shop && <PlayerActions view={view} forRelease {...shop} />}
     />
   );
 }
