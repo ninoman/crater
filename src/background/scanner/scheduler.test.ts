@@ -303,6 +303,22 @@ describe('drainQueue', () => {
     expect(bandcamp.requests).toHaveLength(1);
   });
 
+  it('stops before the next request when paused during a request, with no pace wait', async () => {
+    const bandcamp = fakeBandcamp({ 1: 1, 2: 1 });
+    await queue([fanJob(1), fanJob(2)]);
+    const send = fetchJson;
+    const pausingFetch: typeof fetchJson = async (...args) => {
+      await store.save({ paused: true });
+      // Long enough ago that the next request needs no pace wait.
+      vi.setSystemTime(Date.now() + 3_600_000);
+      return send(...args);
+    };
+
+    expect(await drainQueue(deps({ fetchJson: pausingFetch }))).toBe('paused');
+    expect(bandcamp.requests).toHaveLength(1);
+    expect(slept).toEqual([]);
+  });
+
   it('resumes a fan from its saved cursor after the worker is killed', async () => {
     settings.collectionCap = 2000;
     const bandcamp = fakeBandcamp({ 9: 250 });
