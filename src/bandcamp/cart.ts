@@ -64,6 +64,8 @@ interface CartPage {
   price: number | null;
   /** On a track of an album, the album's page. */
   albumUrl: string | null;
+  /** On an album, its tracks' pages. */
+  trackUrls: ReadonlyMap<ItemKey, string>;
   cart: Cart;
 }
 
@@ -82,6 +84,11 @@ function parseCartPage(html: string, pageUrl: string): CartPage {
     },
     price,
     albumUrl: tralbum.album_url ? new URL(tralbum.album_url, pageUrl).href : null,
+    trackUrls: new Map(
+      (tralbum.trackinfo ?? []).flatMap(({ track_id: id, title_link: link }) =>
+        id != null && link ? [[itemKey('t', id), new URL(link, pageUrl).href] as const] : [],
+      ),
+    ),
     cart: parseCart(html) ?? EMPTY_CART,
   };
 }
@@ -93,13 +100,17 @@ export type CartChange =
 
 type Fetchers = { fetchText: FetchText; fetchJson: FetchJson };
 
-/** Reads `url` signed in; when it's a track of the album wanted, reads the album's page. */
+/**
+ * Reads `url` signed in. When it's a track of the album wanted, reads the album's page; when it's
+ * the album of the track wanted, the track's.
+ */
 async function readPage(fetchers: Fetchers, url: string, wanted: ItemKey) {
   const read = async (pageUrl: string) =>
     parseCartPage(await fetchers.fetchText(signedInReleasePageRequest(pageUrl)), pageUrl);
   const page = await read(url);
-  if (page.item.itemKey === wanted || page.albumUrl === null) return { page, url };
-  return { page: await read(page.albumUrl), url: page.albumUrl };
+  const next = page.trackUrls.get(wanted) ?? page.albumUrl;
+  if (page.item.itemKey === wanted || next === null) return { page, url };
+  return { page: await read(next), url: next };
 }
 
 const syncOf = (cart: Cart): CartSync => ({ syncNum: cart.syncNum, cartLength: cart.items.length });
@@ -171,8 +182,8 @@ async function addLine(
 }
 
 /**
- * Adds the digital `wanted` to your cart at its minimum price, or takes it out. `url` is its page
- * or one of its tracks'. Answers the cart as it now stands.
+ * Adds the digital `wanted` to your cart at its minimum price, or takes it out. `url` is its page,
+ * one of its tracks' or, for a track, its album's. Answers the cart as it now stands.
  */
 export async function setInCart(
   fetchers: Fetchers,
@@ -204,6 +215,7 @@ function parseApiCartPage(json: unknown, cart: Cart): { page: CartPage; url: str
       },
       price,
       albumUrl: null,
+      trackUrls: new Map(),
       cart,
     },
     url: data.bandcamp_url,

@@ -129,8 +129,8 @@ function ListAudioPlayer({
           view={player.view}
           release={row}
           hearts={actions.wishlist}
-          cart={docked ? actions.cart : undefined}
-          releaseHeart={docked}
+          cart={actions.cart}
+          forRelease={docked}
         />
       }
     />
