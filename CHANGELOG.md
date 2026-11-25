@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.0](https://github.com/ninoman/crater/compare/v0.21.1...v0.22.0) (2026-11-25)
+
+
+### Features
+
+* **cart:** cart button for the playing track in the player ([#80](https://github.com/ninoman/crater/issues/80)) ([7bb05a9](https://github.com/ninoman/crater/commit/7bb05a9f9324a501bc707f78c9c2b7ba8bcb525a))
+
 ## [0.21.1](https://github.com/ninoman/crater/compare/v0.21.0...v0.21.1) (2026-11-25)
 
 
