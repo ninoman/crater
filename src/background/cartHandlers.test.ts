@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fixtureJson, fixtureText } from '../../tests/fixtures';
 import { type FetchJson, type FetchText, parseReleasePage } from '../bandcamp';
-import { CraterDb } from '../db';
+import { CraterDb, upsertCollectionItems } from '../db';
 import { cartHandlers } from './cartHandlers';
 import { cartKeys } from './cartStore';
 
@@ -58,6 +58,55 @@ describe('cart handlers', () => {
       status: 'done',
     });
     expect([...(await cartKeys())]).toEqual([album.itemKey]);
+  });
+
+  it('adds a custom-domain release from bandcamp.com, never fetching the domain', async () => {
+    const custom = 'https://craigieknowes.com/album/sidewinder-ep';
+    await upsertCollectionItems(db, [
+      {
+        itemKey: 'a450307620',
+        albumKey: null,
+        title: 'Sidewinder EP',
+        artist: 'Per Hammar',
+        bandId: 3695260806,
+        url: custom,
+        artId: null,
+        purchaseKind: 'album',
+        label: null,
+        labelId: null,
+        otherOwners: null,
+        addedAt: 1,
+        compilation: false,
+      },
+    ]);
+    const answers = [
+      fixtureJson('tralbum_details-custom-domain.json'),
+      fixtureJson('cart_cb-add.json'),
+    ];
+    const fetchText = vi.fn<FetchText>();
+    const h = cartHandlers(
+      db,
+      vi.fn<FetchJson>(async () => answers.shift()),
+      fetchText,
+    );
+
+    expect(await h.setInCart({ url: custom, itemKey: 'a450307620', inCart: true }, sender)).toEqual(
+      { status: 'done' },
+    );
+    expect(fetchText).not.toHaveBeenCalled();
+    expect([...(await cartKeys())]).toEqual(['a450307620']);
+  });
+
+  it('opens a custom-domain release whose seller is unknown', async () => {
+    const fetchJson = vi.fn<FetchJson>();
+    const h = cartHandlers(db, fetchJson, vi.fn<FetchText>());
+    const custom = 'https://craigieknowes.com/album/sidewinder-ep';
+
+    expect(await h.setInCart({ url: custom, itemKey: 'a1', inCart: true }, sender)).toEqual({
+      status: 'free',
+      url: custom,
+    });
+    expect(fetchJson).not.toHaveBeenCalled();
   });
 
   it('is empty before any page has shown the cart', async () => {

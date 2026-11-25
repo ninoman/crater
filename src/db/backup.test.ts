@@ -104,6 +104,28 @@ describe('backup round trip', () => {
   });
 });
 
+describe('a write landing mid-import', () => {
+  it("is replaced by the file's row instead of failing the import", async () => {
+    await seed(db);
+    const { file } = await exportDatabase(db);
+    // Another page's write lands right after the table is emptied.
+    const proto = Object.getPrototypeOf(db.tags) as { clear: () => Promise<void> };
+    const clear = proto.clear;
+    proto.clear = async function (this: { name: string }) {
+      await clear.call(this);
+      if (this.name === 'tags') await db.tags.put({ id: 7, name: 'Stray', nameKey: 'stray' });
+    };
+
+    try {
+      await importDatabase(db, file, memorySnapshot().store, noPhase);
+    } finally {
+      proto.clear = clear;
+    }
+
+    expect(await db.tags.toArray()).toEqual([{ id: 7, name: 'Ambient', nameKey: 'ambient' }]);
+  });
+});
+
 describe('import phases', () => {
   it('walks snapshotting, writing, cleanup and clears', async () => {
     await seed(db);

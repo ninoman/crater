@@ -49,6 +49,9 @@ export interface ScannerStore {
 
 const STORAGE_KEY = 'scanner';
 
+// Saves are load-merge-write, so overlapping ones would overwrite each other's fields.
+let lastSave: Promise<unknown> = Promise.resolve();
+
 export const chromeScannerStore: ScannerStore = {
   async load() {
     const stored = await chrome.storage.local.get(STORAGE_KEY);
@@ -57,10 +60,15 @@ export const chromeScannerStore: ScannerStore = {
       ...(stored[STORAGE_KEY] as Partial<ScannerState> | undefined),
     };
   },
-  async save(patch) {
-    const next = { ...(await this.load()), ...patch };
-    await chrome.storage.local.set({ [STORAGE_KEY]: next });
-    return next;
+  save(patch) {
+    const run = async () => {
+      const next = { ...(await this.load()), ...patch };
+      await chrome.storage.local.set({ [STORAGE_KEY]: next });
+      return next;
+    };
+    const saved = lastSave.then(run, run);
+    lastSave = saved.catch(() => {});
+    return saved;
   },
 };
 

@@ -131,7 +131,23 @@ export async function ensureScannerAlarm(): Promise<void> {
   }
 }
 
-export async function openRelease(
+// Opens and closes read-modify-write the session-stored tab map and watched list, so overlapping
+// ones (restored tabs) would erase each other's entries. A failed call must not stall the next.
+let tabWork: Promise<unknown> = Promise.resolve();
+function oneAtATime<T>(task: () => Promise<T>): Promise<T> {
+  const run = tabWork.then(task);
+  tabWork = run.catch(() => {});
+  return run;
+}
+
+export function openRelease(
+  item: ReleasePageItem,
+  tabId: number | undefined,
+): Promise<ScanProgress> {
+  return oneAtATime(() => openReleaseNow(item, tabId));
+}
+
+async function openReleaseNow(
   item: ReleasePageItem,
   tabId: number | undefined,
 ): Promise<ScanProgress> {
@@ -158,9 +174,11 @@ export async function openRelease(
 }
 
 /** A tab closed: the release it showed leaves the queue unless another tab still shows it. */
-export async function closeReleaseTab(tabId: number): Promise<void> {
-  const left = await closeTab(tabId);
-  if (left) await dropOpenedRelease(left);
+export function closeReleaseTab(tabId: number): Promise<void> {
+  return oneAtATime(async () => {
+    const left = await closeTab(tabId);
+    if (left) await dropOpenedRelease(left);
+  });
 }
 
 /**

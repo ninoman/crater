@@ -8,7 +8,7 @@ import { Tooltip } from './Tooltip';
  */
 export interface WishlistHeart {
   on: boolean;
-  status: 'idle' | 'saving' | 'signed-out' | 'error';
+  status: 'idle' | 'saving' | 'signed-out' | 'unavailable' | 'error';
 }
 
 export interface WishlistButtonProps {
@@ -25,6 +25,8 @@ function hint({ on, status }: WishlistHeart): string {
       return on ? 'Adding to your wishlist…' : 'Removing from your wishlist…';
     case 'signed-out':
       return 'Sign in to Bandcamp to change your wishlist';
+    case 'unavailable':
+      return 'Open the release on Bandcamp to wishlist it';
     case 'error':
       return "Couldn't change your wishlist. Try again";
     case 'idle':

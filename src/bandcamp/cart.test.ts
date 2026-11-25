@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
 import { fixtureJson, fixtureText } from '../../tests/fixtures';
-import { parseCart, readPageCart, setInCart } from './cart';
+import { parseCart, readPageCart, setInCart, setInCartFromApi } from './cart';
 import type { FetchJson } from './collection';
 import { BandcampApiError } from './errors';
 import { parseReleasePage, type FetchText } from './release';
@@ -193,5 +193,109 @@ describe('setInCart', () => {
 
     expect(result).toEqual({ status: 'done', cart: { syncNum: 1, items: [] } });
     expect(f.fetchJson).not.toHaveBeenCalled();
+  });
+});
+
+describe('setInCartFromApi', () => {
+  const DETAILS = fixtureJson('tralbum_details-custom-domain.json') as Record<string, unknown>;
+  const URL_ = 'https://craigieknowes.com/album/sidewinder-ep';
+  const release = { url: URL_, sellerId: 3695260806, cart: { syncNum: 3, items: [] } };
+  const wanted = 'a450307620' as const;
+
+  it('adds a custom-domain release at its API price, to bandcamp.com', async () => {
+    const f = fetchers({}, [DETAILS, fixtureJson('cart_cb-add.json')]);
+
+    const result = await setInCartFromApi(f, release, { ...change, wanted, inCart: true });
+
+    const [details, add] = f.fetchJson.mock.calls.map(([request]) => request);
+    expect(details?.url).toContain('bandcamp.com/api/mobile/');
+    expect(JSON.parse(String(details?.init.body))).toEqual({
+      band_id: 3695260806,
+      tralbum_type: 'a',
+      tralbum_id: 450307620,
+    });
+    expect(add?.url).toBe('https://bandcamp.com/cart/cb');
+    expect(Object.fromEntries(body(add as BandcampRequest))).toMatchObject({
+      req: 'add',
+      item_type: 'a',
+      item_id: '450307620',
+      unit_price: '7',
+      band_id: '3695260806',
+      sync_num: '3',
+      cart_length: '0',
+    });
+    expect(result).toEqual({
+      status: 'done',
+      cart: { syncNum: 2, items: [{ lineId: 410362013, itemKey: wanted }] },
+    });
+    expect(f.fetchText).not.toHaveBeenCalled();
+  });
+
+  it('with no stored cart, retries with the cart Bandcamp answers', async () => {
+    const resync = {
+      ...(fixtureJson('cart_cb-resync.json') as object),
+      cart_data: { sync_num: 5, items: [line(9, 't', 42)] },
+    };
+    const f = fetchers({}, [DETAILS, resync, fixtureJson('cart_cb-add.json')]);
+
+    const result = await setInCartFromApi(
+      f,
+      { ...release, cart: null },
+      { ...change, wanted, inCart: true },
+    );
+
+    const first = body(f.fetchJson.mock.calls[1]?.[0] as BandcampRequest);
+    const retry = body(f.fetchJson.mock.calls[2]?.[0] as BandcampRequest);
+    expect([first.get('sync_num'), first.get('cart_length')]).toEqual(['1', '0']);
+    expect([retry.get('sync_num'), retry.get('cart_length')]).toEqual(['5', '1']);
+    expect(result.status === 'done' && result.cart.items.map((item) => item.itemKey)).toEqual([
+      't42',
+      wanted,
+    ]);
+  });
+
+  it('removes it by the line in our cart, without reading its price', async () => {
+    const f = fetchers({}, [{ req: 'del', sync_num: 4 }]);
+
+    const result = await setInCartFromApi(
+      f,
+      { ...release, cart: { syncNum: 3, items: [{ lineId: 77, itemKey: wanted }] } },
+      { ...change, wanted, inCart: false },
+    );
+
+    expect(Object.fromEntries(body(f.fetchJson.mock.calls[0]?.[0] as BandcampRequest))).toEqual({
+      req: 'del',
+      id: '77',
+      sync_num: '3',
+    });
+    expect(result).toEqual({ status: 'done', cart: { syncNum: 4, items: [] } });
+  });
+
+  it('opens the page of a free download', async () => {
+    const f = fetchers({}, [{ ...DETAILS, free_download: true }]);
+
+    expect(await setInCartFromApi(f, release, { ...change, wanted, inCart: true })).toEqual({
+      status: 'free',
+      url: URL_,
+    });
+    expect(f.fetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails, rather than opening the page, when the price request gets no answer', async () => {
+    const f = fetchers({}, []);
+    f.fetchJson.mockRejectedValueOnce(new Error('offline'));
+
+    await expect(setInCartFromApi(f, release, { ...change, wanted, inCart: true })).rejects.toThrow(
+      'offline',
+    );
+  });
+
+  it("opens the page when the price can't be read", async () => {
+    const f = fetchers({}, [{ error: true, error_message: 'No such tralbum' }]);
+
+    expect(await setInCartFromApi(f, release, { ...change, wanted, inCart: true })).toEqual({
+      status: 'free',
+      url: URL_,
+    });
   });
 });
