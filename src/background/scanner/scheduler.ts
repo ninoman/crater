@@ -59,6 +59,8 @@ export async function drainQueue(deps: SchedulerDeps): Promise<StopReason> {
   try {
     for (;;) {
       await deps.waitForOwnSync();
+      // Reloaded each round so a pause pressed during the last request is seen.
+      state = await store.load();
       const settings = await deps.loadSettings();
       if (pauseFor(state, settings.dailyRequestBudget, deps.now())) return 'paused';
 
