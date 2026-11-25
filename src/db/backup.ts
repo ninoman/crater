@@ -154,7 +154,9 @@ export async function replaceAll(db: CraterDb, file: Blob): Promise<void> {
   ensureFileReader();
   const json = await readJson(file);
   await Promise.all(db.tables.map((table) => table.clear()));
-  await importInto(db, json, { ...READ_ONLY, transform: upgradeRows });
+  // Imports take minutes and page views keep writing; a row landing after the clear must not
+  // make bulkAdd fail on its key (decisions §10).
+  await importInto(db, json, { ...READ_ONLY, transform: upgradeRows, overwriteValues: true });
 }
 
 /**
