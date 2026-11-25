@@ -67,5 +67,9 @@ export const rawApiReleaseResponse = z.union([
     featured_track_id: z.number().nullish(),
     tags: z.array(z.object({ name: z.string() })).nullish(),
     tracks: z.array(rawApiTrack).nullish(),
+    // The digital release's price in the seller's currency, for the cart on custom domains (§28).
+    price: z.number().nullish(),
+    is_purchasable: z.boolean().nullish(),
+    free_download: z.boolean().nullish(),
   }),
 ]);

@@ -54,8 +54,14 @@ export {
   parseCart,
   readPageCart,
   setInCart,
+  setInCartFromApi,
 } from './cart';
-export { parseWishlistPage, setWishlisted, type WishlistChange } from './wishlist';
+export {
+  parseWishlistPage,
+  setWishlisted,
+  setWishlistedFromFanPage,
+  type WishlistChange,
+} from './wishlist';
 export {
   type CollectionReorder,
   MAX_REORDER_ITEMS,

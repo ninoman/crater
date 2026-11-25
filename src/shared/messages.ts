@@ -154,7 +154,8 @@ export interface MessageMap {
   /**
    * Adds `release` to your Bandcamp wishlist or takes it off, from a recommendation row or its
    * player, and records it. `url` is a page of it, its album or one of its tracks, for the crumb.
-   * `signed-out` when Bandcamp gave no session to post with.
+   * `signed-out` when Bandcamp gave no session to post with; `unavailable` for a release on a
+   * custom domain whose seller we don't know.
    */
   setWishlisted: {
     request: {
@@ -162,7 +163,7 @@ export interface MessageMap {
       release: Pick<ReleasePageItem, 'itemKey' | 'albumKey'>;
       wishlisted: boolean;
     };
-    response: { status: 'done' | 'signed-out' };
+    response: { status: 'done' | 'signed-out' | 'unavailable' };
   };
   /**
    * Adds the digital release `itemKey` to your Bandcamp cart at its minimum price, or takes it

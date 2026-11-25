@@ -231,5 +231,40 @@ describe('item list handlers', () => {
       });
       expect(await h.getItemTags({ itemKey: 'a2' }, sender)).toBeNull();
     });
+
+    describe('on a custom domain', () => {
+      const custom = 'https://craigieknowes.com/album/sidewinder-ep';
+      const crumb = (request: unknown) =>
+        new URLSearchParams(String((request as { init: { body: string } }).init.body));
+
+      it('posts with your fan page crumb and the stored seller, never fetching the domain', async () => {
+        await upsertCollectionItems(db, [{ ...ITEM, itemKey: 'a3', bandId: 99, url: custom }]);
+        fetchText.mockResolvedValue(fixtureText('me-fan-page.html'));
+
+        expect(
+          await h.setWishlisted(
+            { url: custom, release: { itemKey: 'a3', albumKey: null }, wishlisted: true },
+            sender,
+          ),
+        ).toEqual({ status: 'done' });
+
+        expect(fetchText.mock.calls.map(([request]) => request.url)).toEqual([
+          'https://bandcamp.com/me',
+        ]);
+        expect(crumb(fetchJson.mock.calls[0]?.[0]).get('band_id')).toBe('99');
+        expect(await h.getItemTags({ itemKey: 'a3' }, sender)).toEqual([]);
+      });
+
+      it('refuses, sending nothing, when the seller is unknown', async () => {
+        expect(
+          await h.setWishlisted(
+            { url: custom, release: { itemKey: 'a3', albumKey: null }, wishlisted: true },
+            sender,
+          ),
+        ).toEqual({ status: 'unavailable' });
+        expect(fetchText).not.toHaveBeenCalled();
+        expect(fetchJson).not.toHaveBeenCalled();
+      });
+    });
   });
 });
