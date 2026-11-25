@@ -5,9 +5,11 @@ import {
   artUrl,
   type FetchJson,
   type FetchText,
+  isBandcampUrl,
   keyToNumber,
   saveCollectionOrder,
   setWishlisted,
+  setWishlistedFromFanPage,
 } from '../bandcamp';
 import {
   assignItemTag,
@@ -30,6 +32,7 @@ import { crateMateOwnerCounts } from '../scoring/wishlistCrateMates';
 import type { ListedItem } from '../shared/itemList';
 import type { MessageHandlers } from '../shared/messages';
 import { releaseFromCard } from './releaseFromCard';
+import { sellerOf } from './sellerOf';
 import { ensureSessionOrigin } from './sessionOrigin';
 
 export type ItemListHandlers = Pick<
@@ -130,12 +133,24 @@ export function itemListHandlers(
     setWishlisted: async ({ url, release, wishlisted }) => {
       const me = await getMe(db);
       if (!me) return { status: 'signed-out' };
-      await ensureSessionOrigin();
-      const change = await setWishlisted({ fetchText, fetchJson }, url, {
-        fanId: me.fanId,
-        itemKey: release.itemKey,
-        wishlisted,
-      });
+      const fetchers = { fetchText, fetchJson };
+      const wanted = { fanId: me.fanId, itemKey: release.itemKey, wishlisted };
+      let change: { status: 'done' | 'signed-out' };
+      if (isBandcampUrl(url)) {
+        await ensureSessionOrigin();
+        change = await setWishlisted(fetchers, url, wanted);
+      } else {
+        // A custom domain's page can't be fetched (§5): the crumb comes from your fan page.
+        const keys = release.albumKey ? [release.itemKey, release.albumKey] : [release.itemKey];
+        const bandId = await sellerOf(db, url, keys);
+        if (bandId === null) return { status: 'unavailable' };
+        await ensureSessionOrigin();
+        change = await setWishlistedFromFanPage(fetchers, {
+          ...wanted,
+          username: me.username,
+          bandId,
+        });
+      }
       if (change.status === 'signed-out') return change;
       if (wishlisted) await markWishlisted(db, me.fanId, release, Date.now());
       else await markUnwishlisted(db, me.fanId, release.itemKey);

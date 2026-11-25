@@ -104,7 +104,7 @@ export function useWishlistHearts(): WishlistHearts {
             return;
           }
           closeOwnPrompt();
-          setHeart(key, { on, status: 'signed-out' });
+          setHeart(key, { on, status: result });
         },
         (error: unknown) => {
           console.warn('crater: could not change your wishlist', error);

@@ -1177,6 +1177,17 @@ Every recommendation row (Also bought, For you, Crate mates' latest, New from fo
 - **What's in your cart is left out of every list**, like wishlisted releases (`exclusions`, `inCart`). A track in the cart keeps its album in. Our copy (`cartStore`, session storage) comes from three places: any release or band page you open (its `data-cart`), and our own adds and removals. A fan page has no `data-cart`, so something added on Bandcamp only drops out of the profile tabs after the next release or band page.
 - **Hearts and cart buttons start off**, since lists leave out what's in your wishlist and cart. A row you just changed keeps its filled button until the list reloads, then drops out.
 
+### Custom domains
+
+Added 2026-11-25. **Not yet tried on a live account**: built from captured fixtures only. Code: `setWishlistedFromFanPage`, `setInCartFromApi`, `background/sellerOf.ts`.
+
+A release on a custom domain has a page we can't fetch (§5), so neither button reads it. Both POSTs were already on bandcamp.com; only the page's data is replaced, with no new permissions:
+
+- **Seller:** the stored item's `bandId`, or the album's, or that of the item at the row's URL (a track's seller sells its album). With none known, the heart answers `unavailable` ("Open the release on Bandcamp to wishlist it") and the cart button opens the page, as for a free release. Nothing is sent.
+- **Heart:** the `collect_item_cb` / `uncollect_item_cb` crumbs from your own fan page, fetched signed in (it carries both, like §29's reorder crumb). Item id and type come from the item key, so no `tralbum_details` call.
+- **Cart add:** price from `tralbum_details` for the wanted key: `price`, or no price (open the page) when `free_download` or not `is_purchasable`. `sync_num` and lines from our cart copy (`cartStore`); with none, the request goes out as an empty cart (`sync_num` 1) and Bandcamp's `resync` answer supplies the real one for the single retry. A failed `tralbum_details` read opens the page. **Removal** needs only the cart line from our copy, so sends nothing when we don't have one.
+- **Open questions for a live account:** whether a fan page's crumb is accepted for another band's release; whether `price` is the floor of a name-your-price release or its suggested price (every captured response says `is_set_price: false`, even fixed-price ones); whether the add's `unit_price` needs the seller's currency to match `currency`.
+
 ## 29. Collection order and drag to reorder
 
 Decided and built 2026-11-13. Code: `bandcamp/collectionReorder.ts`, `db/collectionOrder.ts` (pure), `db/repo/collectionOrder.ts`, `background/syncMe.ts`, `hooks/useCollectionReorder.ts`, `ui/useSortableGrid.ts`, `ui/sortableGrid.ts` (pure), `ui/SortableCardGrid.tsx`, `ui/DragHandle.tsx`, `ui/Toast.tsx`, schema v22. Tested on fixtures and in jsdom; **not yet tried on a live account**.

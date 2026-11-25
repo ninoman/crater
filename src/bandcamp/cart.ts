@@ -2,9 +2,10 @@
 // the buy dialog and the cart's own "remove" do.
 
 import type { FetchJson } from './collection';
+import { rawApiReleaseResponse } from './discographySchemas';
 import { BandcampApiError, ParserError } from './errors';
 import { readDataAttribute } from './html';
-import { itemKey } from './keys';
+import { itemKey, parseItemKey } from './keys';
 import type { FetchText } from './release';
 import {
   type CartAdd,
@@ -12,10 +13,11 @@ import {
   cartAddRequest,
   cartDeleteRequest,
   signedInReleasePageRequest,
+  tralbumDetailsRequest,
 } from './requests';
 import { rawCart, rawCartResponse, rawTralbum } from './schemas';
 import type { ItemKey } from './types';
-import { validate } from './validate';
+import { assertNotApiError, validate } from './validate';
 
 /** One line of your cart: albums and tracks only, since packages aren't recommended. */
 export interface CartItem {
@@ -128,28 +130,31 @@ async function sendSynced(
   return { response, cart: current };
 }
 
-/**
- * Adds the digital `wanted` to your cart at its minimum price, or takes it out. `url` is its page
- * or one of its tracks'. Answers the cart as it now stands.
- */
-export async function setInCart(
+interface Change {
+  wanted: ItemKey;
+  inCart: boolean;
+  fanId: number | null;
+  localId: () => string;
+}
+
+const others = (cart: Cart, wanted: ItemKey) =>
+  cart.items.filter((item) => item.itemKey !== wanted);
+
+async function removeLine(fetchers: Fetchers, start: Cart, wanted: ItemKey): Promise<CartChange> {
+  const { response, cart } = await sendSynced(fetchers, start, (current) => {
+    const line = current.items.find((item) => item.itemKey === wanted);
+    return line ? cartDeleteRequest(line.lineId, syncOf(current)) : null;
+  });
+  const syncNum = response?.sync_num ?? cart.syncNum;
+  return { status: 'done', cart: { syncNum, items: others(cart, wanted) } };
+}
+
+async function addLine(
   fetchers: Fetchers,
-  url: string,
-  change: { wanted: ItemKey; inCart: boolean; fanId: number | null; localId: () => string },
+  page: CartPage,
+  pageUrl: string,
+  change: Change,
 ): Promise<CartChange> {
-  const { page, url: pageUrl } = await readPage(fetchers, url, change.wanted);
-  const others = (cart: Cart) => cart.items.filter((item) => item.itemKey !== change.wanted);
-
-  if (!change.inCart) {
-    const lineOf = (cart: Cart) => cart.items.find((item) => item.itemKey === change.wanted);
-    const { response, cart } = await sendSynced(fetchers, page.cart, (current) => {
-      const line = lineOf(current);
-      return line ? cartDeleteRequest(line.lineId, syncOf(current)) : null;
-    });
-    const syncNum = response?.sync_num ?? cart.syncNum;
-    return { status: 'done', cart: { syncNum, items: others(cart) } };
-  }
-
   if (!page.price) return { status: 'free', url: pageUrl };
   const add = { ...page.item, fanId: change.fanId, localId: change.localId() };
   const { response, cart } = await sendSynced(fetchers, page.cart, (current) =>
@@ -160,7 +165,74 @@ export async function setInCart(
     status: 'done',
     cart: {
       syncNum: response.sync_num ?? cart.syncNum,
-      items: [...others(cart), { lineId: response.id, itemKey: change.wanted }],
+      items: [...others(cart, change.wanted), { lineId: response.id, itemKey: change.wanted }],
     },
   };
+}
+
+/**
+ * Adds the digital `wanted` to your cart at its minimum price, or takes it out. `url` is its page
+ * or one of its tracks'. Answers the cart as it now stands.
+ */
+export async function setInCart(
+  fetchers: Fetchers,
+  url: string,
+  change: Change,
+): Promise<CartChange> {
+  const { page, url: pageUrl } = await readPage(fetchers, url, change.wanted);
+  return change.inCart
+    ? addLine(fetchers, page, pageUrl, change)
+    : removeLine(fetchers, page.cart, change.wanted);
+}
+
+/** A release as `tralbum_details` tells it, shaped like the page it stands in for. */
+function parseApiCartPage(json: unknown, cart: Cart): { page: CartPage; url: string } {
+  const data = assertNotApiError(
+    validate(rawApiReleaseResponse, json, 'tralbum_details'),
+    'tralbum_details',
+  );
+  const payable = data.is_purchasable !== false && !data.free_download;
+  const price = payable ? (data.price ?? null) : null;
+  return {
+    page: {
+      item: {
+        itemKey: itemKey(data.type, data.id),
+        itemType: data.type === 'a' ? 'album' : 'track',
+        itemId: data.id,
+        bandId: data.band.band_id,
+        unitPrice: price ?? 0,
+      },
+      price,
+      albumUrl: null,
+      cart,
+    },
+    url: data.bandcamp_url,
+  };
+}
+
+/**
+ * The same change for a release whose page can't be fetched (a custom domain, decisions §5):
+ * its price from `tralbum_details` on bandcamp.com, the cart from our copy (`cart`, null when we
+ * have none, in which case Bandcamp's resync answer supplies it). Opens `url` instead when the
+ * price can't be read.
+ */
+export async function setInCartFromApi(
+  fetchers: Fetchers,
+  release: { url: string; sellerId: number; cart: Cart | null },
+  change: Change,
+): Promise<CartChange> {
+  const cart = release.cart ?? EMPTY_CART;
+  if (!change.inCart) return removeLine(fetchers, cart, change.wanted);
+  const { type, tralbumId } = parseItemKey(change.wanted);
+  let read: { page: CartPage; url: string };
+  try {
+    read = parseApiCartPage(
+      await fetchers.fetchJson(tralbumDetailsRequest(release.sellerId, type, tralbumId)),
+      cart,
+    );
+  } catch {
+    // Its page still sells it: better than a cart button that only fails.
+    return { status: 'free', url: release.url };
+  }
+  return addLine(fetchers, read.page, read.url, change);
 }

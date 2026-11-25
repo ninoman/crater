@@ -4,7 +4,7 @@ import type { FetchJson } from './collection';
 import { BandcampApiError } from './errors';
 import { parseReleasePage, type FetchText } from './release';
 import type { BandcampRequest } from './requests';
-import { parseWishlistPage, setWishlisted } from './wishlist';
+import { parseWishlistPage, setWishlisted, setWishlistedFromFanPage } from './wishlist';
 
 const ALBUM = fixtureText('album-page.html');
 const ALBUM_URL = 'https://floatingpoints.bandcamp.com/album/promises';
@@ -105,5 +105,51 @@ describe('setWishlisted', () => {
     await expect(
       setWishlisted(f, ALBUM_URL, { fanId: 7, itemKey: album.itemKey, wishlisted: true }),
     ).rejects.toBeInstanceOf(BandcampApiError);
+  });
+});
+
+describe('setWishlistedFromFanPage', () => {
+  const FAN_PAGE = fixtureText('me-fan-page.html');
+  const change = { fanId: 7, username: 'me', bandId: 3695260806, itemKey: 'a450307620' as const };
+
+  it('adds a custom-domain release with the crumb on your own fan page', async () => {
+    const f = fetchers(FAN_PAGE, { ok: true });
+
+    expect(await setWishlistedFromFanPage(f, { ...change, wishlisted: true })).toEqual({
+      status: 'done',
+    });
+
+    const page = f.fetchText.mock.calls[0]?.[0];
+    expect([page?.url, page?.init.credentials]).toEqual(['https://bandcamp.com/me', 'include']);
+    const request = sent(f.fetchJson);
+    expect(request.url).toBe('https://bandcamp.com/collect_item_cb');
+    expect(Object.fromEntries(new URLSearchParams(String(request.init.body)))).toEqual({
+      fan_id: '7',
+      item_id: '450307620',
+      item_type: 'album',
+      band_id: '3695260806',
+      crumb: '|collect_item_cb|1792483607|REDACTED',
+    });
+  });
+
+  it("takes it off with the fan page's other crumb", async () => {
+    const f = fetchers(FAN_PAGE, { ok: true });
+
+    await setWishlistedFromFanPage(f, { ...change, wishlisted: false });
+
+    const request = sent(f.fetchJson);
+    expect(request.url).toBe('https://bandcamp.com/uncollect_item_cb');
+    expect(new URLSearchParams(String(request.init.body)).get('crumb')).toBe(
+      '|uncollect_item_cb|1792483607|REDACTED',
+    );
+  });
+
+  it('answers signed-out on a fan page without crumbs', async () => {
+    const f = fetchers(FAN_PAGE.replace(/data-crumbs="[^"]*"/, ''), null);
+
+    expect(await setWishlistedFromFanPage(f, { ...change, wishlisted: true })).toEqual({
+      status: 'signed-out',
+    });
+    expect(f.fetchJson).not.toHaveBeenCalled();
   });
 });
