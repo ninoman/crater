@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.1](https://github.com/ninoman/crater/compare/v0.21.0...v0.21.1) (2026-11-25)
+
+
+### Bug Fixes
+
+* audit fixes for tab, import and scanner races; cart and heart on custom domains ([#78](https://github.com/ninoman/crater/issues/78)) ([b60c091](https://github.com/ninoman/crater/commit/b60c0916cc21aada5e40d357abcfa4d796d3be47))
+
 ## [0.21.0](https://github.com/ninoman/crater/compare/v0.20.0...v0.21.0) (2026-11-18)
 
 
