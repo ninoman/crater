@@ -230,9 +230,12 @@ export async function setInCartFromApi(
       await fetchers.fetchJson(tralbumDetailsRequest(release.sellerId, type, tralbumId)),
       cart,
     );
-  } catch {
-    // Its page still sells it: better than a cart button that only fails.
-    return { status: 'free', url: release.url };
+  } catch (error) {
+    // An answer we can't read: its page still sells it. Offline or throttled fails as usual.
+    if (error instanceof ParserError || error instanceof BandcampApiError) {
+      return { status: 'free', url: release.url };
+    }
+    throw error;
   }
   return addLine(fetchers, read.page, read.url, change);
 }

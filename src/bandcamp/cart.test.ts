@@ -281,6 +281,15 @@ describe('setInCartFromApi', () => {
     expect(f.fetchJson).toHaveBeenCalledTimes(1);
   });
 
+  it('fails, rather than opening the page, when the price request gets no answer', async () => {
+    const f = fetchers({}, []);
+    f.fetchJson.mockRejectedValueOnce(new Error('offline'));
+
+    await expect(setInCartFromApi(f, release, { ...change, wanted, inCart: true })).rejects.toThrow(
+      'offline',
+    );
+  });
+
   it("opens the page when the price can't be read", async () => {
     const f = fetchers({}, [{ error: true, error_message: 'No such tralbum' }]);
 
