@@ -413,6 +413,15 @@ Design: decisions §23.
 
 ---
 
+## Start previews past the intro (not MVP)
+
+**Goal:** a setting that starts recommendation previews a set percent into each track. Design: decisions §32.
+
+1. [x] `previewStartPercent` setting under *Previews*; wishlist and collection always play from the start.
+2. [x] Heard's half-a-track rule counts against the part that played.
+
+---
+
 ## List filters (removed)
 
 Built and removed on 2026-10-24: a filter bar on For you, Also bought and Crate mates' latest, and the "Your place" setting. See decisions §25.

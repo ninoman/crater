@@ -39,6 +39,8 @@ export interface Settings {
   deepCutMaxSupporters: number;
   /** A desktop notification when a read of your follows finds new releases (decisions §23). */
   followNotifications: boolean;
+  /** Preview tracks start this far in, as a percent of their length, to skip slow intros. */
+  previewStartPercent: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -67,6 +69,7 @@ export const DEFAULT_SETTINGS: Settings = {
   deepCutMaxSupporters: 15,
   // Needs an optional permission, asked for when it's turned on.
   followNotifications: false,
+  previewStartPercent: 0,
 };
 
 /** Whether a heart should open the tag picker: only while tags are on at all. */
@@ -101,6 +104,7 @@ export const SETTING_LIMITS: Record<NumericSetting, { min: number; max: number }
   latelyRescanCrateMates: { min: 0, max: 200 },
   latelyRescanDays: { min: 1, max: 30 },
   deepCutMaxSupporters: { min: 5, max: 1000 },
+  previewStartPercent: { min: 0, max: 90 },
 };
 
 export type SettingsErrors = Partial<Record<keyof Settings, string>>;

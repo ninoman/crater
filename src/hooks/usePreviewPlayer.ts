@@ -8,6 +8,7 @@ import {
   stoppedListening,
 } from '../shared/heard';
 import { sendMessage } from '../shared/messages';
+import { DEFAULT_SETTINGS, loadSettings } from '../shared/settings';
 
 export type PreviewPlayerView =
   | { state: 'idle' }
@@ -38,13 +39,21 @@ export interface PreviewPlayerOptions {
   onEnded?: () => void;
   /** A play passed the heard threshold. The mark itself is already sent to the worker. */
   onHeard?: (matchKey: ItemKey) => void;
+  /** Start tracks at the *Start tracks at* setting. Off for music you already own or saved. */
+  skipIntro?: boolean;
 }
 
 type Load =
   | { state: 'idle' }
   | { state: 'loading' }
   | { state: 'error'; error: string }
-  | { state: 'ready'; tracks: PreviewTrack[]; matchKey: ItemKey | null };
+  | {
+      state: 'ready';
+      tracks: PreviewTrack[];
+      matchKey: ItemKey | null;
+      /** Where each track starts, as a percent of its length (the *Start tracks at* setting). */
+      startPercent: number;
+    };
 
 /**
  * Plays a release's preview in our own audio element, so it starts on the click that opened it
@@ -55,7 +64,7 @@ type Load =
  */
 export function usePreviewPlayer(
   url: string | null,
-  { onEnded, onHeard }: PreviewPlayerOptions = {},
+  { onEnded, onHeard, skipIntro = false }: PreviewPlayerOptions = {},
 ): PreviewPlayer {
   const [audio] = useState(() => new Audio());
   const [load, setLoad] = useState<Load>({ state: 'idle' });
@@ -71,6 +80,8 @@ export function usePreviewPlayer(
   });
   const listening = useRef<Listening>(NOT_LISTENING);
   const heard = useRef(false);
+  // Where the current track started, so the half-a-track rule counts only what could be heard.
+  const trackStart = useRef(0);
 
   useEffect(() => {
     // A new release starts from silence, whatever the last one was doing.
@@ -83,15 +94,22 @@ export function usePreviewPlayer(
     }
     let cancelled = false;
     setLoad({ state: 'loading' });
-    sendMessage('getPreview', { url }).then(
-      ({ tracks, startIndex, matchKey }) => {
+    // Read per release, so a saved change applies from the next preview on.
+    const startPercent = skipIntro
+      ? loadSettings().then(
+          (settings) => settings.previewStartPercent,
+          () => DEFAULT_SETTINGS.previewStartPercent,
+        )
+      : 0;
+    Promise.all([sendMessage('getPreview', { url }), startPercent]).then(
+      ([{ tracks, startIndex, matchKey }, startPercent]) => {
         if (cancelled) return;
         if (tracks.length === 0) {
           setLoad({ state: 'error', error: 'No streamable tracks on this release.' });
           return;
         }
         setIndex(startIndex);
-        setLoad({ state: 'ready', tracks, matchKey });
+        setLoad({ state: 'ready', tracks, matchKey, startPercent });
       },
       (error: unknown) =>
         !cancelled &&
@@ -100,10 +118,11 @@ export function usePreviewPlayer(
     return () => {
       cancelled = true;
     };
-  }, [audio, url]);
+  }, [audio, url, skipIntro]);
 
   const tracks = load.state === 'ready' ? load.tracks : null;
   const matchKey = load.state === 'ready' ? load.matchKey : null;
+  const startPercent = load.state === 'ready' ? load.startPercent : 0;
   const track = tracks?.[index] ?? null;
 
   useEffect(() => {
@@ -136,7 +155,9 @@ export function usePreviewPlayer(
     };
     const onError = () => setFailed(true);
     const onTrackEnded = () => {
-      markIfHeard(Number.isFinite(audio.duration) ? audio.duration : undefined);
+      markIfHeard(
+        Number.isFinite(audio.duration) ? audio.duration - trackStart.current : undefined,
+      );
       listening.current = stoppedListening(listening.current);
       if (tracks && index + 1 < tracks.length) setIndex(index + 1);
       else callbacks.current.onEnded?.();
@@ -162,14 +183,18 @@ export function usePreviewPlayer(
   useEffect(() => {
     if (!track) return;
     setFailed(false);
-    setPosition(0);
     setMediaDuration(0);
     audio.src = track.streamUrl;
+    // Set before metadata loads, this becomes the start position. Unknown lengths start at 0.
+    const start = (track.duration * startPercent) / 100;
+    audio.currentTime = start;
+    trackStart.current = start;
+    setPosition(start);
     // The click that opened the preview counts as a user gesture, so this plays with sound,
     // and so does moving on through a list after it. A rejection (autoplay blocked, or a newer
     // src) just leaves it paused for the Play button.
     audio.play().catch(() => undefined);
-  }, [audio, track]);
+  }, [audio, track, startPercent]);
 
   useEffect(() => onPagePlayerStart(() => audio.pause()), [audio]);
 
