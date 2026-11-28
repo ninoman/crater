@@ -68,6 +68,8 @@ export function useListPlayer<R extends ListPlayerRow>(
     heardRef.current = onHeard;
   });
   const player = usePreviewPlayer(url, {
+    // Every list player plays recommendations, never music you already have.
+    skipIntro: true,
     onEnded: () => dispatch({ type: 'ended' }),
     onHeard: () => {
       if (current !== null) heardRef.current(current);

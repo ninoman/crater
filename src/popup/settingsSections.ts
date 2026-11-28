@@ -69,6 +69,18 @@ export const MAIN_SECTIONS: SettingSection[] = [
     ],
   },
   {
+    title: 'Previews',
+    entries: [
+      {
+        kind: 'number',
+        key: 'previewStartPercent',
+        label: 'Start tracks at (%)',
+        description:
+          'Previews of recommendations skip this far into each track. Your collection and wishlist always play from the start. 0 turns it off.',
+      },
+    ],
+  },
+  {
     title: 'New from your follows',
     entries: [{ kind: 'follow-notifications' }],
   },

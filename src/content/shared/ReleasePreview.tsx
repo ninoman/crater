@@ -12,11 +12,16 @@ export interface ReleasePreviewProps {
   onHeard?: () => void;
   /** Gives the player a heart and a cart button, beside the track title. */
   shop?: { release: PlayingRelease; hearts: WishlistHearts; cart: CartLines };
+  /** Start past the intro, per the *Start tracks at* setting. */
+  skipIntro?: boolean;
 }
 
 /** An open preview under a release row. Mount it only while previewing: it plays on mount. */
-export function ReleasePreview({ url, name, onHeard, shop }: ReleasePreviewProps) {
-  const { view, toggle, seek, previousTrack, nextTrack } = usePreviewPlayer(url, { onHeard });
+export function ReleasePreview({ url, name, onHeard, shop, skipIntro }: ReleasePreviewProps) {
+  const { view, toggle, seek, previousTrack, nextTrack } = usePreviewPlayer(url, {
+    onHeard,
+    skipIntro,
+  });
   return (
     <AudioPlayer
       state={previewPlayerState(view)}

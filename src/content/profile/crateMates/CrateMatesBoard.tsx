@@ -273,6 +273,7 @@ export function CrateMatesBoard({
               url={playing.buy.url}
               name={`${playing.buy.artist} – ${playing.buy.title}`}
               shop={{ release: playing.buy, hearts, cart }}
+              skipIntro
             />
           </NowPlaying>
           {hearts.prompt && <HeartTagPrompt prompt={hearts.prompt} close={hearts.closePrompt} />}

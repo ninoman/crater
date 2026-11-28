@@ -1248,3 +1248,12 @@ Decided and built 2026-11-18. Code: `shared/settings.ts` (`tagging`, `asksForTag
 - **The following, wishlist and collection tabs stay Bandcamp's own.** Without tags, our takeovers (§8, §14, §24) add too little to be worth replacing Bandcamp's lists: full-list search, crate mate rank on follows and drag to reorder (§29) go with them.
 - **Read once per page.** Content scripts read the setting when the page loads, like page badges (§15), so a change applies on reload. A heart re-reads it each time. The popup's Data tab follows saves live.
 - **Still recorded while off:** follows and hearts are saved as before (§21), so nothing is missing when tags come back.
+
+## 32. Starting previews past the intro
+
+Decided and built 2026-11-28. Code: `shared/settings.ts` (`previewStartPercent`), `popup/settingsSections.ts`, `hooks/usePreviewPlayer.ts` (`skipIntro`), `hooks/useListPlayer.ts`, `content/shared/ReleasePreview.tsx`. Tested in jsdom; not yet tried on live pages.
+
+- **Setting:** *Start tracks at (%)*, under *Previews*, 0 to 90, default 0 (off). Every track a preview plays starts that far in, including the ones it moves on to.
+- **Recommendations only.** For you, Crate mates, Follows and Also bought pass `skipIntro`. Your wishlist and collection tabs play from the start: that's music you already chose, and you may want to hear it all.
+- **Read per release.** The player reads the setting when a release opens, so a save applies from the next preview, not to the track already playing.
+- **Heard (§22) counts against what played.** The half-a-track rule measures half of what's left after the start point, so a short single started at 80% can still be marked heard. The 30-second rule is unchanged.
